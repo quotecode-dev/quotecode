@@ -8,7 +8,7 @@ function App() {
   const [passwordInput, setPasswordInput] = useState('');
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
-  const [statusMsg, setStatusMsg] = useState({ text: '', type: '' });
+  const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
   // Form state
   const [clientName, setClientName] = useState('');
@@ -106,7 +106,6 @@ function App() {
   const discountAmount = (subtotal * Number(discount)) / 100;
   const totalAmount = subtotal - discountAmount;
 
-  // Stats calculation
   const totalQuotesCount = quotes.length;
   const approvedPaidCount = quotes.filter(q => q.status === 'Approved' || q.status === 'Paid').length;
   const winRate = totalQuotesCount > 0 ? Math.round((approvedPaidCount / totalQuotesCount) * 100) : 0;
