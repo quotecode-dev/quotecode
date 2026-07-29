@@ -124,7 +124,12 @@ function App() {
       } else {
         const { data: newClientData, error: clientError } = await supabase
           .from('clients')
-          .insert([{ company_name: clientName, email: clientEmail, phone: clientPhone }])
+          .insert([{ 
+            company_name: clientName, 
+            email: clientEmail, 
+            phone: clientPhone,
+            user_id: session.user.id
+          }])
           .select();
         if (clientError) throw clientError;
         clientId = newClientData[0].id;
@@ -139,7 +144,8 @@ function App() {
           tax_rate: 0.00,
           total: totalAmount,
           status: quoteStatus,
-          valid_until: validUntil || null
+          valid_until: validUntil || null,
+          user_id: session.user.id
         }])
         .select();
 
@@ -187,63 +193,85 @@ function App() {
   }
 
   const handlePrintQuote = (quote) => {
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Quote #${quote.id.slice(0, 6)}</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
-            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
-            .logo { font-size: 24px; font-weight: bold; color: #4f46e5; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
-            th { background: #f8fafc; }
-            .total { margin-top: 30px; text-align: right; font-size: 18px; font-weight: bold; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    
+    script.onload = () => {
+      const element = document.createElement('div');
+      element.innerHTML = `
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto;">
+          
+          <!-- Header -->
+          <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px;">
             <div>
-              <div class="logo">&lt;/&gt; QuoteCode Pro</div>
-              <p>Global SaaS Quoting & Invoicing Platform</p>
+              <div style="font-size: 28px; font-weight: 800; color: #4f46e5; letter-spacing: -0.5px;">&lt;/&gt; QuoteCode Pro</div>
+              <p style="color: #6b7280; font-size: 14px; margin-top: 5px;">Global SaaS Quoting & Invoicing Platform</p>
             </div>
-            <div>
-              <h3>Quote #${quote.id.slice(0, 6)}</h3>
-              <p>Date: ${new Date(quote.created_at).toLocaleDateString()}</p>
-              <p>Valid Until: ${quote.valid_until || '-'}</p>
+            <div style="text-align: right;">
+              <h2 style="margin: 0; font-size: 24px; color: #111827;">QUOTE</h2>
+              <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 14px;">Quote #${quote.id.slice(0, 8).toUpperCase()}</p>
+              <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 14px;">Date: ${new Date(quote.created_at).toLocaleDateString('en-US')}</p>
+              <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 14px;">Valid Until: ${quote.valid_until || 'N/A'}</p>
             </div>
           </div>
-          <div>
-            <strong>Client:</strong>
-            <p>${quote.clients?.company_name || 'N/A'}<br/>${quote.clients?.email || ''}</p>
+
+          <!-- Client Info -->
+          <div style="margin-bottom: 40px;">
+            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">Prepared For:</p>
+            <p style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">${quote.clients?.company_name || 'N/A'}</p>
+            <p style="margin: 2px 0 0 0; color: #4b5563; font-size: 14px;">${quote.clients?.email || ''}</p>
+            <p style="margin: 2px 0 0 0; color: #4b5563; font-size: 14px;">${quote.clients?.phone || ''}</p>
           </div>
-          <table>
+
+          <!-- Items Table -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
             <thead>
-              <tr>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Total</th>
+              <tr style="border-bottom: 2px solid #111827;">
+                <th style="padding: 12px 0; text-align: left; font-size: 12px; color: #6b7280; text-transform: uppercase;">Description</th>
+                <th style="padding: 12px 0; text-align: center; font-size: 12px; color: #6b7280; text-transform: uppercase;">Status</th>
+                <th style="padding: 12px 0; text-align: right; font-size: 12px; color: #6b7280; text-transform: uppercase;">Amount</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Professional Services / SaaS License</td>
-                <td>${quote.status}</td>
-                <td>$${Number(quote.total || 0).toFixed(2)} ${quote.currency}</td>
+              <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 15px 0; font-size: 14px; color: #374151;">Professional Services / SaaS License</td>
+                <td style="padding: 15px 0; text-align: center; font-size: 14px; color: #374151;">${quote.status}</td>
+                <td style="padding: 15px 0; text-align: right; font-size: 14px; color: #374151;">$${Number(quote.total || 0).toFixed(2)} ${quote.currency}</td>
               </tr>
             </tbody>
           </table>
-          <div class="total">
-            Total Amount: $${Number(quote.total || 0).toFixed(2)} ${quote.currency}
+
+          <!-- Totals -->
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
+            <div style="width: 300px;">
+              <div style="display: flex; justify-content: space-between; border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: 10px;">
+                <span style="font-size: 18px; font-weight: bold; color: #111827;">Total Amount:</span>
+                <span style="font-size: 18px; font-weight: bold; color: #4f46e5;">$${Number(quote.total || 0).toFixed(2)} ${quote.currency}</span>
+              </div>
+            </div>
           </div>
-          <script>
-            window.onload = function() { window.print(); }
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
+
+          <!-- Footer / Terms -->
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 20px;">
+            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">Terms & Conditions</p>
+            <p style="margin: 0; color: #6b7280; font-size: 12px;">Net 30 days. Thank you for your business. Payment constitutes acceptance of terms.</p>
+          </div>
+          
+        </div>
+      `;
+
+      const opt = {
+        margin:       0,
+        filename:     `Quote_${quote.clients?.company_name?.replace(/[^a-z0-9]/gi, '_') || 'Quote'}_${quote.id.slice(0,6)}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      window.html2pdf().set(opt).from(element).save();
+    };
+    
+    document.body.appendChild(script);
   };
 
   if (!session) {
