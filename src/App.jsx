@@ -422,6 +422,16 @@ function Dashboard() {
   const taxAmount = taxableAmount * taxRate;
   const totalAmount = taxableAmount + taxAmount;
 
+  // Monthly Limits Calculation
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const monthlyQuotesCount = quotes.filter(q => {
+    const qDate = new Date(q.created_at);
+    return qDate.getMonth() === currentMonth && qDate.getFullYear() === currentYear;
+  }).length;
+
+  const planLimit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : '∞';
+
   const totalQuotesCount = quotes.length;
   const approvedPaidCount = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').length;
   const winRate = totalQuotesCount > 0 ? Math.round((approvedPaidCount / totalQuotesCount) * 100) : 0;
@@ -549,12 +559,12 @@ function Dashboard() {
 
     try {
       if (!editingQuoteId) {
-        const limit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 25 : Infinity;
-        if (quotes.length >= limit) {
+        const limit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : Infinity;
+        if (monthlyQuotesCount >= limit) {
           setStatusMsg({ 
             text: isHebrew 
-              ? `הגעת למגבלת ההצעות בחבילה שלך (${limit} הצעות). שדרג לחבילת Pro כדי ליצור הצעות ללא הגבלה!` 
-              : `Quote limit reached for your plan (${limit} quotes). Upgrade to Pro for unlimited quotes!`, 
+              ? `הגעת למגבלת ההצעות החודשית בחבילה שלך (${limit} הצעות). שדרג חבילה כדי ליצור הצעות נוספות!` 
+              : `Monthly quote limit reached for your plan (${limit} quotes). Upgrade to create more!`, 
             type: 'error' 
           });
           return;
@@ -686,6 +696,11 @@ function Dashboard() {
           <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
             <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
+            {bizPlan !== 'pro' && (
+              <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginTop: '5px', fontWeight: 'bold' }}>
+                {isHebrew ? `נוצרו החודש: ${monthlyQuotesCount} מתוך ${planLimit}` : `This month: ${monthlyQuotesCount} / ${planLimit}`}
+              </div>
+            )}
           </div>
           <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #eab308' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #eab308' }}>
             <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.approvedPaid}</div>
