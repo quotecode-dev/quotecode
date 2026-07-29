@@ -1,47 +1,164 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import { supabase } from './supabase';
 import './App.css';
 
-function App() {
+// ==========================================
+// 1. PUBLIC QUOTE VIEW COMPONENT (FOR CLIENTS)
+// ==========================================
+function PublicQuote() {
+  const { id } = useParams();
+  const [quote, setQuote] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchQuote() {
+      const { data, error } = await supabase
+        .from('quotes')
+        .select(`*, clients ( company_name, email, phone ), quote_items ( * )`)
+        .eq('id', id)
+        .single();
+      if (error) console.error('Error fetching quote:', error);
+      else setQuote(data);
+      setLoading(false);
+    }
+    fetchQuote();
+  }, [id]);
+
+  if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>טוען את הצעת המחיר... / Loading...</div>;
+  if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>הצעת המחיר לא נמצאה. / Quote not found.</div>;
+
+  const isLocal = quote.currency === 'ILS';
+  const getCurrencySymbol = (curr) => {
+    if (!curr) return '₪';
+    if (curr.includes('EUR')) return '€';
+    if (curr.includes('GBP')) return '£';
+    if (curr.includes('USD')) return '$';
+    return '₪';
+  };
+  const quoteSym = getCurrencySymbol(quote.currency);
+  const formatNum = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
+  const quoteDiscount = quote.discount || 0;
+  const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
+  const quoteTaxable = quoteSub - quoteDiscountAmount;
+  const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isLocal ? 0.18 : 0.00);
+  const quoteTaxAmount = quoteTaxable * quoteTaxRate;
+  const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + quoteTaxAmount);
+
+  return (
+    <div dir={isLocal ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '40px 20px', color: '#333' }}>
+      <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', textAlign: isLocal ? 'left' : 'right' }}>
+        <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+          {isLocal ? '🖨️ הדפס / הורד כ-PDF' : '🖨️ Print / Download PDF'}
+        </button>
+      </div>
+
+      <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '50px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isLocal ? 'row-reverse' : 'row' }}>
+          <div>
+            <h1 style={{ margin: 0, color: '#4f46e5', fontSize: '28px', fontWeight: '900' }}>&lt;/&gt; QuoteCode Pro</h1>
+            <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>Global SaaS Quoting & Invoicing Platform</p>
+          </div>
+          <div style={{ textAlign: isLocal ? 'left' : 'right' }}>
+            <h2 style={{ margin: 0, color: '#111827', fontSize: '22px', textTransform: 'uppercase' }}>{isLocal ? 'הצעת מחיר' : 'QUOTE'}</h2>
+            <p style={{ margin: '4px 0 0', color: '#6b7280', fontSize: '14px' }}>#{quote.id.slice(0, 8).toUpperCase()}</p>
+            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isLocal ? 'תאריך:' : 'Date:'} {new Date(quote.created_at).toLocaleDateString('en-US')}</p>
+            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isLocal ? 'בתוקף עד:' : 'Valid Until:'} {quote.valid_until || 'N/A'}</p>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: '40px', textAlign: isLocal ? 'right' : 'left' }}>
+          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'הוכן עבור:' : 'Prepared For:'}</p>
+          <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>{quote.clients?.company_name || 'N/A'}</p>
+          <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '15px' }}>{quote.clients?.email || ''}</p>
+          {quote.clients?.phone && <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '15px', direction: 'ltr', textAlign: isLocal ? 'right' : 'left' }}>{quote.clients.phone}</p>}
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', textAlign: isLocal ? 'right' : 'left' }}>
+            <thead>
+              <tr>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827' }}>{isLocal ? 'תיאור' : 'Description'}</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: 'center' }}>{isLocal ? 'כמות' : 'Qty'}</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: isLocal ? 'left' : 'right' }}>{isLocal ? 'מחיר יחידה' : 'Unit Price'}</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: isLocal ? 'left' : 'right' }}>{isLocal ? 'סה"כ' : 'Total'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quote.quote_items && quote.quote_items.length > 0 ? (
+                quote.quote_items.map(item => (
+                  <tr key={item.id}>
+                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', color: '#1f2937' }}>{item.description}</td>
+                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: 'center', color: '#4b5563' }}>{item.quantity}</td>
+                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: isLocal ? 'left' : 'right', color: '#4b5563' }}>{quoteSym}{formatNum(item.unit_price)}</td>
+                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: isLocal ? 'left' : 'right', fontWeight: 'bold', color: '#111827' }}>{quoteSym}{formatNum(item.total_price)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan="4" style={{ padding: '14px', borderBottom: '1px solid #e5e7eb' }}>{isLocal ? 'שירותים מקצועיים' : 'Professional Services'}</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div style={{ textAlign: isLocal ? 'left' : 'right', color: '#4b5563', fontSize: '15px' }}>
+          <div>{isLocal ? 'סכום ביניים:' : 'Subtotal:'} {quoteSym}{formatNum(quoteSub)}</div>
+          {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isLocal ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
+          {quoteTaxRate > 0 && <div style={{ marginTop: '6px' }}>{isLocal ? 'מע"מ (18%):' : 'VAT (18%):'} {quoteSym}{formatNum(quoteTaxAmount)}</div>}
+          <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isLocal ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
+        </div>
+
+        <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', textAlign: isLocal ? 'right' : 'left' }}>
+          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
+          <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>{isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.'}</p>
+        </div>
+        
+      </div>
+      
+      {/* Print CSS hiding the print button itself during actual print */}
+      <style>{`
+        @media print {
+          .no-print { display: none !important; }
+          body { background: white !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ==========================================
+// 2. MAIN DASHBOARD COMPONENT (ADMIN)
+// ==========================================
+function Dashboard() {
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
-  const [services, setServices] = useState([]); // Services Catalog
+  const [services, setServices] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
-  // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-
-  // Edit mode state
   const [editingQuoteId, setEditingQuoteId] = useState(null);
 
-  // Form state
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   
-  // Client Region & Currency state
   const [clientRegion, setClientRegion] = useState('local');
   const [currency, setCurrency] = useState('ILS (₪)');
-  
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
   const [terms, setTerms] = useState('Net 30 days. Thank you for your business.');
   
-  // Items state
-  const [items, setItems] = useState([
-    { description: '', quantity: 1, unit_price: 0 }
-  ]);
-
-  // Catalog Form state
+  const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
 
-  // Dynamic localization labels based on clientRegion
   const isHebrew = clientRegion === 'local';
 
   const t = {
@@ -127,50 +244,32 @@ function App() {
   async function fetchQuotes() {
     const { data, error } = await supabase
       .from('quotes')
-      .select(`
-        *,
-        clients ( company_name, email, phone ),
-        quote_items ( * )
-      `)
+      .select(`*, clients ( company_name, email, phone ), quote_items ( * )`)
       .order('created_at', { ascending: false });
-
     if (error) console.error('Error fetching quotes:', error.message);
     else setQuotes(data || []);
   }
 
   async function fetchClients() {
-    const { data, error } = await supabase
-      .from('clients')
-      .select('id, company_name, email, phone');
+    const { data, error } = await supabase.from('clients').select('id, company_name, email, phone');
     if (error) console.error('Error fetching clients:', error.message);
     else setClients(data || []);
   }
 
   async function fetchServices() {
-    const { data, error } = await supabase
-      .from('services')
-      .select('*')
-      .order('created_at', { ascending: true });
+    const { data, error } = await supabase.from('services').select('*').order('created_at', { ascending: true });
     if (error) console.error('Error fetching services:', error.message);
     else setServices(data || []);
   }
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: emailInput,
-      password: passwordInput,
-    });
-    if (error) {
-      setStatusMsg({ text: error.message, type: 'error' });
-    } else {
-      setStatusMsg({ text: 'Logged in successfully', type: 'success' });
-    }
+    const { error } = await supabase.auth.signInWithPassword({ email: emailInput, password: passwordInput });
+    if (error) setStatusMsg({ text: error.message, type: 'error' });
+    else setStatusMsg({ text: 'Logged in successfully', type: 'success' });
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
+  const handleSignOut = async () => await supabase.auth.signOut();
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
@@ -178,9 +277,7 @@ function App() {
     setItems(newItems);
   };
 
-  const addItem = () => {
-    setItems([...items, { description: '', quantity: 1, unit_price: 0 }]);
-  };
+  const addItem = () => setItems([...items, { description: '', quantity: 1, unit_price: 0 }]);
 
   const handleAddFromCatalog = (e) => {
     const sId = e.target.value;
@@ -197,19 +294,14 @@ function App() {
   };
 
   const removeItem = (index) => {
-    if (items.length > 1) {
-      setItems(items.filter((_, i) => i !== index));
-    }
+    if (items.length > 1) setItems(items.filter((_, i) => i !== index));
   };
 
   async function handleAddService(e) {
     e.preventDefault();
-    const { error } = await supabase
-      .from('services')
-      .insert([{ name: newServiceName, price: Number(newServicePrice) }]);
-    if (error) {
-      setStatusMsg({ text: 'Error adding service: ' + error.message, type: 'error' });
-    } else {
+    const { error } = await supabase.from('services').insert([{ name: newServiceName, price: Number(newServicePrice) }]);
+    if (error) setStatusMsg({ text: 'Error adding service: ' + error.message, type: 'error' });
+    else {
       setNewServiceName('');
       setNewServicePrice('');
       fetchServices();
@@ -220,21 +312,15 @@ function App() {
   async function handleDeleteService(id) {
     if (!window.confirm(isHebrew ? 'למחוק שירות זה מהקטלוג?' : 'Delete this service from catalog?')) return;
     const { error } = await supabase.from('services').delete().eq('id', id);
-    if (error) {
-      setStatusMsg({ text: 'Error deleting service: ' + error.message, type: 'error' });
-    } else {
-      fetchServices();
-    }
+    if (error) setStatusMsg({ text: 'Error deleting service: ' + error.message, type: 'error' });
+    else fetchServices();
   }
 
-  const formatNum = (val) => {
-    return Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
+  const formatNum = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
   const discountAmount = (subtotal * Number(discount)) / 100;
   const taxableAmount = subtotal - discountAmount;
-  
   const taxRate = clientRegion === 'local' ? 0.18 : 0.00;
   const taxAmount = taxableAmount * taxRate;
   const totalAmount = taxableAmount + taxAmount;
@@ -242,9 +328,7 @@ function App() {
   const totalQuotesCount = quotes.length;
   const approvedPaidCount = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').length;
   const winRate = totalQuotesCount > 0 ? Math.round((approvedPaidCount / totalQuotesCount) * 100) : 0;
-  const totalRevenue = quotes
-    .filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid')
-    .reduce((sum, q) => sum + Number(q.total || 0), 0);
+  const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
 
   const getCurrencySymbol = (curr) => {
     if (!curr) return '₪';
@@ -261,34 +345,20 @@ function App() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
     
-    if (quote.currency === 'EUR') {
-      setCurrency('EUR (€)');
-      setClientRegion('international');
-    } else if (quote.currency === 'GBP') {
-      setCurrency('GBP (£)');
-      setClientRegion('international');
-    } else if (quote.currency === 'USD') {
-      setCurrency('USD ($)');
-      setClientRegion('international');
-    } else {
-      setCurrency('ILS (₪)');
-      setClientRegion('local');
-    }
+    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); setClientRegion('international'); } 
+    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); setClientRegion('international'); } 
+    else if (quote.currency === 'USD') { setCurrency('USD ($)'); setClientRegion('international'); } 
+    else { setCurrency('ILS (₪)'); setClientRegion('local'); }
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
-    setDiscount(quote.discount || 0); // Loads the saved discount
+    setDiscount(quote.discount || 0); 
     
     if (quote.quote_items && quote.quote_items.length > 0) {
-      setItems(quote.quote_items.map(item => ({
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unit_price
-      })));
+      setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
     } else {
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
     }
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStatusMsg({ text: `Editing Quote #${quote.id.slice(0, 6)}...`, type: 'success' });
   };
@@ -299,41 +369,22 @@ function App() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
     
-    if (quote.currency === 'EUR') {
-      setCurrency('EUR (€)');
-      setClientRegion('international');
-    } else if (quote.currency === 'GBP') {
-      setCurrency('GBP (£)');
-      setClientRegion('international');
-    } else if (quote.currency === 'USD') {
-      setCurrency('USD ($)');
-      setClientRegion('international');
-    } else {
-      setCurrency('ILS (₪)');
-      setClientRegion('local');
-    }
+    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); setClientRegion('international'); } 
+    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); setClientRegion('international'); } 
+    else if (quote.currency === 'USD') { setCurrency('USD ($)'); setClientRegion('international'); } 
+    else { setCurrency('ILS (₪)'); setClientRegion('local'); }
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0);
     
     if (quote.quote_items && quote.quote_items.length > 0) {
-      setItems(quote.quote_items.map(item => ({
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unit_price
-      })));
+      setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
     } else {
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
     }
-
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setStatusMsg({ 
-      text: isHebrew 
-        ? 'ההצעה נטענה לשכפול בהצלחה. לחץ על הלחצן למטה כדי ליצור הצעה חדשה.' 
-        : 'Quote loaded for duplication. Save to create a new quote.', 
-      type: 'success' 
-    });
+    setStatusMsg({ text: isHebrew ? 'ההצעה נטענה לשכפול בהצלחה. לחץ על הלחצן למטה כדי ליצור הצעה חדשה.' : 'Quote loaded for duplication. Save to create a new quote.', type: 'success' });
   };
 
   const handleEmailQuote = (quote) => {
@@ -345,20 +396,18 @@ function App() {
     const quoteSym = getCurrencySymbol(quote.currency);
     const qIsLocal = quote.currency === 'ILS';
     const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
-    const quoteDiscount = quote.discount || 0;
-    const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
+    const quoteDiscountAmount = (quoteSub * (quote.discount || 0)) / 100;
     const quoteTaxable = quoteSub - quoteDiscountAmount;
     const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
-    const quoteTaxAmount = quoteTaxable * quoteTaxRate;
-    const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + quoteTaxAmount);
+    const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
+    
+    // NEW: Smart Link URL
+    const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    const subject = qIsLocal 
-      ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-QuoteCode Pro` 
-      : `Quote #${quote.id.slice(0, 6).toUpperCase()} from QuoteCode Pro`;
-      
+    const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-QuoteCode Pro` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from QuoteCode Pro`;
     const body = qIsLocal
-      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nבברכה,\nצוות QuoteCode Pro`
-      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nBest regards,\nQuoteCode Pro Team`;
+      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות QuoteCode Pro`
+      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\nQuoteCode Pro Team`;
 
     window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
@@ -372,16 +421,17 @@ function App() {
     const quoteSym = getCurrencySymbol(quote.currency);
     const qIsLocal = quote.currency === 'ILS';
     const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
-    const quoteDiscount = quote.discount || 0;
-    const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
+    const quoteDiscountAmount = (quoteSub * (quote.discount || 0)) / 100;
     const quoteTaxable = quoteSub - quoteDiscountAmount;
     const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
-    const quoteTaxAmount = quoteTaxable * quoteTaxRate;
-    const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + quoteTaxAmount);
+    const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
+
+    // NEW: Smart Link URL
+    const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
     const msg = qIsLocal
-      ? `שלום ${quote.clients?.company_name || ''},\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()}.\n*סך הכל לתשלום:* ${quoteSym}${formatNum(quoteTotal)}\n\nנשמח לעמוד לשירותך!`
-      : `Hello ${quote.clients?.company_name || ''},\nHere is your quote #${quote.id.slice(0, 6).toUpperCase()}.\n*Total Amount:* ${quoteSym}${formatNum(quoteTotal)}\n\nThank you for your business!`;
+      ? `שלום ${quote.clients?.company_name || ''},\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()}.\n*סך הכל לתשלום:* ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ על הקישור:\n${quoteLink}\n\nנשמח לעמוד לשירותך!`
+      : `Hello ${quote.clients?.company_name || ''},\nHere is your quote #${quote.id.slice(0, 6).toUpperCase()}.\n*Total Amount:* ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nThank you for your business!`;
 
     const phoneNum = quote.clients.phone.replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -406,19 +456,9 @@ function App() {
       
       if (existingClient) {
         clientId = existingClient.id;
-        // Update phone number if it changed
-        if (clientPhone !== existingClient.phone) {
-            await supabase.from('clients').update({ phone: clientPhone }).eq('id', clientId);
-        }
+        if (clientPhone !== existingClient.phone) await supabase.from('clients').update({ phone: clientPhone }).eq('id', clientId);
       } else {
-        const { data: newClientData, error: clientError } = await supabase
-          .from('clients')
-          .insert([{ 
-            company_name: clientName, 
-            email: clientEmail,
-            phone: clientPhone
-          }])
-          .select();
+        const { data: newClientData, error: clientError } = await supabase.from('clients').insert([{ company_name: clientName, email: clientEmail, phone: clientPhone }]).select();
         if (clientError) throw clientError;
         clientId = newClientData[0].id;
       }
@@ -428,7 +468,6 @@ function App() {
       else if (currency.includes('GBP')) dbCurrency = 'GBP';
       else if (currency.includes('USD')) dbCurrency = 'USD';
 
-      // Ensure discount is saved to the database
       const quotePayload = {
         client_id: clientId,
         currency: dbCurrency,
@@ -437,27 +476,18 @@ function App() {
         total: totalAmount,
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
-        discount: Number(discount) // Saving discount explicitly
+        discount: Number(discount) 
       };
 
       let quoteId;
 
       if (editingQuoteId) {
-        const { error: updateError } = await supabase
-          .from('quotes')
-          .update(quotePayload)
-          .eq('id', editingQuoteId);
-
+        const { error: updateError } = await supabase.from('quotes').update(quotePayload).eq('id', editingQuoteId);
         if (updateError) throw updateError;
         quoteId = editingQuoteId;
-
         await supabase.from('quote_items').delete().eq('quote_id', quoteId);
       } else {
-        const { data: quoteData, error: quoteError } = await supabase
-          .from('quotes')
-          .insert([quotePayload])
-          .select();
-
+        const { data: quoteData, error: quoteError } = await supabase.from('quotes').insert([quotePayload]).select();
         if (quoteError) throw quoteError;
         quoteId = quoteData[0].id;
       }
@@ -470,17 +500,10 @@ function App() {
         total_price: Number(item.quantity) * Number(item.unit_price)
       }));
 
-      const { error: itemsError } = await supabase
-        .from('quote_items')
-        .insert(quoteItemsToInsert);
-
+      const { error: itemsError } = await supabase.from('quote_items').insert(quoteItemsToInsert);
       if (itemsError) throw itemsError;
 
-      setStatusMsg({ 
-        text: editingQuoteId ? `Quote #${editingQuoteId.slice(0, 6)} successfully updated!` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`, 
-        type: 'success' 
-      });
-      
+      setStatusMsg({ text: editingQuoteId ? `Quote #${editingQuoteId.slice(0, 6)} successfully updated!` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`, type: 'success' });
       setEditingQuoteId(null);
       setClientName('');
       setClientEmail('');
@@ -488,128 +511,11 @@ function App() {
       setValidUntil('');
       setDiscount(0);
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
-      
       loadData();
     } catch (err) {
       setStatusMsg({ text: 'Error saving quote: ' + err.message, type: 'error' });
     }
   }
-
-  const handlePrintQuote = (quote) => {
-    const quoteSym = getCurrencySymbol(quote.currency);
-    const isLocal = quote.currency === 'ILS';
-    
-    const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
-    const quoteDiscount = quote.discount || 0;
-    const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
-    const quoteTaxable = quoteSub - quoteDiscountAmount;
-    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isLocal ? 0.18 : 0.00);
-    const quoteTaxAmount = quoteTaxable * quoteTaxRate;
-    const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + quoteTaxAmount);
-
-    const lblQuote = isLocal ? 'הצעת מחיר' : 'QUOTE';
-    const lblPreparedFor = isLocal ? 'הוכן עבור:' : 'Prepared For:';
-    const lblDate = isLocal ? 'תאריך:' : 'Date:';
-    const lblValidUntil = isLocal ? 'בתוקף עד:' : 'Valid Until:';
-    const lblDesc = isLocal ? 'תיאור' : 'Description';
-    const lblQty = isLocal ? 'כמות' : 'Qty';
-    const lblUnitPrice = isLocal ? 'מחיר יחידה' : 'Unit Price';
-    const lblTotal = isLocal ? 'סה"כ' : 'Total';
-    const lblSubtotal = isLocal ? 'סכום ביניים:' : 'Subtotal:';
-    const lblVat = isLocal ? 'מע"מ (18%):' : 'VAT (18%):';
-    const lblGrandTotal = isLocal ? 'סה"כ לתשלום:' : 'Total Amount:';
-    const lblTerms = isLocal ? 'תנאים והגבלות' : 'Terms & Conditions';
-    const lblTermsText = isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.';
-
-    const itemsRows = quote.quote_items && quote.quote_items.length > 0 
-      ? quote.quote_items.map(item => `
-          <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: ${isLocal ? 'right' : 'left'};">${item.description}</td>
-            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #e5e7eb;">${item.quantity}</td>
-            <td style="padding: 12px; text-align: ${isLocal ? 'left' : 'right'}; border-bottom: 1px solid #e5e7eb;">${quoteSym}${formatNum(item.unit_price)}</td>
-            <td style="padding: 12px; text-align: ${isLocal ? 'left' : 'right'}; border-bottom: 1px solid #e5e7eb; font-weight: bold;">${quoteSym}${formatNum(item.total_price)}</td>
-          </tr>
-        `).join('')
-      : `
-          <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;" colspan="4">${isLocal ? 'שירותים מקצועיים' : 'Professional Services'}</td>
-          </tr>
-        `;
-
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <html dir="${isLocal ? 'rtl' : 'ltr'}">
-        <head>
-          <title>${lblQuote} #${quote.id.slice(0, 8).toUpperCase()}</title>
-          <style>
-            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; background: #fff; text-align: ${isLocal ? 'right' : 'left'}; }
-            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; flex-direction: ${isLocal ? 'row-reverse' : 'row'}; }
-            .title { font-size: 26px; font-weight: 800; color: #4f46e5; }
-            .client-info { margin-bottom: 30px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-            th { background: #f9fafb; padding: 12px; text-align: ${isLocal ? 'right' : 'left'}; font-size: 12px; color: #6b7280; text-transform: uppercase; border-bottom: 2px solid #111827; }
-            th:nth-child(2) { text-align: center; }
-            th:nth-child(3), th:nth-child(4) { text-align: ${isLocal ? 'left' : 'right'}; }
-            .total-section { text-align: ${isLocal ? 'left' : 'right'}; margin-top: 20px; font-size: 15px; color: #4b5563; }
-            .discount-row { color: #ef4444; font-weight: 600; margin-top: 4px; }
-            .grand-total { font-size: 20px; font-weight: bold; color: #4f46e5; margin-top: 8px; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <div>
-              <div class="title">&lt;/&gt; QuoteCode Pro</div>
-              <p style="color: #6b7280; font-size: 14px; margin-top: 5px;">Global SaaS Quoting & Invoicing Platform</p>
-            </div>
-            <div style="text-align: ${isLocal ? 'left' : 'right'};">
-              <h2 style="margin: 0; color: #111827;">${lblQuote}</h2>
-              <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">#${quote.id.slice(0, 8).toUpperCase()}</p>
-              <p style="margin: 2px 0 0; color: #6b7280; font-size: 14px;">${lblDate} ${new Date(quote.created_at).toLocaleDateString('en-US')}</p>
-              <p style="margin: 2px 0 0; color: #6b7280; font-size: 14px;">${lblValidUntil} ${quote.valid_until || 'N/A'}</p>
-            </div>
-          </div>
-
-          <div class="client-info">
-            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">${lblPreparedFor}</p>
-            <p style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">${quote.clients?.company_name || 'N/A'}</p>
-            <p style="margin: 2px 0 0; color: #4b5563; font-size: 14px;">${quote.clients?.email || ''}</p>
-            ${quote.clients?.phone ? `<p style="margin: 2px 0 0; color: #4b5563; font-size: 14px; direction: ltr;">${quote.clients.phone}</p>` : ''}
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>${lblDesc}</th>
-                <th style="text-align: center;">${lblQty}</th>
-                <th style="text-align: ${isLocal ? 'left' : 'right'};">${lblUnitPrice}</th>
-                <th style="text-align: ${isLocal ? 'left' : 'right'};">${lblTotal}</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemsRows}
-            </tbody>
-          </table>
-
-          <div class="total-section">
-            <div>${lblSubtotal} ${quoteSym}${formatNum(quoteSub)}</div>
-            ${quoteDiscount > 0 ? `<div class="discount-row">${isLocal ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -${quoteSym}${formatNum(quoteDiscountAmount)}</div>` : ''}
-            ${quoteTaxRate > 0 ? `<div>${lblVat} ${quoteSym}${formatNum(quoteTaxAmount)}</div>` : ''}
-            <div class="grand-total">${lblGrandTotal} ${quoteSym}${formatNum(quoteTotal)}</div>
-          </div>
-
-          <div style="margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">${lblTerms}</p>
-            <p style="margin: 0; color: #6b7280; font-size: 12px;">${lblTermsText}</p>
-          </div>
-
-          <script>
-            window.onload = function() { window.print(); }
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
 
   // Filter quotes logic
   const filteredQuotes = quotes.filter(quote => {
@@ -947,13 +853,6 @@ function App() {
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.88-.653-1.473-1.46-1.646-1.757-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
                           </button>
                           <button 
-                            title={t.pdfPrint}
-                            onClick={() => handlePrintQuote(quote)}
-                            style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                          >
-                            {t.pdfPrint}
-                          </button>
-                          <button 
                             title={t.delete}
                             onClick={() => handleDeleteQuote(quote.id)}
                             style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
@@ -970,7 +869,6 @@ function App() {
           </div>
         </div>
 
-        {/* Services Catalog Widget */}
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
           <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
           
@@ -1040,4 +938,16 @@ function App() {
   );
 }
 
-export default App;
+// ==========================================
+// 3. ROOT APP (ROUTER SETUP)
+// ==========================================
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/quote/:id" element={<PublicQuote />} />
+      </Routes>
+    </Router>
+  );
+}
