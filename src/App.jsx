@@ -205,21 +205,23 @@ function App() {
       const quoteSym = getCurrencySymbol(quote.currency || 'USD');
       
       element.innerHTML = `
-        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto;">
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto; background: #ffffff;">
           
-          <!-- Header -->
-          <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px;">
-            <div>
-              <div style="font-size: 28px; font-weight: 800; color: #4f46e5; letter-spacing: -0.5px;">&lt;/&gt; QuoteCode Pro</div>
-              <p style="color: #6b7280; font-size: 14px; margin-top: 5px;">Global SaaS Quoting & Invoicing Platform</p>
-            </div>
-            <div style="text-align: right;">
-              <h2 style="margin: 0; font-size: 24px; color: #111827;">QUOTE</h2>
-              <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 14px;">Quote #${quote.id.slice(0, 8).toUpperCase()}</p>
-              <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 14px;">Date: ${new Date(quote.created_at).toLocaleDateString('en-US')}</p>
-              <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 14px;">Valid Until: ${quote.valid_until || 'N/A'}</p>
-            </div>
-          </div>
+          <!-- Header Table -->
+          <table style="width: 100%; border-collapse: collapse; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px;">
+            <tr>
+              <td style="vertical-align: top; width: 60%;">
+                <div style="font-size: 28px; font-weight: 800; color: #4f46e5; letter-spacing: -0.5px;">&lt;/&gt; QuoteCode Pro</div>
+                <p style="color: #6b7280; font-size: 14px; margin-top: 5px;">Global SaaS Quoting & Invoicing Platform</p>
+              </td>
+              <td style="vertical-align: top; text-align: right; width: 40%;">
+                <h2 style="margin: 0; font-size: 24px; color: #111827;">QUOTE</h2>
+                <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 14px;">Quote #${quote.id.slice(0, 8).toUpperCase()}</p>
+                <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 14px;">Date: ${new Date(quote.created_at).toLocaleDateString('en-US')}</p>
+                <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 14px;">Valid Until: ${quote.valid_until || 'N/A'}</p>
+              </td>
+            </tr>
+          </table>
 
           <!-- Client Info -->
           <div style="margin-bottom: 40px;">
@@ -246,15 +248,18 @@ function App() {
             </tbody>
           </table>
 
-          <!-- Totals -->
-          <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
-            <div style="width: 300px;">
-              <div style="display: flex; justify-content: space-between; border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: 10px;">
-                <span style="font-size: 18px; font-weight: bold; color: #111827;">Total Amount:</span>
-                <span style="font-size: 18px; font-weight: bold; color: #4f46e5;">${quoteSym}${Number(quote.total || 0).toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
+          <!-- Totals Table -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
+            <tr>
+              <td style="width: 60%;"></td>
+              <td style="width: 40%; text-align: right;">
+                <div style="border-top: 2px solid #e5e7eb; padding-top: 15px;">
+                  <span style="font-size: 16px; font-weight: bold; color: #111827;">Total Amount: </span>
+                  <span style="font-size: 18px; font-weight: bold; color: #4f46e5; margin-left: 10px;">${quoteSym}${Number(quote.total || 0).toFixed(2)}</span>
+                </div>
+              </td>
+            </tr>
+          </table>
 
           <!-- Footer / Terms -->
           <div style="border-top: 1px solid #e5e7eb; padding-top: 20px;">
@@ -414,9 +419,9 @@ function App() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 36px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>
-              <div style={{ textAlign: 'left' }}>Description</div>
-              <div style={{ textAlign: 'left' }}>Qty</div>
-              <div style={{ textAlign: 'left' }}>Price</div>
+              <div style={{ paddingLeft: '10px' }}>Description</div>
+              <div style={{ paddingLeft: '10px' }}>Qty</div>
+              <div style={{ paddingLeft: '10px' }}>Price</div>
               <div style={{ textAlign: 'right' }}>Total</div>
               <div></div>
             </div>
