@@ -29,7 +29,6 @@ function PublicQuote() {
           .single();
         settingsData = data;
       } else if (quoteData) {
-        // Fallback למקרה של הצעות ישנות שאין להן עדיין user_id
         const { data } = await supabase
           .from('business_settings')
           .select('*')
@@ -337,20 +336,21 @@ function Dashboard() {
     e.preventDefault();
     if (!session?.user?.id) return;
 
+    // We do NOT include bizPlan in the payload here anymore, 
+    // because the user shouldn't be able to update their own plan via this form.
     const payload = {
       business_name: bizName,
       tax_id: bizTaxId,
       email: bizEmail,
       phone: bizPhone,
       logo_url: bizLogoUrl,
-      plan: bizPlan,
       user_id: session.user.id
     };
 
     if (settingId) {
       const { error } = await supabase.from('business_settings').update(payload).eq('id', settingId);
       if (error) setStatusMsg({ text: 'Error updating settings: ' + error.message, type: 'error' });
-      else setStatusMsg({ text: isHebrew ? 'הגדרות העסק והחבילה עודכנו בהצלחה!' : 'Business settings and plan updated successfully!', type: 'success' });
+      else setStatusMsg({ text: isHebrew ? 'הגדרות העסק עודכנו בהצלחה!' : 'Business settings updated successfully!', type: 'success' });
     } else {
       const { data, error } = await supabase.from('business_settings').insert([payload]).select();
       if (error) setStatusMsg({ text: 'Error saving settings: ' + error.message, type: 'error' });
@@ -720,7 +720,7 @@ function Dashboard() {
               </span>
               <button 
                 type="button" 
-                onClick={() => setBizPlan('pro')} 
+                onClick={() => alert(isHebrew ? 'כאן המערכת תעביר את הלקוח לעמוד תשלום (Stripe/PayPal) לאישור השדרוג.' : 'Here the system will redirect the client to a payment gateway (Stripe/PayPal) to process the upgrade.')} 
                 style={{ background: '#d97706', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.8rem' }}
               >
                 {isHebrew ? 'שדרג ל-Pro' : 'Upgrade to Pro'}
@@ -759,7 +759,12 @@ function Dashboard() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.planLabel}</label>
-                <select value={bizPlan} onChange={(e) => setBizPlan(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                <select 
+                  value={bizPlan} 
+                  onChange={(e) => setBizPlan(e.target.value)} 
+                  disabled={true} 
+                  style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#f1f5f9', boxSizing: 'border-box', color: '#64748b' }}
+                >
                   <option value="free">Free ({isHebrew ? 'חינמי' : 'Free'})</option>
                   <option value="basic">Basic ({isHebrew ? 'בסיסי' : 'Basic'})</option>
                   <option value="pro">Pro ({isHebrew ? 'מתקדם' : 'Pro'})</option>
