@@ -23,7 +23,7 @@ function App() {
   const [clientPhone, setClientPhone] = useState('');
   
   // Client Region & Currency state
-  const [clientRegion, setClientRegion] = useState('local'); // 'local' or 'international'
+  const [clientRegion, setClientRegion] = useState('local');
   const [currency, setCurrency] = useState('ILS (₪)');
   
   const [quoteStatus, setQuoteStatus] = useState('Draft');
@@ -74,6 +74,7 @@ function App() {
     filterStatus: isHebrew ? 'כל הסטטוסים' : 'All Statuses',
     actions: isHebrew ? 'פעולות' : 'Actions',
     edit: isHebrew ? 'ערוך' : 'Edit',
+    duplicate: isHebrew ? 'שכפל' : 'Duplicate',
     pdfPrint: isHebrew ? 'הדפס / PDF' : 'PDF / Print',
     delete: isHebrew ? 'מחק' : 'Delete'
   };
@@ -229,6 +230,49 @@ function App() {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStatusMsg({ text: `Editing Quote #${quote.id.slice(0, 6)}...`, type: 'success' });
+  };
+
+  const handleDuplicateQuote = (quote) => {
+    setEditingQuoteId(null); // Clear ID to ensure it creates a NEW quote
+    setClientName(quote.clients?.company_name || '');
+    setClientEmail(quote.clients?.email || '');
+    setClientPhone('');
+    
+    if (quote.currency === 'EUR') {
+      setCurrency('EUR (€)');
+      setClientRegion('international');
+    } else if (quote.currency === 'GBP') {
+      setCurrency('GBP (£)');
+      setClientRegion('international');
+    } else if (quote.currency === 'USD') {
+      setCurrency('USD ($)');
+      setClientRegion('international');
+    } else {
+      setCurrency('ILS (₪)');
+      setClientRegion('local');
+    }
+
+    setQuoteStatus('Draft'); // Duplicated quotes start as draft
+    setValidUntil(quote.valid_until || '');
+    setDiscount(quote.discount || 0);
+    
+    if (quote.quote_items && quote.quote_items.length > 0) {
+      setItems(quote.quote_items.map(item => ({
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unit_price
+      })));
+    } else {
+      setItems([{ description: '', quantity: 1, unit_price: 0 }]);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setStatusMsg({ 
+      text: isHebrew 
+        ? 'ההצעה נטענה לשכפול בהצלחה. לחץ על הלחצן למטה כדי ליצור הצעה חדשה.' 
+        : 'Quote loaded for duplication. Save to create a new quote.', 
+      type: 'success' 
+    });
   };
 
   const handleCancelEdit = () => {
@@ -757,6 +801,12 @@ function App() {
                             style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                           >
                             {t.edit}
+                          </button>
+                          <button 
+                            onClick={() => handleDuplicateQuote(quote)}
+                            style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                          >
+                            {t.duplicate}
                           </button>
                           <button 
                             onClick={() => handlePrintQuote(quote)}
