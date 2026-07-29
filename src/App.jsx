@@ -76,6 +76,7 @@ function App() {
     edit: isHebrew ? 'ערוך' : 'Edit',
     duplicate: isHebrew ? 'שכפל' : 'Duplicate',
     pdfPrint: isHebrew ? 'הדפס / PDF' : 'PDF / Print',
+    sendEmail: isHebrew ? 'שלח במייל' : 'Email',
     delete: isHebrew ? 'מחק' : 'Delete'
   };
 
@@ -233,7 +234,7 @@ function App() {
   };
 
   const handleDuplicateQuote = (quote) => {
-    setEditingQuoteId(null); // Clear ID to ensure it creates a NEW quote
+    setEditingQuoteId(null); 
     setClientName(quote.clients?.company_name || '');
     setClientEmail(quote.clients?.email || '');
     setClientPhone('');
@@ -252,7 +253,7 @@ function App() {
       setClientRegion('local');
     }
 
-    setQuoteStatus('Draft'); // Duplicated quotes start as draft
+    setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0);
     
@@ -273,6 +274,30 @@ function App() {
         : 'Quote loaded for duplication. Save to create a new quote.', 
       type: 'success' 
     });
+  };
+
+  const handleEmailQuote = (quote) => {
+    if (!quote.clients?.email) {
+      setStatusMsg({ text: isHebrew ? 'ללקוח זה אין כתובת אימייל מעודכנת.' : 'This client does not have an email address.', type: 'error' });
+      return;
+    }
+
+    const quoteSym = getCurrencySymbol(quote.currency);
+    const qIsLocal = quote.currency === 'ILS';
+    const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
+    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
+    const quoteTaxAmount = quoteSub * quoteTaxRate;
+    const quoteTotal = quote.total > quoteSub ? quote.total : (quoteSub + quoteTaxAmount);
+
+    const subject = qIsLocal 
+      ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-QuoteCode Pro` 
+      : `Quote #${quote.id.slice(0, 6).toUpperCase()} from QuoteCode Pro`;
+      
+    const body = qIsLocal
+      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nבברכה,\nצוות QuoteCode Pro`
+      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nBest regards,\nQuoteCode Pro Team`;
+
+    window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleCancelEdit = () => {
@@ -807,6 +832,12 @@ function App() {
                             style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                           >
                             {t.duplicate}
+                          </button>
+                          <button 
+                            onClick={() => handleEmailQuote(quote)}
+                            style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                          >
+                            {t.sendEmail}
                           </button>
                           <button 
                             onClick={() => handlePrintQuote(quote)}
