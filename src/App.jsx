@@ -336,8 +336,6 @@ function Dashboard() {
     e.preventDefault();
     if (!session?.user?.id) return;
 
-    // We do NOT include bizPlan in the payload here anymore, 
-    // because the user shouldn't be able to update their own plan via this form.
     const payload = {
       business_name: bizName,
       tax_id: bizTaxId,
@@ -753,7 +751,7 @@ function Dashboard() {
                   value={bizLogoUrl} 
                   onChange={(e) => setBizLogoUrl(e.target.value)} 
                   disabled={bizPlan !== 'pro'} 
-                  placeholder={bizPlan === 'pro' ? "https://.../logo.png" : (isHebrew ? "נעול במסלול חינמי" : "Locked on Free Plan")} 
+                  placeholder={bizPlan === 'pro' ? "https://.../logo.png" : (isHebrew ? "זמין בחבילת Pro בלבד" : "Available on Pro Plan only")} 
                   style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: bizPlan !== 'pro' ? '#f1f5f9' : 'white' }} 
                 />
               </div>
