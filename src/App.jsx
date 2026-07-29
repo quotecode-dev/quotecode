@@ -8,6 +8,7 @@ function App() {
   const [passwordInput, setPasswordInput] = useState('');
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
+  const [services, setServices] = useState([]); // Services Catalog
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
   // Search & Filter state
@@ -36,6 +37,10 @@ function App() {
     { description: '', quantity: 1, unit_price: 0 }
   ]);
 
+  // Catalog Form state
+  const [newServiceName, setNewServiceName] = useState('');
+  const [newServicePrice, setNewServicePrice] = useState('');
+
   // Dynamic localization labels based on clientRegion
   const isHebrew = clientRegion === 'local';
 
@@ -58,7 +63,8 @@ function App() {
     discount: isHebrew ? 'הנחה (%)' : 'Discount (%)',
     terms: isHebrew ? 'תנאים / הערות' : 'Terms / Notes',
     quoteItems: isHebrew ? 'פריטי ההצעה' : 'Quote Items',
-    addItem: isHebrew ? '+ הוסף פריט' : '+ Add Item',
+    addItem: isHebrew ? '+ הוסף פריט ידנית' : '+ Add Custom Item',
+    quickAdd: isHebrew ? 'בחר שירות מהקטלוג...' : 'Choose from catalog...',
     description: isHebrew ? 'תיאור' : 'Description',
     qty: isHebrew ? 'כמות' : 'Qty',
     price: isHebrew ? 'מחיר' : 'Price',
@@ -70,6 +76,10 @@ function App() {
     updateQuote: isHebrew ? 'עדכן הצעה בענן' : 'Update Quote in Cloud',
     cancelEdit: isHebrew ? 'ביטול עריכה' : 'Cancel Edit',
     recentHistory: isHebrew ? 'היסטוריית הצעות מחיר' : 'Recent Quotes History',
+    servicesCatalog: isHebrew ? 'קטלוג שירותים ומוצרים' : 'Services & Products Catalog',
+    addService: isHebrew ? 'הוסף לקטלוג' : 'Add to Catalog',
+    serviceName: isHebrew ? 'שם השירות / המוצר' : 'Service Name',
+    defaultPrice: isHebrew ? 'מחיר קבוע' : 'Default Price',
     searchQuote: isHebrew ? 'חיפוש שם לקוח או מס׳ הצעה...' : 'Search client or quote #...',
     filterStatus: isHebrew ? 'כל הסטטוסים' : 'All Statuses',
     actions: isHebrew ? 'פעולות' : 'Actions',
@@ -110,6 +120,7 @@ function App() {
   async function loadData() {
     await fetchQuotes();
     await fetchClients();
+    await fetchServices();
   }
 
   async function fetchQuotes() {
@@ -132,6 +143,15 @@ function App() {
       .select('id, company_name, email');
     if (error) console.error('Error fetching clients:', error.message);
     else setClients(data || []);
+  }
+
+  async function fetchServices() {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (error) console.error('Error fetching services:', error.message);
+    else setServices(data || []);
   }
 
   const handleLogin = async (e) => {
@@ -161,11 +181,50 @@ function App() {
     setItems([...items, { description: '', quantity: 1, unit_price: 0 }]);
   };
 
+  const handleAddFromCatalog = (e) => {
+    const sId = e.target.value;
+    if (!sId) return;
+    const svc = services.find(s => s.id.toString() === sId);
+    if (svc) {
+      if (items.length === 1 && items[0].description === '' && items[0].unit_price === 0) {
+        setItems([{ description: svc.name, quantity: 1, unit_price: svc.price }]);
+      } else {
+        setItems([...items, { description: svc.name, quantity: 1, unit_price: svc.price }]);
+      }
+    }
+    e.target.value = ''; 
+  };
+
   const removeItem = (index) => {
     if (items.length > 1) {
       setItems(items.filter((_, i) => i !== index));
     }
   };
+
+  async function handleAddService(e) {
+    e.preventDefault();
+    const { error } = await supabase
+      .from('services')
+      .insert([{ name: newServiceName, price: Number(newServicePrice) }]);
+    if (error) {
+      setStatusMsg({ text: 'Error adding service: ' + error.message, type: 'error' });
+    } else {
+      setNewServiceName('');
+      setNewServicePrice('');
+      fetchServices();
+      setStatusMsg({ text: isHebrew ? 'שירות נוסף לקטלוג בהצלחה' : 'Service added to catalog successfully', type: 'success' });
+    }
+  }
+
+  async function handleDeleteService(id) {
+    if (!window.confirm(isHebrew ? 'למחוק שירות זה מהקטלוג?' : 'Delete this service from catalog?')) return;
+    const { error } = await supabase.from('services').delete().eq('id', id);
+    if (error) {
+      setStatusMsg({ text: 'Error deleting service: ' + error.message, type: 'error' });
+    } else {
+      fetchServices();
+    }
+  }
 
   const formatNum = (val) => {
     return Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -398,17 +457,6 @@ function App() {
       loadData();
     } catch (err) {
       setStatusMsg({ text: 'Error saving quote: ' + err.message, type: 'error' });
-    }
-  }
-
-  async function handleDeleteQuote(id) {
-    if (!window.confirm('Are you sure you want to delete this quote?')) return;
-    const { error } = await supabase.from('quotes').delete().eq('id', id);
-    if (error) {
-      setStatusMsg({ text: 'Error deleting quote: ' + error.message, type: 'error' });
-    } else {
-      setStatusMsg({ text: 'Quote deleted successfully', type: 'success' });
-      loadData();
     }
   }
 
@@ -683,7 +731,15 @@ function App() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
               <h3 style={{ fontSize: '1rem', color: '#1e293b', margin: 0 }}>{t.quoteItems}</h3>
-              <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>{t.addItem}</button>
+              <div style={{ display: 'flex', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                <select onChange={handleAddFromCatalog} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', background: 'white' }}>
+                  <option value="">{t.quickAdd}</option>
+                  {services.map(s => (
+                    <option key={s.id} value={s.id}>{s.name} - {sym}{formatNum(s.price)}</option>
+                  ))}
+                </select>
+                <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>{t.addItem}</button>
+              </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '4fr 1fr 1fr 1fr 40px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569', padding: '0 2px' }}>
@@ -737,11 +793,10 @@ function App() {
           </form>
         </div>
 
-        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
             <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
             
-            {/* Search and Filter Controls */}
             <div style={{ display: 'flex', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
               <input 
                 type="text" 
@@ -855,6 +910,70 @@ function App() {
                       </tr>
                     );
                   })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Services Catalog Widget */}
+        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
+          
+          <form onSubmit={handleAddService} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+            <input 
+              type="text" 
+              placeholder={t.serviceName} 
+              value={newServiceName} 
+              onChange={(e) => setNewServiceName(e.target.value)} 
+              required 
+              style={{ flex: 2, padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} 
+            />
+            <input 
+              type="number" 
+              step="0.01" 
+              placeholder={t.defaultPrice} 
+              value={newServicePrice} 
+              onChange={(e) => setNewServicePrice(e.target.value)} 
+              required 
+              style={{ flex: 1, padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} 
+            />
+            <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+              {t.addService}
+            </button>
+          </form>
+
+          <div style={{ overflowX: 'auto' }}>
+             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                  <th style={{ padding: '12px' }}>{t.description}</th>
+                  <th style={{ padding: '12px' }}>{t.defaultPrice}</th>
+                  <th style={{ padding: '12px' }}>{t.actions}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {services.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                      {isHebrew ? 'הקטלוג שלך ריק. הוסף שירותים למעלה.' : 'Your catalog is empty. Add services above.'}
+                    </td>
+                  </tr>
+                ) : (
+                  services.map((svc) => (
+                    <tr key={svc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                      <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{svc.name}</td>
+                      <td style={{ padding: '12px', color: '#4f46e5', fontWeight: '600' }}>{formatNum(svc.price)}</td>
+                      <td style={{ padding: '12px' }}>
+                         <button 
+                            onClick={() => handleDeleteService(svc.id)}
+                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                          >
+                            {t.delete}
+                          </button>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
