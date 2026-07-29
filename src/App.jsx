@@ -608,7 +608,7 @@ function App() {
                         <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
                         <td style={{ padding: '12px' }}>
                           <div style={{ fontWeight: '600', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
-                          <div style={{ fontSize: '0.8rem', color: '#64748b'}>{quote.clients?.email}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{quote.clients?.email}</div>
                         </td>
                         <td style={{ padding: '12px' }}>
                           <span style={{
