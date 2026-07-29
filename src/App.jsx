@@ -32,6 +32,46 @@ function App() {
     { description: '', quantity: 1, unit_price: 0 }
   ]);
 
+  // Dynamic localization labels based on clientRegion
+  const isHebrew = clientRegion === 'local';
+
+  const t = {
+    appName: isHebrew ? 'קווטקוד פרו' : 'QuoteCode Pro',
+    appSub: isHebrew ? 'מערכת ניהול הצעות מחיר וחשבוניות גלובלית' : 'Global SaaS Quoting & Invoicing Platform',
+    totalQuotes: isHebrew ? 'סך הכל הצעות' : 'TOTAL QUOTES',
+    approvedPaid: isHebrew ? 'אושר / שולם' : 'APPROVED / PAID',
+    winRate: isHebrew ? 'אחוז הצלחה' : 'WIN RATE',
+    totalRevenue: isHebrew ? 'סך הכנסות' : 'TOTAL REVENUE',
+    clientName: isHebrew ? 'שם הלקוח' : 'Client Name',
+    clientEmail: isHebrew ? 'אימייל הלקוח' : 'Client Email',
+    clientPhone: isHebrew ? 'טלפון הלקוח' : 'Client Phone',
+    clientRegion: isHebrew ? 'אזור הלקוח' : 'Client Region',
+    localIsrael: isHebrew ? 'מקומי (ישראל)' : 'Local (Israel)',
+    international: isHebrew ? 'בינלאומי (חו"ל)' : 'International (Foreign)',
+    currency: isHebrew ? 'מטבע' : 'Currency',
+    status: isHebrew ? 'סטטוס' : 'Status',
+    validUntil: isHebrew ? 'בתוקף עד' : 'Valid Until',
+    discount: isHebrew ? 'הנחה (%)' : 'Discount (%)',
+    terms: isHebrew ? 'תנאים / הערות' : 'Terms / Notes',
+    quoteItems: isHebrew ? 'פריטי ההצעה' : 'Quote Items',
+    addItem: isHebrew ? '+ הוסף פריט' : '+ Add Item',
+    description: isHebrew ? 'תיאור' : 'Description',
+    qty: isHebrew ? 'כמות' : 'Qty',
+    price: isHebrew ? 'מחיר' : 'Price',
+    total: isHebrew ? 'סה"כ' : 'Total',
+    subtotal: isHebrew ? 'סכום ביניים:' : 'Subtotal:',
+    vat: isHebrew ? 'מע"מ (18%):' : 'VAT (18%):',
+    totalAmount: isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:',
+    generateSave: isHebrew ? 'הפק ושמור בענן' : 'Generate & Save to Cloud',
+    updateQuote: isHebrew ? 'עדכן הצעה בענן' : 'Update Quote in Cloud',
+    cancelEdit: isHebrew ? 'ביטול עריכה' : 'Cancel Edit',
+    recentHistory: isHebrew ? 'היסטוריית הצעות מחיר' : 'Recent Quotes History',
+    actions: isHebrew ? 'פעולות' : 'Actions',
+    edit: isHebrew ? 'ערוך' : 'Edit',
+    pdfPrint: isHebrew ? 'הדפס / PDF' : 'PDF / Print',
+    delete: isHebrew ? 'מחק' : 'Delete'
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -127,7 +167,6 @@ function App() {
   const discountAmount = (subtotal * Number(discount)) / 100;
   const taxableAmount = subtotal - discountAmount;
   
-  // 18% VAT for local Israeli clients, 0% for international
   const taxRate = clientRegion === 'local' ? 0.18 : 0.00;
   const taxAmount = taxableAmount * taxRate;
   const totalAmount = taxableAmount + taxAmount;
@@ -300,39 +339,56 @@ function App() {
 
   const handlePrintQuote = (quote) => {
     const quoteSym = getCurrencySymbol(quote.currency);
-    const quoteTaxRate = quote.tax_rate !== undefined ? Number(quote.tax_rate) : (quote.currency === 'ILS' ? 0.18 : 0.00);
-    const quoteSub = quote.subtotal || 0;
+    const isLocal = quote.currency === 'ILS';
+    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isLocal ? 0.18 : 0.00);
+    const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
     const quoteTaxAmount = quoteSub * quoteTaxRate;
-    const quoteTotal = quote.total || (quoteSub + quoteTaxAmount);
+    const quoteTotal = quote.total > quoteSub ? quote.total : (quoteSub + quoteTaxAmount);
+
+    const lblQuote = isLocal ? 'הצעת מחיר' : 'QUOTE';
+    const lblPreparedFor = isLocal ? 'הוכן עבור:' : 'Prepared For:';
+    const lblDate = isLocal ? 'תאריך:' : 'Date:';
+    const lblValidUntil = isLocal ? 'בתוקף עד:' : 'Valid Until:';
+    const lblDesc = isLocal ? 'תיאור' : 'Description';
+    const lblQty = isLocal ? 'כמות' : 'Qty';
+    const lblUnitPrice = isLocal ? 'מחיר יחידה' : 'Unit Price';
+    const lblTotal = isLocal ? 'סה"כ' : 'Total';
+    const lblSubtotal = isLocal ? 'סכום ביניים:' : 'Subtotal:';
+    const lblVat = isLocal ? 'מע"מ (18%):' : 'VAT (18%):';
+    const lblGrandTotal = isLocal ? 'סה"כ לתשלום:' : 'Total Amount:';
+    const lblTerms = isLocal ? 'תנאים והגבלות' : 'Terms & Conditions';
+    const lblTermsText = isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.';
 
     const itemsRows = quote.quote_items && quote.quote_items.length > 0 
       ? quote.quote_items.map(item => `
           <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.description}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: ${isLocal ? 'right' : 'left'};">${item.description}</td>
             <td style="padding: 12px; text-align: center; border-bottom: 1px solid #e5e7eb;">${item.quantity}</td>
-            <td style="padding: 12px; text-align: right; border-bottom: 1px solid #e5e7eb;">${quoteSym}${formatNum(item.unit_price)}</td>
-            <td style="padding: 12px; text-align: right; border-bottom: 1px solid #e5e7eb; font-weight: bold;">${quoteSym}${formatNum(item.total_price)}</td>
+            <td style="padding: 12px; text-align: ${isLocal ? 'left' : 'right'}; border-bottom: 1px solid #e5e7eb;">${quoteSym}${formatNum(item.unit_price)}</td>
+            <td style="padding: 12px; text-align: ${isLocal ? 'left' : 'right'}; border-bottom: 1px solid #e5e7eb; font-weight: bold;">${quoteSym}${formatNum(item.total_price)}</td>
           </tr>
         `).join('')
       : `
           <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;" colspan="4">Professional Services</td>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;" colspan="4">${isLocal ? 'שירותים מקצועיים' : 'Professional Services'}</td>
           </tr>
         `;
 
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
-      <html>
+      <html dir="${isLocal ? 'rtl' : 'ltr'}">
         <head>
-          <title>Quote #${quote.id.slice(0, 8).toUpperCase()}</title>
+          <title>${lblQuote} #${quote.id.slice(0, 8).toUpperCase()}</title>
           <style>
-            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; background: #fff; }
-            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; }
+            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; background: #fff; text-align: ${isLocal ? 'right' : 'left'}; }
+            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; flex-direction: ${isLocal ? 'row-reverse' : 'row'}; }
             .title { font-size: 26px; font-weight: 800; color: #4f46e5; }
             .client-info { margin-bottom: 30px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-            th { background: #f9fafb; padding: 12px; text-align: left; font-size: 12px; color: #6b7280; text-transform: uppercase; border-bottom: 2px solid #111827; }
-            .total-section { text-align: right; margin-top: 20px; font-size: 15px; color: #4b5563; }
+            th { background: #f9fafb; padding: 12px; text-align: ${isLocal ? 'right' : 'left'}; font-size: 12px; color: #6b7280; text-transform: uppercase; border-bottom: 2px solid #111827; }
+            th:nth-child(2) { text-align: center; }
+            th:nth-child(3), th:nth-child(4) { text-align: ${isLocal ? 'left' : 'right'}; }
+            .total-section { text-align: ${isLocal ? 'left' : 'right'}; margin-top: 20px; font-size: 15px; color: #4b5563; }
             .grand-total { font-size: 20px; font-weight: bold; color: #4f46e5; margin-top: 8px; }
           </style>
         </head>
@@ -342,16 +398,16 @@ function App() {
               <div class="title">&lt;/&gt; QuoteCode Pro</div>
               <p style="color: #6b7280; font-size: 14px; margin-top: 5px;">Global SaaS Quoting & Invoicing Platform</p>
             </div>
-            <div style="text-align: right;">
-              <h2 style="margin: 0; color: #111827;">QUOTE</h2>
-              <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Quote #${quote.id.slice(0, 8).toUpperCase()}</p>
-              <p style="margin: 2px 0 0; color: #6b7280; font-size: 14px;">Date: ${new Date(quote.created_at).toLocaleDateString('en-US')}</p>
-              <p style="margin: 2px 0 0; color: #6b7280; font-size: 14px;">Valid Until: ${quote.valid_until || 'N/A'}</p>
+            <div style="text-align: ${isLocal ? 'left' : 'right'};">
+              <h2 style="margin: 0; color: #111827;">${lblQuote}</h2>
+              <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">#${quote.id.slice(0, 8).toUpperCase()}</p>
+              <p style="margin: 2px 0 0; color: #6b7280; font-size: 14px;">${lblDate} ${new Date(quote.created_at).toLocaleDateString('en-US')}</p>
+              <p style="margin: 2px 0 0; color: #6b7280; font-size: 14px;">${lblValidUntil} ${quote.valid_until || 'N/A'}</p>
             </div>
           </div>
 
           <div class="client-info">
-            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">Prepared For:</p>
+            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">${lblPreparedFor}</p>
             <p style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">${quote.clients?.company_name || 'N/A'}</p>
             <p style="margin: 2px 0 0; color: #4b5563; font-size: 14px;">${quote.clients?.email || ''}</p>
           </div>
@@ -359,10 +415,10 @@ function App() {
           <table>
             <thead>
               <tr>
-                <th>Description</th>
-                <th style="text-align: center;">Qty</th>
-                <th style="text-align: right;">Unit Price</th>
-                <th style="text-align: right;">Total</th>
+                <th>${lblDesc}</th>
+                <th style="text-align: center;">${lblQty}</th>
+                <th style="text-align: ${isLocal ? 'left' : 'right'};">${lblUnitPrice}</th>
+                <th style="text-align: ${isLocal ? 'left' : 'right'};">${lblTotal}</th>
               </tr>
             </thead>
             <tbody>
@@ -371,14 +427,14 @@ function App() {
           </table>
 
           <div class="total-section">
-            <div>Subtotal: ${quoteSym}${formatNum(quoteSub)}</div>
-            ${quoteTaxRate > 0 ? `<div>VAT (${quoteTaxRate * 100}%): ${quoteSym}${formatNum(quoteTaxAmount)}</div>` : ''}
-            <div class="grand-total">Total Amount: ${quoteSym}${formatNum(quoteTotal)}</div>
+            <div>${lblSubtotal} ${quoteSym}${formatNum(quoteSub)}</div>
+            ${quoteTaxRate > 0 ? `<div>${lblVat} ${quoteSym}${formatNum(quoteTaxAmount)}</div>` : ''}
+            <div class="grand-total">${lblGrandTotal} ${quoteSym}${formatNum(quoteTotal)}</div>
           </div>
 
           <div style="margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">Terms & Conditions</p>
-            <p style="margin: 0; color: #6b7280; font-size: 12px;">Net 30 days. Thank you for your business.</p>
+            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">${lblTerms}</p>
+            <p style="margin: 0; color: #6b7280; font-size: 12px;">${lblTermsText}</p>
           </div>
 
           <script>
@@ -423,35 +479,35 @@ function App() {
   }
 
   return (
-    <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', color: '#333' }}>
+    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', color: '#333', textAlign: isHebrew ? 'right' : 'left' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
             <div style={{ background: '#4f46e5', color: 'white', padding: '8px 12px', borderRadius: '8px', fontWeight: 'bold' }}>&lt;/&gt;</div>
-            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b' }}>QuoteCode Pro</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b' }}>{t.appName}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
             <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{session.user.email}</span>
             <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Sign Out</button>
           </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '25px' }}>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '4px solid #4f46e5' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>TOTAL QUOTES</div>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
           </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '4px solid #eab308' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>APPROVED / PAID</div>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #eab308' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #eab308' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.approvedPaid}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{approvedPaidCount}</div>
           </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '4px solid #a855f7' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>WIN RATE</div>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #a855f7' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #a855f7' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.winRate}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#a855f7' }}>{winRate}%</div>
           </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '4px solid #22c55e' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>TOTAL REVENUE</div>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
           </div>
         </div>
@@ -463,13 +519,13 @@ function App() {
         )}
 
         <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
             <div>
               <h2 style={{ color: '#1e293b', marginTop: 0, fontSize: '1.4rem', marginBottom: '4px' }}>
-                {editingQuoteId ? `Editing Quote #${editingQuoteId.slice(0, 6)}` : 'QuoteCode Pro'}
+                {editingQuoteId ? `${isHebrew ? 'עריכת הצעה #' : 'Editing Quote #'}${editingQuoteId.slice(0, 6)}` : t.appName}
               </h2>
               <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>
-                {editingQuoteId ? 'Modify the quote details below and save changes' : 'Global SaaS Quoting & Invoicing Platform'}
+                {editingQuoteId ? (isHebrew ? 'עדכן את פרטי ההצעה ושמור שינויים' : 'Modify the quote details below and save changes') : t.appSub}
               </p>
             </div>
             {editingQuoteId && (
@@ -478,7 +534,7 @@ function App() {
                 onClick={handleCancelEdit}
                 style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}
               >
-                Cancel Edit
+                {t.cancelEdit}
               </button>
             )}
           </div>
@@ -486,29 +542,29 @@ function App() {
           <form onSubmit={handleSaveQuote}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '20px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Name</label>
-                <input type="text" name="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientName}</label>
+                <input type="text" name="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Email</label>
-                <input type="email" name="clientEmail" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="contact@acme.com" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientEmail}</label>
+                <input type="email" name="clientEmail" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="contact@acme.com" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Phone</label>
-                <input type="text" name="clientPhone" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+1 (555) 0192" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientPhone}</label>
+                <input type="text" name="clientPhone" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+1 (555) 0192" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '20px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Region</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientRegion}</label>
                 <select name="clientRegion" value={clientRegion} onChange={(e) => handleRegionChange(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                  <option value="local">Local (Israel)</option>
-                  <option value="international">International (Foreign)</option>
+                  <option value="local">{t.localIsrael}</option>
+                  <option value="international">{t.international}</option>
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Currency</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                 <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
                   {clientRegion === 'local' && <option>ILS (₪)</option>}
                   <option>USD ($)</option>
@@ -517,50 +573,50 @@ function App() {
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Status</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.status}</label>
                 <select name="quoteStatus" value={quoteStatus} onChange={(e) => setQuoteStatus(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                  <option value="Draft">Draft</option>
-                  <option value="Sent">Sent</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Paid">Paid</option>
+                  <option value="Draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
+                  <option value="Sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
+                  <option value="Approved">{isHebrew ? 'אושר' : 'Approved'}</option>
+                  <option value="Paid">{isHebrew ? 'שולם' : 'Paid'}</option>
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Valid Until</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.validUntil}</label>
                 <input type="date" name="validUntil" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '25px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Discount (%)</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.discount}</label>
                 <input type="number" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Terms / Notes</label>
-                <input type="text" name="terms" value={terms} onChange={(e) => setTerms(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.terms}</label>
+                <input type="text" name="terms" value={terms} onChange={(e) => setTerms(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <h3 style={{ fontSize: '1rem', color: '#1e293b', margin: 0 }}>Quote Items</h3>
-              <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>+ Add Item</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+              <h3 style={{ fontSize: '1rem', color: '#1e293b', margin: 0 }}>{t.quoteItems}</h3>
+              <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>{t.addItem}</button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '4fr 1fr 1fr 1fr 40px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569', padding: '0 2px' }}>
-              <div>Description</div>
-              <div>Qty</div>
-              <div>Price</div>
-              <div style={{ textAlign: 'right' }}>Total</div>
+              <div>{t.description}</div>
+              <div>{t.qty}</div>
+              <div>{t.price}</div>
+              <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>{t.total}</div>
               <div></div>
             </div>
 
             {items.map((item, index) => (
               <div key={index} style={{ display: 'grid', gridTemplateColumns: '4fr 1fr 1fr 1fr 40px', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
-                <input type="text" placeholder="Item description" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
+                <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
                 <input type="number" placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
                 <input type="number" placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
-                <div style={{ fontWeight: '600', color: '#334155', textAlign: 'right' }}>{sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}</div>
+                <div style={{ fontWeight: '600', color: '#334155', textAlign: isHebrew ? 'left' : 'right' }}>{sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}</div>
                 {items.length > 1 ? (
                   <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '10px 0', borderRadius: '6px', cursor: 'pointer', width: '100%', textAlign: 'center' }}>✕</button>
                 ) : (
@@ -570,64 +626,73 @@ function App() {
             ))}
 
             <div style={{ borderTop: '2px solid #f1f5f9', marginTop: '20px', paddingTop: '15px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b' }}>
-                <span>Subtotal:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                <span>{t.subtotal}</span>
                 <span>{sym}{formatNum(subtotal)}</span>
               </div>
               {discount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444' }}>
-                  <span>Discount ({discount}%):</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                  <span>{isHebrew ? `הנחה (${discount}%):` : `Discount (${discount}%):`}</span>
                   <span>-{sym}{formatNum(discountAmount)}</span>
                 </div>
               )}
               {clientRegion === 'local' && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b' }}>
-                  <span>VAT (18%):</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                  <span>{t.vat}</span>
                   <span>{sym}{formatNum(taxAmount)}</span>
                 </div>
               )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px' }}>
-                <span>Total Amount:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                <span>{t.totalAmount}</span>
                 <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : currency.includes('USD') ? 'USD' : 'ILS'}</span>
               </div>
             </div>
 
             <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-              {editingQuoteId ? 'Update Quote in Cloud' : 'Generate & Save to Cloud'}
+              {editingQuoteId ? t.updateQuote : t.generateSave}
             </button>
           </form>
         </div>
 
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>Recent Quotes History</h2>
+          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>{t.recentHistory}</h2>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                  <th style={{ padding: '12px' }}>Quote #</th>
-                  <th style={{ padding: '12px' }}>Client</th>
-                  <th style={{ padding: '12px' }}>Status</th>
-                  <th style={{ padding: '12px' }}>Total</th>
-                  <th style={{ padding: '12px' }}>Valid Until</th>
-                  <th style={{ padding: '12px' }}>Actions</th>
+                  <th style={{ padding: '12px' }}>{isHebrew ? 'מספר הצעה' : 'Quote #'}</th>
+                  <th style={{ padding: '12px' }}>{isHebrew ? 'לקוח' : 'Client'}</th>
+                  <th style={{ padding: '12px' }}>{t.status}</th>
+                  <th style={{ padding: '12px' }}>{t.total}</th>
+                  <th style={{ padding: '12px' }}>{t.validUntil}</th>
+                  <th style={{ padding: '12px' }}>{t.actions}</th>
                 </tr>
               </thead>
               <tbody>
                 {quotes.length === 0 ? (
                   <tr>
                     <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
-                      No quotes found in the database.
+                      {isHebrew ? 'לא נמצאו הצעות מחיר במסד הנתונים.' : 'No quotes found in the database.'}
                     </td>
                   </tr>
                 ) : (
                   quotes.map((quote) => {
                     const quoteSym = getCurrencySymbol(quote.currency);
+                    const qIsHebrew = quote.currency === 'ILS';
+                    const statusText = quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft';
+                    let translatedStatus = statusText;
+                    if (qIsHebrew) {
+                      if (statusText.toLowerCase() === 'draft') translatedStatus = 'טיוטה';
+                      else if (statusText.toLowerCase() === 'sent') translatedStatus = 'נשלח';
+                      else if (statusText.toLowerCase() === 'approved') translatedStatus = 'אושר';
+                      else if (statusText.toLowerCase() === 'paid') translatedStatus = 'שולם';
+                    }
                     return (
                       <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
                         <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
                         <td style={{ padding: '12px' }}>
                           <div style={{ fontWeight: '600', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
-                          <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{quote.clients?.email}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
                         </td>
                         <td style={{ padding: '12px' }}>
                           <span style={{
@@ -638,31 +703,31 @@ function App() {
                             background: quote.status?.toLowerCase() === 'approved' ? '#dcfce7' : quote.status?.toLowerCase() === 'paid' ? '#dbeafe' : '#f1f5f9',
                             color: quote.status?.toLowerCase() === 'approved' ? '#166534' : quote.status?.toLowerCase() === 'paid' ? '#1e40af' : '#475569'
                           }}>
-                            {quote.status || 'Draft'}
+                            {translatedStatus}
                           </span>
                         </td>
                         <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
                           {quoteSym}{formatNum(quote.total)}
                         </td>
                         <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
-                        <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
+                        <td style={{ padding: '12px', display: 'flex', gap: '8px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                           <button 
                             onClick={() => handleEditClick(quote)}
                             style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                           >
-                            Edit
+                            {t.edit}
                           </button>
                           <button 
                             onClick={() => handlePrintQuote(quote)}
                             style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                           >
-                            PDF / Print
+                            {t.pdfPrint}
                           </button>
                           <button 
                             onClick={() => handleDeleteQuote(quote.id)}
                             style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                           >
-                            Delete
+                            {t.delete}
                           </button>
                         </td>
                       </tr>
