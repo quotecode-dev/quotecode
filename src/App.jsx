@@ -415,9 +415,9 @@ function App() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 36px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>
-              <div style={{ paddingLeft: '10px' }}>Description</div>
-              <div style={{ paddingLeft: '10px' }}>Qty</div>
-              <div style={{ paddingLeft: '10px' }}>Price</div>
+              <div>Description</div>
+              <div style={{ paddingLeft: '2px' }}>Qty</div>
+              <div style={{ paddingLeft: '2px' }}>Price</div>
               <div style={{ textAlign: 'right' }}>Total</div>
               <div></div>
             </div>
