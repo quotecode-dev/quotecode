@@ -27,7 +27,7 @@ function PublicQuote() {
         .single();
 
       setQuote(quoteData);
-      setSettings(settingsData || { business_name: 'ProFlow' });
+      setSettings(settingsData || { business_name: 'ProFlow', plan: 'free' });
       setLoading(false);
     }
     fetchData();
@@ -41,7 +41,8 @@ function PublicQuote() {
   const bizTaxId = settings?.tax_id || '';
   const bizEmail = settings?.email || '';
   const bizPhone = settings?.phone || '';
-  const bizLogo = settings?.logo_url || '';
+  const isProPlan = settings?.plan === 'pro';
+  const bizLogo = isProPlan ? (settings?.logo_url || '') : '';
 
   const getCurrencySymbol = (curr) => {
     if (!curr) return '₪';
@@ -165,6 +166,7 @@ function Dashboard() {
   const [bizEmail, setBizEmail] = useState('');
   const [bizPhone, setBizPhone] = useState('');
   const [bizLogoUrl, setBizLogoUrl] = useState('');
+  const [bizPlan, setBizPlan] = useState('free');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -220,11 +222,12 @@ function Dashboard() {
     cancelEdit: isHebrew ? 'ביטול עריכה' : 'Cancel Edit',
     recentHistory: isHebrew ? 'היסטוריית הצעות מחיר' : 'Recent Quotes History',
     servicesCatalog: isHebrew ? 'קטלוג שירותים ומוצרים' : 'Services & Products Catalog',
-    businessSettings: isHebrew ? 'הגדרות עסק' : 'Business Settings',
+    businessSettings: isHebrew ? 'הגדרות עסק וחבילה' : 'Business Settings & Plan',
     saveSettings: isHebrew ? 'שמור הגדרות עסק' : 'Save Business Settings',
     businessNameLabel: isHebrew ? 'שם העסק' : 'Business Name',
     taxIdLabel: isHebrew ? 'ח.פ / עוסק מורשה / פטור' : 'Tax ID / Lic No',
     logoUrlLabel: isHebrew ? 'כתובת תמונת לוגו (URL)' : 'Logo Image URL',
+    planLabel: isHebrew ? 'סוג חבילה (Plan)' : 'Subscription Plan',
     addService: isHebrew ? 'הוסף לקטלוג' : 'Add to Catalog',
     serviceName: isHebrew ? 'שם השירות / המוצר' : 'Service Name',
     defaultPrice: isHebrew ? 'מחיר קבוע' : 'Default Price',
@@ -303,6 +306,7 @@ function Dashboard() {
       setBizEmail(data.email || '');
       setBizPhone(data.phone || '');
       setBizLogoUrl(data.logo_url || '');
+      setBizPlan(data.plan || 'free');
     }
   }
 
@@ -313,13 +317,14 @@ function Dashboard() {
       tax_id: bizTaxId,
       email: bizEmail,
       phone: bizPhone,
-      logo_url: bizLogoUrl
+      logo_url: bizLogoUrl,
+      plan: bizPlan
     };
 
     if (settingId) {
       const { error } = await supabase.from('business_settings').update(payload).eq('id', settingId);
       if (error) setStatusMsg({ text: 'Error updating settings: ' + error.message, type: 'error' });
-      else setStatusMsg({ text: isHebrew ? 'הגדרות העסק והלוגו עודכנו בהצלחה!' : 'Business settings and logo updated successfully!', type: 'success' });
+      else setStatusMsg({ text: isHebrew ? 'הגדרות העסק והחבילה עודכנו בהצלחה!' : 'Business settings and plan updated successfully!', type: 'success' });
     } else {
       const { data, error } = await supabase.from('business_settings').insert([payload]).select();
       if (error) setStatusMsg({ text: 'Error saving settings: ' + error.message, type: 'error' });
@@ -662,11 +667,28 @@ function Dashboard() {
           </div>
         )}
 
-        {/* Business Settings Widget */}
+        {/* Business Settings & Plan Widget */}
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
           <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.businessSettings}</h2>
+          
+          {/* Upsell banner for Free / Basic users */}
+          {bizPlan !== 'pro' && (
+            <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', padding: '12px 16px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: '#92400e', fontSize: '0.9rem', fontWeight: '600' }}>
+                ⭐ רוצה להוסיף את הלוגו שלך להצעות המחיר ולשדרג את מיתוג העסק? שדרג עכשיו לחבילת Pro!
+              </span>
+              <button 
+                type="button" 
+                onClick={() => setBizPlan('pro')} 
+                style={{ background: '#d97706', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.8rem' }}
+              >
+                שדרג ל-Pro
+              </button>
+            </div>
+          )}
+
           <form onSubmit={handleSaveSettings}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.businessNameLabel}</label>
                 <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
@@ -685,7 +707,22 @@ function Dashboard() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.logoUrlLabel}</label>
-                <input type="text" value={bizLogoUrl} onChange={(e) => setBizLogoUrl(e.target.value)} placeholder="https://.../logo.png" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+                <input 
+                  type="text" 
+                  value={bizLogoUrl} 
+                  onChange={(e) => setBizLogoUrl(e.target.value)} 
+                  disabled={bizPlan !== 'pro'} 
+                  placeholder={bizPlan === 'pro' ? "https://.../logo.png" : "נעול במסלול חינמי"} 
+                  style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: bizPlan !== 'pro' ? '#f1f5f9' : 'white' }} 
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.planLabel}</label>
+                <select value={bizPlan} onChange={(e) => setBizPlan(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                  <option value="free">Free (חינמי)</option>
+                  <option value="basic">Basic (בסיסי)</option>
+                  <option value="pro">Pro (מתקדם)</option>
+                </select>
               </div>
             </div>
             <button type="submit" style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
