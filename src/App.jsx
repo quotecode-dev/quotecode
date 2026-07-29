@@ -103,6 +103,11 @@ function App() {
     }
   };
 
+  // פונקציית עזר להצגת סכומים עם פסיקים (למשל 3,000.00)
+  const formatNum = (val) => {
+    return Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
   const discountAmount = (subtotal * Number(discount)) / 100;
   const totalAmount = subtotal - discountAmount;
@@ -171,7 +176,7 @@ function App() {
 
       if (itemsError) throw itemsError;
 
-      setStatusMsg({ text: `Quote successfully created and saved to cloud! Total: ${sym}${totalAmount.toFixed(2)}`, type: 'success' });
+      setStatusMsg({ text: `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`, type: 'success' });
       
       setClientName('');
       setClientEmail('');
@@ -198,65 +203,64 @@ function App() {
   }
 
   const handlePrintQuote = (quote) => {
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-    
-    script.onload = () => {
-      const quoteSym = getCurrencySymbol(quote.currency || 'USD');
-      
-      const itemsRows = quote.quote_items && quote.quote_items.length > 0 
-        ? quote.quote_items.map(item => `
-            <tr style="border-bottom: 1px solid #e5e7eb;">
-              <td style="padding: 12px 8px; font-size: 14px; color: #374151;">${item.description}</td>
-              <td style="padding: 12px 8px; text-align: center; font-size: 14px; color: #374151;">${item.quantity}</td>
-              <td style="padding: 12px 8px; text-align: right; font-size: 14px; color: #374151;">${quoteSym}${Number(item.unit_price || 0).toFixed(2)}</td>
-              <td style="padding: 12px 8px; text-align: right; font-size: 14px; color: #374151; font-weight: bold;">${quoteSym}${Number(item.total_price || 0).toFixed(2)}</td>
-            </tr>
-          `).join('')
-        : `
-            <tr style="border-bottom: 1px solid #e5e7eb;">
-              <td style="padding: 12px 8px; font-size: 14px; color: #374151;" colspan="4">Standard Services</td>
-            </tr>
-          `;
+    const quoteSym = getCurrencySymbol(quote.currency || 'USD');
+    const itemsRows = quote.quote_items && quote.quote_items.length > 0 
+      ? quote.quote_items.map(item => `
+          <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">${item.description}</td>
+            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #e5e7eb;">${item.quantity}</td>
+            <td style="padding: 12px; text-align: right; border-bottom: 1px solid #e5e7eb;">${quoteSym}${formatNum(item.unit_price)}</td>
+            <td style="padding: 12px; text-align: right; border-bottom: 1px solid #e5e7eb; font-weight: bold;">${quoteSym}${formatNum(item.total_price)}</td>
+          </tr>
+        `).join('')
+      : `
+          <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;" colspan="4">Professional Services</td>
+          </tr>
+        `;
 
-      const element = document.createElement('div');
-      element.style.width = '700px';
-      element.style.background = '#ffffff';
-      element.style.padding = '30px';
-      element.style.boxSizing = 'border-box';
-      element.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
-      element.style.color = '#333333';
-      
-      element.innerHTML = `
-        <div>
-          <table style="width: 100%; border-collapse: collapse; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 25px;">
-            <tr>
-              <td style="vertical-align: top; width: 60%;">
-                <div style="font-size: 26px; font-weight: 800; color: #4f46e5; letter-spacing: -0.5px;">&lt;/&gt; QuoteCode Pro</div>
-                <p style="color: #6b7280; font-size: 13px; margin-top: 5px;">Global SaaS Quoting & Invoicing Platform</p>
-              </td>
-              <td style="vertical-align: top; text-align: right; width: 40%;">
-                <h2 style="margin: 0; font-size: 22px; color: #111827;">QUOTE</h2>
-                <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 13px;">Quote #${quote.id.slice(0, 8).toUpperCase()}</p>
-                <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 13px;">Date: ${new Date(quote.created_at).toLocaleDateString('en-US')}</p>
-                <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 13px;">Valid Until: ${quote.valid_until || 'N/A'}</p>
-              </td>
-            </tr>
-          </table>
-
-          <div style="margin-bottom: 30px;">
-            <p style="font-size: 11px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 4px;">Prepared For:</p>
-            <p style="margin: 0; font-size: 16px; font-weight: bold; color: #111827;">${quote.clients?.company_name || 'N/A'}</p>
-            <p style="margin: 2px 0 0 0; color: #4b5563; font-size: 13px;">${quote.clients?.email || ''}</p>
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Quote #${quote.id.slice(0, 8).toUpperCase()}</title>
+          <style>
+            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; background: #fff; }
+            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; }
+            .title { font-size: 26px; font-weight: 800; color: #4f46e5; }
+            .client-info { margin-bottom: 30px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+            th { background: #f9fafb; padding: 12px; text-align: left; font-size: 12px; color: #6b7280; text-transform: uppercase; border-bottom: 2px solid #111827; }
+            .total-section { text-align: right; margin-top: 20px; font-size: 18px; font-weight: bold; color: #4f46e5; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="title">&lt;/&gt; QuoteCode Pro</div>
+              <p style="color: #6b7280; font-size: 14px; margin-top: 5px;">Global SaaS Quoting & Invoicing Platform</p>
+            </div>
+            <div style="text-align: right;">
+              <h2 style="margin: 0; color: #111827;">QUOTE</h2>
+              <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Quote #${quote.id.slice(0, 8).toUpperCase()}</p>
+              <p style="margin: 2px 0 0; color: #6b7280; font-size: 14px;">Date: ${new Date(quote.created_at).toLocaleDateString('en-US')}</p>
+              <p style="margin: 2px 0 0; color: #6b7280; font-size: 14px;">Valid Until: ${quote.valid_until || 'N/A'}</p>
+            </div>
           </div>
 
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+          <div class="client-info">
+            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">Prepared For:</p>
+            <p style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">${quote.clients?.company_name || 'N/A'}</p>
+            <p style="margin: 2px 0 0; color: #4b5563; font-size: 14px;">${quote.clients?.email || ''}</p>
+          </div>
+
+          <table>
             <thead>
-              <tr style="border-bottom: 2px solid #111827;">
-                <th style="padding: 10px 8px; text-align: left; font-size: 11px; color: #6b7280; text-transform: uppercase;">Description</th>
-                <th style="padding: 10px 8px; text-align: center; font-size: 11px; color: #6b7280; text-transform: uppercase;">Qty</th>
-                <th style="padding: 10px 8px; text-align: right; font-size: 11px; color: #6b7280; text-transform: uppercase;">Unit Price</th>
-                <th style="padding: 10px 8px; text-align: right; font-size: 11px; color: #6b7280; text-transform: uppercase;">Total</th>
+              <tr>
+                <th>Description</th>
+                <th style="text-align: center;">Qty</th>
+                <th style="text-align: right;">Unit Price</th>
+                <th style="text-align: right;">Total</th>
               </tr>
             </thead>
             <tbody>
@@ -264,41 +268,22 @@ function App() {
             </tbody>
           </table>
 
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-            <tr>
-              <td style="width: 60%;"></td>
-              <td style="width: 40%; text-align: right;">
-                <div style="border-top: 2px solid #e5e7eb; padding-top: 12px;">
-                  <span style="font-size: 15px; font-weight: bold; color: #111827;">Total Amount: </span>
-                  <span style="font-size: 17px; font-weight: bold; color: #4f46e5; margin-left: 8px;">${quoteSym}${Number(quote.total || 0).toFixed(2)}</span>
-                </div>
-              </td>
-            </tr>
-          </table>
-
-          <div style="border-top: 1px solid #e5e7eb; padding-top: 15px;">
-            <p style="font-size: 11px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 4px;">Terms & Conditions</p>
-            <p style="margin: 0; color: #6b7280; font-size: 11px;">Net 30 days. Thank you for your business. Payment constitutes acceptance of terms.</p>
+          <div class="total-section">
+            Total Amount: ${quoteSym}${formatNum(quote.total)}
           </div>
-        </div>
-      `;
 
-      document.body.appendChild(element);
+          <div style="margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+            <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">Terms & Conditions</p>
+            <p style="margin: 0; color: #6b7280; font-size: 12px;">Net 30 days. Thank you for your business.</p>
+          </div>
 
-      const opt = {
-        margin:       0.4,
-        filename:     `Quote_${quote.clients?.company_name?.replace(/[^a-z0-9]/gi, '_') || 'Quote'}_${quote.id.slice(0,6)}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
-
-      window.html2pdf().set(opt).from(element).save().then(() => {
-        document.body.removeChild(element);
-      });
-    };
-    
-    document.body.appendChild(script);
+          <script>
+            window.onload = function() { window.print(); }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   if (!session) {
@@ -365,7 +350,7 @@ function App() {
           </div>
           <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '4px solid #22c55e' }}>
             <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>TOTAL REVENUE</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{totalRevenue.toFixed(2)}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
           </div>
         </div>
 
@@ -435,22 +420,22 @@ function App() {
               <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>+ Add Item</button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 36px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>
-              <div style={{ paddingLeft: '10px' }}>Description</div>
-              <div style={{ paddingLeft: '10px' }}>Qty</div>
-              <div style={{ paddingLeft: '10px' }}>Price</div>
-              <div style={{ textAlign: 'right', paddingRight: '10px' }}>Total</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '4fr 1fr 1fr 1fr 40px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569', padding: '0 2px' }}>
+              <div>Description</div>
+              <div>Qty</div>
+              <div>Price</div>
+              <div style={{ textAlign: 'right' }}>Total</div>
               <div></div>
             </div>
 
             {items.map((item, index) => (
-              <div key={index} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 36px', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
-                <input type="text" name={`description_${index}`} placeholder="Item description" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
-                <input type="number" name={`quantity_${index}`} placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
-                <input type="number" name={`price_${index}`} placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
-                <div style={{ fontWeight: '600', color: '#334155', textAlign: 'right', paddingRight: '10px' }}>{sym}{(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}</div>
+              <div key={index} style={{ display: 'grid', gridTemplateColumns: '4fr 1fr 1fr 1fr 40px', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
+                <input type="text" placeholder="Item description" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
+                <input type="number" placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
+                <input type="number" placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
+                <div style={{ fontWeight: '600', color: '#334155', textAlign: 'right' }}>{sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}</div>
                 {items.length > 1 ? (
-                  <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer', width: '100%' }}>✕</button>
+                  <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '10px 0', borderRadius: '6px', cursor: 'pointer', width: '100%', textAlign: 'center' }}>✕</button>
                 ) : (
                   <div></div>
                 )}
@@ -460,17 +445,17 @@ function App() {
             <div style={{ borderTop: '2px solid #f1f5f9', marginTop: '20px', paddingTop: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b' }}>
                 <span>Subtotal:</span>
-                <span>{sym}{subtotal.toFixed(2)}</span>
+                <span>{sym}{formatNum(subtotal)}</span>
               </div>
               {discount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444' }}>
                   <span>Discount ({discount}%):</span>
-                  <span>-{sym}{discountAmount.toFixed(2)}</span>
+                  <span>-{sym}{formatNum(discountAmount)}</span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px' }}>
                 <span>Total Amount:</span>
-                <span style={{ color: '#4f46e5' }}>{sym}{totalAmount.toFixed(2)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD'}</span>
+                <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD'}</span>
               </div>
             </div>
 
@@ -525,19 +510,19 @@ function App() {
                           </span>
                         </td>
                         <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
-                          {quoteSym}{Number(quote.total || 0).toFixed(2)}
+                          {quoteSym}{formatNum(quote.total)}
                         </td>
                         <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
                         <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
                           <button 
                             onClick={() => handlePrintQuote(quote)}
-                            style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.80rem' }}
+                            style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                           >
-                            PDF
+                            PDF / Print
                           </button>
                           <button 
                             onClick={() => handleDeleteQuote(quote.id)}
-                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.80rem' }}
+                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                           >
                             Delete
                           </button>
