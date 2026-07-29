@@ -53,7 +53,8 @@ function App() {
       .from('quotes')
       .select(`
         *,
-        clients ( company_name, email )
+        clients ( company_name, email ),
+        quote_items ( * )
       `)
       .order('created_at', { ascending: false });
 
@@ -201,12 +202,33 @@ function App() {
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
     
     script.onload = () => {
-      const element = document.createElement('div');
       const quoteSym = getCurrencySymbol(quote.currency || 'USD');
       
+      const itemsRows = quote.quote_items && quote.quote_items.length > 0 
+        ? quote.quote_items.map(item => `
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 12px 0; font-size: 14px; color: #374151;">${item.description}</td>
+              <td style="padding: 12px 0; text-align: center; font-size: 14px; color: #374151;">${item.quantity}</td>
+              <td style="padding: 12px 0; text-align: right; font-size: 14px; color: #374151;">${quoteSym}${Number(item.unit_price || 0).toFixed(2)}</td>
+              <td style="padding: 12px 0; text-align: right; font-size: 14px; color: #374151; font-weight: bold;">${quoteSym}${Number(item.total_price || 0).toFixed(2)}</td>
+            </tr>
+          `).join('')
+        : `
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+              <td style="padding: 12px 0; font-size: 14px; color: #374151;" colspan="4">Standard Services</td>
+            </tr>
+          `;
+
+      const element = document.createElement('div');
+      element.style.width = '750px';
+      element.style.background = '#ffffff';
+      element.style.padding = '40px';
+      element.style.boxSizing = 'border-box';
+      element.style.fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+      element.style.color = '#333333';
+      
       element.innerHTML = `
-        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto; background: #ffffff;">
-          
+        <div>
           <!-- Header Table -->
           <table style="width: 100%; border-collapse: collapse; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px;">
             <tr>
@@ -235,16 +257,13 @@ function App() {
             <thead>
               <tr style="border-bottom: 2px solid #111827;">
                 <th style="padding: 12px 0; text-align: left; font-size: 12px; color: #6b7280; text-transform: uppercase;">Description</th>
-                <th style="padding: 12px 0; text-align: center; font-size: 12px; color: #6b7280; text-transform: uppercase;">Status</th>
-                <th style="padding: 12px 0; text-align: right; font-size: 12px; color: #6b7280; text-transform: uppercase;">Amount</th>
+                <th style="padding: 12px 0; text-align: center; font-size: 12px; color: #6b7280; text-transform: uppercase;">Qty</th>
+                <th style="padding: 12px 0; text-align: right; font-size: 12px; color: #6b7280; text-transform: uppercase;">Unit Price</th>
+                <th style="padding: 12px 0; text-align: right; font-size: 12px; color: #6b7280; text-transform: uppercase;">Total</th>
               </tr>
             </thead>
             <tbody>
-              <tr style="border-bottom: 1px solid #e5e7eb;">
-                <td style="padding: 15px 0; font-size: 14px; color: #374151;">Professional Services / SaaS License</td>
-                <td style="padding: 15px 0; text-align: center; font-size: 14px; color: #374151;">${quote.status}</td>
-                <td style="padding: 15px 0; text-align: right; font-size: 14px; color: #374151;">${quoteSym}${Number(quote.total || 0).toFixed(2)}</td>
-              </tr>
+              ${itemsRows}
             </tbody>
           </table>
 
@@ -266,19 +285,22 @@ function App() {
             <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">Terms & Conditions</p>
             <p style="margin: 0; color: #6b7280; font-size: 12px;">Net 30 days. Thank you for your business. Payment constitutes acceptance of terms.</p>
           </div>
-          
         </div>
       `;
 
+      document.body.appendChild(element);
+
       const opt = {
-        margin:       0,
+        margin:       0.5,
         filename:     `Quote_${quote.clients?.company_name?.replace(/[^a-z0-9]/gi, '_') || 'Quote'}_${quote.id.slice(0,6)}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
+        html2canvas:  { scale: 2, useCORS: true },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
 
-      window.html2pdf().set(opt).from(element).save();
+      window.html2pdf().set(opt).from(element).save().then(() => {
+        document.body.removeChild(element);
+      });
     };
     
     document.body.appendChild(script);
@@ -419,9 +441,9 @@ function App() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 36px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>
-              <div style={{ paddingLeft: '10px' }}>Description</div>
-              <div style={{ paddingLeft: '10px' }}>Qty</div>
-              <div style={{ paddingLeft: '10px' }}>Price</div>
+              <div style={{ paddingLeft: '2px' }}>Description</div>
+              <div style={{ paddingLeft: '2px' }}>Qty</div>
+              <div style={{ paddingLeft: '2px' }}>Price</div>
               <div style={{ textAlign: 'right' }}>Total</div>
               <div></div>
             </div>
