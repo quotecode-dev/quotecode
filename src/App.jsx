@@ -9,26 +9,39 @@ import './App.css';
 function PublicQuote() {
   const { id } = useParams();
   const [quote, setQuote] = useState(null);
+  const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchQuote() {
-      const { data, error } = await supabase
+    async function fetchData() {
+      const { data: quoteData } = await supabase
         .from('quotes')
         .select(`*, clients ( company_name, email, phone ), quote_items ( * )`)
         .eq('id', id)
         .single();
-      if (error) console.error('Error fetching quote:', error);
-      else setQuote(data);
+      
+      const { data: settingsData } = await supabase
+        .from('business_settings')
+        .select('*')
+        .limit(1)
+        .single();
+
+      setQuote(quoteData);
+      setSettings(settingsData || { business_name: 'ProFlow' });
       setLoading(false);
     }
-    fetchQuote();
+    fetchData();
   }, [id]);
 
   if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>טוען את הצעת המחיר... / Loading...</div>;
   if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>הצעת המחיר לא נמצאה. / Quote not found.</div>;
 
   const isLocal = quote.currency === 'ILS';
+  const bizName = settings?.business_name || 'ProFlow';
+  const bizTaxId = settings?.tax_id || '';
+  const bizEmail = settings?.email || '';
+  const bizPhone = settings?.phone || '';
+
   const getCurrencySymbol = (curr) => {
     if (!curr) return '₪';
     if (curr.includes('EUR')) return '€';
@@ -58,8 +71,10 @@ function PublicQuote() {
       <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '50px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isLocal ? 'row-reverse' : 'row' }}>
           <div>
-            <h1 style={{ margin: 0, color: '#4f46e5', fontSize: '28px', fontWeight: '900' }}>&lt;/&gt; QuoteCode Pro</h1>
-            <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>Global SaaS Quoting & Invoicing Platform</p>
+            <h1 style={{ margin: 0, color: '#4f46e5', fontSize: '28px', fontWeight: '900' }}>&lt;/&gt; {bizName}</h1>
+            <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
+              {bizTaxId && `${isLocal ? 'עוסק/ח.פ:' : 'Tax ID:'} ${bizTaxId} | `} {bizEmail} {bizPhone ? `| ${bizPhone}` : ''}
+            </p>
           </div>
           <div style={{ textAlign: isLocal ? 'left' : 'right' }}>
             <h2 style={{ margin: 0, color: '#111827', fontSize: '22px', textTransform: 'uppercase' }}>{isLocal ? 'הצעת מחיר' : 'QUOTE'}</h2>
@@ -114,10 +129,8 @@ function PublicQuote() {
           <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
           <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>{isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.'}</p>
         </div>
-        
       </div>
       
-      {/* Print CSS hiding the print button itself during actual print */}
       <style>{`
         @media print {
           .no-print { display: none !important; }
@@ -139,6 +152,13 @@ function Dashboard() {
   const [clients, setClients] = useState([]);
   const [services, setServices] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
+
+  // Business Settings state
+  const [settingId, setSettingId] = useState(null);
+  const [bizName, setBizName] = useState('ProFlow');
+  const [bizTaxId, setBizTaxId] = useState('');
+  const [bizEmail, setBizEmail] = useState('');
+  const [bizPhone, setBizPhone] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -162,8 +182,8 @@ function Dashboard() {
   const isHebrew = clientRegion === 'local';
 
   const t = {
-    appName: isHebrew ? 'קווטקוד פרו' : 'QuoteCode Pro',
-    appSub: isHebrew ? 'מערכת ניהול הצעות מחיר וחשבוניות גלובלית' : 'Global SaaS Quoting & Invoicing Platform',
+    appName: isHebrew ? bizName : (bizName || 'ProFlow'),
+    appSub: isHebrew ? 'מערכת ניהול עסק והצעות מחיר גלובלית' : 'Global SaaS Business & Quoting Platform',
     totalQuotes: isHebrew ? 'סך הכל הצעות' : 'TOTAL QUOTES',
     approvedPaid: isHebrew ? 'אושר / שולם' : 'APPROVED / PAID',
     winRate: isHebrew ? 'אחוז הצלחה' : 'WIN RATE',
@@ -194,6 +214,10 @@ function Dashboard() {
     cancelEdit: isHebrew ? 'ביטול עריכה' : 'Cancel Edit',
     recentHistory: isHebrew ? 'היסטוריית הצעות מחיר' : 'Recent Quotes History',
     servicesCatalog: isHebrew ? 'קטלוג שירותים ומוצרים' : 'Services & Products Catalog',
+    businessSettings: isHebrew ? 'הגדרות עסק' : 'Business Settings',
+    saveSettings: isHebrew ? 'שמור הגדרות עסק' : 'Save Business Settings',
+    businessNameLabel: isHebrew ? 'שם העסק' : 'Business Name',
+    taxIdLabel: isHebrew ? 'ח.פ / עוסק מורשה / פטור' : 'Tax ID / Lic No',
     addService: isHebrew ? 'הוסף לקטלוג' : 'Add to Catalog',
     serviceName: isHebrew ? 'שם השירות / המוצר' : 'Service Name',
     defaultPrice: isHebrew ? 'מחיר קבוע' : 'Default Price',
@@ -239,6 +263,7 @@ function Dashboard() {
     await fetchQuotes();
     await fetchClients();
     await fetchServices();
+    await fetchSettings();
   }
 
   async function fetchQuotes() {
@@ -260,6 +285,40 @@ function Dashboard() {
     const { data, error } = await supabase.from('services').select('*').order('created_at', { ascending: true });
     if (error) console.error('Error fetching services:', error.message);
     else setServices(data || []);
+  }
+
+  async function fetchSettings() {
+    const { data, error } = await supabase.from('business_settings').select('*').limit(1).single();
+    if (data) {
+      setSettingId(data.id);
+      setBizName(data.business_name || 'ProFlow');
+      setBizTaxId(data.tax_id || '');
+      setBizEmail(data.email || '');
+      setBizPhone(data.phone || '');
+    }
+  }
+
+  async function handleSaveSettings(e) {
+    e.preventDefault();
+    const payload = {
+      business_name: bizName,
+      tax_id: bizTaxId,
+      email: bizEmail,
+      phone: bizPhone
+    };
+
+    if (settingId) {
+      const { error } = await supabase.from('business_settings').update(payload).eq('id', settingId);
+      if (error) setStatusMsg({ text: 'Error updating settings: ' + error.message, type: 'error' });
+      else setStatusMsg({ text: isHebrew ? 'הגדרות העסק עודכנו בהצלחה!' : 'Business settings updated successfully!', type: 'success' });
+    } else {
+      const { data, error } = await supabase.from('business_settings').insert([payload]).select();
+      if (error) setStatusMsg({ text: 'Error saving settings: ' + error.message, type: 'error' });
+      else if (data && data[0]) {
+        setSettingId(data[0].id);
+        setStatusMsg({ text: isHebrew ? 'הגדרות העסק נשמרו בהצלחה!' : 'Business settings saved successfully!', type: 'success' });
+      }
+    }
   }
 
   const handleLogin = async (e) => {
@@ -401,13 +460,12 @@ function Dashboard() {
     const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
     const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
     
-    // NEW: Smart Link URL
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-QuoteCode Pro` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from QuoteCode Pro`;
+    const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
     const body = qIsLocal
-      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות QuoteCode Pro`
-      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\nQuoteCode Pro Team`;
+      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
+      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
 
     window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
@@ -426,7 +484,6 @@ function Dashboard() {
     const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
     const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
 
-    // NEW: Smart Link URL
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
     const msg = qIsLocal
@@ -517,7 +574,6 @@ function Dashboard() {
     }
   }
 
-  // Filter quotes logic
   const filteredQuotes = quotes.filter(quote => {
     const matchesSearch = (quote.clients?.company_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
                           quote.id.toLowerCase().includes(searchTerm.toLowerCase());
@@ -531,7 +587,7 @@ function Dashboard() {
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px' }}>
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
             <div style={{ background: '#4f46e5', color: 'white', width: '40px', height: '40px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginBottom: '10px' }}>&lt;/&gt;</div>
-            <h2 style={{ color: '#1e293b', margin: 0, fontSize: '1.5rem' }}>QuoteCode Pro</h2>
+            <h2 style={{ color: '#1e293b', margin: 0, fontSize: '1.5rem' }}>{bizName}</h2>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>Sign in to your SaaS dashboard</p>
           </div>
           {statusMsg.text && (
@@ -596,6 +652,34 @@ function Dashboard() {
             {statusMsg.text}
           </div>
         )}
+
+        {/* Business Settings Widget */}
+        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.businessSettings}</h2>
+          <form onSubmit={handleSaveSettings}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.businessNameLabel}</label>
+                <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.taxIdLabel}</label>
+                <input type="text" value={bizTaxId} onChange={(e) => setBizTaxId(e.target.value)} placeholder="123456789" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientEmail}</label>
+                <input type="email" value={bizEmail} onChange={(e) => setBizEmail(e.target.value)} placeholder="business@email.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientPhone}</label>
+                <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="+972..." style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+              </div>
+            </div>
+            <button type="submit" style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
+              {t.saveSettings}
+            </button>
+          </form>
+        </div>
 
         <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
