@@ -10,6 +10,9 @@ function App() {
   const [clients, setClients] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
+  // Edit mode state
+  const [editingQuoteId, setEditingQuoteId] = useState(null);
+
   // Form state
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
@@ -103,7 +106,6 @@ function App() {
     }
   };
 
-  // פונקציית עזר להצגת סכומים עם פסיקים (למשל 3,000.00)
   const formatNum = (val) => {
     return Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
@@ -126,7 +128,46 @@ function App() {
   };
   const sym = getCurrencySymbol(currency);
 
-  async function handleGenerateQuote(e) {
+  const handleEditClick = (quote) => {
+    setEditingQuoteId(quote.id);
+    setClientName(quote.clients?.company_name || '');
+    setClientEmail(quote.clients?.email || '');
+    setClientPhone('');
+    
+    if (quote.currency === 'EUR') setCurrency('EUR (€)');
+    else if (quote.currency === 'GBP') setCurrency('GBP (£)');
+    else setCurrency('USD ($)');
+
+    setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
+    setValidUntil(quote.valid_until || '');
+    setDiscount(quote.discount || 0);
+    
+    if (quote.quote_items && quote.quote_items.length > 0) {
+      setItems(quote.quote_items.map(item => ({
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unit_price
+      })));
+    } else {
+      setItems([{ description: '', quantity: 1, unit_price: 0 }]);
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setStatusMsg({ text: `Editing Quote #${quote.id.slice(0, 6)}...`, type: 'success' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingQuoteId(null);
+    setClientName('');
+    setClientEmail('');
+    setClientPhone('');
+    setValidUntil('');
+    setDiscount(0);
+    setItems([{ description: '', quantity: 1, unit_price: 0 }]);
+    setStatusMsg({ text: 'Edit cancelled.', type: 'success' });
+  };
+
+  async function handleSaveQuote(e) {
     e.preventDefault();
     try {
       let clientId;
@@ -146,21 +187,37 @@ function App() {
         clientId = newClientData[0].id;
       }
 
-      const { data: quoteData, error: quoteError } = await supabase
-        .from('quotes')
-        .insert([{
-          client_id: clientId,
-          currency: currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD',
-          subtotal: subtotal,
-          tax_rate: 0.00,
-          total: totalAmount,
-          status: quoteStatus.toLowerCase(),
-          valid_until: validUntil || null
-        }])
-        .select();
+      const quotePayload = {
+        client_id: clientId,
+        currency: currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD',
+        subtotal: subtotal,
+        tax_rate: 0.00,
+        total: totalAmount,
+        status: quoteStatus.toLowerCase(),
+        valid_until: validUntil || null
+      };
 
-      if (quoteError) throw quoteError;
-      const quoteId = quoteData[0].id;
+      let quoteId;
+
+      if (editingQuoteId) {
+        const { error: updateError } = await supabase
+          .from('quotes')
+          .update(quotePayload)
+          .eq('id', editingQuoteId);
+
+        if (updateError) throw updateError;
+        quoteId = editingQuoteId;
+
+        await supabase.from('quote_items').delete().eq('quote_id', quoteId);
+      } else {
+        const { data: quoteData, error: quoteError } = await supabase
+          .from('quotes')
+          .insert([quotePayload])
+          .select();
+
+        if (quoteError) throw quoteError;
+        quoteId = quoteData[0].id;
+      }
 
       const quoteItemsToInsert = items.map(item => ({
         quote_id: quoteId,
@@ -176,8 +233,12 @@ function App() {
 
       if (itemsError) throw itemsError;
 
-      setStatusMsg({ text: `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`, type: 'success' });
+      setStatusMsg({ 
+        text: editingQuoteId ? `Quote #${editingQuoteId.slice(0, 6)} successfully updated!` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`, 
+        type: 'success' 
+      });
       
+      setEditingQuoteId(null);
       setClientName('');
       setClientEmail('');
       setClientPhone('');
@@ -187,7 +248,7 @@ function App() {
       
       loadData();
     } catch (err) {
-      setStatusMsg({ text: 'Error creating quote: ' + err.message, type: 'error' });
+      setStatusMsg({ text: 'Error saving quote: ' + err.message, type: 'error' });
     }
   }
 
@@ -322,7 +383,6 @@ function App() {
     <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', color: '#333' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
-        {/* Top Navbar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ background: '#4f46e5', color: 'white', padding: '8px 12px', borderRadius: '8px', fontWeight: 'bold' }}>&lt;/&gt;</div>
@@ -334,7 +394,6 @@ function App() {
           </div>
         </div>
 
-        {/* Metrics Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '25px' }}>
           <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '4px solid #4f46e5' }}>
             <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>TOTAL QUOTES</div>
@@ -354,31 +413,46 @@ function App() {
           </div>
         </div>
 
-        {/* Status Message */}
         {statusMsg.text && (
           <div style={{ padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', fontWeight: '500', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b' }}>
             {statusMsg.text}
           </div>
         )}
 
-        {/* Main Form Box */}
-        <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-          <h2 style={{ color: '#1e293b', marginTop: 0, fontSize: '1.4rem' }}>QuoteCode Pro</h2>
-          <p style={{ color: '#64748b', marginTop: '-5px', marginBottom: '25px', fontSize: '0.9rem' }}>Global SaaS Quoting & Invoicing Platform</p>
+        <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div>
+              <h2 style={{ color: '#1e293b', marginTop: 0, fontSize: '1.4rem', marginBottom: '4px' }}>
+                {editingQuoteId ? `Editing Quote #${editingQuoteId.slice(0, 6)}` : 'QuoteCode Pro'}
+              </h2>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>
+                {editingQuoteId ? 'Modify the quote details below and save changes' : 'Global SaaS Quoting & Invoicing Platform'}
+              </p>
+            </div>
+            {editingQuoteId && (
+              <button 
+                type="button" 
+                onClick={handleCancelEdit}
+                style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
 
-          <form onSubmit={handleGenerateQuote}>
+          <form onSubmit={handleSaveQuote}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '20px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Name</label>
-                <input type="text" name="clientName" autoComplete="organization" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <input type="text" name="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Email</label>
-                <input type="email" name="clientEmail" autoComplete="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="contact@acme.com" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <input type="email" name="clientEmail" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="contact@acme.com" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Phone</label>
-                <input type="text" name="clientPhone" autoComplete="tel" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+1 (555) 0192" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <input type="text" name="clientPhone" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+1 (555) 0192" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
             </div>
 
@@ -459,13 +533,12 @@ function App() {
               </div>
             </div>
 
-            <button type="submit" style={{ width: '100%', background: '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(37, 99, 235, 0.2)' }}>
-              Generate & Save to Cloud
+            <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+              {editingQuoteId ? 'Update Quote in Cloud' : 'Generate & Save to Cloud'}
             </button>
           </form>
         </div>
 
-        {/* Recent Quotes History Table */}
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
           <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>Recent Quotes History</h2>
           <div style={{ overflowX: 'auto' }}>
@@ -514,6 +587,12 @@ function App() {
                         </td>
                         <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
                         <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
+                          <button 
+                            onClick={() => handleEditClick(quote)}
+                            style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                          >
+                            Edit
+                          </button>
                           <button 
                             onClick={() => handlePrintQuote(quote)}
                             style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
