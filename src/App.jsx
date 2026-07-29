@@ -20,11 +20,23 @@ function PublicQuote() {
         .eq('id', id)
         .single();
       
-      const { data: settingsData } = await supabase
-        .from('business_settings')
-        .select('*')
-        .limit(1)
-        .single();
+      let settingsData = null;
+      if (quoteData && quoteData.user_id) {
+        const { data } = await supabase
+          .from('business_settings')
+          .select('*')
+          .eq('user_id', quoteData.user_id)
+          .single();
+        settingsData = data;
+      } else if (quoteData) {
+        // Fallback למקרה של הצעות ישנות שאין להן עדיין user_id
+        const { data } = await supabase
+          .from('business_settings')
+          .select('*')
+          .limit(1)
+          .single();
+        settingsData = data;
+      }
 
       setQuote(quoteData);
       setSettings(settingsData || { business_name: 'ProFlow', plan: 'free' });
@@ -277,9 +289,11 @@ function Dashboard() {
   }
 
   async function fetchQuotes() {
+    if (!session?.user?.id) return;
     const { data, error } = await supabase
       .from('quotes')
       .select(`*, clients ( company_name, email, phone ), quote_items ( * )`)
+      .eq('user_id', session.user.id)
       .order('created_at', { ascending: false });
     if (error) console.error('Error fetching quotes:', error.message);
     else setQuotes(data || []);
@@ -298,7 +312,13 @@ function Dashboard() {
   }
 
   async function fetchSettings() {
-    const { data, error } = await supabase.from('business_settings').select('*').limit(1).single();
+    if (!session?.user?.id) return;
+    const { data, error } = await supabase
+      .from('business_settings')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .single();
+    
     if (data) {
       setSettingId(data.id);
       setBizName(data.business_name || 'ProFlow');
@@ -307,18 +327,24 @@ function Dashboard() {
       setBizPhone(data.phone || '');
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'free');
+    } else {
+      setSettingId(null);
+      setBizPlan('free');
     }
   }
 
   async function handleSaveSettings(e) {
     e.preventDefault();
+    if (!session?.user?.id) return;
+
     const payload = {
       business_name: bizName,
       tax_id: bizTaxId,
       email: bizEmail,
       phone: bizPhone,
       logo_url: bizLogoUrl,
-      plan: bizPlan
+      plan: bizPlan,
+      user_id: session.user.id
     };
 
     if (settingId) {
@@ -521,8 +547,9 @@ function Dashboard() {
 
   async function handleSaveQuote(e) {
     e.preventDefault();
+    if (!session?.user?.id) return;
+
     try {
-      // Plan Limit Check (Free = 5 quotes max, Basic = 25 quotes max, Pro = unlimited)
       if (!editingQuoteId) {
         const limit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 25 : Infinity;
         if (quotes.length >= limit) {
@@ -561,7 +588,8 @@ function Dashboard() {
         total: totalAmount,
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
-        discount: Number(discount) 
+        discount: Number(discount),
+        user_id: session.user.id
       };
 
       let quoteId;
