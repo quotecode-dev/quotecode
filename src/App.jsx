@@ -414,23 +414,24 @@ function App() {
               <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>+ Add Item</button>
             </div>
 
-            {/* שורת הכותרות המקובעת שמונעת היעלמות של הטקסט PRICE וכו' */}
-            <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '8px', padding: '0 5px', fontSize: '0.8rem', fontWeight: '600', color: '#475569' }}>
-              <div>Description</div>
-              <div>Qty</div>
-              <div>Price</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 36px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>
+              <div style={{ paddingLeft: '10px' }}>Description</div>
+              <div style={{ paddingLeft: '10px' }}>Qty</div>
+              <div style={{ paddingLeft: '10px' }}>Price</div>
               <div style={{ textAlign: 'right' }}>Total</div>
-              <div style={{ width: items.length > 1 ? '36px' : '0' }}></div>
+              <div></div>
             </div>
 
             {items.map((item, index) => (
-              <div key={index} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
+              <div key={index} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 36px', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
                 <input type="text" name={`description_${index}`} placeholder="Item description" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
                 <input type="number" name={`quantity_${index}`} placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
                 <input type="number" name={`price_${index}`} placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
                 <div style={{ fontWeight: '600', color: '#334155', textAlign: 'right' }}>{sym}{(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}</div>
-                {items.length > 1 && (
-                  <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer' }}>✕</button>
+                {items.length > 1 ? (
+                  <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer', width: '100%' }}>✕</button>
+                ) : (
+                  <div></div>
                 )}
               </div>
             ))}
