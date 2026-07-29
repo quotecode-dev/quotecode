@@ -522,6 +522,20 @@ function Dashboard() {
   async function handleSaveQuote(e) {
     e.preventDefault();
     try {
+      // Plan Limit Check (Free = 5 quotes max, Basic = 25 quotes max, Pro = unlimited)
+      if (!editingQuoteId) {
+        const limit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 25 : Infinity;
+        if (quotes.length >= limit) {
+          setStatusMsg({ 
+            text: isHebrew 
+              ? `הגעת למגבלת ההצעות בחבילה שלך (${limit} הצעות). שדרג לחבילת Pro כדי ליצור הצעות ללא הגבלה!` 
+              : `Quote limit reached for your plan (${limit} quotes). Upgrade to Pro for unlimited quotes!`, 
+            type: 'error' 
+          });
+          return;
+        }
+      }
+
       let clientId;
       const existingClient = clients.find(c => c.company_name?.toLowerCase() === clientName.toLowerCase());
       
@@ -628,35 +642,35 @@ function Dashboard() {
   }
 
   return (
-    <div dir="rtl" style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', color: '#333', textAlign: 'right' }}>
+    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', color: '#333', textAlign: isHebrew ? 'right' : 'left' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px', flexDirection: 'row-reverse' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: 'row-reverse' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
             <div style={{ background: '#4f46e5', color: 'white', padding: '8px 12px', borderRadius: '8px', fontWeight: 'bold' }}>&lt;/&gt;</div>
-            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b' }}>{bizName}</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b' }}>{t.appName}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: 'row-reverse' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
             <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{session.user.email}</span>
             <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Sign Out</button>
           </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '25px' }}>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: '4px solid #4f46e5' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>סך הכל הצעות</div>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
           </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: '4px solid #eab308' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>אושר / שולם</div>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #eab308' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #eab308' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.approvedPaid}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{approvedPaidCount}</div>
           </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: '4px solid #a855f7' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>אחוז הצלחה</div>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #a855f7' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #a855f7' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.winRate}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#a855f7' }}>{winRate}%</div>
           </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: '4px solid #22c55e' }}>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>סך הכנסות</div>
+          <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
             <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
           </div>
         </div>
@@ -669,19 +683,19 @@ function Dashboard() {
 
         {/* Business Settings & Plan Widget */}
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>הגדרות עסק וחבילה</h2>
+          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.businessSettings}</h2>
           
           {bizPlan !== 'pro' && (
-            <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', padding: '12px 16px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row-reverse' }}>
+            <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', padding: '12px 16px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
               <span style={{ color: '#92400e', fontSize: '0.9rem', fontWeight: '600' }}>
-                ⭐ רוצה להוסיף את הלוגו שלך להצעות המחיר ולשדרג את מיתוג העסק? שדרג עכשיו לחבילת Pro!
+                {isHebrew ? '⭐ רוצה להוסיף את הלוגו שלך להצעות המחיר ולשדרג את מיתוג העסק? שדרג עכשיו לחבילת Pro!' : '⭐ Want to add your logo and upgrade your business branding? Upgrade to Pro!'}
               </span>
               <button 
                 type="button" 
                 onClick={() => setBizPlan('pro')} 
                 style={{ background: '#d97706', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.8rem' }}
               >
-                שדרג ל-Pro
+                {isHebrew ? 'שדרג ל-Pro' : 'Upgrade to Pro'}
               </button>
             </div>
           )}
@@ -689,43 +703,43 @@ function Dashboard() {
           <form onSubmit={handleSaveSettings}>
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.2fr 1.2fr 1fr 1.2fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>שם העסק</label>
-                <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: 'right' }} />
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.businessNameLabel}</label>
+                <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>ח.פ / עוסק מורשה / פטור</label>
-                <input type="text" value={bizTaxId} onChange={(e) => setBizTaxId(e.target.value)} placeholder="123456789" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: 'right' }} />
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.taxIdLabel}</label>
+                <input type="text" value={bizTaxId} onChange={(e) => setBizTaxId(e.target.value)} placeholder="123456789" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>אימייל העסק</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'אימייל העסק' : 'Business Email'}</label>
                 <input type="email" value={bizEmail} onChange={(e) => setBizEmail(e.target.value)} placeholder="business@email.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>טלפון העסק</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'טלפון העסק' : 'Business Phone'}</label>
                 <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="+972..." style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>כתובת תמונת לוגו (URL)</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.logoUrlLabel}</label>
                 <input 
                   type="text" 
                   value={bizLogoUrl} 
                   onChange={(e) => setBizLogoUrl(e.target.value)} 
                   disabled={bizPlan !== 'pro'} 
-                  placeholder={bizPlan === 'pro' ? "https://.../logo.png" : "נעול במסלול חינמי"} 
+                  placeholder={bizPlan === 'pro' ? "https://.../logo.png" : (isHebrew ? "נעול במסלול חינמי" : "Locked on Free Plan")} 
                   style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: bizPlan !== 'pro' ? '#f1f5f9' : 'white' }} 
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>סוג חבילה (Plan)</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.planLabel}</label>
                 <select value={bizPlan} onChange={(e) => setBizPlan(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                  <option value="free">Free (חינמי)</option>
-                  <option value="basic">Basic (בסיסי)</option>
-                  <option value="pro">Pro (מתקדם)</option>
+                  <option value="free">Free ({isHebrew ? 'חינמי' : 'Free'})</option>
+                  <option value="basic">Basic ({isHebrew ? 'בסיסי' : 'Basic'})</option>
+                  <option value="pro">Pro ({isHebrew ? 'מתקדם' : 'Pro'})</option>
                 </select>
               </div>
             </div>
             <button type="submit" style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
-              שמור הגדרות עסק
+              {t.saveSettings}
             </button>
           </form>
         </div>
