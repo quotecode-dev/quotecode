@@ -53,7 +53,7 @@ function App() {
       .from('quotes')
       .select(`
         *,
-        clients ( company_name, email, phone )
+        clients ( company_name, email )
       `)
       .order('created_at', { ascending: false });
 
@@ -64,7 +64,7 @@ function App() {
   async function fetchClients() {
     const { data, error } = await supabase
       .from('clients')
-      .select('*');
+      .select('id, company_name, email');
     if (error) console.error('Error fetching clients:', error.message);
     else setClients(data || []);
   }
@@ -113,11 +113,18 @@ function App() {
     .filter(q => q.status === 'Approved' || q.status === 'Paid')
     .reduce((sum, q) => sum + Number(q.total || 0), 0);
 
+  const getCurrencySymbol = (curr) => {
+    if (curr.includes('EUR')) return '€';
+    if (curr.includes('GBP')) return '£';
+    return '$';
+  };
+  const sym = getCurrencySymbol(currency);
+
   async function handleGenerateQuote(e) {
     e.preventDefault();
     try {
       let clientId;
-      const existingClient = clients.find(c => c.company_name.toLowerCase() === clientName.toLowerCase());
+      const existingClient = clients.find(c => c.company_name?.toLowerCase() === clientName.toLowerCase());
       
       if (existingClient) {
         clientId = existingClient.id;
@@ -126,9 +133,7 @@ function App() {
           .from('clients')
           .insert([{ 
             company_name: clientName, 
-            email: clientEmail, 
-            phone: clientPhone,
-            user_id: session.user.id
+            email: clientEmail
           }])
           .select();
         if (clientError) throw clientError;
@@ -166,7 +171,7 @@ function App() {
 
       if (itemsError) throw itemsError;
 
-      setStatusMsg({ text: `Quote successfully created and saved to cloud! Total: ${totalAmount.toFixed(2)}`, type: 'success' });
+      setStatusMsg({ text: `Quote successfully created and saved to cloud! Total: ${sym}${totalAmount.toFixed(2)}`, type: 'success' });
       
       setClientName('');
       setClientEmail('');
@@ -198,6 +203,8 @@ function App() {
     
     script.onload = () => {
       const element = document.createElement('div');
+      const quoteSym = getCurrencySymbol(quote.currency || 'USD');
+      
       element.innerHTML = `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto;">
           
@@ -220,7 +227,6 @@ function App() {
             <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">Prepared For:</p>
             <p style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">${quote.clients?.company_name || 'N/A'}</p>
             <p style="margin: 2px 0 0 0; color: #4b5563; font-size: 14px;">${quote.clients?.email || ''}</p>
-            <p style="margin: 2px 0 0 0; color: #4b5563; font-size: 14px;">${quote.clients?.phone || ''}</p>
           </div>
 
           <!-- Items Table -->
@@ -236,7 +242,7 @@ function App() {
               <tr style="border-bottom: 1px solid #e5e7eb;">
                 <td style="padding: 15px 0; font-size: 14px; color: #374151;">Professional Services / SaaS License</td>
                 <td style="padding: 15px 0; text-align: center; font-size: 14px; color: #374151;">${quote.status}</td>
-                <td style="padding: 15px 0; text-align: right; font-size: 14px; color: #374151;">${Number(quote.total || 0).toFixed(2)} ${quote.currency}</td>
+                <td style="padding: 15px 0; text-align: right; font-size: 14px; color: #374151;">${quoteSym}${Number(quote.total || 0).toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
@@ -246,7 +252,7 @@ function App() {
             <div style="width: 300px;">
               <div style="display: flex; justify-content: space-between; border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: 10px;">
                 <span style="font-size: 18px; font-weight: bold; color: #111827;">Total Amount:</span>
-                <span style="font-size: 18px; font-weight: bold; color: #4f46e5;">${Number(quote.total || 0).toFixed(2)} ${quote.currency}</span>
+                <span style="font-size: 18px; font-weight: bold; color: #4f46e5;">${quoteSym}${Number(quote.total || 0).toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -291,11 +297,11 @@ function App() {
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Email</label>
-              <input type="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="shlomisiny@gmail.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+              <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="shlomisiny@gmail.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Password</label>
-              <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+              <input type="password" name="loginPassword" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
               Sign In
@@ -338,7 +344,7 @@ function App() {
           </div>
           <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderLeft: '4px solid #22c55e' }}>
             <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>TOTAL REVENUE</div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>${totalRevenue.toFixed(2)}</div>
+            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{totalRevenue.toFixed(2)}</div>
           </div>
         </div>
 
@@ -358,22 +364,22 @@ function App() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '20px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Name</label>
-                <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <input type="text" name="clientName" autoComplete="organization" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Email</label>
-                <input type="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="contact@acme.com" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <input type="email" name="clientEmail" autoComplete="email" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="contact@acme.com" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Phone</label>
-                <input type="text" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+1 (555) 0192" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <input type="text" name="clientPhone" autoComplete="tel" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+1 (555) 0192" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '20px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Currency</label>
-                <select value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
                   <option>USD ($)</option>
                   <option>EUR (€)</option>
                   <option>GBP (£)</option>
@@ -381,7 +387,7 @@ function App() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Status</label>
-                <select value={quoteStatus} onChange={(e) => setQuoteStatus(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                <select name="quoteStatus" value={quoteStatus} onChange={(e) => setQuoteStatus(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
                   <option value="Draft">Draft</option>
                   <option value="Sent">Sent</option>
                   <option value="Approved">Approved</option>
@@ -390,17 +396,17 @@ function App() {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Valid Until</label>
-                <input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <input type="date" name="validUntil" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Discount (%)</label>
-                <input type="number" value={discount} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+                <input type="number" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
             </div>
 
             <div style={{ marginBottom: '25px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Terms / Notes</label>
-              <input type="text" value={terms} onChange={(e) => setTerms(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+              <input type="text" name="terms" value={terms} onChange={(e) => setTerms(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
@@ -408,12 +414,21 @@ function App() {
               <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>+ Add Item</button>
             </div>
 
+            {/* שורת הכותרות המקובעת שמונעת היעלמות של הטקסט PRICE וכו' */}
+            <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '8px', padding: '0 5px', fontSize: '0.8rem', fontWeight: '600', color: '#475569' }}>
+              <div>Description</div>
+              <div>Qty</div>
+              <div>Price</div>
+              <div style={{ textAlign: 'right' }}>Total</div>
+              <div style={{ width: items.length > 1 ? '36px' : '0' }}></div>
+            </div>
+
             {items.map((item, index) => (
               <div key={index} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
-                <input type="text" placeholder="Item description" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
-                <input type="number" placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
-                <input type="number" placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
-                <div style={{ fontWeight: '600', color: '#334155', textAlign: 'right' }}>{(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}</div>
+                <input type="text" name={`description_${index}`} placeholder="Item description" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
+                <input type="number" name={`quantity_${index}`} placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
+                <input type="number" name={`price_${index}`} placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
+                <div style={{ fontWeight: '600', color: '#334155', textAlign: 'right' }}>{sym}{(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}</div>
                 {items.length > 1 && (
                   <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer' }}>✕</button>
                 )}
@@ -423,17 +438,17 @@ function App() {
             <div style={{ borderTop: '2px solid #f1f5f9', marginTop: '20px', paddingTop: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b' }}>
                 <span>Subtotal:</span>
-                <span>{subtotal.toFixed(2)}</span>
+                <span>{sym}{subtotal.toFixed(2)}</span>
               </div>
               {discount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444' }}>
                   <span>Discount ({discount}%):</span>
-                  <span>-{discountAmount.toFixed(2)}</span>
+                  <span>-{sym}{discountAmount.toFixed(2)}</span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px' }}>
                 <span>Total Amount:</span>
-                <span style={{ color: '#4f46e5' }}>{totalAmount.toFixed(2)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD'}</span>
+                <span style={{ color: '#4f46e5' }}>{sym}{totalAmount.toFixed(2)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD'}</span>
               </div>
             </div>
 
@@ -466,45 +481,48 @@ function App() {
                     </td>
                   </tr>
                 ) : (
-                  quotes.map((quote) => (
-                    <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                      <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
-                      <td style={{ padding: '12px' }}>
-                        <div style={{ fontWeight: '600', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
-                        <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{quote.clients?.email}</div>
-                      </td>
-                      <td style={{ padding: '12px' }}>
-                        <span style={{
-                          padding: '4px 10px',
-                          borderRadius: '6px',
-                          fontSize: '0.75rem',
-                          fontWeight: '600',
-                          background: quote.status === 'Approved' ? '#dcfce7' : quote.status === 'Paid' ? '#dbeafe' : '#f1f5f9',
-                          color: quote.status === 'Approved' ? '#166534' : quote.status === 'Paid' ? '#1e40af' : '#475569'
-                        }}>
-                          {quote.status || 'Draft'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
-                        {Number(quote.total || 0).toFixed(2)} {quote.currency}
-                      </td>
-                      <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
-                      <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
-                        <button 
-                          onClick={() => handlePrintQuote(quote)}
-                          style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
-                        >
-                          PDF
-                        </button>
-                        <button 
-                          onClick={() => handleDeleteQuote(quote.id)}
-                          style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  quotes.map((quote) => {
+                    const quoteSym = getCurrencySymbol(quote.currency || 'USD');
+                    return (
+                      <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                        <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
+                        <td style={{ padding: '12px' }}>
+                          <div style={{ fontWeight: '600', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{quote.clients?.email}</div>
+                        </td>
+                        <td style={{ padding: '12px' }}>
+                          <span style={{
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            background: quote.status === 'Approved' ? '#dcfce7' : quote.status === 'Paid' ? '#dbeafe' : '#f1f5f9',
+                            color: quote.status === 'Approved' ? '#166534' : quote.status === 'Paid' ? '#1e40af' : '#475569'
+                          }}>
+                            {quote.status || 'Draft'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
+                          {quoteSym}{Number(quote.total || 0).toFixed(2)}
+                        </td>
+                        <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
+                        <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
+                          <button 
+                            onClick={() => handlePrintQuote(quote)}
+                            style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                          >
+                            PDF
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteQuote(quote.id)}
+                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
