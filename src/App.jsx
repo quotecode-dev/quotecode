@@ -41,6 +41,7 @@ function PublicQuote() {
   const bizTaxId = settings?.tax_id || '';
   const bizEmail = settings?.email || '';
   const bizPhone = settings?.phone || '';
+  const bizLogo = settings?.logo_url || '';
 
   const getCurrencySymbol = (curr) => {
     if (!curr) return '₪';
@@ -71,7 +72,11 @@ function PublicQuote() {
       <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '50px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isLocal ? 'row-reverse' : 'row' }}>
           <div>
-            <h1 style={{ margin: 0, color: '#4f46e5', fontSize: '28px', fontWeight: '900' }}>&lt;/&gt; {bizName}</h1>
+            {bizLogo ? (
+              <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block' }} />
+            ) : (
+              <h1 style={{ margin: 0, color: '#4f46e5', fontSize: '28px', fontWeight: '900' }}>&lt;/&gt; {bizName}</h1>
+            )}
             <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
               {bizTaxId && `${isLocal ? 'עוסק/ח.פ:' : 'Tax ID:'} ${bizTaxId} | `} {bizEmail} {bizPhone ? `| ${bizPhone}` : ''}
             </p>
@@ -159,6 +164,7 @@ function Dashboard() {
   const [bizTaxId, setBizTaxId] = useState('');
   const [bizEmail, setBizEmail] = useState('');
   const [bizPhone, setBizPhone] = useState('');
+  const [bizLogoUrl, setBizLogoUrl] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -218,6 +224,7 @@ function Dashboard() {
     saveSettings: isHebrew ? 'שמור הגדרות עסק' : 'Save Business Settings',
     businessNameLabel: isHebrew ? 'שם העסק' : 'Business Name',
     taxIdLabel: isHebrew ? 'ח.פ / עוסק מורשה / פטור' : 'Tax ID / Lic No',
+    logoUrlLabel: isHebrew ? 'כתובת תמונת לוגו (URL)' : 'Logo Image URL',
     addService: isHebrew ? 'הוסף לקטלוג' : 'Add to Catalog',
     serviceName: isHebrew ? 'שם השירות / המוצר' : 'Service Name',
     defaultPrice: isHebrew ? 'מחיר קבוע' : 'Default Price',
@@ -295,6 +302,7 @@ function Dashboard() {
       setBizTaxId(data.tax_id || '');
       setBizEmail(data.email || '');
       setBizPhone(data.phone || '');
+      setBizLogoUrl(data.logo_url || '');
     }
   }
 
@@ -304,13 +312,14 @@ function Dashboard() {
       business_name: bizName,
       tax_id: bizTaxId,
       email: bizEmail,
-      phone: bizPhone
+      phone: bizPhone,
+      logo_url: bizLogoUrl
     };
 
     if (settingId) {
       const { error } = await supabase.from('business_settings').update(payload).eq('id', settingId);
       if (error) setStatusMsg({ text: 'Error updating settings: ' + error.message, type: 'error' });
-      else setStatusMsg({ text: isHebrew ? 'הגדרות העסק עודכנו בהצלחה!' : 'Business settings updated successfully!', type: 'success' });
+      else setStatusMsg({ text: isHebrew ? 'הגדרות העסק והלוגו עודכנו בהצלחה!' : 'Business settings and logo updated successfully!', type: 'success' });
     } else {
       const { data, error } = await supabase.from('business_settings').insert([payload]).select();
       if (error) setStatusMsg({ text: 'Error saving settings: ' + error.message, type: 'error' });
@@ -657,7 +666,7 @@ function Dashboard() {
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
           <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.businessSettings}</h2>
           <form onSubmit={handleSaveSettings}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.businessNameLabel}</label>
                 <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
@@ -673,6 +682,10 @@ function Dashboard() {
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientPhone}</label>
                 <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="+972..." style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.logoUrlLabel}</label>
+                <input type="text" value={bizLogoUrl} onChange={(e) => setBizLogoUrl(e.target.value)} placeholder="https://.../logo.png" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
               </div>
             </div>
             <button type="submit" style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
