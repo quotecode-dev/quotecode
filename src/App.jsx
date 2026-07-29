@@ -107,10 +107,10 @@ function App() {
   const totalAmount = subtotal - discountAmount;
 
   const totalQuotesCount = quotes.length;
-  const approvedPaidCount = quotes.filter(q => q.status === 'Approved' || q.status === 'Paid').length;
+  const approvedPaidCount = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').length;
   const winRate = totalQuotesCount > 0 ? Math.round((approvedPaidCount / totalQuotesCount) * 100) : 0;
   const totalRevenue = quotes
-    .filter(q => q.status === 'Approved' || q.status === 'Paid')
+    .filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid')
     .reduce((sum, q) => sum + Number(q.total || 0), 0);
 
   const getCurrencySymbol = (curr) => {
@@ -148,7 +148,7 @@ function App() {
           subtotal: subtotal,
           tax_rate: 0.00,
           total: totalAmount,
-          status: quoteStatus,
+          status: quoteStatus.toLowerCase(),
           valid_until: validUntil || null
         }])
         .select();
@@ -414,9 +414,9 @@ function App() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr 36px', gap: '10px', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>
-              <div style={{ paddingLeft: '10px' }}>Description</div>
-              <div style={{ paddingLeft: '10px' }}>Qty</div>
-              <div style={{ paddingLeft: '10px' }}>Price</div>
+              <div style={{ textAlign: 'left' }}>Description</div>
+              <div style={{ textAlign: 'left' }}>Qty</div>
+              <div style={{ textAlign: 'left' }}>Price</div>
               <div style={{ textAlign: 'right' }}>Total</div>
               <div></div>
             </div>
@@ -496,8 +496,8 @@ function App() {
                             borderRadius: '6px',
                             fontSize: '0.75rem',
                             fontWeight: '600',
-                            background: quote.status === 'Approved' ? '#dcfce7' : quote.status === 'Paid' ? '#dbeafe' : '#f1f5f9',
-                            color: quote.status === 'Approved' ? '#166534' : quote.status === 'Paid' ? '#1e40af' : '#475569'
+                            background: quote.status?.toLowerCase() === 'approved' ? '#dcfce7' : quote.status?.toLowerCase() === 'paid' ? '#dbeafe' : '#f1f5f9',
+                            color: quote.status?.toLowerCase() === 'approved' ? '#166534' : quote.status?.toLowerCase() === 'paid' ? '#1e40af' : '#475569'
                           }}>
                             {quote.status || 'Draft'}
                           </span>
