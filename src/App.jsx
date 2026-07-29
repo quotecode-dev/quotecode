@@ -10,6 +10,10 @@ function App() {
   const [clients, setClients] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
+  // Search & Filter state
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+
   // Edit mode state
   const [editingQuoteId, setEditingQuoteId] = useState(null);
 
@@ -66,6 +70,8 @@ function App() {
     updateQuote: isHebrew ? 'עדכן הצעה בענן' : 'Update Quote in Cloud',
     cancelEdit: isHebrew ? 'ביטול עריכה' : 'Cancel Edit',
     recentHistory: isHebrew ? 'היסטוריית הצעות מחיר' : 'Recent Quotes History',
+    searchQuote: isHebrew ? 'חיפוש שם לקוח או מס׳ הצעה...' : 'Search client or quote #...',
+    filterStatus: isHebrew ? 'כל הסטטוסים' : 'All Statuses',
     actions: isHebrew ? 'פעולות' : 'Actions',
     edit: isHebrew ? 'ערוך' : 'Edit',
     pdfPrint: isHebrew ? 'הדפס / PDF' : 'PDF / Print',
@@ -446,6 +452,14 @@ function App() {
     printWindow.document.close();
   };
 
+  // Filter quotes logic
+  const filteredQuotes = quotes.filter(quote => {
+    const matchesSearch = (quote.clients?.company_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          quote.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || (quote.status || 'draft').toLowerCase() === statusFilter.toLowerCase();
+    return matchesSearch && matchesStatus;
+  });
+
   if (!session) {
     return (
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
@@ -655,7 +669,32 @@ function App() {
         </div>
 
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>{t.recentHistory}</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+            <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
+            
+            {/* Search and Filter Controls */}
+            <div style={{ display: 'flex', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+              <input 
+                type="text" 
+                placeholder={t.searchQuote} 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '250px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
+              />
+              <select 
+                value={statusFilter} 
+                onChange={(e) => setStatusFilter(e.target.value)}
+                style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
+              >
+                <option value="All">{t.filterStatus}</option>
+                <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
+                <option value="sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
+                <option value="approved">{isHebrew ? 'אושר' : 'Approved'}</option>
+                <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
+              </select>
+            </div>
+          </div>
+
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left' }}>
               <thead>
@@ -669,14 +708,16 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {quotes.length === 0 ? (
+                {filteredQuotes.length === 0 ? (
                   <tr>
                     <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
-                      {isHebrew ? 'לא נמצאו הצעות מחיר במסד הנתונים.' : 'No quotes found in the database.'}
+                      {quotes.length === 0 
+                        ? (isHebrew ? 'לא נמצאו הצעות מחיר במסד הנתונים.' : 'No quotes found in the database.') 
+                        : (isHebrew ? 'לא נמצאו תוצאות לחיפוש ולסינון הנוכחיים.' : 'No results found for this search and filter.')}
                     </td>
                   </tr>
                 ) : (
-                  quotes.map((quote) => {
+                  filteredQuotes.map((quote) => {
                     const quoteSym = getCurrencySymbol(quote.currency);
                     const qIsHebrew = quote.currency === 'ILS';
                     const statusText = quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft';
