@@ -86,7 +86,8 @@ function App() {
     edit: isHebrew ? 'ערוך' : 'Edit',
     duplicate: isHebrew ? 'שכפל' : 'Duplicate',
     pdfPrint: isHebrew ? 'הדפס / PDF' : 'PDF / Print',
-    sendEmail: isHebrew ? 'שלח במייל' : 'Email',
+    sendEmail: isHebrew ? 'מייל' : 'Email',
+    sendWhatsApp: isHebrew ? 'וואטסאפ' : 'WhatsApp',
     delete: isHebrew ? 'מחק' : 'Delete'
   };
 
@@ -128,7 +129,7 @@ function App() {
       .from('quotes')
       .select(`
         *,
-        clients ( company_name, email ),
+        clients ( company_name, email, phone ),
         quote_items ( * )
       `)
       .order('created_at', { ascending: false });
@@ -140,7 +141,7 @@ function App() {
   async function fetchClients() {
     const { data, error } = await supabase
       .from('clients')
-      .select('id, company_name, email');
+      .select('id, company_name, email, phone');
     if (error) console.error('Error fetching clients:', error.message);
     else setClients(data || []);
   }
@@ -258,7 +259,7 @@ function App() {
     setEditingQuoteId(quote.id);
     setClientName(quote.clients?.company_name || '');
     setClientEmail(quote.clients?.email || '');
-    setClientPhone('');
+    setClientPhone(quote.clients?.phone || '');
     
     if (quote.currency === 'EUR') {
       setCurrency('EUR (€)');
@@ -276,7 +277,7 @@ function App() {
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
-    setDiscount(quote.discount || 0);
+    setDiscount(quote.discount || 0); // Loads the saved discount
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({
@@ -296,7 +297,7 @@ function App() {
     setEditingQuoteId(null); 
     setClientName(quote.clients?.company_name || '');
     setClientEmail(quote.clients?.email || '');
-    setClientPhone('');
+    setClientPhone(quote.clients?.phone || '');
     
     if (quote.currency === 'EUR') {
       setCurrency('EUR (€)');
@@ -344,9 +345,12 @@ function App() {
     const quoteSym = getCurrencySymbol(quote.currency);
     const qIsLocal = quote.currency === 'ILS';
     const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
+    const quoteDiscount = quote.discount || 0;
+    const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
+    const quoteTaxable = quoteSub - quoteDiscountAmount;
     const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
-    const quoteTaxAmount = quoteSub * quoteTaxRate;
-    const quoteTotal = quote.total > quoteSub ? quote.total : (quoteSub + quoteTaxAmount);
+    const quoteTaxAmount = quoteTaxable * quoteTaxRate;
+    const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + quoteTaxAmount);
 
     const subject = qIsLocal 
       ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-QuoteCode Pro` 
@@ -357,6 +361,30 @@ function App() {
       : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nBest regards,\nQuoteCode Pro Team`;
 
     window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const handleWhatsAppQuote = (quote) => {
+    if (!quote.clients?.phone) {
+      setStatusMsg({ text: isHebrew ? 'ללקוח זה אין מספר טלפון מעודכן.' : 'This client does not have a phone number.', type: 'error' });
+      return;
+    }
+
+    const quoteSym = getCurrencySymbol(quote.currency);
+    const qIsLocal = quote.currency === 'ILS';
+    const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
+    const quoteDiscount = quote.discount || 0;
+    const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
+    const quoteTaxable = quoteSub - quoteDiscountAmount;
+    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
+    const quoteTaxAmount = quoteTaxable * quoteTaxRate;
+    const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + quoteTaxAmount);
+
+    const msg = qIsLocal
+      ? `שלום ${quote.clients?.company_name || ''},\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()}.\n*סך הכל לתשלום:* ${quoteSym}${formatNum(quoteTotal)}\n\nנשמח לעמוד לשירותך!`
+      : `Hello ${quote.clients?.company_name || ''},\nHere is your quote #${quote.id.slice(0, 6).toUpperCase()}.\n*Total Amount:* ${quoteSym}${formatNum(quoteTotal)}\n\nThank you for your business!`;
+
+    const phoneNum = quote.clients.phone.replace(/[^0-9]/g, '');
+    window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const handleCancelEdit = () => {
@@ -378,12 +406,17 @@ function App() {
       
       if (existingClient) {
         clientId = existingClient.id;
+        // Update phone number if it changed
+        if (clientPhone !== existingClient.phone) {
+            await supabase.from('clients').update({ phone: clientPhone }).eq('id', clientId);
+        }
       } else {
         const { data: newClientData, error: clientError } = await supabase
           .from('clients')
           .insert([{ 
             company_name: clientName, 
-            email: clientEmail
+            email: clientEmail,
+            phone: clientPhone
           }])
           .select();
         if (clientError) throw clientError;
@@ -395,6 +428,7 @@ function App() {
       else if (currency.includes('GBP')) dbCurrency = 'GBP';
       else if (currency.includes('USD')) dbCurrency = 'USD';
 
+      // Ensure discount is saved to the database
       const quotePayload = {
         client_id: clientId,
         currency: dbCurrency,
@@ -402,7 +436,8 @@ function App() {
         tax_rate: taxRate,
         total: totalAmount,
         status: quoteStatus.toLowerCase(),
-        valid_until: validUntil || null
+        valid_until: validUntil || null,
+        discount: Number(discount) // Saving discount explicitly
       };
 
       let quoteId;
@@ -463,10 +498,14 @@ function App() {
   const handlePrintQuote = (quote) => {
     const quoteSym = getCurrencySymbol(quote.currency);
     const isLocal = quote.currency === 'ILS';
-    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isLocal ? 0.18 : 0.00);
+    
     const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
-    const quoteTaxAmount = quoteSub * quoteTaxRate;
-    const quoteTotal = quote.total > quoteSub ? quote.total : (quoteSub + quoteTaxAmount);
+    const quoteDiscount = quote.discount || 0;
+    const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
+    const quoteTaxable = quoteSub - quoteDiscountAmount;
+    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isLocal ? 0.18 : 0.00);
+    const quoteTaxAmount = quoteTaxable * quoteTaxRate;
+    const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + quoteTaxAmount);
 
     const lblQuote = isLocal ? 'הצעת מחיר' : 'QUOTE';
     const lblPreparedFor = isLocal ? 'הוכן עבור:' : 'Prepared For:';
@@ -512,6 +551,7 @@ function App() {
             th:nth-child(2) { text-align: center; }
             th:nth-child(3), th:nth-child(4) { text-align: ${isLocal ? 'left' : 'right'}; }
             .total-section { text-align: ${isLocal ? 'left' : 'right'}; margin-top: 20px; font-size: 15px; color: #4b5563; }
+            .discount-row { color: #ef4444; font-weight: 600; margin-top: 4px; }
             .grand-total { font-size: 20px; font-weight: bold; color: #4f46e5; margin-top: 8px; }
           </style>
         </head>
@@ -533,6 +573,7 @@ function App() {
             <p style="font-size: 12px; font-weight: bold; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px;">${lblPreparedFor}</p>
             <p style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">${quote.clients?.company_name || 'N/A'}</p>
             <p style="margin: 2px 0 0; color: #4b5563; font-size: 14px;">${quote.clients?.email || ''}</p>
+            ${quote.clients?.phone ? `<p style="margin: 2px 0 0; color: #4b5563; font-size: 14px; direction: ltr;">${quote.clients.phone}</p>` : ''}
           </div>
 
           <table>
@@ -551,6 +592,7 @@ function App() {
 
           <div class="total-section">
             <div>${lblSubtotal} ${quoteSym}${formatNum(quoteSub)}</div>
+            ${quoteDiscount > 0 ? `<div class="discount-row">${isLocal ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -${quoteSym}${formatNum(quoteDiscountAmount)}</div>` : ''}
             ${quoteTaxRate > 0 ? `<div>${lblVat} ${quoteSym}${formatNum(quoteTaxAmount)}</div>` : ''}
             <div class="grand-total">${lblGrandTotal} ${quoteSym}${formatNum(quoteTotal)}</div>
           </div>
@@ -895,6 +937,12 @@ function App() {
                             {t.sendEmail}
                           </button>
                           <button 
+                            onClick={() => handleWhatsAppQuote(quote)}
+                            style={{ background: '#dcfce7', color: '#166534', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
+                          >
+                            {t.sendWhatsApp}
+                          </button>
+                          <button 
                             onClick={() => handlePrintQuote(quote)}
                             style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                           >
@@ -918,7 +966,7 @@ function App() {
 
         {/* Services Catalog Widget */}
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
+          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
           
           <form onSubmit={handleAddService} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
             <input 
