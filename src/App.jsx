@@ -17,7 +17,11 @@ function App() {
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  const [currency, setCurrency] = useState('USD ($)');
+  
+  // Client Region & Currency state
+  const [clientRegion, setClientRegion] = useState('local'); // 'local' or 'international'
+  const [currency, setCurrency] = useState('ILS (₪)');
+  
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -45,6 +49,15 @@ function App() {
       loadData();
     }
   }, [session]);
+
+  const handleRegionChange = (newRegion) => {
+    setClientRegion(newRegion);
+    if (newRegion === 'international' && currency.includes('ILS')) {
+      setCurrency('USD ($)');
+    } else if (newRegion === 'local' && !currency.includes('ILS')) {
+      setCurrency('ILS (₪)');
+    }
+  };
 
   async function loadData() {
     await fetchQuotes();
@@ -122,9 +135,11 @@ function App() {
     .reduce((sum, q) => sum + Number(q.total || 0), 0);
 
   const getCurrencySymbol = (curr) => {
+    if (!curr) return '₪';
     if (curr.includes('EUR')) return '€';
     if (curr.includes('GBP')) return '£';
-    return '$';
+    if (curr.includes('USD')) return '$';
+    return '₪';
   };
   const sym = getCurrencySymbol(currency);
 
@@ -134,9 +149,19 @@ function App() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone('');
     
-    if (quote.currency === 'EUR') setCurrency('EUR (€)');
-    else if (quote.currency === 'GBP') setCurrency('GBP (£)');
-    else setCurrency('USD ($)');
+    if (quote.currency === 'EUR') {
+      setCurrency('EUR (€)');
+      setClientRegion('international');
+    } else if (quote.currency === 'GBP') {
+      setCurrency('GBP (£)');
+      setClientRegion('international');
+    } else if (quote.currency === 'USD') {
+      setCurrency('USD ($)');
+      setClientRegion('international');
+    } else {
+      setCurrency('ILS (₪)');
+      setClientRegion('local');
+    }
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
@@ -187,9 +212,14 @@ function App() {
         clientId = newClientData[0].id;
       }
 
+      let dbCurrency = 'ILS';
+      if (currency.includes('EUR')) dbCurrency = 'EUR';
+      else if (currency.includes('GBP')) dbCurrency = 'GBP';
+      else if (currency.includes('USD')) dbCurrency = 'USD';
+
       const quotePayload = {
         client_id: clientId,
-        currency: currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD',
+        currency: dbCurrency,
         subtotal: subtotal,
         tax_rate: 0.00,
         total: totalAmount,
@@ -264,7 +294,7 @@ function App() {
   }
 
   const handlePrintQuote = (quote) => {
-    const quoteSym = getCurrencySymbol(quote.currency || 'USD');
+    const quoteSym = getCurrencySymbol(quote.currency);
     const itemsRows = quote.quote_items && quote.quote_items.length > 0 
       ? quote.quote_items.map(item => `
           <tr>
@@ -458,8 +488,16 @@ function App() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '15px', marginBottom: '20px' }}>
               <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Client Region</label>
+                <select name="clientRegion" value={clientRegion} onChange={(e) => handleRegionChange(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                  <option value="local">Local (Israel)</option>
+                  <option value="international">International (Foreign)</option>
+                </select>
+              </div>
+              <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Currency</label>
                 <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                  {clientRegion === 'local' && <option>ILS (₪)</option>}
                   <option>USD ($)</option>
                   <option>EUR (€)</option>
                   <option>GBP (£)</option>
@@ -478,15 +516,17 @@ function App() {
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Valid Until</label>
                 <input type="date" name="validUntil" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '25px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Discount (%)</label>
                 <input type="number" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
               </div>
-            </div>
-
-            <div style={{ marginBottom: '25px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Terms / Notes</label>
-              <input type="text" name="terms" value={terms} onChange={(e) => setTerms(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+              <div>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Terms / Notes</label>
+                <input type="text" name="terms" value={terms} onChange={(e) => setTerms(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+              </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
@@ -529,7 +569,7 @@ function App() {
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px' }}>
                 <span>Total Amount:</span>
-                <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD'}</span>
+                <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : currency.includes('USD') ? 'USD' : 'ILS'}</span>
               </div>
             </div>
 
@@ -562,13 +602,13 @@ function App() {
                   </tr>
                 ) : (
                   quotes.map((quote) => {
-                    const quoteSym = getCurrencySymbol(quote.currency || 'USD');
+                    const quoteSym = getCurrencySymbol(quote.currency);
                     return (
                       <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
                         <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
                         <td style={{ padding: '12px' }}>
                           <div style={{ fontWeight: '600', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
-                          <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{quote.clients?.email}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#64748b'}>{quote.clients?.email}</div>
                         </td>
                         <td style={{ padding: '12px' }}>
                           <span style={{
