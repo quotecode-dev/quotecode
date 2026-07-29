@@ -139,7 +139,7 @@ function App() {
         .from('quotes')
         .insert([{
           client_id: clientId,
-          currency: currency.includes('USD') ? 'USD' : 'ILS',
+          currency: currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD',
           subtotal: subtotal,
           tax_rate: 0.00,
           total: totalAmount,
@@ -166,7 +166,7 @@ function App() {
 
       if (itemsError) throw itemsError;
 
-      setStatusMsg({ text: `Quote successfully created and saved to cloud! Total: $${totalAmount.toFixed(2)}`, type: 'success' });
+      setStatusMsg({ text: `Quote successfully created and saved to cloud! Total: ${totalAmount.toFixed(2)}`, type: 'success' });
       
       setClientName('');
       setClientEmail('');
@@ -236,7 +236,7 @@ function App() {
               <tr style="border-bottom: 1px solid #e5e7eb;">
                 <td style="padding: 15px 0; font-size: 14px; color: #374151;">Professional Services / SaaS License</td>
                 <td style="padding: 15px 0; text-align: center; font-size: 14px; color: #374151;">${quote.status}</td>
-                <td style="padding: 15px 0; text-align: right; font-size: 14px; color: #374151;">$${Number(quote.total || 0).toFixed(2)} ${quote.currency}</td>
+                <td style="padding: 15px 0; text-align: right; font-size: 14px; color: #374151;">${Number(quote.total || 0).toFixed(2)} ${quote.currency}</td>
               </tr>
             </tbody>
           </table>
@@ -246,7 +246,7 @@ function App() {
             <div style="width: 300px;">
               <div style="display: flex; justify-content: space-between; border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: 10px;">
                 <span style="font-size: 18px; font-weight: bold; color: #111827;">Total Amount:</span>
-                <span style="font-size: 18px; font-weight: bold; color: #4f46e5;">$${Number(quote.total || 0).toFixed(2)} ${quote.currency}</span>
+                <span style="font-size: 18px; font-weight: bold; color: #4f46e5;">${Number(quote.total || 0).toFixed(2)} ${quote.currency}</span>
               </div>
             </div>
           </div>
@@ -375,7 +375,8 @@ function App() {
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Currency</label>
                 <select value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
                   <option>USD ($)</option>
-                  <option>ILS (₪)</option>
+                  <option>EUR (€)</option>
+                  <option>GBP (£)</option>
                 </select>
               </div>
               <div>
@@ -411,8 +412,8 @@ function App() {
               <div key={index} style={{ display: 'grid', gridTemplateColumns: '3fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
                 <input type="text" placeholder="Item description" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
                 <input type="number" placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
-                <input type="number" placeholder="Price ($)" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
-                <div style={{ fontWeight: '600', color: '#334155', textAlign: 'right' }}>${(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}</div>
+                <input type="number" placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
+                <div style={{ fontWeight: '600', color: '#334155', textAlign: 'right' }}>{(Number(item.quantity) * Number(item.unit_price)).toFixed(2)}</div>
                 {items.length > 1 && (
                   <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '10px', borderRadius: '6px', cursor: 'pointer' }}>✕</button>
                 )}
@@ -422,17 +423,17 @@ function App() {
             <div style={{ borderTop: '2px solid #f1f5f9', marginTop: '20px', paddingTop: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b' }}>
                 <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{subtotal.toFixed(2)}</span>
               </div>
               {discount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444' }}>
                   <span>Discount ({discount}%):</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
+                  <span>-{discountAmount.toFixed(2)}</span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px' }}>
                 <span>Total Amount:</span>
-                <span style={{ color: '#4f46e5' }}>${totalAmount.toFixed(2)} {currency.includes('USD') ? 'USD' : 'ILS'}</span>
+                <span style={{ color: '#4f46e5' }}>{totalAmount.toFixed(2)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : 'USD'}</span>
               </div>
             </div>
 
@@ -485,7 +486,7 @@ function App() {
                         </span>
                       </td>
                       <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
-                        ${Number(quote.total || 0).toFixed(2)}
+                        {Number(quote.total || 0).toFixed(2)} {quote.currency}
                       </td>
                       <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
                       <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
