@@ -125,7 +125,12 @@ function App() {
 
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
   const discountAmount = (subtotal * Number(discount)) / 100;
-  const totalAmount = subtotal - discountAmount;
+  const taxableAmount = subtotal - discountAmount;
+  
+  // 18% VAT for local Israeli clients, 0% for international
+  const taxRate = clientRegion === 'local' ? 0.18 : 0.00;
+  const taxAmount = taxableAmount * taxRate;
+  const totalAmount = taxableAmount + taxAmount;
 
   const totalQuotesCount = quotes.length;
   const approvedPaidCount = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').length;
@@ -221,7 +226,7 @@ function App() {
         client_id: clientId,
         currency: dbCurrency,
         subtotal: subtotal,
-        tax_rate: 0.00,
+        tax_rate: taxRate,
         total: totalAmount,
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null
@@ -295,6 +300,11 @@ function App() {
 
   const handlePrintQuote = (quote) => {
     const quoteSym = getCurrencySymbol(quote.currency);
+    const quoteTaxRate = quote.tax_rate !== undefined ? Number(quote.tax_rate) : (quote.currency === 'ILS' ? 0.18 : 0.00);
+    const quoteSub = quote.subtotal || 0;
+    const quoteTaxAmount = quoteSub * quoteTaxRate;
+    const quoteTotal = quote.total || (quoteSub + quoteTaxAmount);
+
     const itemsRows = quote.quote_items && quote.quote_items.length > 0 
       ? quote.quote_items.map(item => `
           <tr>
@@ -322,7 +332,8 @@ function App() {
             .client-info { margin-bottom: 30px; }
             table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
             th { background: #f9fafb; padding: 12px; text-align: left; font-size: 12px; color: #6b7280; text-transform: uppercase; border-bottom: 2px solid #111827; }
-            .total-section { text-align: right; margin-top: 20px; font-size: 18px; font-weight: bold; color: #4f46e5; }
+            .total-section { text-align: right; margin-top: 20px; font-size: 15px; color: #4b5563; }
+            .grand-total { font-size: 20px; font-weight: bold; color: #4f46e5; margin-top: 8px; }
           </style>
         </head>
         <body>
@@ -360,7 +371,9 @@ function App() {
           </table>
 
           <div class="total-section">
-            Total Amount: ${quoteSym}${formatNum(quote.total)}
+            <div>Subtotal: ${quoteSym}${formatNum(quoteSub)}</div>
+            ${quoteTaxRate > 0 ? `<div>VAT (${quoteTaxRate * 100}%): ${quoteSym}${formatNum(quoteTaxAmount)}</div>` : ''}
+            <div class="grand-total">Total Amount: ${quoteSym}${formatNum(quoteTotal)}</div>
           </div>
 
           <div style="margin-top: 40px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
@@ -565,6 +578,12 @@ function App() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444' }}>
                   <span>Discount ({discount}%):</span>
                   <span>-{sym}{formatNum(discountAmount)}</span>
+                </div>
+              )}
+              {clientRegion === 'local' && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b' }}>
+                  <span>VAT (18%):</span>
+                  <span>{sym}{formatNum(taxAmount)}</span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px' }}>
