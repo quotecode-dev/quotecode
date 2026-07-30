@@ -534,7 +534,6 @@ function Dashboard() {
     const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    // Master EmailJS configuration
     const EMAILJS_SERVICE_ID = "service_n0jzdfq";
     const EMAILJS_TEMPLATE_ID = "template_tixfha8";
     const EMAILJS_PUBLIC_KEY = "TKnGiZybtH0R9mkY5";
@@ -549,6 +548,7 @@ function Dashboard() {
           service_id: EMAILJS_SERVICE_ID,
           template_id: EMAILJS_TEMPLATE_ID,
           user_id: EMAILJS_PUBLIC_KEY,
+          publicKey: EMAILJS_PUBLIC_KEY,
           template_params: {
             to_email: quote.clients.email,
             to_name: quote.clients.company_name,
@@ -568,20 +568,12 @@ function Dashboard() {
         return;
       } else {
         const errText = await response.text();
-        console.error('EmailJS error response:', errText);
-        throw new Error('EmailJS failed: ' + errText);
+        throw new Error(errText || 'EmailJS failed');
       }
     } catch (err) {
-      console.error('EmailJS error, falling back to mailto:', err);
+      console.error('EmailJS error:', err);
+      setStatusMsg({ text: isHebrew ? `שגיאה בשליחת המייל: ${err.message}` : `Email error: ${err.message}`, type: 'error' });
     }
-
-    // Fallback to mailto: if EmailJS fails
-    const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
-    const body = qIsLocal
-      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
-      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
-
-    window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleWhatsAppQuote = (quote) => {
