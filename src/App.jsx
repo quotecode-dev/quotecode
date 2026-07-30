@@ -14,10 +14,6 @@ function PublicQuote() {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Smart global/local detection for public view
-  const userLang = navigator.language || navigator.userLanguage;
-  const isGlobalUser = userLang && !userLang.startsWith('he');
-
   useEffect(() => {
     async function fetchData() {
       const { data: quoteData } = await supabase
@@ -53,7 +49,7 @@ function PublicQuote() {
   if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>טוען את הצעת המחיר... / Loading...</div>;
   if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>הצעת המחיר לא נמצאה. / Quote not found.</div>;
 
-  const isLocal = !isGlobalUser && quote.currency === 'ILS';
+  const isLocal = quote.currency === 'ILS';
   const bizName = settings?.business_name || 'ProFlow';
   const bizTaxId = settings?.tax_id || '';
   const bizEmail = settings?.email || '';
@@ -177,6 +173,9 @@ function Dashboard() {
   const [services, setServices] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
+  // DEFAULT TO ENGLISH ('en') for international/VPN users unless explicitly set to Hebrew ('he')
+  const [forcedLang, setForcedLang] = useState('en');
+
   // Business Settings state
   const [settingId, setSettingId] = useState(null);
   const [bizName, setBizName] = useState('ProFlow');
@@ -196,8 +195,8 @@ function Dashboard() {
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   
-  const [clientRegion, setClientRegion] = useState('local');
-  const [currency, setCurrency] = useState('ILS (₪)');
+  const [clientRegion, setClientRegion] = useState('international');
+  const [currency, setCurrency] = useState('USD ($)');
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -207,10 +206,7 @@ function Dashboard() {
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
 
-  // VPN / International browser detection: force English if browser language / VPN is not Hebrew
-  const browserLang = navigator.language || navigator.userLanguage || 'he';
-  const isGlobalNetworkOrBrowser = !browserLang.startsWith('he');
-  const isHebrew = !isGlobalNetworkOrBrowser && clientRegion === 'local';
+  const isHebrew = forcedLang === 'he';
 
   const t = {
     appName: bizName || 'ProFlow',
@@ -700,6 +696,16 @@ function Dashboard() {
     return (
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
+          
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+            <button 
+              onClick={() => setForcedLang(isHebrew ? 'en' : 'he')} 
+              style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', color: '#4f46e5' }}
+            >
+              {isHebrew ? '🌐 Switch to English' : '🌐 מעבר לעברית'}
+            </button>
+          </div>
+
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
             <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '60px', marginBottom: '10px', display: 'block', margin: '0 auto' }} />
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>
@@ -751,6 +757,12 @@ function Dashboard() {
             <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '40px' }} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+            <button 
+              onClick={() => setForcedLang(isHebrew ? 'en' : 'he')} 
+              style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', color: '#4f46e5' }}
+            >
+              {isHebrew ? '🌐 Switch to English' : '🌐 מעבר לעברית'}
+            </button>
             {bizRole === 'super_admin' && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 8px', borderRadius: '4px' }}>SUPER ADMIN</span>}
             <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{session.user.email}</span>
             <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Sign Out</button>
@@ -1197,7 +1209,7 @@ function Dashboard() {
                 </thead>
                 <tbody>
                   {allAccounts.map(acc => (
-                    <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' }}>
+                    <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' -> 'light' }}>
                       <td style={{ padding: '12px', color: '#92400e', fontSize: '0.85rem' }}>{acc.user_id?.slice(0,8)}...</td>
                       <td style={{ padding: '12px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
                       <td style={{ padding: '12px' }}>{acc.business_name}</td>
