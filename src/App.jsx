@@ -421,7 +421,7 @@ function Dashboard() {
 
   async function handleAddService(e) {
     e.preventDefault();
-    const { error } = await supabase.from('services').insert([{ name: newServiceName, price: Number(newServicePrice) }]);
+    const { error } = await supabase.services.insert([{ name: newServiceName, price: Number(newServicePrice) }]);
     if (error) setStatusMsg({ text: 'Error adding service: ' + error.message, type: 'error' });
     else {
       setNewServiceName('');
@@ -521,7 +521,7 @@ function Dashboard() {
 
   const handleEmailQuote = async (quote) => {
     if (!quote.clients?.email) {
-      setStatusMsg({ text: isHebrew ? 'ללקוח זה אין כתובת אימייל מעודכנת.' : 'This client does not have an email address.', type: 'error' });
+      alert(isHebrew ? 'ללקוח זה אין כתובת אימייל מעודכנת.' : 'This client does not have an email address.');
       return;
     }
 
@@ -538,7 +538,7 @@ function Dashboard() {
     const EMAILJS_TEMPLATE_ID = "template_tixfha8";
     const EMAILJS_PUBLIC_KEY = "TKnGiZybtH0R9mkY5";
 
-    setStatusMsg({ text: isHebrew ? 'שולח מייל אוטומטי ללקוח...' : 'Sending automated email...', type: 'success' });
+    alert(isHebrew ? 'שולח מייל אוטומטי ללקוח...' : 'Sending automated email...');
     
     try {
       const response = await fetch('https://api.emailjs.com/v1.0/email/send', {
@@ -548,7 +548,6 @@ function Dashboard() {
           service_id: EMAILJS_SERVICE_ID,
           template_id: EMAILJS_TEMPLATE_ID,
           user_id: EMAILJS_PUBLIC_KEY,
-          publicKey: EMAILJS_PUBLIC_KEY,
           template_params: {
             to_email: quote.clients.email,
             to_name: quote.clients.company_name,
@@ -564,7 +563,7 @@ function Dashboard() {
       });
 
       if (response.ok) {
-        setStatusMsg({ text: isHebrew ? 'המייל נשלח בהצלחה ללקוח! 🚀' : 'Email sent successfully! 🚀', type: 'success' });
+        alert(isHebrew ? 'המייל נשלח בהצלחה ללקוח! 🚀' : 'Email sent successfully! 🚀');
         return;
       } else {
         const errText = await response.text();
@@ -572,7 +571,7 @@ function Dashboard() {
       }
     } catch (err) {
       console.error('EmailJS error:', err);
-      setStatusMsg({ text: isHebrew ? `שגיאה בשליחת המייל: ${err.message}` : `Email error: ${err.message}`, type: 'error' });
+      alert(isHebrew ? `שגיאה בשליחת המייל: ${err.message}` : `Email error: ${err.message}`);
     }
   };
 
