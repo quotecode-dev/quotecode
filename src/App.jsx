@@ -398,6 +398,15 @@ function Dashboard() {
       if (error) {
         setStatusMsg({ text: error.message, type: 'error' });
       } else {
+        // שליחת מייל ברכת הלומה ישירות דרך ה-Edge Function שלנו
+        try {
+          await supabase.functions.invoke('send-welcome-email', {
+            body: { email: emailInput }
+          });
+        } catch (fnErr) {
+          console.error('Welcome email invocation error:', fnErr);
+        }
+
         setStatusMsg({ text: isBrowserHebrew ? 'ההרשמה הצליחה! אנא בדוק את המייל שלך לאישור או התחבר כעת.' : 'Sign up successful! Please check your email to verify or sign in now.', type: 'success' });
         setIsSignUp(false);
       }
