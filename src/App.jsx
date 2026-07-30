@@ -5,9 +5,6 @@ import './App.css';
 
 const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM0ZjQ2ZTUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxMGI5ODEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNMTUgNTAgTDQ1IDIwIEw2MCAzNSBMNDAgNTUgTDYwIDc1IEw0NSA5MCBaIiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1IEw4NSA3NSBMNzAgOTAgWiIgZmlsbD0iIzFlMjkzYiIgb3BhY2l0eT0iMC45Ii8+PHRleHQgeD0iMTA1IiB5PSI2NiIgZm9udC1mYW1pbHk9IlNlZ29lIFVJLCBTYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
 
-// ==========================================
-// 1. PUBLIC QUOTE VIEW COMPONENT (FOR CLIENTS)
-// ==========================================
 function PublicQuote() {
   const { id } = useParams();
   const [quote, setQuote] = useState(null);
@@ -46,8 +43,8 @@ function PublicQuote() {
     fetchData();
   }, [id]);
 
-  if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>טוען את הצעת המחיר... / Loading...</div>;
-  if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>הצעת המחיר לא נמצאה. / Quote not found.</div>;
+  if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>Loading quote...</div>;
+  if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>Quote not found.</div>;
 
   const isLocal = quote.currency === 'ILS';
   const bizName = settings?.business_name || 'ProFlow';
@@ -96,28 +93,27 @@ function PublicQuote() {
             </p>
           </div>
           <div style={{ textAlign: isLocal ? 'left' : 'right' }}>
-            <h2 style={{ margin: 0, color: '#111827', fontSize: '22px', textTransform: 'uppercase' }}>{isLocal ? 'הצעת מחיר' : 'QUOTE'}</h2>
+            <h2 style={{ margin: 0, color: '#111827', fontSize: '22px', textTransform: 'uppercase' }}>QUOTE</h2>
             <p style={{ margin: '4px 0 0', color: '#6b7280', fontSize: '14px' }}>#{quote.id.slice(0, 8).toUpperCase()}</p>
-            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isLocal ? 'תאריך:' : 'Date:'} {new Date(quote.created_at).toLocaleDateString('en-US')}</p>
-            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isLocal ? 'בתוקף עד:' : 'Valid Until:'} {quote.valid_until || 'N/A'}</p>
+            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>Date: {new Date(quote.created_at).toLocaleDateString('en-US')}</p>
+            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>Valid Until: {quote.valid_until || 'N/A'}</p>
           </div>
         </div>
 
         <div style={{ marginBottom: '40px', textAlign: isLocal ? 'right' : 'left' }}>
-          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'הוכן עבור:' : 'Prepared For:'}</p>
+          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>Prepared For:</p>
           <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>{quote.clients?.company_name || 'N/A'}</p>
           <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '15px' }}>{quote.clients?.email || ''}</p>
-          {quote.clients?.phone && <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '15px', direction: 'ltr', textAlign: isLocal ? 'right' : 'left' }}>{quote.clients.phone}</p>}
         </div>
 
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', textAlign: isLocal ? 'right' : 'left', minWidth: '450px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', textAlign: 'left', minWidth: '450px' }}>
             <thead>
               <tr>
-                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827' }}>{isLocal ? 'תיאור' : 'Description'}</th>
-                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: 'center' }}>{isLocal ? 'כמות' : 'Qty'}</th>
-                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: isLocal ? 'left' : 'right' }}>{isLocal ? 'מחיר יחידה' : 'Unit Price'}</th>
-                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: isLocal ? 'left' : 'right' }}>{isLocal ? 'סה"כ' : 'Total'}</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827' }}>Description</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: 'center' }}>Qty</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: 'right' }}>Unit Price</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: 'right' }}>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -126,43 +122,33 @@ function PublicQuote() {
                   <tr key={item.id}>
                     <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', color: '#1f2937' }}>{item.description}</td>
                     <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: 'center', color: '#4b5563' }}>{item.quantity}</td>
-                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: isLocal ? 'left' : 'right', color: '#4b5563' }}>{quoteSym}{formatNum(item.unit_price)}</td>
-                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: isLocal ? 'left' : 'right', fontWeight: 'bold', color: '#111827' }}>{quoteSym}{formatNum(item.total_price)}</td>
+                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: 'right', color: '#4b5563' }}>{quoteSym}{formatNum(item.unit_price)}</td>
+                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: 'right', fontWeight: 'bold', color: '#111827' }}>{quoteSym}{formatNum(item.total_price)}</td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan="4" style={{ padding: '14px', borderBottom: '1px solid #e5e7eb' }}>{isLocal ? 'שירותים מקצועיים' : 'Professional Services'}</td></tr>
+                <tr><td colSpan="4" style={{ padding: '14px', borderBottom: '1px solid #e5e7eb' }}>Professional Services</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
-        <div style={{ textAlign: isLocal ? 'left' : 'right', color: '#4b5563', fontSize: '15px' }}>
-          <div>{isLocal ? 'סכום ביניים:' : 'Subtotal:'} {quoteSym}{formatNum(quoteSub)}</div>
-          {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isLocal ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
-          {quoteTaxRate > 0 && <div style={{ marginTop: '6px' }}>{isLocal ? 'מע"מ (18%):' : 'VAT (18%):'} {quoteSym}{formatNum(quoteTaxAmount)}</div>}
-          <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isLocal ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
+        <div style={{ textAlign: 'right', color: '#4b5563', fontSize: '15px' }}>
+          <div>Subtotal: {quoteSym}{formatNum(quoteSub)}</div>
+          {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>Discount ({quoteDiscount}%): -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
+          {quoteTaxRate > 0 && <div style={{ marginTop: '6px' }}>VAT (18%): {quoteSym}{formatNum(quoteTaxAmount)}</div>}
+          <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>Total Amount: {quoteSym}{formatNum(quoteTotal)}</div>
         </div>
 
-        <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', textAlign: isLocal ? 'right' : 'left' }}>
-          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-          <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>{isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.'}</p>
+        <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', textAlign: 'left' }}>
+          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>Terms & Conditions</p>
+          <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>Net 30 days. Thank you for your business.</p>
         </div>
       </div>
-      
-      <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          body { background: white !important; }
-        }
-      `}</style>
     </div>
   );
 }
 
-// ==========================================
-// 2. MAIN DASHBOARD COMPONENT (ADMIN)
-// ==========================================
 function Dashboard() {
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
@@ -173,10 +159,8 @@ function Dashboard() {
   const [services, setServices] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
-  // DEFAULT TO ENGLISH ('en') for international/VPN users unless explicitly set to Hebrew ('he')
   const [forcedLang, setForcedLang] = useState('en');
 
-  // Business Settings state
   const [settingId, setSettingId] = useState(null);
   const [bizName, setBizName] = useState('ProFlow');
   const [bizTaxId, setBizTaxId] = useState('');
@@ -1209,7 +1193,7 @@ function Dashboard() {
                 </thead>
                 <tbody>
                   {allAccounts.map(acc => (
-                    <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' -> 'light' }}>
+                    <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' }}>
                       <td style={{ padding: '12px', color: '#92400e', fontSize: '0.85rem' }}>{acc.user_id?.slice(0,8)}...</td>
                       <td style={{ padding: '12px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
                       <td style={{ padding: '12px' }}>{acc.business_name}</td>
@@ -1240,9 +1224,6 @@ function Dashboard() {
   );
 }
 
-// ==========================================
-// 3. ROOT APP (ROUTER SETUP)
-// ==========================================
 export default function App() {
   return (
     <Router>
