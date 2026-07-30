@@ -534,7 +534,7 @@ function Dashboard() {
     const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    // Global Master EmailJS configuration
+    // Master EmailJS configuration
     const EMAILJS_SERVICE_ID = "service_n0jzdfq";
     const EMAILJS_TEMPLATE_ID = "template_tixfha8";
     const EMAILJS_PUBLIC_KEY = "TKnGiZybtH0R9mkY5";
@@ -552,11 +552,13 @@ function Dashboard() {
           template_params: {
             to_email: quote.clients.email,
             to_name: quote.clients.company_name,
+            from_name: bizName,
+            reply_to: bizEmail || 'quotecodedev@gmail.com',
             quote_id: quote.id.slice(0, 6).toUpperCase(),
             quote_total: `${quoteSym}${formatNum(quoteTotal)}`,
             quote_link: quoteLink,
             business_name: bizName,
-            message: `שלום ${quote.clients?.company_name},\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} סך הכל: ${quoteSym}${formatNum(quoteTotal)}\nלצפייה בהצעה לחץ כאן: ${quoteLink}`
+            message: `שלום ${quote.clients?.company_name},\n\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()}.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
           }
         })
       });
@@ -565,7 +567,9 @@ function Dashboard() {
         setStatusMsg({ text: isHebrew ? 'המייל נשלח בהצלחה ללקוח! 🚀' : 'Email sent successfully! 🚀', type: 'success' });
         return;
       } else {
-        throw new Error('EmailJS failed');
+        const errText = await response.text();
+        console.error('EmailJS error response:', errText);
+        throw new Error('EmailJS failed: ' + errText);
       }
     } catch (err) {
       console.error('EmailJS error, falling back to mailto:', err);
