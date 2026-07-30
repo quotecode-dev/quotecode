@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-
 import { supabase } from './supabase';
 import './App.css';
 
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNTAgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM0ZjQ2ZTUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxMGI5ODEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNMTUgNTAgTDQ1IDIwIEw2MCAzNSBMNDAgNTUgTDYwIDc1IEw0NSA5MCBaIiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTQwIDUwIEw3MCAyMCBMODUgMzUgTDY1IDU1IEw4NSA3NSBMNzAgOTAgWiIgZmlsbD0iIzFlMjkzYiIgb3BhY2l0eT0iMC45Ii8+PHRleHQgeD0iMTA1IiB5PSI2NiIgZm9udC1mYW1pbHk9IlNlZ29lIFVJLCBTYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
+
 // ==========================================
 // 1. PUBLIC QUOTE VIEW COMPONENT (FOR CLIENTS)
 // ==========================================
@@ -87,7 +89,7 @@ function PublicQuote() {
             {bizLogo ? (
               <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block' }} />
             ) : (
-              <h1 style={{ margin: 0, color: '#4f46e5', fontSize: '28px', fontWeight: '900' }}>&lt;/&gt; {bizName}</h1>
+              <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '40px', marginBottom: '8px', display: 'block' }} />
             )}
             <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
               {bizTaxId && `${isLocal ? 'עוסק/ח.פ:' : 'Tax ID:'} ${bizTaxId} | `} {bizEmail} {bizPhone ? `| ${bizPhone}` : ''}
@@ -689,8 +691,7 @@ function Dashboard() {
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir={isBrowserHebrew ? 'rtl' : 'ltr'}>
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isBrowserHebrew ? 'right' : 'left' }}>
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-            <div style={{ background: '#4f46e5', color: 'white', width: '40px', height: '40px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginBottom: '10px' }}>&lt;/&gt;</div>
-            <h2 style={{ color: '#1e293b', margin: 0, fontSize: '1.5rem' }}>{bizName}</h2>
+            <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '60px', marginBottom: '10px' }} />
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>
               {isSignUp 
                 ? (isBrowserHebrew ? 'יצירת חשבון חדש במערכת' : 'Create a new account') 
@@ -737,8 +738,7 @@ function Dashboard() {
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-            <div style={{ background: '#4f46e5', color: 'white', padding: '8px 12px', borderRadius: '8px', fontWeight: 'bold' }}>&lt;/&gt;</div>
-            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b' }}>{t.appName}</span>
+            <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '40px' }} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
             {bizRole === 'super_admin' && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 8px', borderRadius: '4px' }}>SUPER ADMIN</span>}
