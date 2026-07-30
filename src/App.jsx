@@ -165,6 +165,7 @@ function Dashboard() {
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
   const [services, setServices] = useState([]);
@@ -384,11 +385,21 @@ function Dashboard() {
     }
   }
 
-  const handleLogin = async (e) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({ email: emailInput, password: passwordInput });
-    if (error) setStatusMsg({ text: error.message, type: 'error' });
-    else setStatusMsg({ text: 'Logged in successfully', type: 'success' });
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email: emailInput, password: passwordInput });
+      if (error) {
+        setStatusMsg({ text: error.message, type: 'error' });
+      } else {
+        setStatusMsg({ text: 'ההרשמה הצליחה! אנא בדוק את המייל שלך לאישור או התחבר כעת.', type: 'success' });
+        setIsSignUp(false);
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email: emailInput, password: passwordInput });
+      if (error) setStatusMsg({ text: error.message, type: 'error' });
+      else setStatusMsg({ text: 'Logged in successfully', type: 'success' });
+    }
   };
 
   const handleSignOut = async () => await supabase.auth.signOut();
@@ -671,31 +682,40 @@ function Dashboard() {
 
   if (!session) {
     return (
-      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px' }}>
+      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir="rtl">
+        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: 'right' }}>
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
             <div style={{ background: '#4f46e5', color: 'white', width: '40px', height: '40px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginBottom: '10px' }}>&lt;/&gt;</div>
             <h2 style={{ color: '#1e293b', margin: 0, fontSize: '1.5rem' }}>{bizName}</h2>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>Sign in to your SaaS dashboard</p>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>{isSignUp ? 'יצירת חשבון חדש במערכת' : 'התחברות למערכת הניהול'}</p>
           </div>
           {statusMsg.text && (
             <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b' }}>
               {statusMsg.text}
             </div>
           )}
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleAuth}>
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Email</label>
-              <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>אימייל</label>
+              <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
             </div>
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Password</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>סיסמה</label>
               <input type="password" name="loginPassword" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
-              Sign In
+              {isSignUp ? 'הירשם' : 'התחבר'}
             </button>
           </form>
+          <div style={{ marginTop: '15px', textAlign: 'center' }}>
+            <button
+              type="button"
+              onClick={() => { setIsSignUp(!isSignUp); setStatusMsg({ text: 'System connected to Supabase.', type: 'success' }); }}
+              style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}
+            >
+              {isSignUp ? 'כבר יש לך חשבון? התחבר כאן' : 'אין לך חשבון עדיין? הירשם כאן'}
+            </button>
+          </div>
         </div>
       </div>
     );
