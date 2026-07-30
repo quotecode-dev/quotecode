@@ -179,9 +179,6 @@ function Dashboard() {
   const [bizLogoUrl, setBizLogoUrl] = useState('');
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
-  const [emailjsServiceId, setEmailjsServiceId] = useState('');
-  const [emailjsTemplateId, setEmailjsTemplateId] = useState('');
-  const [emailjsPublicKey, setEmailjsPublicKey] = useState('');
   const [allAccounts, setAllAccounts] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -332,9 +329,6 @@ function Dashboard() {
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'free');
       setBizRole(data.role || 'user');
-      setEmailjsServiceId(data.emailjs_service_id || '');
-      setEmailjsTemplateId(data.emailjs_template_id || '');
-      setEmailjsPublicKey(data.emailjs_public_key || '');
       
       if (data.role === 'super_admin') {
         fetchAllAccounts();
@@ -373,9 +367,6 @@ function Dashboard() {
       email: bizEmail,
       phone: bizPhone,
       logo_url: bizLogoUrl,
-      emailjs_service_id: emailjsServiceId,
-      emailjs_template_id: emailjsTemplateId,
-      emailjs_public_key: emailjsPublicKey,
       user_id: session.user.id
     };
 
@@ -543,40 +534,41 @@ function Dashboard() {
     const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    // If EmailJS credentials are configured, send via EmailJS API
-    if (emailjsServiceId && emailjsTemplateId && emailjsPublicKey) {
-      setStatusMsg({ text: isHebrew ? 'שולח מייל אוטומטי ללקוח...' : 'Sending automated email...', type: 'success' });
-      try {
-        const response = await fetch('https://api.emailjs.com/v1.0/email/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            service_id: emailjsServiceId,
-            template_id: emailjsTemplateId,
-            user_id: emailjsPublicKey,
-            template_params: {
-              to_email: quote.clients.email,
-              to_name: quote.clients.company_name,
-              quote_id: quote.id.slice(0, 6).toUpperCase(),
-              quote_total: `${quoteSym}${formatNum(quoteTotal)}`,
-              quote_link: quoteLink,
-              business_name: bizName
-            }
-          })
-        });
+    // Global Master EmailJS configuration (Built-in for all ProFlow merchants)
+    const EMAILJS_SERVICE_ID = "service_proflow";
+    const EMAILJS_TEMPLATE_ID = "template_proflow";
+    const EMAILJS_PUBLIC_KEY = "public_proflow_key";
 
-        if (response.ok) {
-          setStatusMsg({ text: isHebrew ? 'המייל נשלח בהצלחה ללקוח! 🚀' : 'Email sent successfully! 🚀', type: 'success' });
-          return;
-        } else {
-          throw new Error('EmailJS failed');
-        }
-      } catch (err) {
-        console.error('EmailJS error, falling back to mailto:', err);
+    setStatusMsg({ text: isHebrew ? 'שולח מייל אוטומטי ללקוח...' : 'Sending automated email...', type: 'success' });
+    
+    try {
+      const response = await fetch('https://api.emailjs.com/v1.0/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service_id: EMAILJS_SERVICE_ID,
+          template_id: EMAILJS_TEMPLATE_ID,
+          user_id: EMAILJS_PUBLIC_KEY,
+          template_params: {
+            to_email: quote.clients.email,
+            to_name: quote.clients.company_name,
+            quote_id: quote.id.slice(0, 6).toUpperCase(),
+            quote_total: `${quoteSym}${formatNum(quoteTotal)}`,
+            quote_link: quoteLink,
+            business_name: bizName
+          }
+        })
+      });
+
+      if (response.ok) {
+        setStatusMsg({ text: isHebrew ? 'המייל נשלח בהצלחה ללקוח! 🚀' : 'Email sent successfully! 🚀', type: 'success' });
+        return;
       }
+    } catch (err) {
+      console.error('EmailJS error, falling back to mailto:', err);
     }
 
-    // Fallback to mailto:
+    // Fallback to mailto: if EmailJS fails or is not connected yet
     const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
     const body = qIsLocal
       ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
@@ -852,23 +844,6 @@ function Dashboard() {
                 </select>
               </div>
             </div>
-
-            {/* EmailJS Credentials Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '15px', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>EmailJS Service ID</label>
-                <input type="text" value={emailjsServiceId} onChange={(e) => setEmailjsServiceId(e.target.value)} placeholder="service_xxx" style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', direction: 'ltr', textAlign: 'left', fontSize: '0.85rem' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>EmailJS Template ID</label>
-                <input type="text" value={emailjsTemplateId} onChange={(e) => setEmailjsTemplateId(e.target.value)} placeholder="template_xxx" style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', direction: 'ltr', textAlign: 'left', fontSize: '0.85rem' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>EmailJS Public Key</label>
-                <input type="text" value={emailjsPublicKey} onChange={(e) => setEmailjsPublicKey(e.target.value)} placeholder="public_key_xxx" style={{ width: '100%', padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', direction: 'ltr', textAlign: 'left', fontSize: '0.85rem' }} />
-              </div>
-            </div>
-
             <button type="submit" style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
               {t.saveSettings}
             </button>
@@ -1206,7 +1181,7 @@ function Dashboard() {
         {/* SUPER ADMIN PANEL */}
         {bizRole === 'super_admin' && (
           <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '30px', border: '2px solid #f59e0b' }}>
-            <h2 style={{ fontSize: '1.4.rem', color: '#92400e', margin: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <h2 style={{ fontSize: '1.4rem', color: '#92400e', margin: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
               👑 Super Admin Panel
             </h2>
             <p style={{ color: '#b45309', marginBottom: '20px' }}>
@@ -1233,7 +1208,7 @@ function Dashboard() {
                       <td style={{ padding: '12px' }}>
                         <select 
                           value={acc.plan} 
-                          onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
+                          onChange={(e) => handleAdminPlanCardChange ? null : handleAdminPlanChange(acc.id, e.target.value)}
                           style={{ padding: '6px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb' }}
                         >
                           <option value="free">Free</option>
@@ -1264,7 +1239,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element([], Dashboard)} />
         <Route path="/quote/:id" element={<PublicQuote />} />
       </Routes>
     </Router>
