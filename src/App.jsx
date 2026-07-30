@@ -202,6 +202,7 @@ function Dashboard() {
   const [newServicePrice, setNewServicePrice] = useState('');
 
   const isHebrew = clientRegion === 'local';
+  const isBrowserHebrew = navigator.language?.startsWith('he') || false;
 
   const t = {
     appName: isHebrew ? bizName : (bizName || 'ProFlow'),
@@ -392,13 +393,13 @@ function Dashboard() {
       if (error) {
         setStatusMsg({ text: error.message, type: 'error' });
       } else {
-        setStatusMsg({ text: 'ההרשמה הצליחה! אנא בדוק את המייל שלך לאישור או התחבר כעת.', type: 'success' });
+        setStatusMsg({ text: isBrowserHebrew ? 'ההרשמה הצליחה! אנא בדוק את המייל שלך לאישור או התחבר כעת.' : 'Sign up successful! Please check your email to verify or sign in now.', type: 'success' });
         setIsSignUp(false);
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: emailInput, password: passwordInput });
       if (error) setStatusMsg({ text: error.message, type: 'error' });
-      else setStatusMsg({ text: 'Logged in successfully', type: 'success' });
+      else setStatusMsg({ text: isBrowserHebrew ? 'התחברת בהצלחה' : 'Logged in successfully', type: 'success' });
     }
   };
 
@@ -682,12 +683,16 @@ function Dashboard() {
 
   if (!session) {
     return (
-      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir="rtl">
-        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: 'right' }}>
+      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir={isBrowserHebrew ? 'rtl' : 'ltr'}>
+        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isBrowserHebrew ? 'right' : 'left' }}>
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
             <div style={{ background: '#4f46e5', color: 'white', width: '40px', height: '40px', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', marginBottom: '10px' }}>&lt;/&gt;</div>
             <h2 style={{ color: '#1e293b', margin: 0, fontSize: '1.5rem' }}>{bizName}</h2>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>{isSignUp ? 'יצירת חשבון חדש במערכת' : 'התחברות למערכת הניהול'}</p>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>
+              {isSignUp 
+                ? (isBrowserHebrew ? 'יצירת חשבון חדש במערכת' : 'Create a new account') 
+                : (isBrowserHebrew ? 'התחברות למערכת הניהול' : 'Sign in to your dashboard')}
+            </p>
           </div>
           {statusMsg.text && (
             <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b' }}>
@@ -696,15 +701,15 @@ function Dashboard() {
           )}
           <form onSubmit={handleAuth}>
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>אימייל</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isBrowserHebrew ? 'אימייל' : 'Email'}</label>
               <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
             </div>
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>סיסמה</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isBrowserHebrew ? 'סיסמה' : 'Password'}</label>
               <input type="password" name="loginPassword" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
-              {isSignUp ? 'הירשם' : 'התחבר'}
+              {isSignUp ? (isBrowserHebrew ? 'הירשם' : 'Sign Up') : (isBrowserHebrew ? 'התחבר' : 'Sign In')}
             </button>
           </form>
           <div style={{ marginTop: '15px', textAlign: 'center' }}>
@@ -713,7 +718,9 @@ function Dashboard() {
               onClick={() => { setIsSignUp(!isSignUp); setStatusMsg({ text: 'System connected to Supabase.', type: 'success' }); }}
               style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}
             >
-              {isSignUp ? 'כבר יש לך חשבון? התחבר כאן' : 'אין לך חשבון עדיין? הירשם כאן'}
+              {isSignUp 
+                ? (isBrowserHebrew ? 'כבר יש לך חשבון? התחבר כאן' : 'Already have an account? Sign in here') 
+                : (isBrowserHebrew ? 'אין לך חשבון עדיין? הירשם כאן' : "Don't have an account yet? Sign up here")}
             </button>
           </div>
         </div>
