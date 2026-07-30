@@ -519,7 +519,7 @@ function Dashboard() {
     setStatusMsg({ text: isHebrew ? 'ההצעה נטענה לשכפול בהצלחה. לחץ על הלחצן למטה כדי ליצור הצעה חדשה.' : 'Quote loaded for duplication. Save to create a new quote.', type: 'success' });
   };
 
-  const handleEmailQuote = async (quote) => {
+  const handleEmailQuote = (quote) => {
     if (!quote.clients?.email) {
       alert(isHebrew ? 'ללקוח זה אין כתובת אימייל מעודכנת.' : 'This client does not have an email address.');
       return;
@@ -534,49 +534,12 @@ function Dashboard() {
     const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    const EMAILJS_SERVICE_ID = "service_n0jzdfq";
-    const EMAILJS_TEMPLATE_ID = "template_tixfha8";
-    const EMAILJS_PUBLIC_KEY = "TKnGiZybtH0R9mkY5";
-    
-    try {
-      const response = await fetch('https://api.emailjs.com/v1.0/email/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service_id: EMAILJS_SERVICE_ID,
-          template_id: EMAILJS_TEMPLATE_ID,
-          user_id: EMAILJS_PUBLIC_KEY,
-          template_params: {
-            to_email: quote.clients.email,
-            to_name: quote.clients.company_name,
-            from_name: bizName,
-            reply_to: bizEmail || 'quotecodedev@gmail.com',
-            quote_id: quote.id.slice(0, 6).toUpperCase(),
-            quote_total: `${quoteSym}${formatNum(quoteTotal)}`,
-            quote_link: quoteLink,
-            business_name: bizName,
-            message: `שלום ${quote.clients?.company_name},\n\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()}.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
-          }
-        })
-      });
+    const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
+    const body = qIsLocal
+      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
+      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
 
-      if (response.ok) {
-        alert(isHebrew ? 'המייל נשלח בהצלחה ללקוח! 🚀' : 'Email sent successfully! 🚀');
-        return;
-      } else {
-        const errText = await response.text();
-        throw new Error(errText || 'EmailJS failed');
-      }
-    } catch (err) {
-      console.error('EmailJS error / blocked by adblocker, falling back to mailto:', err);
-      
-      const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
-      const body = qIsLocal
-        ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
-        : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
-
-      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
+    window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleWhatsAppQuote = (quote) => {
