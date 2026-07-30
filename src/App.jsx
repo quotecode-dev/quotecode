@@ -147,6 +147,13 @@ function PublicQuote() {
           <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>{isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.'}</p>
         </div>
       </div>
+      
+      <style>{`
+        @media print {
+          .no-print { display: none !important; }
+          body { background: white !important; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -711,7 +718,16 @@ function Dashboard() {
           <div style={{ marginTop: '15px', textAlign: 'center' }}>
             <button
               type="button"
-              onClick={() => { setIsSignUp(!isSignUp); setStatusMsg({ text: 'System connected to Supabase.', type: 'success' }); }}
+              onClick={() => { 
+                const nextIsSignUp = !isSignUp;
+                setIsSignUp(nextIsSignUp); 
+                setStatusMsg({ 
+                  text: nextIsSignUp 
+                    ? (isHebrew ? 'אנא הקלד אימייל וסיסמה כדי ליצור חשבון חדש.' : 'Please enter an email and password to create a new account.')
+                    : (isHebrew ? 'אנא הקלד את פרטי ההתחברות שלך.' : 'Please enter your login details.'), 
+                  type: 'success' 
+                }); 
+              }}
               style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}
             >
               {isSignUp 
