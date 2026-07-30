@@ -202,7 +202,10 @@ function Dashboard() {
   const [newServicePrice, setNewServicePrice] = useState('');
 
   const isHebrew = clientRegion === 'local';
-  const isBrowserHebrew = navigator.language?.startsWith('he') || false;
+  
+  // Smart location/language detection for the login screen
+  const isIsraelLocation = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+  const isBrowserHebrew = navigator.language?.startsWith('he') || isIsraelLocation;
 
   const t = {
     appName: isHebrew ? bizName : (bizName || 'ProFlow'),
