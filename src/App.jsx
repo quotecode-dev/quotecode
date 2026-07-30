@@ -568,8 +568,14 @@ function Dashboard() {
         throw new Error(errText || 'EmailJS failed');
       }
     } catch (err) {
-      console.error('EmailJS error:', err);
-      alert(isHebrew ? `שגיאה בשליחת המייל: ${err.message}` : `Email error: ${err.message}`);
+      console.error('EmailJS error / blocked by adblocker, falling back to mailto:', err);
+      
+      const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
+      const body = qIsLocal
+        ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
+        : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
+
+      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
   };
 
@@ -591,7 +597,7 @@ function Dashboard() {
 
     const msg = qIsLocal
       ? `שלום ${quote.clients?.company_name || ''},\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()}.\n*סך הכל לתשלום:* ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ על הקישור:\n${quoteLink}\n\nנשמח לעמוד לשירותך!`
-      : `Hello ${quote.clients?.company_name || ''},\nHere is your quote #${quote.id.slice(0, 6).toUpperCase()}.\n*Total Amount:* ${quoteSym}${formatNum(quoteTotal)}s\n\nView and download your full quote here:\n${quoteLink}\n\nThank you for your business!`;
+      : `Hello ${quote.clients?.company_name || ''},\nHere is your quote #${quote.id.slice(0, 6).toUpperCase()}.\n*Total Amount:* ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nThank you for your business!`;
 
     const phoneNum = quote.clients.phone.replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}`, '_blank');
