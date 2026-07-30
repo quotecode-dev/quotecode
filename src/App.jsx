@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import { supabase } from './supabase';
+import { Resend } from 'resend';
 import './App.css';
+
+// אתחול רסינד לשליחת מיילים ישירה
+const resend = new Resend('re_VPof3Ffp...'); // מפתח ה-API שלך מ-Resend
 
 const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM0ZjQ2ZTUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxMGI5ODEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNMTUgNTAgTDQ1IDIwIEw2MCAzNSBMNDAgNTUgTDYwIDc1IEw0NSA5MCBaIiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1IEw4NSA3NSBMNzAgOTAgWiIgZmlsbD0iIzFlMjkzYiIgb3BhY2l0eT0iMC45Ii8+PHRleHQgeD0iMTA1IiB5PSI2NiIgZm9udC1mYW1pbHk9IlNlZ29lIFVJLCBTYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
 
@@ -197,7 +201,6 @@ function Dashboard() {
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
 
-  // Automatic Zone Detection: Hebrew for Israel, English for Foreign / VPN
   const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
   const isHebrew = isIsraelZone;
 
@@ -390,15 +393,37 @@ function Dashboard() {
       if (error) {
         setStatusMsg({ text: error.message, type: 'error' });
       } else {
+        // שליחת מייל ברוך הבא מעוצב דרך Resend ישירות מהקוד
         try {
-          await supabase.functions.invoke('send-welcome-email', {
-            body: { email: emailInput }
+          await resend.emails.send({
+            from: 'ProFlow <info@quotecodepro.com>',
+            to: [emailInput],
+            subject: '🎉 ברוכים הבאים ל-ProFlow!',
+            html: `
+              <div dir="rtl" style="font-family: Arial, sans-serif; text-align: right; background-color: #f9fafb; padding: 20px; border-radius: 8px;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                  <h1 style="color: #111827; font-size: 24px;">🎉 ברוכים הבאים ל-ProFlow!</h1>
+                  <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
+                    שמחים שהצטרפת אלינו! חשבון ההרשמה שלך נוצר בהצלחה.
+                  </p>
+                  <p style="color: #4b5563; font-size: 16px; line-height: 1.5;">
+                    מעכשיו תוכל להתחיל להפיק הצעות מחיר חכמות בקלות ובמהירות.
+                  </p>
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://quotecode.vercel.app" style="background-color: #4f46e5; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">התחל עבודה</a>
+                  </div>
+                  <p style="color: #9ca3af; font-size: 14px; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                    אם לא ביקשת להירשם ל-ProFlow, תוכל להתעלם ממייל זה.
+                  </p>
+                </div>
+              </div>
+            `,
           });
         } catch (fnErr) {
-          console.error('Welcome email invocation error:', fnErr);
+          console.error('Welcome email error:', fnErr);
         }
 
-        setStatusMsg({ text: isHebrew ? 'ההרשמה הצליחה! אנא בדוק את המייל שלך לאישור.' : 'Sign up successful! Please check your email for confirmation.', type: 'success' });
+        setStatusMsg({ text: isHebrew ? 'ההרשמה הצליחה! אימייל נשלח לתיבת הדואר שלך.' : 'Sign up successful! Email sent to your inbox.', type: 'success' });
         setIsSignUp(false);
       }
     } else {
