@@ -74,14 +74,14 @@ function PublicQuote() {
   const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + quoteTaxAmount);
 
   return (
-    <div dir={isLocal ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '40px 20px', color: '#333' }}>
+    <div dir={isLocal ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333' }}>
       <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', textAlign: isLocal ? 'left' : 'right' }}>
         <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
           {isLocal ? '🖨️ הדפס / הורד כ-PDF' : '🖨️ Print / Download PDF'}
         </button>
       </div>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '50px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '25px 15px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isLocal ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
           <div>
             {bizLogo ? (
@@ -109,7 +109,7 @@ function PublicQuote() {
         </div>
 
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', textAlign: isLocal ? 'right' : 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', textAlign: isLocal ? 'right' : 'left', minWidth: '450px' }}>
             <thead>
               <tr>
                 <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827' }}>{isLocal ? 'תיאור' : 'Description'}</th>
@@ -830,7 +830,7 @@ function Dashboard() {
               <button 
                 type="button" 
                 onClick={handleCancelEdit}
-                style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}
+                style={{ background: '#f1f5f9', color: '#4f46e5', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}
               >
                 {t.cancelEdit}
               </button>
