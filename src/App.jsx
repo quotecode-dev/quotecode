@@ -178,6 +178,8 @@ function Dashboard() {
   const [bizPhone, setBizPhone] = useState('');
   const [bizLogoUrl, setBizLogoUrl] = useState('');
   const [bizPlan, setBizPlan] = useState('free');
+  const [bizRole, setBizRole] = useState('user'); // New role state
+  const [allAccounts, setAllAccounts] = useState([]); // Super admin data
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -326,9 +328,32 @@ function Dashboard() {
       setBizPhone(data.phone || '');
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'free');
+      setBizRole(data.role || 'user');
+      
+      if (data.role === 'super_admin') {
+        fetchAllAccounts();
+      }
     } else {
       setSettingId(null);
       setBizPlan('free');
+      setBizRole('user');
+    }
+  }
+
+  async function fetchAllAccounts() {
+    const { data, error } = await supabase.from('business_settings').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      setAllAccounts(data);
+    }
+  }
+
+  async function handleAdminPlanChange(accountId, newPlan) {
+    const { error } = await supabase.from('business_settings').update({ plan: newPlan }).eq('id', accountId);
+    if (error) {
+      setStatusMsg({ text: 'Error updating user plan: ' + error.message, type: 'error' });
+    } else {
+      setStatusMsg({ text: 'User plan updated successfully!', type: 'success' });
+      fetchAllAccounts();
     }
   }
 
@@ -662,7 +687,7 @@ function Dashboard() {
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Email</label>
-              <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="shlomisiny@gmail.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+              <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>Password</label>
@@ -687,6 +712,7 @@ function Dashboard() {
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b' }}>{t.appName}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+            {bizRole === 'super_admin' && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 8px', borderRadius: '4px' }}>SUPER ADMIN</span>}
             <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{session.user.email}</span>
             <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Sign Out</button>
           </div>
@@ -1125,6 +1151,55 @@ function Dashboard() {
             </table>
           </div>
         </div>
+        
+        {/* SUPER ADMIN PANEL */}
+        {bizRole === 'super_admin' && (
+          <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '30px', border: '2px solid #f59e0b' }}>
+            <h2 style={{ fontSize: '1.4rem', color: '#92400e', margin: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              👑 Super Admin Panel
+            </h2>
+            <p style={{ color: '#b45309', marginBottom: '20px' }}>
+              {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות שלהם.' : 'View all registered users and manage their subscription plans.'}
+            </p>
+            
+            <div style={{ overflowX: 'auto', background: 'white', borderRadius: '8px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #fde68a', color: '#92400e', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                    <th style={{ padding: '12px' }}>ID</th>
+                    <th style={{ padding: '12px' }}>Email</th>
+                    <th style={{ padding: '12px' }}>Business Name</th>
+                    <th style={{ padding: '12px' }}>Current Plan</th>
+                    <th style={{ padding: '12px' }}>Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allAccounts.map(acc => (
+                    <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' }}>
+                      <td style={{ padding: '12px', color: '#92400e', fontSize: '0.85rem' }}>{acc.user_id?.slice(0,8)}...</td>
+                      <td style={{ padding: '12px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
+                      <td style={{ padding: '12px' }}>{acc.business_name}</td>
+                      <td style={{ padding: '12px' }}>
+                        <select 
+                          value={acc.plan} 
+                          onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
+                          style={{ padding: '6px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb' }}
+                        >
+                          <option value="free">Free</option>
+                          <option value="basic">Basic</option>
+                          <option value="pro">Pro</option>
+                        </select>
+                      </td>
+                      <td style={{ padding: '12px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
+                        {acc.role}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
