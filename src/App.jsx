@@ -421,7 +421,7 @@ function Dashboard() {
 
   async function handleAddService(e) {
     e.preventDefault();
-    const { error } = await supabase.services.insert([{ name: newServiceName, price: Number(newServicePrice) }]);
+    const { error } = await supabase.from('services').insert([{ name: newServiceName, price: Number(newServicePrice) }]);
     if (error) setStatusMsg({ text: 'Error adding service: ' + error.message, type: 'error' });
     else {
       setNewServiceName('');
@@ -537,8 +537,6 @@ function Dashboard() {
     const EMAILJS_SERVICE_ID = "service_n0jzdfq";
     const EMAILJS_TEMPLATE_ID = "template_tixfha8";
     const EMAILJS_PUBLIC_KEY = "TKnGiZybtH0R9mkY5";
-
-    alert(isHebrew ? 'שולח מייל אוטומטי ללקוח...' : 'Sending automated email...');
     
     try {
       const response = await fetch('https://api.emailjs.com/v1.0/email/send', {
@@ -593,7 +591,7 @@ function Dashboard() {
 
     const msg = qIsLocal
       ? `שלום ${quote.clients?.company_name || ''},\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()}.\n*סך הכל לתשלום:* ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ על הקישור:\n${quoteLink}\n\nנשמח לעמוד לשירותך!`
-      : `Hello ${quote.clients?.company_name || ''},\nHere is your quote #${quote.id.slice(0, 6).toUpperCase()}.\n*Total Amount:* ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nThank you for your business!`;
+      : `Hello ${quote.clients?.company_name || ''},\nHere is your quote #${quote.id.slice(0, 6).toUpperCase()}.\n*Total Amount:* ${quoteSym}${formatNum(quoteTotal)}s\n\nView and download your full quote here:\n${quoteLink}\n\nThank you for your business!`;
 
     const phoneNum = quote.clients.phone.replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}`, '_blank');
