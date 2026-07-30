@@ -534,10 +534,10 @@ function Dashboard() {
     const quoteTotal = quote.total > quoteTaxable ? quote.total : (quoteTaxable + (quoteTaxable * quoteTaxRate));
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    // Global Master EmailJS configuration (Built-in for all ProFlow merchants)
-    const EMAILJS_SERVICE_ID = "service_proflow";
-    const EMAILJS_TEMPLATE_ID = "template_proflow";
-    const EMAILJS_PUBLIC_KEY = "public_proflow_key";
+    // Global Master EmailJS configuration
+    const EMAILJS_SERVICE_ID = "service_n0jzdfq";
+    const EMAILJS_TEMPLATE_ID = "template_tixfha8";
+    const EMAILJS_PUBLIC_KEY = "TKnGiZybtH0R9mkY5";
 
     setStatusMsg({ text: isHebrew ? 'שולח מייל אוטומטי ללקוח...' : 'Sending automated email...', type: 'success' });
     
@@ -555,7 +555,8 @@ function Dashboard() {
             quote_id: quote.id.slice(0, 6).toUpperCase(),
             quote_total: `${quoteSym}${formatNum(quoteTotal)}`,
             quote_link: quoteLink,
-            business_name: bizName
+            business_name: bizName,
+            message: `שלום ${quote.clients?.company_name},\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} סך הכל: ${quoteSym}${formatNum(quoteTotal)}\nלצפייה בהצעה לחץ כאן: ${quoteLink}`
           }
         })
       });
@@ -563,12 +564,14 @@ function Dashboard() {
       if (response.ok) {
         setStatusMsg({ text: isHebrew ? 'המייל נשלח בהצלחה ללקוח! 🚀' : 'Email sent successfully! 🚀', type: 'success' });
         return;
+      } else {
+        throw new Error('EmailJS failed');
       }
     } catch (err) {
       console.error('EmailJS error, falling back to mailto:', err);
     }
 
-    // Fallback to mailto: if EmailJS fails or is not connected yet
+    // Fallback to mailto: if EmailJS fails
     const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
     const body = qIsLocal
       ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
@@ -1208,7 +1211,7 @@ function Dashboard() {
                       <td style={{ padding: '12px' }}>
                         <select 
                           value={acc.plan} 
-                          onChange={(e) => handleAdminPlanCardChange ? null : handleAdminPlanChange(acc.id, e.target.value)}
+                          onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
                           style={{ padding: '6px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb' }}
                         >
                           <option value="free">Free</option>
@@ -1239,7 +1242,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element([], Dashboard)} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
       </Routes>
     </Router>
