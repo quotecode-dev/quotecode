@@ -225,6 +225,13 @@ function Dashboard() {
   const [bizRole, setBizRole] = useState('user');
   const [allAccounts, setAllAccounts] = useState([]);
 
+  // מצבי ניהול חלונית שדרוג ותשלום סימולציה
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState(null); // 'basic' או 'pro'
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExp, setCardExp] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [editingQuoteId, setEditingQuoteId] = useState(null);
@@ -406,22 +413,35 @@ function Dashboard() {
     }
   }
 
-  async function handleUpgradeToPro() {
+  // אישור תשלום מדמה (סליקה סימולציה)
+  async function handleSimulatePayment(e) {
+    e.preventDefault();
     if (!settingId) {
       setStatusMsg({ text: isHebrew ? 'אנא שמור את הגדרות העסק תחילה.' : 'Please save business settings first.', type: 'error' });
       return;
     }
 
+    const targetPlan = selectedPlanToUpgrade || 'pro';
     const { error } = await supabase
       .from('business_settings')
-      .update({ plan: 'pro' })
+      .update({ plan: targetPlan })
       .eq('id', settingId);
 
     if (error) {
       setStatusMsg({ text: 'Error upgrading plan: ' + error.message, type: 'error' });
     } else {
-      setBizPlan('pro');
-      setStatusMsg({ text: isHebrew ? '🎉 שדרגת בהצלחה לחבילת Pro! מעכשיו הלוגו שלך פתוח ואין הגבלת הצעות.' : '🎉 Successfully upgraded to Pro plan!', type: 'success' });
+      setBizPlan(targetPlan);
+      setShowUpgradeModal(false);
+      setSelectedPlanToUpgrade(null);
+      setCardNumber('');
+      setCardExp('');
+      setCardCvv('');
+      setStatusMsg({ 
+        text: isHebrew 
+          ? `🎉 התשלום בוצע בהצלחה! שדרגת לחבילת ${targetPlan.toUpperCase()}.` 
+          : `🎉 Payment successful! Upgraded to ${targetPlan.toUpperCase()}.`, 
+        type: 'success' 
+      });
     }
   }
 
@@ -894,11 +914,75 @@ function Dashboard() {
               </span>
               <button 
                 type="button" 
-                onClick={handleUpgradeToPro} 
+                onClick={() => setShowUpgradeModal(true)} 
                 style={{ background: '#d97706', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.8rem' }}
               >
-                {isHebrew ? 'שדרג ל-Pro' : 'Upgrade to Pro'}
+                {isHebrew ? 'שדרג חבילה' : 'Upgrade Plan'}
               </button>
+            </div>
+          )}
+
+          {/* --- מודאל / חלונית בחירת חבילות וסימולציית תשלום מאובטח --- */}
+          {showUpgradeModal && (
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
+              <div style={{ background: 'white', padding: '30px', borderRadius: '12px', width: '100%', maxWidth: '500px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', textAlign: isHebrew ? 'right' : 'left' }}>
+                <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.4rem', marginBottom: '10px' }}>
+                  {isHebrew ? '🚀 בחירת מסלול ושדרוג עסק' : '🚀 Choose Plan & Upgrade'}
+                </h3>
+                <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>
+                  {isHebrew ? 'בחר את החבילה המתאימה לעסק שלך והזן פרטי אשראי לסימולציית סליקה מאובטחת:' : 'Select your plan and enter card details for secure simulated checkout:'}
+                </p>
+
+                {!selectedPlanToUpgrade ? (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+                    <div onClick={() => setSelectedPlanToUpgrade('basic')} style={{ border: '2px solid #cbd5e1', padding: '20px', borderRadius: '8px', cursor: 'pointer', textAlign: 'center', background: '#f8fafc' }}>
+                      <h4 style={{ margin: '0 0 10px 0', color: '#1e293b' }}>Basic</h4>
+                      <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4f46e5', margin: '0 0 10px 0' }}>₪99 /mo</p>
+                      <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{isHebrew ? 'עד 20 הצעות בחודש' : 'Up to 20 quotes'}</span>
+                    </div>
+                    <div onClick={() => setSelectedPlanToUpgrade('pro')} style={{ border: '2px solid #4f46e5', padding: '20px', borderRadius: '8px', cursor: 'pointer', textAlign: 'center', background: '#eef2ff' }}>
+                      <h4 style={{ margin: '0 0 10px 0', color: '#4f46e5' }}>Pro ⭐</h4>
+                      <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4f46e5', margin: '0 0 10px 0' }}>₪199 /mo</p>
+                      <span style={{ fontSize: '0.8rem', color: '#4f46e5', fontWeight: 'bold' }}>{isHebrew ? 'לוגו אישי + ללא הגבלה' : 'Logo + Unlimited'}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSimulatePayment}>
+                    <div style={{ background: '#f1f5f9', padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontWeight: '600', color: '#334155' }}>
+                        {isHebrew ? `מסלול נבחר: ${selectedPlanToUpgrade.toUpperCase()}` : `Selected: ${selectedPlanToUpgrade.toUpperCase()}`}
+                      </span>
+                      <button type="button" onClick={() => setSelectedPlanToUpgrade(null)} style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontSize: '0.85rem' }}>
+                        {isHebrew ? 'שנה מסלול' : 'Change plan'}
+                      </button>
+                    </div>
+
+                    <div style={{ marginBottom: '12px' }}>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'מספר כרטיס אשראי (סימולציה)' : 'Card Number'}</label>
+                      <input type="text" placeholder="4242 4242 4242 4242" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תוקף (MM/YY)' : 'Expires'}</label>
+                        <input type="text" placeholder="12/28" value={cardExp} onChange={(e) => setCardExp(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>CVV</label>
+                        <input type="text" placeholder="123" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+                      </div>
+                    </div>
+
+                    <button type="submit" style={{ width: '100%', background: '#10b981', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', marginBottom: '10px' }}>
+                      {isHebrew ? '🔒 שלם ובצע שדרוג מאובטח' : '🔒 Pay & Securely Upgrade'}
+                    </button>
+                  </form>
+                )}
+
+                <button type="button" onClick={() => { setShowUpgradeModal(false); setSelectedPlanToUpgrade(null); }} style={{ width: '100%', background: '#f1f5f9', color: '#64748b', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+                  {isHebrew ? 'סגור' : 'Cancel'}
+                </button>
+              </div>
             </div>
           )}
 
