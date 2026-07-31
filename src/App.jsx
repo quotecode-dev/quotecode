@@ -50,6 +50,12 @@ function PublicQuote() {
   }, [id]);
 
   const handleClientApprove = async () => {
+    const confirmMsg = isIsraelZone 
+      ? 'לחיצה על אישור הצעה זו מהווה הסכמתך לביצוע העבודה. האם להמשיך?' 
+      : 'Clicking approve means you agree to proceed with the work. Do you want to continue?';
+
+    if (!window.confirm(confirmMsg)) return;
+
     const { error } = await supabase
       .from('quotes')
       .update({ status: 'approved' })
