@@ -1153,18 +1153,17 @@ function Dashboard() {
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientRegion}</label>
                 <select name="clientRegion" value={clientRegion} onChange={(e) => handleRegionChange(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                  <option value="local">{t.localIsrael}</option>
+                  {isHebrew && <option value="local">{t.localIsrael}</option>}
                   <option value="international">{t.international}</option>
                 </select>
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                 <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                  {isHebrew && clientRegion === 'local' && <option>ILS (₪)</option>}
+                  {isHebrew && <option>ILS (₪)</option>}
                   <option>USD ($)</option>
                   <option>EUR (€)</option>
                   <option>GBP (£)</option>
-                  {!isHebrew && <option>ILS (₪)</option>}
                 </select>
               </div>
               <div>
