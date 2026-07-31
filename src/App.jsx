@@ -235,6 +235,13 @@ function PublicQuote() {
 }
 
 function Dashboard() {
+  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+  const browserLang = navigator.language || '';
+  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
+
+  const defaultRegion = isHebrew ? 'local' : 'international';
+  const defaultCurrency = isHebrew ? 'ILS (₪)' : 'USD ($)';
+
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -269,8 +276,8 @@ function Dashboard() {
   const [clientPhone, setClientPhone] = useState('');
   const [clientType, setClientType] = useState('');
   
-  const [clientRegion, setClientRegion] = useState('local');
-  const [currency, setCurrency] = useState('ILS (₪)');
+  const [clientRegion, setClientRegion] = useState(defaultRegion);
+  const [currency, setCurrency] = useState(defaultCurrency);
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -279,10 +286,6 @@ function Dashboard() {
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
-
-  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
-  const browserLang = navigator.language || '';
-  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
 
   const t = {
     appName: bizName || 'ProFlow',
@@ -298,8 +301,8 @@ function Dashboard() {
     clientEmail: isHebrew ? 'אימייל הלקוח' : 'Client Email',
     clientPhone: isHebrew ? 'טלפון הלקוח' : 'Client Phone',
     clientRegion: isHebrew ? 'אזור הלקוח' : 'Client Region',
-    localIsrael: isHebrew ? 'מקומי (ישראל)' : 'Local (Israel)',
-    international: isHebrew ? 'בינלאומי (חו"ל)' : 'International (Foreign)',
+    localIsrael: isHebrew ? 'מקומי (ישראל)' : 'Local (Domestic)',
+    international: isHebrew ? 'בינלאומי (חו"ל)' : 'International',
     currency: isHebrew ? 'מטבע' : 'Currency',
     status: isHebrew ? 'סטטוס' : 'Status',
     validUntil: isHebrew ? 'בתוקף עד' : 'Valid Until',
@@ -363,7 +366,7 @@ function Dashboard() {
     setClientRegion(newRegion);
     if (newRegion === 'international' && currency.includes('ILS')) {
       setCurrency('USD ($)');
-    } else if (newRegion === 'local' && !currency.includes('ILS')) {
+    } else if (newRegion === 'local' && isHebrew) {
       setCurrency('ILS (₪)');
     }
   };
@@ -1157,10 +1160,11 @@ function Dashboard() {
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                 <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                  {clientRegion === 'local' && <option>ILS (₪)</option>}
+                  {isHebrew && clientRegion === 'local' && <option>ILS (₪)</option>}
                   <option>USD ($)</option>
                   <option>EUR (€)</option>
                   <option>GBP (£)</option>
+                  {!isHebrew && <option>ILS (₪)</option>}
                 </select>
               </div>
               <div>
