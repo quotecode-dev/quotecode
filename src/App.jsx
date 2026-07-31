@@ -56,23 +56,22 @@ function PublicQuote() {
 
     if (!window.confirm(confirmMsg)) return;
 
-    const { error } = await supabase
-      .from('quotes')
-      .update({ status: 'approved' })
-      .eq('id', id);
+    // קריאה לפונקציה מיוחדת צד-שרת שמאשרת את ההצעה גם ללא משתמש מחובר
+    const { error: rpcError } = await supabase.rpc('approve_quote_public', { quote_id: id });
 
-    if (!error) {
+    if (!rpcError) {
       setApprovedSuccess(true);
     } else {
-      const { error: errRetry } = await supabase
+      // גיבוי - ניסיון עדכון רגיל
+      const { error: updateError } = await supabase
         .from('quotes')
         .update({ status: 'approved' })
-        .match({ id: id });
+        .eq('id', id);
 
-      if (!errRetry) {
+      if (!updateError) {
         setApprovedSuccess(true);
       } else {
-        alert(isIsraelZone ? 'שגיאה באישור ההצעה. אנא נסה שוב.' : 'Error approving quote. Please try again.');
+        alert(isIsraelZone ? `שגיאה באישור ההצעה: ${updateError.message}` : `Error: ${updateError.message}`);
       }
     }
   };
