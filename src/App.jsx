@@ -406,6 +406,25 @@ function Dashboard() {
     }
   }
 
+  async function handleUpgradeToPro() {
+    if (!settingId) {
+      setStatusMsg({ text: isHebrew ? 'אנא שמור את הגדרות העסק תחילה.' : 'Please save business settings first.', type: 'error' });
+      return;
+    }
+
+    const { error } = await supabase
+      .from('business_settings')
+      .update({ plan: 'pro' })
+      .eq('id', settingId);
+
+    if (error) {
+      setStatusMsg({ text: 'Error upgrading plan: ' + error.message, type: 'error' });
+    } else {
+      setBizPlan('pro');
+      setStatusMsg({ text: isHebrew ? '🎉 שדרגת בהצלחה לחבילת Pro! מעכשיו הלוגו שלך פתוח ואין הגבלת הצעות.' : '🎉 Successfully upgraded to Pro plan!', type: 'success' });
+    }
+  }
+
   async function handleSaveSettings(e) {
     e.preventDefault();
     if (!session?.user?.id) return;
@@ -875,7 +894,7 @@ function Dashboard() {
               </span>
               <button 
                 type="button" 
-                onClick={() => alert(isHebrew ? 'כאן המערכת תעביר את הלקוח לעמוד תשלום לאישור השדרוג.' : 'Here the system will redirect the client to payment gateway.')} 
+                onClick={handleUpgradeToPro} 
                 style={{ background: '#d97706', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.8rem' }}
               >
                 {isHebrew ? 'שדרג ל-Pro' : 'Upgrade to Pro'}
