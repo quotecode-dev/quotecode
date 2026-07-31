@@ -209,6 +209,9 @@ function Dashboard() {
     approvedPaid: isHebrew ? 'אושר / שולם' : 'APPROVED / PAID',
     winRate: isHebrew ? 'אחוז הצלחה' : 'WIN RATE',
     totalRevenue: isHebrew ? 'סך הכנסות' : 'TOTAL REVENUE',
+    analyticsTitle: isHebrew ? '📊 סיכום ומדדים עסקיים' : '📊 Business Analytics & Summary',
+    pendingQuotes: isHebrew ? 'הצעות ממתינות לטיפול (טיוטה/נשלח)' : 'Pending Quotes',
+    topClient: isHebrew ? 'לקוח מוביל' : 'Top Client',
     clientName: isHebrew ? 'שם הלקוח' : 'Client Name',
     clientEmail: isHebrew ? 'אימייל הלקוח' : 'Client Email',
     clientPhone: isHebrew ? 'טלפון הלקוח' : 'Client Phone',
@@ -489,6 +492,7 @@ function Dashboard() {
 
   const totalQuotesCount = quotes.length;
   const approvedPaidCount = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').length;
+  const pendingQuotesCount = quotes.filter(q => q.status?.toLowerCase() === 'draft' || q.status?.toLowerCase() === 'sent').length;
   const winRate = totalQuotesCount > 0 ? Math.round((approvedPaidCount / totalQuotesCount) * 100) : 0;
   const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
 
@@ -793,6 +797,23 @@ function Dashboard() {
           </div>
         </div>
 
+        {/* --- אזור אנליטיקה וסיכומים מתקדמים (שלב 1) --- */}
+        <div style={{ background: 'white', padding: '20px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px', border: '1px solid #e2e8f0' }}>
+          <h3 style={{ fontSize: '1rem', color: '#1e293b', marginTop: 0, marginBottom: '15px' }}>{t.analyticsTitle}</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
+            <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>{t.pendingQuotes}</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#d97706', marginTop: '5px' }}>{pendingQuotesCount}</div>
+            </div>
+            <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>{t.topClient}</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1e293b', marginTop: '5px' }}>
+                {clients.length > 0 ? clients[0].company_name : (isHebrew ? 'אין לקוחות' : 'No clients')}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {statusMsg.text && (
           <div style={{ padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', fontWeight: '500', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b' }}>
             {statusMsg.text}
@@ -1045,7 +1066,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* --- היסטוריית הצעות מחיר עם שינוי סטטוס ישיר מהטבלה --- */}
+        {/* --- היסטוריית הצעות מחיר --- */}
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
