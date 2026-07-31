@@ -265,7 +265,7 @@ function Dashboard() {
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  const [clientType, setClientType] = useState('business');
+  const [clientType, setClientType] = useState('');
   
   const [clientRegion, setClientRegion] = useState('local');
   const [currency, setCurrency] = useState('ILS (₪)');
@@ -633,7 +633,7 @@ function Dashboard() {
     setClientName(quote.clients?.company_name || '');
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
-    setClientType(quote.client_type || quote.clients?.client_type || 'business');
+    setClientType(quote.client_type || quote.clients?.client_type || '');
     
     if (quote.currency === 'EUR') { setCurrency('EUR (€)'); setClientRegion('international'); } 
     else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); setClientRegion('international'); } 
@@ -658,7 +658,7 @@ function Dashboard() {
     setClientName(quote.clients?.company_name || '');
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
-    setClientType(quote.client_type || quote.clients?.client_type || 'business');
+    setClientType(quote.client_type || quote.clients?.client_type || '');
     
     if (quote.currency === 'EUR') { setCurrency('EUR (€)'); setClientRegion('international'); } 
     else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); setClientRegion('international'); } 
@@ -747,7 +747,7 @@ function Dashboard() {
     setClientName('');
     setClientEmail('');
     setClientPhone('');
-    setClientType('business');
+    setClientType('');
     setValidUntil('');
     setDiscount(0);
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
@@ -833,7 +833,7 @@ function Dashboard() {
       setClientName('');
       setClientEmail('');
       setClientPhone('');
-      setClientType('business');
+      setClientType('');
       setValidUntil('');
       setDiscount(0);
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
@@ -1128,6 +1128,7 @@ function Dashboard() {
               <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'סוג לקוח (חובה)' : 'Client Type'}</label>
                 <select name="clientType" value={clientType} onChange={(e) => setClientType(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                  <option value="" disabled>{isHebrew ? 'בחר סוג לקוח...' : 'Select Client Type...'}</option>
                   <option value="business">{isHebrew ? 'עסקי (חברה/עוסק)' : 'Business'}</option>
                   <option value="private">{isHebrew ? 'פרטי (B2C)' : 'Private'}</option>
                 </select>
