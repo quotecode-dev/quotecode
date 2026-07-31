@@ -56,13 +56,11 @@ function PublicQuote() {
 
     if (!window.confirm(confirmMsg)) return;
 
-    // קריאה לפונקציה מיוחדת צד-שרת שמאשרת את ההצעה גם ללא משתמש מחובר
     const { error: rpcError } = await supabase.rpc('approve_quote_public', { quote_id: id });
 
     if (!rpcError) {
       setApprovedSuccess(true);
     } else {
-      // גיבוי - ניסיון עדכון רגיל
       const { error: updateError } = await supabase
         .from('quotes')
         .update({ status: 'approved' })
@@ -95,7 +93,9 @@ function PublicQuote() {
     return '₪';
   };
   const quoteSym = getCurrencySymbol(quote.currency);
-  const formatNum = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  
+  // פונקציית העיצוב החדשה שמבצעת עיגול לפי חוקי מתמטיקה ומשאירה תמיד .00 בסוף
+  const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
   const quoteDiscount = quote.discount || 0;
@@ -566,7 +566,8 @@ function Dashboard() {
     }
   }
 
-  const formatNum = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // פונקציית העיצוב החדשה שמבצעת עיגול לפי חוקי מתמטיקה ומשאירה תמיד .00 בסוף
+  const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
   const discountAmount = (subtotal * Number(discount)) / 100;
