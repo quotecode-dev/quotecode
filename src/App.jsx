@@ -459,6 +459,16 @@ function Dashboard() {
     }
   }
 
+  async function handleStatusChange(quoteId, newStatus) {
+    const { error } = await supabase.from('quotes').update({ status: newStatus.toLowerCase() }).eq('id', quoteId);
+    if (error) {
+      setStatusMsg({ text: 'Error updating status: ' + error.message, type: 'error' });
+    } else {
+      setStatusMsg({ text: isHebrew ? 'סטטוס ההצעה עודכן בהצלחה!' : 'Quote status updated successfully!', type: 'success' });
+      fetchQuotes();
+    }
+  }
+
   const formatNum = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
@@ -1035,7 +1045,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* --- היסטוריית הצעות מחיר עם כפתורי וואטסאפ ואימייל משודרגים --- */}
+        {/* --- היסטוריית הצעות מחיר עם שינוי סטטוס ישיר מהטבלה --- */}
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
@@ -1086,15 +1096,7 @@ function Dashboard() {
                 ) : (
                   filteredQuotes.map((quote) => {
                     const quoteSym = getCurrencySymbol(quote.currency);
-                    const qIsHebrew = quote.currency === 'ILS';
-                    const statusText = quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft';
-                    let translatedStatus = statusText;
-                    if (qIsHebrew) {
-                      if (statusText.toLowerCase() === 'draft') translatedStatus = 'טיוטה';
-                      else if (statusText.toLowerCase() === 'sent') translatedStatus = 'נשלח';
-                      else if (statusText.toLowerCase() === 'approved') translatedStatus = 'אושר';
-                      else if (statusText.toLowerCase() === 'paid') translatedStatus = 'שולם';
-                    }
+                    const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
                     return (
                       <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
                         <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
@@ -1103,16 +1105,25 @@ function Dashboard() {
                           <div style={{ fontSize: '0.8rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
                         </td>
                         <td style={{ padding: '12px' }}>
-                          <span style={{
-                            padding: '4px 10px',
-                            borderRadius: '6px',
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                            background: quote.status?.toLowerCase() === 'approved' ? '#dcfce7' : quote.status?.toLowerCase() === 'paid' ? '#dbeafe' : '#f1f5f9',
-                            color: quote.status?.toLowerCase() === 'approved' ? '#166534' : quote.status?.toLowerCase() === 'paid' ? '#1e40af' : '#475569'
-                          }}>
-                            {translatedStatus}
-                          </span>
+                          <select
+                            value={currentStatus}
+                            onChange={(e) => handleStatusChange(quote.id, e.target.value)}
+                            style={{
+                              padding: '6px 10px',
+                              borderRadius: '6px',
+                              fontSize: '0.8rem',
+                              fontWeight: '600',
+                              background: currentStatus === 'approved' ? '#dcfce7' : currentStatus === 'paid' ? '#dbeafe' : currentStatus === 'sent' ? '#fef9c3' : '#f1f5f9',
+                              color: currentStatus === 'approved' ? '#166534' : currentStatus === 'paid' ? '#1e40af' : currentStatus === 'sent' ? '#854d0e' : '#475569',
+                              border: '1px solid #cbd5e1',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
+                            <option value="sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
+                            <option value="approved">{isHebrew ? 'אושר' : 'Approved'}</option>
+                            <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
+                          </select>
                         </td>
                         <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
                           {quoteSym}{formatNum(quote.total)}
