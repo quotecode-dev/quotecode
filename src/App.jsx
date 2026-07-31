@@ -1346,7 +1346,7 @@ function Dashboard() {
           </div>
         </div>
 
-        <div style.background="white" style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
           <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
           
           <form onSubmit={handleAddService} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
@@ -1466,12 +1466,10 @@ function Dashboard() {
 export default function App() {
   return (
     <Router>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/quote/:id" element={<PublicQuote />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/quote/:id" element={<PublicQuote />} />
+      </Routes>
     </Router>
   );
 }
