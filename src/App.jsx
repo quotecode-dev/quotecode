@@ -64,7 +64,16 @@ function PublicQuote() {
     if (!error) {
       setApprovedSuccess(true);
     } else {
-      alert(isIsraelZone ? 'שגיאה באישור ההצעה. אנא נסה שוב.' : 'Error approving quote. Please try again.');
+      const { error: errRetry } = await supabase
+        .from('quotes')
+        .update({ status: 'approved' })
+        .match({ id: id });
+
+      if (!errRetry) {
+        setApprovedSuccess(true);
+      } else {
+        alert(isIsraelZone ? 'שגיאה באישור ההצעה. אנא נסה שוב.' : 'Error approving quote. Please try again.');
+      }
     }
   };
 
