@@ -152,7 +152,7 @@ function PublicQuote() {
       <style>{`
         @media print {
           .no-print { display: none !important; }
-          body { background: white !important; margin: 0; padding: 0; }
+          body { background: white !important; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           div { box-shadow: none !important; border-radius: 0 !important; }
         }
       `}</style>
@@ -252,7 +252,8 @@ function Dashboard() {
     pdfPrint: 'PDF',
     sendEmail: isHebrew ? 'שלח למייל' : 'Send via Email',
     sendWhatsApp: isHebrew ? 'שלח בוואטסאפ' : 'Send via WhatsApp',
-    delete: isHebrew ? 'מחק' : 'Delete'
+    delete: isHebrew ? 'מחק' : 'Delete',
+    clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management'
   };
 
   useEffect(() => {
@@ -301,7 +302,7 @@ function Dashboard() {
   }
 
   async function fetchClients() {
-    const { data, error } = await supabase.from('clients').select('id, company_name, email, phone');
+    const { data, error } = await supabase.from('clients').select('id, company_name, email, phone, created_at');
     if (error) console.error('Error fetching clients:', error.message);
     else setClients(data || []);
   }
@@ -446,6 +447,16 @@ function Dashboard() {
     const { error } = await supabase.from('services').delete().eq('id', id);
     if (error) setStatusMsg({ text: 'Error deleting service: ' + error.message, type: 'error' });
     else fetchServices();
+  }
+
+  async function handleDeleteClient(clientId) {
+    if (!window.confirm(isHebrew ? 'למחוק לקוח זה? שים לב שהדבר עלול להשפיע על הצעות מחיר קשורות.' : 'Delete this client?')) return;
+    const { error } = await supabase.from('clients').delete().eq('id', clientId);
+    if (error) setStatusMsg({ text: 'Error deleting client: ' + error.message, type: 'error' });
+    else {
+      setStatusMsg({ text: isHebrew ? 'הלקוח נמחק בהצלחה.' : 'Client deleted successfully.', type: 'success' });
+      fetchClients();
+    }
   }
 
   const formatNum = (val) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -981,6 +992,49 @@ function Dashboard() {
           </form>
         </div>
 
+        {/* --- אזור חדש: ניהול לקוחות (Clients Management) --- */}
+        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
+          
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                  <th style={{ padding: '12px' }}>{t.clientName}</th>
+                  <th style={{ padding: '12px' }}>{t.clientEmail}</th>
+                  <th style={{ padding: '12px' }}>{t.clientPhone}</th>
+                  <th style={{ padding: '12px' }}>{t.actions}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clients.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                      {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients found.'}
+                    </td>
+                  </tr>
+                ) : (
+                  clients.map((client) => (
+                    <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                      <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{client.company_name || 'N/A'}</td>
+                      <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
+                      <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
+                      <td style={{ padding: '12px' }}>
+                        <button 
+                          onClick={() => handleDeleteClient(client.id)}
+                          style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                        >
+                          {t.delete}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
@@ -1190,6 +1244,7 @@ function Dashboard() {
                     <th style={{ padding: '12px' }}>Email</th>
                     <th style={{ padding: '12px' }}>Business Name</th>
                     <th style={{ padding: '12px' }}>Current Plan</th>
+                    <th style={{/th>
                     <th style={{ padding: '12px' }}>Role</th>
                   </tr>
                 </thead>
