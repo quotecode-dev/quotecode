@@ -76,13 +76,14 @@ function PublicQuote() {
 
   return (
     <div dir={isLocal ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333' }}>
-      <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', textAlign: isLocal ? 'left' : 'right' }}>
-        <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-          {isLocal ? '🖨️ הדפס / הורד כ-PDF' : '🖨️ Print / Download PDF'}
+      <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{isIsraelZone ? 'מסמך רשמי מאושר' : 'Official Document'}</span>
+        <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>🖨️</span> {isLocal ? 'הורד כ-PDF / הדפס' : 'Download PDF / Print'}
         </button>
       </div>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '25px 15px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '35px 25px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isLocal ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
           <div>
             {bizLogo ? (
@@ -151,7 +152,8 @@ function PublicQuote() {
       <style>{`
         @media print {
           .no-print { display: none !important; }
-          body { background: white !important; }
+          body { background: white !important; margin: 0; padding: 0; }
+          div { box-shadow: none !important; border-radius: 0 !important; }
         }
       `}</style>
     </div>
