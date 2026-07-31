@@ -104,7 +104,6 @@ function PublicQuote() {
 
       <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '35px 25px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
         
-        {/* הודעת אישור דיגיטלי במידה ואושר */}
         {approvedSuccess && (
           <div style={{ background: '#dcfce7', border: '1px solid #22c55e', color: '#166534', padding: '15px 20px', borderRadius: '8px', marginBottom: '25px', textAlign: 'center', fontWeight: 'bold' }}>
             {isIsraelZone ? '✅ הצעת המחיר אושרה בהצלחה על ידך! תודה רבה.' : '✅ Quote successfully approved! Thank you for your business.'}
@@ -837,7 +836,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* --- אזור אנליטיקה וסיכומים מתקדמים (שלב 1) --- */}
+        {/* --- אזור אנליטיקה וסיכומים מתקדמים --- */}
         <div style={{ background: 'white', padding: '20px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px', border: '1px solid #e2e8f0' }}>
           <h3 style={{ fontSize: '1rem', color: '#1e293b', marginTop: 0, marginBottom: '15px' }}>{t.analyticsTitle}</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
@@ -1316,7 +1315,7 @@ function Dashboard() {
                     <th style={{ padding: '12px' }}>ID</th>
                     <th style={{ padding: '12px' }}>Email</th>
                     <th style={{ padding: '12px' }}>Business Name</th>
-                    <th style={{ `Current Plan` }}>Current Plan</th>
+                    <th style={{ padding: '12px' }}>Current Plan</th>
                     <th style={{ padding: '12px' }}>Role</th>
                   </tr>
                 </thead>
@@ -1354,20 +1353,6 @@ function Dashboard() {
 }
 
 export default function App() {
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   return (
     <Router>
       <Routes>
