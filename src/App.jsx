@@ -992,7 +992,7 @@ function Dashboard() {
           </form>
         </div>
 
-        {/* --- אזור חדש: ניהול לקוחות (Clients Management) --- */}
+        {/* --- ניהול לקוחות (Clients Management) --- */}
         <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
           <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
           
@@ -1244,7 +1244,6 @@ function Dashboard() {
                     <th style={{ padding: '12px' }}>Email</th>
                     <th style={{ padding: '12px' }}>Business Name</th>
                     <th style={{ padding: '12px' }}>Current Plan</th>
-                    <th style={{/th>
                     <th style={{ padding: '12px' }}>Role</th>
                   </tr>
                 </thead>
