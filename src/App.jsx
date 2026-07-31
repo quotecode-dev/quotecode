@@ -10,6 +10,7 @@ function PublicQuote() {
   const [quote, setQuote] = useState(null);
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [approvedSuccess, setApprovedSuccess] = useState(false);
 
   const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
 
@@ -40,10 +41,26 @@ function PublicQuote() {
 
       setQuote(quoteData);
       setSettings(settingsData || { business_name: 'ProFlow', plan: 'free' });
+      if (quoteData && quoteData.status === 'approved') {
+        setApprovedSuccess(true);
+      }
       setLoading(false);
     }
     fetchData();
   }, [id]);
+
+  const handleClientApprove = async () => {
+    const { error } = await supabase
+      .from('quotes')
+      .update({ status: 'approved' })
+      .eq('id', id);
+
+    if (!error) {
+      setApprovedSuccess(true);
+    } else {
+      alert(isIsraelZone ? 'שגיאה באישור ההצעה. אנא נסה שוב.' : 'Error approving quote. Please try again.');
+    }
+  };
 
   if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isIsraelZone ? 'טוען את הצעת המחיר...' : 'Loading quote...'}</div>;
   if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isIsraelZone ? 'הצעת המחיר לא נמצאה.' : 'Quote not found.'}</div>;
@@ -76,14 +93,24 @@ function PublicQuote() {
 
   return (
     <div dir={isLocal ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333' }}>
-      <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{isIsraelZone ? 'מסמך רשמי מאושר' : 'Official Document'}</span>
-        <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span>🖨️</span> {isLocal ? 'הורד כ-PDF / הדפס' : 'Download PDF / Print'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>🖨️</span> {isLocal ? 'הורד כ-PDF / הדפס' : 'Download PDF / Print'}
+          </button>
+        </div>
       </div>
 
       <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '35px 25px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+        
+        {/* הודעת אישור דיגיטלי במידה ואושר */}
+        {approvedSuccess && (
+          <div style={{ background: '#dcfce7', border: '1px solid #22c55e', color: '#166534', padding: '15px 20px', borderRadius: '8px', marginBottom: '25px', textAlign: 'center', fontWeight: 'bold' }}>
+            {isIsraelZone ? '✅ הצעת המחיר אושרה בהצלחה על ידך! תודה רבה.' : '✅ Quote successfully approved! Thank you for your business.'}
+          </div>
+        )}
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isLocal ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
           <div>
             {bizLogo ? (
@@ -143,9 +170,22 @@ function PublicQuote() {
           <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isLocal ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
         </div>
 
-        <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', textAlign: isLocal ? 'right' : 'left' }}>
-          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-          <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>{isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.'}</p>
+        <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isLocal ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '20px' }}>
+          <div style={{ textAlign: isLocal ? 'right' : 'left' }}>
+            <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
+            <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>{isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.'}</p>
+          </div>
+
+          {!approvedSuccess && (
+            <div className="no-print">
+              <button 
+                onClick={handleClientApprove}
+                style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+              >
+                {isLocal ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
       
@@ -1276,7 +1316,7 @@ function Dashboard() {
                     <th style={{ padding: '12px' }}>ID</th>
                     <th style={{ padding: '12px' }}>Email</th>
                     <th style={{ padding: '12px' }}>Business Name</th>
-                    <th style={{ padding: '12px' }}>Current Plan</th>
+                    <th style={{ `Current Plan` }}>Current Plan</th>
                     <th style={{ padding: '12px' }}>Role</th>
                   </tr>
                 </thead>
@@ -1314,6 +1354,20 @@ function Dashboard() {
 }
 
 export default function App() {
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <Router>
       <Routes>
