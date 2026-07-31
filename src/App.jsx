@@ -225,9 +225,8 @@ function Dashboard() {
   const [bizRole, setBizRole] = useState('user');
   const [allAccounts, setAllAccounts] = useState([]);
 
-  // מצבי ניהול חלונית שדרוג ותשלום סימולציה
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState(null); // 'basic' או 'pro'
+  const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState(null);
   const [cardNumber, setCardNumber] = useState('');
   const [cardExp, setCardExp] = useState('');
   const [cardCvv, setCardCvv] = useState('');
@@ -413,7 +412,6 @@ function Dashboard() {
     }
   }
 
-  // אישור תשלום מדמה (סליקה סימולציה)
   async function handleSimulatePayment(e) {
     e.preventDefault();
     if (!settingId) {
