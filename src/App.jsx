@@ -41,7 +41,7 @@ function PublicQuote() {
 
       setQuote(quoteData);
       setSettings(settingsData || { business_name: 'ProFlow', plan: 'free' });
-      if (quoteData && quoteData.status === 'approved') {
+      if (quoteData && (quoteData.status === 'approved' || quoteData.status === 'paid')) {
         setApprovedSuccess(true);
       }
       setLoading(false);
@@ -356,7 +356,11 @@ function Dashboard() {
   }
 
   async function fetchClients() {
-    const { data, error } = await supabase.from('clients').select('id, company_name, email, phone, created_at');
+    if (!session?.user?.id) return;
+    const { data, error } = await supabase
+      .from('clients')
+      .select('id, company_name, email, phone, created_at')
+      .eq('user_id', session.user.id);
     if (error) console.error('Error fetching clients:', error.message);
     else setClients(data || []);
   }
@@ -718,7 +722,7 @@ function Dashboard() {
         clientId = existingClient.id;
         if (clientPhone !== existingClient.phone) await supabase.from('clients').update({ phone: clientPhone }).eq('id', clientId);
       } else {
-        const { data: newClientData, error: clientError } = await supabase.from('clients').insert([{ company_name: clientName, email: clientEmail, phone: clientPhone }]).select();
+        const { data: newClientData, error: clientError } = await supabase.from('clients').insert([{ company_name: clientName, email: clientEmail, phone: clientPhone, user_id: session.user.id }]).select();
         if (clientError) throw clientError;
         clientId = newClientData[0].id;
       }
@@ -1342,7 +1346,7 @@ function Dashboard() {
           </div>
         </div>
 
-        <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+        <div style.background="white" style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
           <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
           
           <form onSubmit={handleAddService} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
@@ -1462,10 +1466,12 @@ function Dashboard() {
 export default function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/quote/:id" element={<PublicQuote />} />
-      </Routes>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/quote/:id" element={<PublicQuote />} />
+        </Routes>
+      </Router>
     </Router>
   );
 }
