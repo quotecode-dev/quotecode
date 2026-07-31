@@ -13,6 +13,8 @@ function PublicQuote() {
   const [approvedSuccess, setApprovedSuccess] = useState(false);
 
   const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+  const browserLang = navigator.language || '';
+  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
 
   useEffect(() => {
     async function fetchData() {
@@ -50,7 +52,7 @@ function PublicQuote() {
   }, [id]);
 
   const handleClientApprove = async () => {
-    const confirmMsg = isIsraelZone 
+    const confirmMsg = isHebrew 
       ? 'לחיצה על אישור הצעה זו מהווה הסכמתך לביצוע העבודה. האם להמשיך?' 
       : 'Clicking approve means you agree to proceed with the work. Do you want to continue?';
 
@@ -69,13 +71,13 @@ function PublicQuote() {
       if (!updateError) {
         setApprovedSuccess(true);
       } else {
-        alert(isIsraelZone ? `שגיאה באישור ההצעה: ${updateError.message}` : `Error: ${updateError.message}`);
+        alert(isHebrew ? `שגיאה באישור ההצעה: ${updateError.message}` : `Error: ${updateError.message}`);
       }
     }
   };
 
-  if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isIsraelZone ? 'טוען את הצעת המחיר...' : 'Loading quote...'}</div>;
-  if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isIsraelZone ? 'הצעת המחיר לא נמצאה.' : 'Quote not found.'}</div>;
+  if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isHebrew ? 'טוען את הצעת המחיר...' : 'Loading quote...'}</div>;
+  if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isHebrew ? 'הצעת המחיר לא נמצאה.' : 'Quote not found.'}</div>;
 
   const isLocal = quote.currency === 'ILS';
   const isPrivate = quote.client_type === 'private';
@@ -114,12 +116,12 @@ function PublicQuote() {
   }
 
   return (
-    <div dir={isLocal ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333' }}>
+    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333' }}>
       <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{isIsraelZone ? 'מסמך רשמי מאושר' : 'Official Document'}</span>
+        <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{isHebrew ? 'מסמך רשמי מאושר' : 'Official Document'}</span>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>🖨️</span> {isLocal ? 'הורד כ-PDF / הדפס' : 'Download PDF / Print'}
+            <span>🖨️</span> {isHebrew ? 'הורד כ-PDF / הדפס' : 'Download PDF / Print'}
           </button>
         </div>
       </div>
@@ -128,11 +130,11 @@ function PublicQuote() {
         
         {approvedSuccess && (
           <div style={{ background: '#dcfce7', border: '1px solid #22c55e', color: '#166534', padding: '15px 20px', borderRadius: '8px', marginBottom: '25px', textAlign: 'center', fontWeight: 'bold' }}>
-            {isIsraelZone ? '✅ הצעת המחיר אושרה בהצלחה על ידך! תודה רבה.' : '✅ Quote successfully approved! Thank you for your business.'}
+            {isHebrew ? '✅ הצעת המחיר אושרה בהצלחה על ידך! תודה רבה.' : '✅ Quote successfully approved! Thank you for your business.'}
           </div>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isLocal ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
           <div>
             {bizLogo ? (
               <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block' }} />
@@ -140,31 +142,31 @@ function PublicQuote() {
               <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '40px', marginBottom: '8px', display: 'block' }} />
             )}
             <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
-              {bizTaxId && `${isLocal ? 'עוסק/ח.פ:' : 'Tax ID:'} ${bizTaxId} | `} {bizEmail} {bizPhone ? `| ${bizPhone}` : ''}
+              {bizTaxId && `${isHebrew ? 'עוסק/ח.פ:' : 'Tax ID:'} ${bizTaxId} | `} {bizEmail} {bizPhone ? `| ${bizPhone}` : ''}
             </p>
           </div>
-          <div style={{ textAlign: isLocal ? 'left' : 'right' }}>
-            <h2 style={{ margin: 0, color: '#111827', fontSize: '22px', textTransform: 'uppercase' }}>{isLocal ? 'הצעת מחיר' : 'QUOTE'}</h2>
+          <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
+            <h2 style={{ margin: 0, color: '#111827', fontSize: '22px', textTransform: 'uppercase' }}>{isHebrew ? 'הצעת מחיר' : 'QUOTE'}</h2>
             <p style={{ margin: '4px 0 0', color: '#6b7280', fontSize: '14px' }}>#{quote.id.slice(0, 8).toUpperCase()}</p>
-            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isLocal ? 'תאריך:' : 'Date:'} {new Date(quote.created_at).toLocaleDateString('en-US')}</p>
-            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isLocal ? 'בתוקף עד:' : 'Valid Until:'} {quote.valid_until || 'N/A'}</p>
+            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isHebrew ? 'תאריך:' : 'Date:'} {new Date(quote.created_at).toLocaleDateString('en-US')}</p>
+            <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isHebrew ? 'בתוקף עד:' : 'Valid Until:'} {quote.valid_until || 'N/A'}</p>
           </div>
         </div>
 
-        <div style={{ marginBottom: '40px', textAlign: isLocal ? 'right' : 'left' }}>
-          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'הוכן עבור:' : 'Prepared For:'}</p>
+        <div style={{ marginBottom: '40px', textAlign: isHebrew ? 'right' : 'left' }}>
+          <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'הוכן עבור:' : 'Prepared For:'}</p>
           <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>{quote.clients?.company_name || 'N/A'}</p>
           <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '15px' }}>{quote.clients?.email || ''}</p>
         </div>
 
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', textAlign: isLocal ? 'right' : 'left', minWidth: '450px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', textAlign: isHebrew ? 'right' : 'left', minWidth: '450px' }}>
             <thead>
               <tr>
-                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827' }}>{isLocal ? 'תיאור' : 'Description'}</th>
-                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: 'center' }}>{isLocal ? 'כמות' : 'Qty'}</th>
-                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: isLocal ? 'left' : 'right' }}>{isLocal ? 'מחיר יחידה' : 'Unit Price'}</th>
-                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: isLocal ? 'left' : 'right' }}>{isLocal ? 'סה"כ' : 'Total'}</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827' }}>{isHebrew ? 'תיאור' : 'Description'}</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: 'center' }}>{isHebrew ? 'כמות' : 'Qty'}</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: isHebrew ? 'left' : 'right' }}>{isHebrew ? 'מחיר יחידה' : 'Unit Price'}</th>
+                <th style={{ background: '#f9fafb', padding: '14px', fontSize: '13px', color: '#6b7280', textTransform: 'uppercase', borderBottom: '2px solid #111827', textAlign: isHebrew ? 'left' : 'right' }}>{isHebrew ? 'סה"כ' : 'Total'}</th>
               </tr>
             </thead>
             <tbody>
@@ -173,39 +175,39 @@ function PublicQuote() {
                   <tr key={item.id}>
                     <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', color: '#1f2937' }}>{item.description}</td>
                     <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: 'center', color: '#4b5563' }}>{item.quantity}</td>
-                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: isLocal ? 'left' : 'right', color: '#4b5563' }}>{quoteSym}{formatNum(item.unit_price)}</td>
-                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: isLocal ? 'left' : 'right', fontWeight: 'bold', color: '#111827' }}>{quoteSym}{formatNum(item.total_price)}</td>
+                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: isHebrew ? 'left' : 'right', color: '#4b5563' }}>{quoteSym}{formatNum(item.unit_price)}</td>
+                    <td style={{ padding: '14px', borderBottom: '1px solid #e5e7eb', textAlign: isHebrew ? 'left' : 'right', fontWeight: 'bold', color: '#111827' }}>{quoteSym}{formatNum(item.total_price)}</td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan="4" style={{ padding: '14px', borderBottom: '1px solid #e5e7eb' }}>{isLocal ? 'שירותים מקצועיים' : 'Professional Services'}</td></tr>
+                <tr><td colSpan="4" style={{ padding: '14px', borderBottom: '1px solid #e5e7eb' }}>{isHebrew ? 'שירותים מקצועיים' : 'Professional Services'}</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
-        <div style={{ textAlign: isLocal ? 'left' : 'right', color: '#4b5563', fontSize: '15px' }}>
+        <div style={{ textAlign: isHebrew ? 'left' : 'right', color: '#4b5563', fontSize: '15px' }}>
           {isLocal && isPrivate ? (
             <>
-              <div>{isLocal ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):'} {quoteSym}{formatNum(quoteSub)}</div>
-              {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isLocal ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
-              <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isLocal ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
-              <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{isLocal ? `(הסכום כולל מע"מ בסך ${quoteSym}${formatNum(quoteTaxAmount)})` : `(Includes VAT: ${quoteSym}${formatNum(quoteTaxAmount)})`}</div>
+              <div>{isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):'} {quoteSym}{formatNum(quoteSub)}</div>
+              {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
+              <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
+              <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{isHebrew ? `(הסכום כולל מע"מ בסך ${quoteSym}${formatNum(quoteTaxAmount)})` : `(Includes VAT: ${quoteSym}${formatNum(quoteTaxAmount)})`}</div>
             </>
           ) : (
             <>
-              <div>{isLocal ? 'סכום ביניים:' : 'Subtotal:'} {quoteSym}{formatNum(quoteSub)}</div>
-              {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isLocal ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
-              {quoteTaxRate > 0 && <div style={{ marginTop: '6px' }}>{isLocal ? 'מע"מ (18%):' : 'VAT (18%):'} {quoteSym}{formatNum(quoteTaxAmount)}</div>}
-              <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isLocal ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
+              <div>{isHebrew ? 'סכום ביניים:' : 'Subtotal:'} {quoteSym}{formatNum(quoteSub)}</div>
+              {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
+              {quoteTaxRate > 0 && <div style={{ marginTop: '6px' }}>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'} {quoteSym}{formatNum(quoteTaxAmount)}</div>}
+              <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
             </>
           )}
         </div>
 
-        <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isLocal ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '20px' }}>
-          <div style={{ textAlign: isLocal ? 'right' : 'left' }}>
-            <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isLocal ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-            <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>{isLocal ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.'}</p>
+        <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '20px' }}>
+          <div style={{ textAlign: isHebrew ? 'right' : 'left' }}>
+            <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
+            <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>{isHebrew ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.'}</p>
           </div>
 
           {!approvedSuccess && (
@@ -214,7 +216,7 @@ function PublicQuote() {
                 onClick={handleClientApprove}
                 style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
               >
-                {isLocal ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
+                {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
               </button>
             </div>
           )}
@@ -279,7 +281,8 @@ function Dashboard() {
   const [newServicePrice, setNewServicePrice] = useState('');
 
   const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
-  const isHebrew = isIsraelZone;
+  const browserLang = navigator.language || '';
+  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
 
   const t = {
     appName: bizName || 'ProFlow',
