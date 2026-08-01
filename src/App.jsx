@@ -12,9 +12,12 @@ function PublicQuote() {
   const [loading, setLoading] = useState(true);
   const [approvedSuccess, setApprovedSuccess] = useState(false);
 
-  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
-  const browserLang = navigator.language || '';
-  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
+  const [lang, setLang] = useState(() => {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const navLang = navigator.language || '';
+    return (navLang.startsWith('he') || tz === 'Asia/Jerusalem') ? 'he' : 'en';
+  });
+  const isHebrew = lang === 'he';
 
   useEffect(() => {
     async function fetchData() {
@@ -79,7 +82,6 @@ function PublicQuote() {
   if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isHebrew ? 'טוען את הצעת המחיר...' : 'Loading quote...'}</div>;
   if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isHebrew ? 'הצעת המחיר לא נמצאה.' : 'Quote not found.'}</div>;
 
-  const isLocal = quote.currency === 'ILS';
   const isPrivate = quote.client_type === 'private';
   const bizName = settings?.business_name || 'ProFlow';
   const bizTaxId = settings?.tax_id || '';
@@ -102,12 +104,14 @@ function PublicQuote() {
   const quoteDiscount = quote.discount || 0;
   const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
   const baseAmount = quoteSub - quoteDiscountAmount;
-  const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isLocal ? 0.18 : 0.00);
+  
+  const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isHebrew ? 0.18 : 0.00);
+  const hasVat = quoteTaxRate > 0;
   
   let quoteTaxAmount = 0;
   let quoteTotal = 0;
 
-  if (isLocal && isPrivate) {
+  if (hasVat && isPrivate) {
       quoteTotal = baseAmount;
       quoteTaxAmount = quoteTotal - (quoteTotal / (1 + quoteTaxRate));
   } else {
@@ -120,6 +124,9 @@ function PublicQuote() {
       <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{isHebrew ? 'מסמך רשמי מאושר' : 'Official Document'}</span>
         <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={() => setLang(lang === 'he' ? 'en' : 'he')} className="no-print" style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
+            🌐 {isHebrew ? 'English' : 'עברית'}
+          </button>
           <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>🖨️</span> {isHebrew ? 'הורד כ-PDF / הדפס' : 'Download PDF / Print'}
           </button>
@@ -187,7 +194,7 @@ function PublicQuote() {
         </div>
 
         <div style={{ textAlign: isHebrew ? 'left' : 'right', color: '#4b5563', fontSize: '15px' }}>
-          {isLocal && isPrivate ? (
+          {hasVat && isPrivate ? (
             <>
               <div>{isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):'} {quoteSym}{formatNum(quoteSub)}</div>
               {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
@@ -198,7 +205,7 @@ function PublicQuote() {
             <>
               <div>{isHebrew ? 'סכום ביניים:' : 'Subtotal:'} {quoteSym}{formatNum(quoteSub)}</div>
               {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
-              {quoteTaxRate > 0 && <div style={{ marginTop: '6px' }}>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'} {quoteSym}{formatNum(quoteTaxAmount)}</div>}
+              {hasVat && <div style={{ marginTop: '6px' }}>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'} {quoteSym}{formatNum(quoteTaxAmount)}</div>}
               <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
             </>
           )}
@@ -239,7 +246,6 @@ function Dashboard() {
   const browserLang = navigator.language || '';
   const isHebrew = browserLang.startsWith('he') || isIsraelZone;
 
-  const defaultRegion = isHebrew ? 'local' : 'international';
   const defaultCurrency = isHebrew ? 'ILS (₪)' : 'USD ($)';
 
   const [session, setSession] = useState(null);
@@ -276,7 +282,6 @@ function Dashboard() {
   const [clientPhone, setClientPhone] = useState('');
   const [clientType, setClientType] = useState('');
   
-  const [clientRegion, setClientRegion] = useState(defaultRegion);
   const [currency, setCurrency] = useState(defaultCurrency);
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
@@ -300,9 +305,6 @@ function Dashboard() {
     clientName: isHebrew ? 'שם הלקוח' : 'Client Name',
     clientEmail: isHebrew ? 'אימייל הלקוח' : 'Client Email',
     clientPhone: isHebrew ? 'טלפון הלקוח' : 'Client Phone',
-    clientRegion: isHebrew ? 'אזור הלקוח' : 'Client Region',
-    localIsrael: isHebrew ? 'מקומי (ישראל)' : 'Local (Domestic)',
-    international: isHebrew ? 'בינלאומי (חו"ל)' : 'International',
     currency: isHebrew ? 'מטבע' : 'Currency',
     status: isHebrew ? 'סטטוס' : 'Status',
     validUntil: isHebrew ? 'בתוקף עד' : 'Valid Until',
@@ -361,15 +363,6 @@ function Dashboard() {
       loadData();
     }
   }, [session]);
-
-  const handleRegionChange = (newRegion) => {
-    setClientRegion(newRegion);
-    if (newRegion === 'international' && currency.includes('ILS')) {
-      setCurrency('USD ($)');
-    } else if (newRegion === 'local' && isHebrew) {
-      setCurrency('ILS (₪)');
-    }
-  };
 
   async function loadData() {
     await fetchQuotes();
@@ -597,12 +590,12 @@ function Dashboard() {
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
   const discountAmount = (subtotal * Number(discount)) / 100;
   const baseAmount = subtotal - discountAmount;
-  let taxRate = clientRegion === 'local' ? 0.18 : 0.00;
+  let taxRate = isHebrew ? 0.18 : 0.00;
   
   let taxAmount = 0;
   let totalAmount = 0;
 
-  if (clientRegion === 'local' && clientType === 'private') {
+  if (isHebrew && clientType === 'private') {
     totalAmount = baseAmount;
     taxAmount = totalAmount - (totalAmount / (1 + taxRate));
   } else {
@@ -641,10 +634,10 @@ function Dashboard() {
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
     
-    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); setClientRegion('international'); } 
-    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); setClientRegion('international'); } 
-    else if (quote.currency === 'USD') { setCurrency('USD ($)'); setClientRegion('international'); } 
-    else { setCurrency('ILS (₪)'); setClientRegion('local'); }
+    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
+    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
+    else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
+    else { setCurrency(isHebrew ? 'ILS (₪)' : 'USD ($)'); }
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
@@ -666,10 +659,10 @@ function Dashboard() {
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
     
-    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); setClientRegion('international'); } 
-    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); setClientRegion('international'); } 
-    else if (quote.currency === 'USD') { setCurrency('USD ($)'); setClientRegion('international'); } 
-    else { setCurrency('ILS (₪)'); setClientRegion('local'); }
+    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
+    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
+    else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
+    else { setCurrency(isHebrew ? 'ILS (₪)' : 'USD ($)'); }
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
@@ -691,15 +684,15 @@ function Dashboard() {
     }
 
     const quoteSym = getCurrencySymbol(quote.currency);
-    const qIsLocal = quote.currency === 'ILS';
     const qIsPrivate = quote.client_type === 'private';
     const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
     const quoteDiscountAmount = (quoteSub * (quote.discount || 0)) / 100;
     const qBaseAmount = quoteSub - quoteDiscountAmount;
-    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
+    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isHebrew ? 0.18 : 0.00);
+    const hasVat = quoteTaxRate > 0;
     
     let qTotalAmount = 0;
-    if (qIsLocal && qIsPrivate) {
+    if (hasVat && qIsPrivate) {
       qTotalAmount = qBaseAmount;
     } else {
       qTotalAmount = qBaseAmount + (qBaseAmount * quoteTaxRate);
@@ -708,8 +701,8 @@ function Dashboard() {
     const quoteTotal = quote.total > qBaseAmount ? quote.total : qTotalAmount;
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    const subject = qIsLocal ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
-    const body = qIsLocal
+    const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
+    const body = isHebrew
       ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
       : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
 
@@ -723,15 +716,15 @@ function Dashboard() {
     }
 
     const quoteSym = getCurrencySymbol(quote.currency);
-    const qIsLocal = quote.currency === 'ILS';
     const qIsPrivate = quote.client_type === 'private';
     const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
     const quoteDiscountAmount = (quoteSub * (quote.discount || 0)) / 100;
     const qBaseAmount = quoteSub - quoteDiscountAmount;
-    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (qIsLocal ? 0.18 : 0.00);
+    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isHebrew ? 0.18 : 0.00);
+    const hasVat = quoteTaxRate > 0;
     
     let qTotalAmount = 0;
-    if (qIsLocal && qIsPrivate) {
+    if (hasVat && qIsPrivate) {
       qTotalAmount = qBaseAmount;
     } else {
       qTotalAmount = qBaseAmount + (qBaseAmount * quoteTaxRate);
@@ -740,7 +733,7 @@ function Dashboard() {
     const quoteTotal = quote.total > qBaseAmount ? quote.total : qTotalAmount;
     const quoteLink = `${window.location.origin}/quote/${quote.id}`;
 
-    const msg = qIsLocal
+    const msg = isHebrew
       ? `שלום ${quote.clients?.company_name || ''},\nמצורפת הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()}.\n*סך הכל לתשלום:* ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ על הקישור:\n${quoteLink}\n\nנשמח לעמוד לשירותך!`
       : `Hello ${quote.clients?.company_name || ''},\nHere is your quote #${quote.id.slice(0, 6).toUpperCase()}.\n*Total Amount:* ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nThank you for your business!`;
 
@@ -792,10 +785,10 @@ function Dashboard() {
         clientId = newClientData[0].id;
       }
 
-      let dbCurrency = 'ILS';
-      if (currency.includes('EUR')) dbCurrency = 'EUR';
+      let dbCurrency = 'USD';
+      if (currency.includes('ILS')) dbCurrency = 'ILS';
+      else if (currency.includes('EUR')) dbCurrency = 'EUR';
       else if (currency.includes('GBP')) dbCurrency = 'GBP';
-      else if (currency.includes('USD')) dbCurrency = 'USD';
 
       const quotePayload = {
         client_id: clientId,
@@ -858,7 +851,7 @@ function Dashboard() {
 
   if (!session) {
     return (
-      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }} dir={isHebrew ? 'rtl' : 'ltr'}>
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
             <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '60px', marginBottom: '10px', display: 'block', margin: '0 auto' }} />
@@ -1151,13 +1144,6 @@ function Dashboard() {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '20px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientRegion}</label>
-                <select name="clientRegion" value={clientRegion} onChange={(e) => handleRegionChange(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                  {isHebrew && <option value="local">{t.localIsrael}</option>}
-                  <option value="international">{t.international}</option>
-                </select>
-              </div>
-              <div>
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                 <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
                   {isHebrew && <option>ILS (₪)</option>}
@@ -1221,7 +1207,7 @@ function Dashboard() {
 
             <div style={{ borderTop: '2px solid #f1f5f9', marginTop: '20px', paddingTop: '15px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-                <span>{clientRegion === 'local' && clientType === 'private' ? (isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):') : t.subtotal}</span>
+                <span>{isHebrew && clientType === 'private' ? (isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):') : t.subtotal}</span>
                 <span>{sym}{formatNum(subtotal)}</span>
               </div>
               {discount > 0 && (
@@ -1230,7 +1216,7 @@ function Dashboard() {
                   <span>-{sym}{formatNum(discountAmount)}</span>
                 </div>
               )}
-              {clientRegion === 'local' && clientType === 'business' && (
+              {isHebrew && clientType === 'business' && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                   <span>{t.vat}</span>
                   <span>{sym}{formatNum(taxAmount)}</span>
@@ -1240,7 +1226,7 @@ function Dashboard() {
                 <span>{t.totalAmount}</span>
                 <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : currency.includes('USD') ? 'USD' : 'ILS'}</span>
               </div>
-              {clientRegion === 'local' && clientType === 'private' && (
+              {isHebrew && clientType === 'private' && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                   <span></span>
                   <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}${formatNum(taxAmount)})` : `(Includes VAT: ${sym}${formatNum(taxAmount)})`}</span>
