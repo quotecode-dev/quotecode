@@ -727,6 +727,47 @@ function Dashboard() {
     }
   }
 
+  // שדרוג לשליחת אימייל אוטומטית דרך הענן באמצעות fetch לשרת
+  const handleEmailQuote = async (quote) => {
+    if (!quote.clients?.email) {
+      alert(isHebrew ? 'ללקוח זה אין כתובת אימייל מעודכנת.' : 'This client does not have an email address.');
+      return;
+    }
+
+    setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך הענן...' : 'Sending email via cloud...', type: 'success' });
+
+    try {
+      const quoteSym = getCurrencySymbol(quote.currency);
+      const quoteLink = `${window.location.origin}/quote/${quote.id}`;
+      
+      const { error } = await supabase.functions.invoke('send-quote-email', {
+        body: {
+          to: quote.clients.email,
+          clientName: quote.clients.company_name,
+          quoteId: quote.id,
+          total: formatNum(quote.total),
+          currencySymbol: quoteSym,
+          quoteLink: quoteLink,
+          businessName: bizName
+        }
+      });
+
+      if (error) throw error;
+      setStatusMsg({ text: isHebrew ? '📧 האימייל נשלח בהצלחה ללקוח!' : '📧 Email sent successfully!', type: 'success' });
+    } catch (err) {
+      console.error("Email send error:", err);
+      // גיבוי למקרה שהפונקציה טרם הוגדרה במלואה - פתיחת מייל מקומי
+      const quoteSym = getCurrencySymbol(quote.currency);
+      const quoteLink = `${window.location.origin}/quote/${quote.id}`;
+      const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
+      const body = isHebrew
+        ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
+        : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
+
+      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+  };
+
   const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
@@ -817,38 +858,6 @@ function Dashboard() {
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStatusMsg({ text: isHebrew ? 'ההצעה נטענה לשכפול בהצלחה.' : 'Quote loaded for duplication.', type: 'success' });
-  };
-
-  const handleEmailQuote = (quote) => {
-    if (!quote.clients?.email) {
-      alert(isHebrew ? 'ללקוח זה אין כתובת אימייל מעודכנת.' : 'This client does not have an email address.');
-      return;
-    }
-
-    const quoteSym = getCurrencySymbol(quote.currency);
-    const qIsPrivate = quote.client_type === 'private';
-    const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
-    const quoteDiscountAmount = (quoteSub * (quote.discount || 0)) / 100;
-    const qBaseAmount = quoteSub - quoteDiscountAmount;
-    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isHebrew ? 0.18 : 0.00);
-    const hasVat = quoteTaxRate > 0;
-    
-    let qTotalAmount = 0;
-    if (hasVat && qIsPrivate) {
-      qTotalAmount = qBaseAmount;
-    } else {
-      qTotalAmount = qBaseAmount + (qBaseAmount * quoteTaxRate);
-    }
-    
-    const quoteTotal = quote.total > qBaseAmount ? quote.total : qTotalAmount;
-    const quoteLink = `${window.location.origin}/quote/${quote.id}`;
-
-    const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
-    const body = isHebrew
-      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
-      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
-
-    window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleWhatsAppQuote = (quote) => {
