@@ -267,6 +267,9 @@ function Dashboard() {
   const [bizRole, setBizRole] = useState('user');
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
+  
+  const [sortField, setSortField] = useState('email');
+  const [sortDirection, setSortDirection] = useState('asc');
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState(null);
@@ -402,6 +405,11 @@ function Dashboard() {
   async function fetchSettings() {
     if (!session?.user?.id) return;
     
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const isIL = tz === 'Asia/Jerusalem';
+    const detectedCountry = isIL ? 'Israel (Local)' : (tz ? tz.split('/')[1]?.replace('_', ' ') : 'International');
+    const nowIso = new Date().toISOString();
+
     const { data, error } = await supabase
       .from('business_settings')
       .select('*')
@@ -418,21 +426,24 @@ function Dashboard() {
       setBizPlan(data.plan || 'free');
       setBizRole(data.role || 'user');
       
+      // עדכון זמן התחברות אחרון
+      await supabase
+        .from('business_settings')
+        .update({ last_sign_in: nowIso, country: detectedCountry })
+        .eq('user_id', session.user.id);
+
       if (data.role === 'super_admin') {
         fetchAllAccounts();
       }
     } else {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const isIL = tz === 'Asia/Jerusalem';
-      const detectedCountry = isIL ? 'Israel (Local)' : (tz ? tz.split('/')[1]?.replace('_', ' ') : 'International');
-
       const defaultPayload = {
         user_id: session.user.id,
         email: session.user.email,
         business_name: 'New Business',
         country: detectedCountry,
         plan: 'free',
-        role: 'user'
+        role: 'user',
+        last_sign_in: nowIso
       };
 
       const { data: newData } = await supabase
@@ -883,10 +894,28 @@ function Dashboard() {
     return matchesSearch && matchesStatus;
   });
 
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
   const filteredAdminAccounts = allAccounts.filter(acc => {
     const term = adminSearchTerm.toLowerCase();
     return (acc.email && acc.email.toLowerCase().includes(term)) || 
            (acc.business_name && acc.business_name.toLowerCase().includes(term));
+  }).sort((a, b) => {
+    let aVal = a[sortField] || '';
+    let bVal = b[sortField] || '';
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+    if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
   });
 
   if (!session) {
@@ -1537,21 +1566,34 @@ function Dashboard() {
             </div>
             
             <div style={{ overflowX: 'auto', background: 'white', borderRadius: '8px' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid #fde68a', color: '#92400e', fontSize: '0.85rem', textTransform: 'uppercase' }}>
                     <th style={{ padding: '12px' }}>ID</th>
-                    <th style={{ padding: '12px' }}>Email</th>
-                    <th style={{ padding: '12px' }}>Business Name</th>
-                    <th style={{ padding: '12px' }}>Region / Country</th>
-                    <th style={{ padding: '12px' }}>Current Plan</th>
-                    <th style={{ padding: '12px' }}>Role</th>
+                    <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('email')}>
+                      Email {sortField === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('business_name')}>
+                      Business Name {sortField === 'business_name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('country')}>
+                      Region / Country {sortField === 'country' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('plan')}>
+                      Current Plan {sortField === 'plan' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('role')}>
+                      Role {sortField === 'role' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
+                    <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('last_sign_in')}>
+                      Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAdminAccounts.length === 0 ? (
                     <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', padding: '20px', color: '#92400e' }}>
+                      <td colSpan="7" style={{ textAlign: 'center', padding: '20px', color: '#92400e' }}>
                         {isHebrew ? 'לא נמצאו משתמשים התואמים לחיפוש.' : 'No users found matching your search.'}
                       </td>
                     </tr>
@@ -1567,7 +1609,7 @@ function Dashboard() {
                             color: acc.country === 'Israel (Local)' ? '#1e40af' : '#166534',
                             padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'
                           }}>
-                            {acc.country || 'Unknown'}
+                            {acc.country || 'Israel (Local)'}
                           </span>
                         </td>
                         <td style={{ padding: '12px' }}>
@@ -1583,6 +1625,9 @@ function Dashboard() {
                         </td>
                         <td style={{ padding: '12px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
                           {acc.role}
+                        </td>
+                        <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569' }}>
+                          {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                         </td>
                       </tr>
                     ))
