@@ -476,7 +476,18 @@ function Dashboard() {
   }
 
   async function handleAdminPlanChange(accountId, newPlan) {
-    const { error } = await supabase.from('business_settings').update({ plan: newPlan }).eq('id', accountId);
+    const updatePayload = { plan: newPlan };
+    
+    if (newPlan !== 'free') {
+      const trialEndDate = new Date();
+      trialEndDate.setDate(trialEndDate.getDate() + 30);
+      updatePayload.trial_ends_at = trialEndDate.toISOString();
+    } else {
+      updatePayload.trial_ends_at = null;
+    }
+
+    const { error } = await supabase.from('business_settings').update(updatePayload).eq('id', accountId);
+    
     if (error) {
       setStatusMsg({ text: 'Error updating user plan: ' + error.message, type: 'error' });
     } else {
