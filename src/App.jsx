@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import { supabase } from './supabase';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import './App.css';
 
 const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM0ZjQ2ZTUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxMGI5ODEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNMTUgNTAgTDQ1IDIwIEw2MCAzNSBMNDAgNTUgTDYwIDc1IEw0NSA5MCBaIiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1IEw4NSA3NSBMNzAgOTAgWiIgZmlsbD0iIzFlMjkzYiIgb3BhY2l0eT0iMC45Ii8+PHRleHQgeD0iMTA1IiB5PSI2NiIgZm9udC1mYW1pbHk9IlNlZ29lIFVJLCBTYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
 
-// --- רכיב משותף: מודאל הצהרת נגישות ---
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
 
@@ -45,6 +46,7 @@ function PublicQuote() {
   const [loading, setLoading] = useState(true);
   const [approvedSuccess, setApprovedSuccess] = useState(false);
   const [showAccessibility, setShowAccessibility] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const [lang, setLang] = useState(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -113,6 +115,31 @@ function PublicQuote() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      const element = document.getElementById('quote-document-container');
+      const canvas = await html2canvas(element, { 
+        scale: 2, 
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Quote_${quote.id.slice(0, 8).toUpperCase()}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert(isHebrew ? 'אירעה שגיאה ביצירת קובץ ה-PDF.' : 'An error occurred while generating the PDF.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isHebrew ? 'טוען את הצעת המחיר...' : 'Loading quote...'}</div>;
   if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isHebrew ? 'הצעת המחיר לא נמצאה.' : 'Quote not found.'}</div>;
 
@@ -162,19 +189,19 @@ function PublicQuote() {
         <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{isHebrew ? 'מסמך רשמי מאושר' : 'Official Document'}</span>
           <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => setLang(lang === 'he' ? 'en' : 'he')} className="no-print" style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
+            <button onClick={() => setLang(lang === 'he' ? 'en' : 'he')} style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
               🌐 {isHebrew ? 'English' : 'עברית'}
             </button>
-            <button onClick={() => window.print()} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span>🖨️</span> {isHebrew ? 'הורד כ-PDF / הדפס' : 'Download PDF / Print'}
+            <button onClick={handleDownloadPDF} disabled={isGeneratingPDF} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: isGeneratingPDF ? 'wait' : 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px', opacity: isGeneratingPDF ? 0.7 : 1 }}>
+              <span>🖨️</span> {isGeneratingPDF ? (isHebrew ? 'מייצר PDF...' : 'Generating...') : (isHebrew ? 'הורד כ-PDF' : 'Download PDF')}
             </button>
           </div>
         </div>
 
-        <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '35px 25px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+        <div id="quote-document-container" style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '40px 30px', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
           
           {approvedSuccess && (
-            <div style={{ background: '#dcfce7', border: '1px solid #22c55e', color: '#166534', padding: '15px 20px', borderRadius: '8px', marginBottom: '25px', textAlign: 'center', fontWeight: 'bold' }}>
+            <div data-html2canvas-ignore="true" style={{ background: '#dcfce7', border: '1px solid #22c55e', color: '#166534', padding: '15px 20px', borderRadius: '8px', marginBottom: '25px', textAlign: 'center', fontWeight: 'bold' }}>
               {isHebrew ? '✅ הצעת המחיר אושרה בהצלחה על ידך! תודה רבה.' : '✅ Quote successfully approved! Thank you for your business.'}
             </div>
           )}
@@ -182,9 +209,9 @@ function PublicQuote() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <div>
               {bizLogo ? (
-                <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block' }} />
+                <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block' }} crossOrigin="anonymous" />
               ) : (
-                <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '40px', marginBottom: '8px', display: 'block' }} />
+                <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '40px', marginBottom: '8px', display: 'block' }} crossOrigin="anonymous" />
               )}
               <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
                 {bizTaxId && `${isHebrew ? 'עוסק/ח.פ:' : 'Tax ID:'} ${bizTaxId} | `} {bizEmail} {bizPhone ? `| ${bizPhone}` : ''}
@@ -256,7 +283,7 @@ function PublicQuote() {
             </div>
 
             {!approvedSuccess && (
-              <div className="no-print">
+              <div data-html2canvas-ignore="true" className="no-print">
                 <button 
                   onClick={handleClientApprove}
                   style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
@@ -278,13 +305,6 @@ function PublicQuote() {
         </button>
       </footer>
       
-      <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          body { background: white !important; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          div { box-shadow: none !important; border-radius: 0 !important; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -1775,13 +1795,6 @@ function Dashboard() {
         </button>
       </footer>
       
-      <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          body { background: white !important; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          div { box-shadow: none !important; border-radius: 0 !important; }
-        }
-      `}</style>
     </div>
   );
 }
