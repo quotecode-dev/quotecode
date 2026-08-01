@@ -265,6 +265,7 @@ function Dashboard() {
   const [bizLogoUrl, setBizLogoUrl] = useState('');
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
+  const [trialEndsAt, setTrialEndsAt] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
   
@@ -422,8 +423,8 @@ function Dashboard() {
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'free');
       setBizRole(data.role || 'user');
+      setTrialEndsAt(data.trial_ends_at || null);
       
-      // עדכון זמן התחברות אחרון
       await supabase
         .from('business_settings')
         .update({ last_sign_in: nowIso, country: detectedCountry })
@@ -457,10 +458,12 @@ function Dashboard() {
         setBizEmail(newData.email);
         setBizPlan(newData.plan);
         setBizRole(newData.role);
+        setTrialEndsAt(null);
       } else {
         setSettingId(null);
         setBizPlan('free');
         setBizRole('user');
+        setTrialEndsAt(null);
       }
     }
   }
@@ -490,15 +493,20 @@ function Dashboard() {
     }
 
     const targetPlan = selectedPlanToUpgrade || 'pro';
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + 30);
+    const trialEndDateStr = trialEndDate.toISOString();
+
     const { error } = await supabase
       .from('business_settings')
-      .update({ plan: targetPlan })
+      .update({ plan: targetPlan, trial_ends_at: trialEndDateStr })
       .eq('id', settingId);
 
     if (error) {
       setStatusMsg({ text: 'Error upgrading plan: ' + error.message, type: 'error' });
     } else {
       setBizPlan(targetPlan);
+      setTrialEndsAt(trialEndDateStr);
       setShowUpgradeModal(false);
       setSelectedPlanToUpgrade(null);
       setStatusMsg({ 
@@ -910,7 +918,7 @@ function Dashboard() {
     if (aVal === null || aVal === undefined) aVal = '';
     if (bVal === null || bVal === undefined) bVal = '';
 
-    if (sortField === 'last_sign_in') {
+    if (sortField === 'last_sign_in' || sortField === 'trial_ends_at') {
       const timeA = aVal ? new Date(aVal).getTime() : 0;
       const timeB = bVal ? new Date(bVal).getTime() : 0;
       return sortDirection === 'asc' ? timeA - timeB : timeB - timeA;
@@ -923,6 +931,16 @@ function Dashboard() {
     if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
     return 0;
   });
+
+  let trialDaysLeft = null;
+  let isTrialExpired = false;
+  if (trialEndsAt) {
+    const end = new Date(trialEndsAt);
+    const now = new Date();
+    const diffTime = end - now;
+    trialDaysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    isTrialExpired = trialDaysLeft <= 0;
+  }
 
   if (!session) {
     return (
@@ -993,6 +1011,19 @@ function Dashboard() {
             <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Sign Out</button>
           </div>
         </div>
+
+        {trialEndsAt && !isTrialExpired && (
+          <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+            <span>{isHebrew ? '🚀 תקופת ניסיון פעילה' : '🚀 Active Trial Period'}</span>
+            <span>{isHebrew ? `נותרו עוד ${trialDaysLeft} ימים` : `${trialDaysLeft} days remaining`}</span>
+          </div>
+        )}
+
+        {isTrialExpired && (
+          <div style={{ background: '#fee2e2', border: '1px solid #ef4444', color: '#b91c1c', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', fontWeight: '500' }}>
+            {isHebrew ? '⚠️ תקופת הניסיון שלך הסתיימה. כדי להמשיך להפיק הצעות מחיר, אנא שדרג את החבילה.' : '⚠️ Your trial period has expired. Please upgrade to continue generating quotes.'}
+          </div>
+        )}
 
         <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '25px' }}>
           <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
@@ -1304,7 +1335,7 @@ function Dashboard() {
               )}
             </div>
 
-            <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} disabled={isTrialExpired}>
               {editingQuoteId ? t.updateQuote : t.generateSave}
             </button>
           </form>
@@ -1586,6 +1617,9 @@ function Dashboard() {
                     <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('role')}>
                       Role {sortField === 'role' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                     </th>
+                    <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('trial_ends_at')}>
+                      Trial Ends {sortField === 'trial_ends_at' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                    </th>
                     <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('last_sign_in')}>
                       Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                     </th>
@@ -1594,7 +1628,7 @@ function Dashboard() {
                 <tbody>
                   {filteredAdminAccounts.length === 0 ? (
                     <tr>
-                      <td colSpan="7" style={{ textAlign: 'center', padding: '20px', color: '#92400e' }}>
+                      <td colSpan="8" style={{ textAlign: 'center', padding: '20px', color: '#92400e' }}>
                         {isHebrew ? 'לא נמצאו משתמשים התואמים לחיפוש.' : 'No users found matching your search.'}
                       </td>
                     </tr>
@@ -1626,6 +1660,9 @@ function Dashboard() {
                         </td>
                         <td style={{ padding: '12px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
                           {acc.role}
+                        </td>
+                        <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                          {acc.trial_ends_at ? new Date(acc.trial_ends_at).toLocaleDateString('en-GB') : '-'}
                         </td>
                         <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                           {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
