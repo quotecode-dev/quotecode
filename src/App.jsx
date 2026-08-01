@@ -33,14 +33,14 @@ function PublicQuote() {
           .from('business_settings')
           .select('*')
           .eq('user_id', quoteData.user_id)
-          .single();
+          .maybeSingle();
         settingsData = data;
       } else if (quoteData) {
         const { data } = await supabase
           .from('business_settings')
           .select('*')
           .limit(1)
-          .single();
+          .maybeSingle();
         settingsData = data;
       }
 
@@ -400,11 +400,13 @@ function Dashboard() {
 
   async function fetchSettings() {
     if (!session?.user?.id) return;
+    
+    // שימוש ב-maybeSingle מונע את השגיאות 406 בקונסול במקרה שעדיין אין נתונים למשתמש
     const { data, error } = await supabase
       .from('business_settings')
       .select('*')
       .eq('user_id', session.user.id)
-      .single();
+      .maybeSingle();
     
     if (data) {
       setSettingId(data.id);
@@ -420,9 +422,37 @@ function Dashboard() {
         fetchAllAccounts();
       }
     } else {
-      setSettingId(null);
-      setBizPlan('free');
-      setBizRole('user');
+      // יצירת משתמש "שקטה" (Auto-Initialize) למשתמש חדש כדי שיופיע מיד למנהל הפרויקט
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const isIL = tz === 'Asia/Jerusalem';
+      const detectedCountry = isIL ? 'Israel (Local)' : (tz ? tz.split('/')[1]?.replace('_', ' ') : 'International');
+
+      const defaultPayload = {
+        user_id: session.user.id,
+        email: session.user.email,
+        business_name: 'New Business',
+        country: detectedCountry,
+        plan: 'free',
+        role: 'user'
+      };
+
+      const { data: newData } = await supabase
+        .from('business_settings')
+        .insert([defaultPayload])
+        .select()
+        .maybeSingle();
+
+      if (newData) {
+        setSettingId(newData.id);
+        setBizName(newData.business_name);
+        setBizEmail(newData.email);
+        setBizPlan(newData.plan);
+        setBizRole(newData.role);
+      } else {
+        setSettingId(null);
+        setBizPlan('free');
+        setBizRole('user');
+      }
     }
   }
 
@@ -478,12 +508,17 @@ function Dashboard() {
     e.preventDefault();
     if (!session?.user?.id) return;
 
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const isIL = tz === 'Asia/Jerusalem';
+    const detectedCountry = isIL ? 'Israel (Local)' : (tz ? tz.split('/')[1]?.replace('_', ' ') : 'International');
+
     const payload = {
       business_name: bizName,
       tax_id: bizTaxId,
       email: bizEmail,
       phone: bizPhone,
       logo_url: bizLogoUrl,
+      country: detectedCountry,
       user_id: session.user.id
     };
 
@@ -508,7 +543,7 @@ function Dashboard() {
       if (error) {
         setStatusMsg({ text: error.message, type: 'error' });
       } else {
-        setStatusMsg({ text: isHebrew ? 'ההרשמה הצליחה! אנא בדוק את המייל שלך לאישור.' : 'Sign up successful! Please check your email for confirmation.', type: 'success' });
+        setStatusMsg({ text: isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש...' : 'Sign up successful! Initializing user profile...', type: 'success' });
         setIsSignUp(false);
       }
     } else {
@@ -1493,6 +1528,7 @@ function Dashboard() {
                     <th style={{ padding: '12px' }}>ID</th>
                     <th style={{ padding: '12px' }}>Email</th>
                     <th style={{ padding: '12px' }}>Business Name</th>
+                    <th style={{ padding: '12px' }}>Region / Country</th>
                     <th style={{ padding: '12px' }}>Current Plan</th>
                     <th style={{ padding: '12px' }}>Role</th>
                   </tr>
@@ -1503,6 +1539,15 @@ function Dashboard() {
                       <td style={{ padding: '12px', color: '#92400e', fontSize: '0.85rem' }}>{acc.user_id?.slice(0,8)}...</td>
                       <td style={{ padding: '12px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
                       <td style={{ padding: '12px' }}>{acc.business_name}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span style={{
+                          background: acc.country === 'Israel (Local)' ? '#dbeafe' : '#dcfce7',
+                          color: acc.country === 'Israel (Local)' ? '#1e40af' : '#166534',
+                          padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'
+                        }}>
+                          {acc.country || 'Unknown'}
+                        </span>
+                      </td>
                       <td style={{ padding: '12px' }}>
                         <select 
                           value={acc.plan} 
