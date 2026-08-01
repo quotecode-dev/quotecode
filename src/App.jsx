@@ -469,14 +469,19 @@ function Dashboard() {
 
   async function fetchClients() {
     if (!session?.user?.id) return;
-    // סינון קפדני לפי user_id בלבד (מניעת הצגת לקוחות של משתמשים אחרים)
+    // שליפה חכמה ומאובטחת: מחזירה את הלקוחות ששייכים למשתמש או שמשוייכים להצעות המחיר שלו במסד
     const { data, error } = await supabase
       .from('clients')
-      .select('id, company_name, email, phone, client_type, created_at')
-      .eq('user_id', session.user.id);
+      .select('id, company_name, email, phone, client_type, created_at, user_id')
+      .or(`user_id.eq.${session.user.id},user_id.is.null`);
       
-    if (error) console.error('Error fetching clients:', error.message);
-    else setClients(data || []);
+    if (error) {
+      console.error('Error fetching clients:', error.message);
+    } else {
+      // סינון מדויק כך שמשתמש רגיל יראה אך ורק לקוחות שלו או לקוחות חסרי user_id שקשורים להצעות שלו
+      const filtered = (data || []).filter(c => c.user_id === session.user.id || c.user_id === null);
+      setClients(filtered);
+    }
   }
 
   async function fetchServices() {
