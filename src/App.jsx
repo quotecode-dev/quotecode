@@ -266,6 +266,7 @@ function Dashboard() {
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
   const [allAccounts, setAllAccounts] = useState([]);
+  const [adminSearchTerm, setAdminSearchTerm] = useState('');
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState(null);
@@ -401,7 +402,6 @@ function Dashboard() {
   async function fetchSettings() {
     if (!session?.user?.id) return;
     
-    // שימוש ב-maybeSingle מונע את השגיאות 406 בקונסול במקרה שעדיין אין נתונים למשתמש
     const { data, error } = await supabase
       .from('business_settings')
       .select('*')
@@ -422,7 +422,6 @@ function Dashboard() {
         fetchAllAccounts();
       }
     } else {
-      // יצירת משתמש "שקטה" (Auto-Initialize) למשתמש חדש כדי שיופיע מיד למנהל הפרויקט
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const isIL = tz === 'Asia/Jerusalem';
       const detectedCountry = isIL ? 'Israel (Local)' : (tz ? tz.split('/')[1]?.replace('_', ' ') : 'International');
@@ -882,6 +881,12 @@ function Dashboard() {
                           quote.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || (quote.status || 'draft').toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
+  });
+
+  const filteredAdminAccounts = allAccounts.filter(acc => {
+    const term = adminSearchTerm.toLowerCase();
+    return (acc.email && acc.email.toLowerCase().includes(term)) || 
+           (acc.business_name && acc.business_name.toLowerCase().includes(term));
   });
 
   if (!session) {
@@ -1520,6 +1525,16 @@ function Dashboard() {
             <p style={{ color: '#b45309', marginBottom: '20px' }}>
               {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות שלהם.' : 'View all registered users and manage their subscription plans.'}
             </p>
+
+            <div style={{ marginBottom: '15px' }}>
+              <input 
+                type="text" 
+                placeholder={isHebrew ? "חיפוש משתמש (אימייל או שם עסק)..." : "Search user (email or business)..."} 
+                value={adminSearchTerm}
+                onChange={(e) => setAdminSearchTerm(e.target.value)}
+                style={{ padding: '8px 12px', border: '1px solid #d97706', borderRadius: '6px', width: '300px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
+              />
+            </div>
             
             <div style={{ overflowX: 'auto', background: 'white', borderRadius: '8px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
@@ -1534,36 +1549,44 @@ function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {allAccounts.map(acc => (
-                    <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' }}>
-                      <td style={{ padding: '12px', color: '#92400e', fontSize: '0.85rem' }}>{acc.user_id?.slice(0,8)}...</td>
-                      <td style={{ padding: '12px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
-                      <td style={{ padding: '12px' }}>{acc.business_name}</td>
-                      <td style={{ padding: '12px' }}>
-                        <span style={{
-                          background: acc.country === 'Israel (Local)' ? '#dbeafe' : '#dcfce7',
-                          color: acc.country === 'Israel (Local)' ? '#1e40af' : '#166534',
-                          padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'
-                        }}>
-                          {acc.country || 'Unknown'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '12px' }}>
-                        <select 
-                          value={acc.plan} 
-                          onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
-                          style={{ padding: '6px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb' }}
-                        >
-                          <option value="free">Free</option>
-                          <option value="basic">Basic</option>
-                          <option value="pro">Pro</option>
-                        </select>
-                      </td>
-                      <td style={{ padding: '12px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
-                        {acc.role}
+                  {filteredAdminAccounts.length === 0 ? (
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: 'center', padding: '20px', color: '#92400e' }}>
+                        {isHebrew ? 'לא נמצאו משתמשים התואמים לחיפוש.' : 'No users found matching your search.'}
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredAdminAccounts.map(acc => (
+                      <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' }}>
+                        <td style={{ padding: '12px', color: '#92400e', fontSize: '0.85rem' }}>{acc.user_id?.slice(0,8)}...</td>
+                        <td style={{ padding: '12px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
+                        <td style={{ padding: '12px' }}>{acc.business_name}</td>
+                        <td style={{ padding: '12px' }}>
+                          <span style={{
+                            background: acc.country === 'Israel (Local)' ? '#dbeafe' : '#dcfce7',
+                            color: acc.country === 'Israel (Local)' ? '#1e40af' : '#166534',
+                            padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'
+                          }}>
+                            {acc.country || 'Unknown'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px' }}>
+                          <select 
+                            value={acc.plan} 
+                            onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
+                            style={{ padding: '6px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb' }}
+                          >
+                            <option value="free">Free</option>
+                            <option value="basic">Basic</option>
+                            <option value="pro">Pro</option>
+                          </select>
+                        </td>
+                        <td style={{ padding: '12px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
+                          {acc.role}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
