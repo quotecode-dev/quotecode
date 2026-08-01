@@ -446,11 +446,13 @@ function Dashboard() {
         last_sign_in: nowIso
       };
 
-      const { data: newData } = await supabase
+      const { data: newData, error: insertError } = await supabase
         .from('business_settings')
         .insert([defaultPayload])
         .select()
         .maybeSingle();
+
+      if (insertError) console.error("Auto-init error:", insertError);
 
       if (newData) {
         setSettingId(newData.id);
@@ -887,13 +889,6 @@ function Dashboard() {
     }
   }
 
-  const filteredQuotes = quotes.filter(quote => {
-    const matchesSearch = (quote.clients?.company_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          quote.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'All' || (quote.status || 'draft').toLowerCase() === statusFilter.toLowerCase();
-    return matchesSearch && matchesStatus;
-  });
-
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -903,13 +898,30 @@ function Dashboard() {
     }
   };
 
+  const filteredQuotes = quotes.filter(quote => {
+    const matchesSearch = (quote.clients?.company_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          quote.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'All' || (quote.status || 'draft').toLowerCase() === statusFilter.toLowerCase();
+    return matchesSearch && matchesStatus;
+  });
+
   const filteredAdminAccounts = allAccounts.filter(acc => {
     const term = adminSearchTerm.toLowerCase();
     return (acc.email && acc.email.toLowerCase().includes(term)) || 
            (acc.business_name && acc.business_name.toLowerCase().includes(term));
   }).sort((a, b) => {
-    let aVal = a[sortField] || '';
-    let bVal = b[sortField] || '';
+    let aVal = a[sortField];
+    let bVal = b[sortField];
+
+    if (aVal === null || aVal === undefined) aVal = '';
+    if (bVal === null || bVal === undefined) bVal = '';
+
+    if (sortField === 'last_sign_in') {
+      const timeA = aVal ? new Date(aVal).getTime() : 0;
+      const timeB = bVal ? new Date(bVal).getTime() : 0;
+      return sortDirection === 'asc' ? timeA - timeB : timeB - timeA;
+    }
+
     if (typeof aVal === 'string') aVal = aVal.toLowerCase();
     if (typeof bVal === 'string') bVal = bVal.toLowerCase();
 
@@ -1626,7 +1638,7 @@ function Dashboard() {
                         <td style={{ padding: '12px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
                           {acc.role}
                         </td>
-                        <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569' }}>
+                        <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                           {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                         </td>
                       </tr>
