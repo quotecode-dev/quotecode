@@ -1080,12 +1080,12 @@ function Dashboard() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
                     <div onClick={() => setSelectedPlanToUpgrade('basic')} style={{ border: '2px solid #cbd5e1', padding: '20px', borderRadius: '8px', cursor: 'pointer', textAlign: 'center', background: '#f8fafc' }}>
                       <h4 style={{ margin: '0 0 10px 0', color: '#1e293b' }}>Basic</h4>
-                      <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4f46e5', margin: '0 0 10px 0' }}>₪99 /mo</p>
+                      <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4f46e5', margin: '0 0 10px 0' }}>{isHebrew ? '₪99 /mo' : '$29 /mo'}</p>
                       <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{isHebrew ? 'עד 20 הצעות בחודש' : 'Up to 20 quotes'}</span>
                     </div>
                     <div onClick={() => setSelectedPlanToUpgrade('pro')} style={{ border: '2px solid #4f46e5', padding: '20px', borderRadius: '8px', cursor: 'pointer', textAlign: 'center', background: '#eef2ff' }}>
                       <h4 style={{ margin: '0 0 10px 0', color: '#4f46e5' }}>Pro ⭐</h4>
-                      <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4f46e5', margin: '0 0 10px 0' }}>₪199 /mo</p>
+                      <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4f46e5', margin: '0 0 10px 0' }}>{isHebrew ? '₪199 /mo' : '$49 /mo'}</p>
                       <span style={{ fontSize: '0.8rem', color: '#4f46e5', fontWeight: 'bold' }}>{isHebrew ? 'לוגו אישי + ללא הגבלה' : 'Logo + Unlimited'}</span>
                     </div>
                   </div>
