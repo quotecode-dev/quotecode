@@ -273,9 +273,6 @@ function Dashboard() {
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState(null);
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExp, setCardExp] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -485,7 +482,7 @@ function Dashboard() {
     }
   }
 
-  async function handleSimulatePayment(e) {
+  async function handleClaimFreeTrial(e) {
     e.preventDefault();
     if (!settingId) {
       setStatusMsg({ text: isHebrew ? 'אנא שמור את הגדרות העסק תחילה.' : 'Please save business settings first.', type: 'error' });
@@ -504,13 +501,10 @@ function Dashboard() {
       setBizPlan(targetPlan);
       setShowUpgradeModal(false);
       setSelectedPlanToUpgrade(null);
-      setCardNumber('');
-      setCardExp('');
-      setCardCvv('');
       setStatusMsg({ 
         text: isHebrew 
-          ? `🎉 התשלום בוצע בהצלחה! שדרגת לחבילת ${targetPlan.toUpperCase()}.` 
-          : `🎉 Payment successful! Upgraded to ${targetPlan.toUpperCase()}.`, 
+          ? `🎉 שודרגת בהצלחה לחבילת ${targetPlan.toUpperCase()} לחודש ניסיון בחינם!` 
+          : `🎉 Successfully upgraded to ${targetPlan.toUpperCase()} for a 1-month free trial!`, 
         type: 'success' 
       });
     }
@@ -1065,7 +1059,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* --- מודאל / חלונית בחירת חבילות וסימולציית תשלום מאובטח --- */}
+          {/* --- מודאל / חלונית בחירת חבילות ושדרוג (ללא סליקה) --- */}
           {showUpgradeModal && (
             <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
               <div style={{ background: 'white', padding: '30px', borderRadius: '12px', width: '100%', maxWidth: '500px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', textAlign: isHebrew ? 'right' : 'left' }}>
@@ -1073,7 +1067,7 @@ function Dashboard() {
                   {isHebrew ? '🚀 בחירת מסלול ושדרוג עסק' : '🚀 Choose Plan & Upgrade'}
                 </h3>
                 <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>
-                  {isHebrew ? 'בחר את החבילה המתאימה לעסק שלך והזן פרטי אשראי לסימולציית סליקה מאובטחת:' : 'Select your plan and enter card details for secure simulated checkout:'}
+                  {isHebrew ? 'בחר את החבילה המתאימה לעסק שלך:' : 'Select the best plan for your business:'}
                 </p>
 
                 {!selectedPlanToUpgrade ? (
@@ -1090,7 +1084,7 @@ function Dashboard() {
                     </div>
                   </div>
                 ) : (
-                  <form onSubmit={handleSimulatePayment}>
+                  <form onSubmit={handleClaimFreeTrial}>
                     <div style={{ background: '#f1f5f9', padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span style={{ fontWeight: '600', color: '#334155' }}>
                         {isHebrew ? `מסלול נבחר: ${selectedPlanToUpgrade.toUpperCase()}` : `Selected: ${selectedPlanToUpgrade.toUpperCase()}`}
@@ -1100,24 +1094,19 @@ function Dashboard() {
                       </button>
                     </div>
 
-                    <div style={{ marginBottom: '12px' }}>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'מספר כרטיס אשראי (סימולציה)' : 'Card Number'}</label>
-                      <input type="text" placeholder="4242 4242 4242 4242" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+                    <div style={{ padding: '20px', background: '#f0fdf4', border: '1px solid #22c55e', borderRadius: '8px', marginBottom: '20px', textAlign: 'center' }}>
+                      <h4 style={{ margin: '0 0 10px 0', color: '#166534', fontSize: '1.2rem' }}>
+                        {isHebrew ? '🎁 מבצע השקה מיוחד!' : '🎁 Launch Special!'}
+                      </h4>
+                      <p style={{ margin: 0, color: '#15803d', fontSize: '0.95rem' }}>
+                        {isHebrew 
+                          ? `קבל את מסלול ה-${selectedPlanToUpgrade.toUpperCase()} בחינם לחודש שלם! ללא צורך בהזנת פרטי אשראי.` 
+                          : `Get the ${selectedPlanToUpgrade.toUpperCase()} plan for FREE for a whole month! No credit card required.`}
+                      </p>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תוקף (MM/YY)' : 'Expires'}</label>
-                        <input type="text" placeholder="12/28" value={cardExp} onChange={(e) => setCardExp(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>CVV</label>
-                        <input type="text" placeholder="123" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
-                      </div>
-                    </div>
-
-                    <button type="submit" style={{ width: '100%', background: '#10b981', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', marginBottom: '10px' }}>
-                      {isHebrew ? '🔒 שלם ובצע שדרוג מאובטח' : '🔒 Pay & Securely Upgrade'}
+                    <button type="submit" style={{ width: '100%', background: '#10b981', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', marginBottom: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                      {isHebrew ? '🚀 ממש חודש חינם עכשיו' : '🚀 Claim Free Month Now'}
                     </button>
                   </form>
                 )}
