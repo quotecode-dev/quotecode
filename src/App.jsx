@@ -472,7 +472,7 @@ function Dashboard() {
     const { data, error } = await supabase
       .from('clients')
       .select('id, company_name, email, phone, client_type, created_at')
-      .or(`user_id.eq.${session.user.id},user_id.is.null`);
+      .eq('user_id', session.user.id);
       
     if (error) console.error('Error fetching clients:', error.message);
     else setClients(data || []);
@@ -1422,7 +1422,7 @@ function Dashboard() {
             </>
           )}
 
-          {/* --- תוכן טאב 2: רשימת לקוחות --- */}
+          {/* --- תוכן טאב 2: רשימת לקוחות (עם סינון מאובטח לפי user_id) --- */}
           {activeTab === 'clients' && (
             <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
               <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
