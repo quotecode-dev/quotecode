@@ -496,6 +496,18 @@ function Dashboard() {
     }
   }
 
+  async function handleMakeLifetime(accountId) {
+    if (!window.confirm(isHebrew ? 'האם אתה בטוח שברצונך להעניק למשתמש זה מנוי לכל החיים ולבטל את תקופת הניסיון?' : 'Are you sure you want to grant this user a lifetime subscription?')) return;
+    
+    const { error } = await supabase.from('business_settings').update({ trial_ends_at: null }).eq('id', accountId);
+    if (error) {
+      setStatusMsg({ text: 'Error updating user: ' + error.message, type: 'error' });
+    } else {
+      setStatusMsg({ text: isHebrew ? 'מנוי לכל החיים עודכן בהצלחה!' : 'Lifetime access granted successfully!', type: 'success' });
+      fetchAllAccounts();
+    }
+  }
+
   async function handleClaimFreeTrial(e) {
     e.preventDefault();
     if (!settingId) {
@@ -818,7 +830,7 @@ function Dashboard() {
     if (!session?.user?.id) return;
 
     try {
-      if (!editingQuoteId) {
+      if (!editingQuoteId && bizRole !== 'super_admin') {
         const limit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : Infinity;
         if (monthlyQuotesCount >= limit) {
           setStatusMsg({ 
@@ -1023,14 +1035,14 @@ function Dashboard() {
           </div>
         </div>
 
-        {trialEndsAt && !isTrialExpired && (
+        {trialEndsAt && !isTrialExpired && bizRole !== 'super_admin' && (
           <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
             <span>{isHebrew ? '🚀 תקופת ניסיון פעילה' : '🚀 Active Trial Period'}</span>
             <span>{isHebrew ? `נותרו עוד ${trialDaysLeft} ימים` : `${trialDaysLeft} days remaining`}</span>
           </div>
         )}
 
-        {isTrialExpired && (
+        {isTrialExpired && bizRole !== 'super_admin' && (
           <div style={{ background: '#fee2e2', border: '1px solid #ef4444', color: '#b91c1c', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', fontWeight: '500' }}>
             {isHebrew ? '⚠️ תקופת הניסיון שלך הסתיימה. כדי להמשיך להפיק הצעות מחיר, אנא שדרג את החבילה.' : '⚠️ Your trial period has expired. Please upgrade to continue generating quotes.'}
           </div>
@@ -1101,7 +1113,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* --- מודאל / חלונית בחירת חבילות ושדרוג (ללא סליקה) --- */}
+          {/* --- מודאל / חלונית בחירת חבילות ושדרוג --- */}
           {showUpgradeModal && (
             <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
               <div style={{ background: 'white', padding: '30px', borderRadius: '12px', width: '100%', maxWidth: '500px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', textAlign: isHebrew ? 'right' : 'left' }}>
@@ -1346,7 +1358,7 @@ function Dashboard() {
               )}
             </div>
 
-            <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} disabled={isTrialExpired}>
+            <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} disabled={isTrialExpired && bizRole !== 'super_admin'}>
               {editingQuoteId ? t.updateQuote : t.generateSave}
             </button>
           </form>
@@ -1673,7 +1685,18 @@ function Dashboard() {
                           {acc.role}
                         </td>
                         <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
-                          {acc.trial_ends_at ? new Date(acc.trial_ends_at).toLocaleDateString('en-GB') : '-'}
+                          {acc.trial_ends_at ? (
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
+                              <span>{new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}</span>
+                              <button 
+                                onClick={() => handleMakeLifetime(acc.id)} 
+                                title={isHebrew ? "הפוך למנוי לכל החיים (בטל תאריך תפוגה)" : "Make Lifetime (Remove expiration)"}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}
+                              >
+                                ♾️
+                              </button>
+                            </div>
+                          ) : '-'}
                         </td>
                         <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                           {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
