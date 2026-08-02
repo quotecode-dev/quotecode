@@ -153,11 +153,12 @@ function PublicQuote() {
   const bizLogo = isProPlan ? (settings?.logo_url || '') : '';
 
   const getCurrencySymbol = (curr) => {
-    if (!curr) return '₪';
+    if (isHebrew) return '₪';
+    if (!curr) return '$';
     if (curr.includes('EUR')) return '€';
     if (curr.includes('GBP')) return '£';
-    if (curr.includes('USD')) return '$';
-    return '₪';
+    if (curr.includes('ILS')) return '₪';
+    return '$';
   };
   const quoteSym = getCurrencySymbol(quote.currency);
   const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -316,6 +317,13 @@ function PublicQuote() {
 }
 
 function Dashboard() {
+  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+  const browserLang = navigator.language || '';
+  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
+
+  const defaultCurrency = isHebrew ? 'ILS (₪)' : 'USD ($)';
+  const defaultTermsText = isHebrew ? 'שוטף + 30' : 'Net 30 days';
+
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -357,11 +365,11 @@ function Dashboard() {
   const [clientPhone, setClientPhone] = useState('');
   const [clientType, setClientType] = useState('');
   
-  const [currency, setCurrency] = useState('ILS (₪)');
+  const [currency, setCurrency] = useState(defaultCurrency);
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [terms, setTerms] = useState('');
+  const [terms, setTerms] = useState(defaultTermsText);
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
@@ -370,12 +378,6 @@ function Dashboard() {
   const [expenseDesc, setExpenseDesc] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('Hosting / Cloud');
-
-  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
-  const browserLang = navigator.language || '';
-  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
-
-  const defaultTermsText = isHebrew ? 'שוטף + 30' : 'Net 30 days';
 
   const t = {
     appName: bizName || 'ProFlow',
@@ -864,11 +866,12 @@ function Dashboard() {
   const netProfit = totalRevenue - totalExpenses;
 
   const getCurrencySymbol = (curr) => {
-    if (!curr) return '₪';
+    if (isHebrew) return '₪';
+    if (!curr) return '$';
     if (curr.includes('EUR')) return '€';
     if (curr.includes('GBP')) return '£';
-    if (curr.includes('USD')) return '$';
-    return '₪';
+    if (curr.includes('ILS')) return '₪';
+    return '$';
   };
   const sym = getCurrencySymbol(currency);
 
@@ -879,10 +882,14 @@ function Dashboard() {
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
     
-    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
-    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
-    else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
-    else { setCurrency('ILS (₪)'); }
+    if (isHebrew) {
+      setCurrency('ILS (₪)');
+    } else {
+      if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
+      else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
+      else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
+      else { setCurrency('ILS (₪)'); }
+    }
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
@@ -905,10 +912,14 @@ function Dashboard() {
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
     
-    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
-    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
-    else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
-    else { setCurrency('ILS (₪)'); }
+    if (isHebrew) {
+      setCurrency('ILS (₪)');
+    } else {
+      if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
+      else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
+      else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
+      else { setCurrency('ILS (₪)'); }
+    }
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
@@ -965,6 +976,7 @@ function Dashboard() {
     setValidUntil('');
     setDiscount(0);
     setTerms('');
+    setCurrency(defaultCurrency);
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
     setStatusMsg({ text: isHebrew ? 'העריכה בוטלה.' : 'Edit cancelled.', type: 'success' });
   };
@@ -1006,10 +1018,12 @@ function Dashboard() {
         clientId = newClientData[0].id;
       }
 
-      let dbCurrency = 'USD';
-      if (currency.includes('ILS')) dbCurrency = 'ILS';
-      else if (currency.includes('EUR')) dbCurrency = 'EUR';
-      else if (currency.includes('GBP')) dbCurrency = 'GBP';
+      let dbCurrency = 'ILS';
+      if (!isHebrew) {
+        if (currency.includes('EUR')) dbCurrency = 'EUR';
+        else if (currency.includes('GBP')) dbCurrency = 'GBP';
+        else if (currency.includes('USD')) dbCurrency = 'USD';
+      }
 
       const quotePayload = {
         client_id: clientId,
@@ -1063,6 +1077,7 @@ function Dashboard() {
       setValidUntil('');
       setDiscount(0);
       setTerms('');
+      setCurrency(defaultCurrency);
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
       loadData();
     } catch (err) {
@@ -1342,7 +1357,7 @@ function Dashboard() {
                                 </select>
                               </td>
                               <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
-                                {quoteSym}{formatNum(quote.total)}
+                                {isHebrew ? '₪' : quoteSym}{formatNum(quote.total)}
                               </td>
                               <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
                               <td style={{ padding: '8px', display: 'flex', gap: '6px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
@@ -1445,10 +1460,16 @@ function Dashboard() {
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                       <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                        <option value="ILS (₪)">ILS (₪)</option>
-                        <option value="USD ($)">USD ($)</option>
-                        <option value="EUR (€)">EUR (€)</option>
-                        <option value="GBP (£)">GBP (£)</option>
+                        {isHebrew ? (
+                          <option value="ILS (₪)">ILS (₪)</option>
+                        ) : (
+                          <>
+                            <option value="USD ($)">USD ($)</option>
+                            <option value="EUR (€)">EUR (€)</option>
+                            <option value="GBP (£)">GBP (£)</option>
+                            <option value="ILS (₪)">ILS (₪)</option>
+                          </>
+                        )}
                       </select>
                     </div>
                     <div>
@@ -1538,7 +1559,7 @@ function Dashboard() {
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                       <span>{t.totalAmount}</span>
-                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : currency.includes('USD') ? 'USD' : 'ILS'}</span>
+                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isHebrew ? '' : (currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : currency.includes('USD') ? 'USD' : 'ILS')}</span>
                     </div>
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
