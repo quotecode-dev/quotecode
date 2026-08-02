@@ -321,7 +321,6 @@ function Dashboard() {
   const isHebrew = browserLang.startsWith('he') || isIsraelZone;
 
   const defaultCurrency = isHebrew ? 'ILS (₪)' : 'USD ($)';
-  const defaultTermsText = isHebrew ? 'שוטף + 30. תודה על העסקאות.' : 'Net 30 days. Thank you for your business.';
 
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
@@ -368,7 +367,7 @@ function Dashboard() {
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [terms, setTerms] = useState(defaultTermsText);
+  const [terms, setTerms] = useState('');
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
@@ -965,7 +964,7 @@ function Dashboard() {
     setClientType('');
     setValidUntil('');
     setDiscount(0);
-    setTerms(defaultTermsText);
+    setTerms('');
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
     setStatusMsg({ text: 'Edit cancelled.', type: 'success' });
   };
@@ -1053,7 +1052,7 @@ function Dashboard() {
       setClientType('');
       setValidUntil('');
       setDiscount(0);
-      setTerms(defaultTermsText);
+      setTerms('');
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
       loadData();
     } catch (err) {
@@ -1405,7 +1404,11 @@ function Dashboard() {
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'סוג לקוח (חובה)' : 'Client Type'}</label>
-                      <select name="clientType" value={clientType} onChange={(e) => setClientType(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                      <select name="clientType" value={clientType} onChange={(e) => {
+                          const val = e.target.value;
+                          setClientType(val);
+                          if (val === 'private') setTerms('');
+                        }} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
                         <option value="" disabled>{isHebrew ? 'בחר סוג לקוח...' : 'Select Client Type...'}</option>
                         <option value="business">{isHebrew ? 'עסקי (חברה/עוסק)' : 'Business'}</option>
                         <option value="private">{isHebrew ? 'פרטי (B2C)' : 'Private'}</option>
@@ -1451,10 +1454,20 @@ function Dashboard() {
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.discount}</label>
                       <input type="number" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
                     </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.terms}</label>
-                      <input type="text" name="terms" value={terms} onChange={(e) => setTerms(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
-                    </div>
+                    {clientType === 'business' && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'תנאי תשלום (חובה לעסקי)' : 'Payment Terms'}</label>
+                        <select name="terms" value={terms} onChange={(e) => setTerms(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}>
+                          <option value="" disabled>{isHebrew ? 'בחר תנאי תשלום...' : 'Select terms...'}</option>
+                          <option value="תשלום בגמר העבודה">תשלום בגמר העבודה</option>
+                          <option value="30 יום מגמר העבודה">30 יום מגמר העבודה</option>
+                          <option value="שוטף 30">שוטף 30</option>
+                          {terms && !["תשלום בגמר העבודה", "30 יום מגמר העבודה", "שוטף 30"].includes(terms) && (
+                            <option value={terms}>{terms}</option>
+                          )}
+                        </select>
+                      </div>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
