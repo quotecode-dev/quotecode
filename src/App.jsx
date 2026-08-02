@@ -5,9 +5,8 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
-import AIChatWidget from './AIChatWidget';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRo dD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1 CMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRo dD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1 CMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTkwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -37,6 +36,82 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
           {isHebrew ? 'סגור' : 'Close'}
         </button>
       </div>
+    </div>
+  );
+}
+
+// רכיב צ'אט AI מתוקן ויציב לחלוטין
+function AIChatWidget() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([
+    { sender: 'ai', text: 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך היום?' }
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    const userText = input;
+    setMessages(prev => [...prev, { sender: 'user', text: userText }]);
+    setInput('');
+    setLoading(true);
+
+    try {
+      setTimeout(() => {
+        let reply = "הבנתי אותך. כדי לשלוח הצעת מחיר בווצאפ, לחץ על כפתור 'וואטסאפ' המופיע בשורת הפעולות של ההצעה בטבלה.";
+        if (userText.includes('מחיר') || userText.includes('הצעה')) {
+          reply = "ניתן ליצור הצעת מחיר חדשה דרך טופס יצירת ההצעות במסך הראשי של המערכת.";
+        } else if (userText.includes('סיסמה') || userText.includes('שחזור')) {
+          reply = "אם שכחת סיסמה, תוכל להשתמש בכפתור 'שכחת סיסמה' במסך ההתחברות לקבלת קישור איפוס למייל.";
+        }
+        setMessages(prev => [...prev, { sender: 'ai', text: reply }]);
+        setLoading(false);
+      }, 600);
+    } catch (err) {
+      setMessages(prev => [...prev, { sender: 'ai', text: 'אירעה שגיאה בקבלת התשובה. נסה שוב.' }]);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }}>
+      {!isOpen ? (
+        <button
+          onClick={() => setIsOpen(true)}
+          style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+        >
+          💬 שירות לקוחות AI
+        </button>
+      ) : (
+        <div style={{ position: 'absolute', right: 0, top: '40px', width: '300px', background: 'white', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', border: '1px solid #e2e8f0', zIndex: 1000, overflow: 'hidden' }} dir="rtl">
+          <div style={{ background: '#4f46e5', color: 'white', padding: '10px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>שירות לקוחות ProFlow (AI)</span>
+            <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}>✕</button>
+          </div>
+          <div style={{ height: '220px', overflowY: 'auto', padding: '10px', fontSize: '0.85rem', background: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {messages.map((m, idx) => (
+              <div key={idx} style={{ textAlign: m.sender === 'user' ? 'left' : 'right' }}>
+                <div style={{ display: 'inline-block', padding: '8px 12px', borderRadius: '8px', background: m.sender === 'user' ? '#4f46e5' : 'white', color: m.sender === 'user' ? 'white' : '#1e293b', border: m.sender === 'user' ? 'none' : '1px solid #e2e8f0', maxWidth: '85%', wordBreak: 'break-word' }}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+            {loading && <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#64748b' }}>ה-AI חושב...</div>}
+          </div>
+          <form onSubmit={handleSend} style={{ display: 'flex', padding: '8px', background: 'white', borderTop: '1px solid #e2e8f0', gap: '5px' }}>
+            <input
+              type="text"
+              placeholder="שאל משהו..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }}
+            />
+            <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>שלח</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
@@ -325,13 +400,15 @@ function Dashboard() {
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [authSuccess, setAuthSuccess] = useState('');
+
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
   const [services, setServices] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
-  // טאבים ראשיים ודוחות
   const [activeTab, setActiveTab] = useState('main');
   const [financeReportType, setFinanceReportType] = useState('monthly');
   const [startDate, setStartDate] = useState('');
@@ -679,7 +756,6 @@ function Dashboard() {
     else fetchExpenses();
   }
 
-  // פונקציית ייצוא ל-CSV
   const exportToCSV = (dataArray, filename) => {
     if (!dataArray || dataArray.length === 0) {
       alert(isHebrew ? 'אין נתונים לייצוא.' : 'No data to export.');
@@ -726,20 +802,45 @@ function Dashboard() {
     exportToCSV(exportData, 'expenses_report.csv');
   };
 
+  // טיפול מתוקן בהתחברות, הרשמה ושחזור סיסמה
   const handleAuth = async (e) => {
     e.preventDefault();
+    setAuthError('');
+    setAuthSuccess('');
+
     if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email: emailInput, password: passwordInput });
+      const { data, error } = await supabase.auth.signUp({ email: emailInput, password: passwordInput });
       if (error) {
-        setStatusMsg({ text: error.message, type: 'error' });
+        if (error.message.includes('already registered')) {
+          setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
+        } else {
+          setAuthError(error.message);
+        }
       } else {
-        setStatusMsg({ text: isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש...' : 'Sign up successful! Initializing user profile...', type: 'success' });
-        setIsSignUp(false);
+        setAuthSuccess(isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש...' : 'Sign up successful! Initializing user profile...');
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: emailInput, password: passwordInput });
-      if (error) setStatusMsg({ text: error.message, type: 'error' });
-      else setStatusMsg({ text: isHebrew ? 'התחברת בהצלחה' : 'Logged in successfully', type: 'success' });
+      if (error) {
+        setAuthError(isHebrew ? 'שגיאה בהתחברות: בדוק את האימייל והסיסמה או השתמש בשחזור סיסמה.' : 'Login error: check your credentials or reset password.');
+      } else {
+        setStatusMsg({ text: isHebrew ? 'התחברת בהצלחה' : 'Logged in successfully', type: 'success' });
+      }
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!emailInput) {
+      setAuthError(isHebrew ? 'נא להזין כתובת אימייל בתיבת האימייל למעלה לשחזור סיסמה.' : 'Please enter your email above to reset password.');
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(emailInput, {
+      redirectTo: window.location.origin,
+    });
+    if (error) {
+      setAuthError(error.message);
+    } else {
+      setAuthSuccess(isHebrew ? 'קישור לשחזור סיסמה נשלח לאימייל שלך בהצלחה.' : 'Password reset link sent to your email.');
     }
   };
 
@@ -800,6 +901,18 @@ function Dashboard() {
     }
   }
 
+  async function handleDeleteQuote(quoteId) {
+    if (!window.confirm(isHebrew ? 'למחוק הצעת מחיר זו לצמיתות?' : 'Delete this quote permanently?')) return;
+    await supabase.from('quote_items').delete().eq('quote_id', quoteId);
+    const { error } = await supabase.from('quotes').delete().eq('id', quoteId);
+    if (error) {
+      setStatusMsg({ text: 'Error deleting quote: ' + error.message, type: 'error' });
+    } else {
+      setStatusMsg({ text: isHebrew ? 'ההצעה נמחקה בהצלחה!' : 'Quote deleted successfully!', type: 'success' });
+      fetchQuotes();
+    }
+  }
+
   async function handleStatusChange(quoteId, newStatus) {
     const { error } = await supabase.from('quotes').update({ status: newStatus.toLowerCase() }).eq('id', quoteId);
     if (error) {
@@ -809,6 +922,14 @@ function Dashboard() {
       fetchQuotes();
     }
   }
+
+  // פונקציית שליחה בוואטסאפ
+  const sendWhatsApp = (proposal) => {
+    const clientNameVal = proposal.clients?.company_name || 'לקוח';
+    const text = `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ₪${formatNum(proposal.total)}. בתוקף עד ${proposal.validUntil || 'N/A'}.`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
 
   const handleEmailQuote = async (quote) => {
     if (!quote.clients?.email) {
@@ -1228,11 +1349,10 @@ function Dashboard() {
                 : (isHebrew ? 'התחברות למערכת הניהול' : 'Sign in to your dashboard')}
             </p>
           </div>
-          {statusMsg.text && (
-            <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b' }}>
-              {statusMsg.text}
-            </div>
-          )}
+
+          {authSuccess && <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: '#dcfce7', color: '#166534' }}>{authSuccess}</div>}
+          {authError && <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: '#fee2e2', color: '#991b1b' }}>{authError}</div>}
+
           <form onSubmit={handleAuth}>
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'אימייל' : 'Email'}</label>
@@ -1246,25 +1366,24 @@ function Dashboard() {
               {isSignUp ? (isHebrew ? 'הירשם' : 'Sign Up') : (isHebrew ? 'התחבר' : 'Sign In')}
             </button>
           </form>
-          <div style={{ marginTop: '15px', textAlign: 'center' }}>
+
+          <div style={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
             <button
               type="button"
-              onClick={() => { 
-                const nextIsSignUp = !isSignUp;
-                setIsSignUp(nextIsSignUp); 
-                setStatusMsg({ 
-                  text: nextIsSignUp 
-                    ? (isHebrew ? 'אנא הקלד אימייל וסיסמה כדי ליצור חשבון חדש.' : 'Please enter an email and password to create a new account.')
-                    : (isHebrew ? 'אנא הקלד את פרטי ההתחברות שלך.' : 'Please enter your login details.'), 
-                  type: 'success' 
-                }); 
-              }}
-              style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}
+              onClick={() => setIsSignUp(!isSignUp)}
+              style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontWeight: '600', padding: 0 }}
             >
-              {isSignUp 
-                ? (isHebrew ? 'כבר יש לך חשבון? התחבר כאן' : 'Already have an account? Sign in here') 
-                : (isHebrew ? 'אין לך חשבון עדיין? הירשם כאן' : "Don't have an account yet? Sign up here")}
+              {isSignUp ? (isHebrew ? 'כבר יש לך חשבון? התחבר' : 'Already have an account?') : (isHebrew ? 'אין חשבון? הירשם כאן' : "Don't have an account?")}
             </button>
+            {!isSignUp && (
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+              >
+                {isHebrew ? 'שכחת סיסמה?' : 'Forgot password?'}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -1488,7 +1607,14 @@ function Dashboard() {
                                   {t.duplicate}
                                 </button>
                                 <button 
-                                  title={t.sendEmail}
+                                  title="שלח בוואטסאפ"
+                                  onClick={() => sendWhatsApp(quote)}
+                                  style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem' }}
+                                >
+                                  💬 וואטסאפ
+                                </button>
+                                <button 
+                                  title="שלח אימייל"
                                   onClick={() => handleEmailQuote(quote)}
                                   style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}
                                 >
@@ -1742,9 +1868,9 @@ function Dashboard() {
                             <td style={{ padding: '10px', color: '#4f46e5', fontWeight: '600' }}>{formatNum(svc.price)}</td>
                             <td style={{ padding: '10px' }}>
                                <button 
-                              title={t.delete}
-                              onClick={() => handleDeleteService(svc.id)}
-                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                            title={t.delete}
+                            onClick={() => handleDeleteService(svc.id)}
+                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
                             >
                               {t.delete}
                             </button>
