@@ -864,6 +864,10 @@ function Dashboard() {
   const netProfit = totalRevenue - totalExpenses;
 
   const getCurrencySymbol = (curr) => {
+    if (!curr) return '₪';
+    if (curr.includes('EUR')) return '€';
+    if (curr.includes('GBP')) return '£';
+    if (curr.includes('USD')) return '$';
     return '₪';
   };
   const sym = getCurrencySymbol(currency);
@@ -874,7 +878,11 @@ function Dashboard() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
-    setCurrency('ILS (₪)');
+    
+    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
+    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
+    else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
+    else { setCurrency(isHebrew ? 'ILS (₪)' : 'USD ($)'); }
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
@@ -887,7 +895,7 @@ function Dashboard() {
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setStatusMsg({ text: `Editing Quote #${quote.id.slice(0, 6)}...`, type: 'success' });
+    setStatusMsg({ text: isHebrew ? `טוען לעריכה הצעה #${quote.id.slice(0, 6)}...` : `Editing Quote #${quote.id.slice(0, 6)}...`, type: 'success' });
   };
 
   const handleDuplicateQuote = (quote) => {
@@ -896,7 +904,11 @@ function Dashboard() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
-    setCurrency('ILS (₪)');
+    
+    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
+    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
+    else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
+    else { setCurrency(isHebrew ? 'ILS (₪)' : 'USD ($)'); }
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
@@ -952,9 +964,9 @@ function Dashboard() {
     setClientType('');
     setValidUntil('');
     setDiscount(0);
-    setTerms(defaultTermsText);
+    setTerms('');
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
-    setStatusMsg({ text: 'Edit cancelled.', type: 'success' });
+    setStatusMsg({ text: isHebrew ? 'העריכה בוטלה.' : 'Edit cancelled.', type: 'success' });
   };
 
   async function handleSaveQuote(e) {
@@ -995,7 +1007,10 @@ function Dashboard() {
         clientId = newClientData[0].id;
       }
 
-      const dbCurrency = 'ILS';
+      let dbCurrency = 'USD';
+      if (currency.includes('ILS')) dbCurrency = 'ILS';
+      else if (currency.includes('EUR')) dbCurrency = 'EUR';
+      else if (currency.includes('GBP')) dbCurrency = 'GBP';
 
       const quotePayload = {
         client_id: clientId,
@@ -1035,7 +1050,12 @@ function Dashboard() {
       const { error: itemsError } = await supabase.from('quote_items').insert(quoteItemsToInsert);
       if (itemsError) throw itemsError;
 
-      setStatusMsg({ text: editingQuoteId ? `Quote #${editingQuoteId.slice(0, 6)} successfully updated!` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`, type: 'success' });
+      setStatusMsg({ 
+        text: editingQuoteId 
+          ? (isHebrew ? `הצעה #${editingQuoteId.slice(0, 6)} עודכנה בהצלחה!` : `Quote #${editingQuoteId.slice(0, 6)} successfully updated!`) 
+          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}${formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`), 
+        type: 'success' 
+      });
       setEditingQuoteId(null);
       setClientName('');
       setClientEmail('');
@@ -1043,13 +1063,12 @@ function Dashboard() {
       setClientType('');
       setValidUntil('');
       setDiscount(0);
-      setTerms(defaultTermsText);
+      setTerms('');
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
       loadData();
     } catch (err) {
       console.error(err);
-      setStatusMsg({ text: 'Error saving quote: ' + err.message, type: 'error' });
-      alert(isHebrew ? `שגיאה בשמירת ההצעה: ${err.message}` : `Error saving quote: ${err.message}`);
+      setStatusMsg({ text: isHebrew ? `שגיאה בשמירת ההצעה: ${err.message}` : `Error saving quote: ${err.message}`, type: 'error' });
     }
   }
 
@@ -1427,7 +1446,16 @@ function Dashboard() {
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                       <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                        <option value="ILS (₪)">ILS (₪)</option>
+                        {isHebrew ? (
+                          <option value="ILS (₪)">ILS (₪)</option>
+                        ) : (
+                          <>
+                            <option value="USD ($)">USD ($)</option>
+                            <option value="EUR (€)">EUR (€)</option>
+                            <option value="GBP (£)">GBP (£)</option>
+                            <option value="ILS (₪)">ILS (₪)</option>
+                          </>
+                        )}
                       </select>
                     </div>
                     <div>
@@ -1453,7 +1481,12 @@ function Dashboard() {
                     {clientType === 'business' && (
                       <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'תנאי תשלום (חובה לעסקי)' : 'Payment Terms'}</label>
-                        <select name="terms" value={terms} onChange={(e) => setTerms(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}>
+                        <select 
+                          name="terms" 
+                          value={terms} 
+                          onChange={(e) => setTerms(e.target.value)} 
+                          style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
+                        >
                           <option value="" disabled>{isHebrew ? 'בחר תנאי תשלום...' : 'Select terms...'}</option>
                           <option value="תשלום בגמר העבודה">תשלום בגמר העבודה</option>
                           <option value="30 יום מגמר העבודה">30 יום מגמר העבודה</option>
@@ -1512,7 +1545,7 @@ function Dashboard() {
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                       <span>{t.totalAmount}</span>
-                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} ILS</span>
+                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : currency.includes('USD') ? 'USD' : 'ILS'}</span>
                     </div>
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
