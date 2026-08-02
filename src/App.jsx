@@ -1228,7 +1228,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* --- תוכן טאב 1: הוצאות והכנסות (מוצג אך ורק בטאב הפיננסי למנהל או למשתמש רגיל) --- */}
+          {/* --- תוכן טאב 1: הוצאות והכנסות --- */}
           {(bizRole !== 'super_admin' || activeTab === 'finances') && (
             <>
               <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
@@ -1682,7 +1682,15 @@ function Dashboard() {
           {/* --- תוכן טאב 2: רשימת לקוחות בלבד (מוצג אך ורק כאשר activeTab === 'clients') --- */}
           {bizRole === 'super_admin' && activeTab === 'clients' && (
             <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-              <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
+                <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.clientsManagement}</h2>
+                <button 
+                  onClick={() => setActiveTab('finances')}
+                  style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}
+                >
+                  {isHebrew ? '🏠 חזרה למסך ראשי' : '🏠 Back to Main Screen'}
+                </button>
+              </div>
               
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
