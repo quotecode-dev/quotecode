@@ -1470,7 +1470,7 @@ function Dashboard() {
             </>
           )}
 
-          {/* --- תוכן טאב 2: רשימת לקוחות בלבד (בלי שום דבר אחר) --- */}
+          {/* --- תוכן טאב 2: רשימת לקוחות בלבד (מוצג אך ורק כאשר activeTab === 'clients') --- */}
           {bizRole === 'super_admin' && activeTab === 'clients' && (
             <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
               <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
@@ -1515,7 +1515,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* טופס יצירת הצעה וקטלוג שירותים מוצגים אך ורק בטאב הפיננסי (למנהל) או כרגיל (למשתמש) */}
+          {/* טופס יצירת הצעה וקטלוג שירותים (מוצגים אך ורק בטאב הפיננסי עבור מנהל, או כרגיל למשתמש רגיל) */}
           {(bizRole !== 'super_admin' || activeTab === 'finances') && (
             <>
               <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
