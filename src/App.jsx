@@ -151,15 +151,13 @@ function PublicQuote() {
   const bizPhone = settings?.phone || '';
   const isProPlan = settings?.plan === 'pro';
   const bizLogo = isProPlan ? (settings?.logo_url || '') : '';
-  const isLocalIsraeliBusiness = settings?.country === 'Israel (Local)';
 
   const getCurrencySymbol = (curr) => {
-    if (isLocalIsraeliBusiness) return '₪';
-    if (!curr) return '$';
-    if (curr === 'EUR') return '€';
-    if (curr === 'GBP') return '£';
-    if (curr === 'ILS') return '₪';
-    return '$';
+    if (!curr) return '₪';
+    if (curr.includes('USD') || curr === 'USD') return '$';
+    if (curr.includes('EUR') || curr === 'EUR') return '€';
+    if (curr.includes('GBP') || curr === 'GBP') return '£';
+    return '₪';
   };
   const quoteSym = getCurrencySymbol(quote.currency);
   const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -370,7 +368,7 @@ function Dashboard() {
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [terms, setTerms] = useState('');
+  const [terms, setTerms] = useState(defaultTermsText);
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
@@ -536,6 +534,8 @@ function Dashboard() {
       
       if (data.country === 'Israel (Local)') {
         setCurrency('ILS');
+      } else {
+        setCurrency('USD');
       }
 
       await supabase
@@ -575,6 +575,8 @@ function Dashboard() {
         setTrialEndsAt(null);
         if (newData.country === 'Israel (Local)') {
           setCurrency('ILS');
+        } else {
+          setCurrency('USD');
         }
       } else {
         setSettingId(null);
@@ -897,7 +899,9 @@ function Dashboard() {
     if (isLocalIsraeliBusiness) {
       setCurrency('ILS');
     } else {
-      setCurrency(quote.currency || 'USD');
+      let c = quote.currency || 'USD';
+      if (c === 'ILS') c = 'USD';
+      setCurrency(c);
     }
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
@@ -924,7 +928,9 @@ function Dashboard() {
     if (isLocalIsraeliBusiness) {
       setCurrency('ILS');
     } else {
-      setCurrency(quote.currency || 'USD');
+      let c = quote.currency || 'USD';
+      if (c === 'ILS') c = 'USD';
+      setCurrency(c);
     }
 
     setQuoteStatus('Draft');
@@ -992,10 +998,12 @@ function Dashboard() {
         clientId = newClientData[0].id;
       }
 
+      let dbCurrency = isLocalIsraeliBusiness ? 'ILS' : currency;
+
       const quotePayload = {
         client_id: clientId,
         client_type: clientType,
-        currency: isLocalIsraeliBusiness ? 'ILS' : currency,
+        currency: dbCurrency,
         subtotal: subtotal,
         tax_rate: taxRate,
         total: totalAmount,
@@ -1434,7 +1442,6 @@ function Dashboard() {
                             <option value="USD">USD ($)</option>
                             <option value="EUR">EUR (€)</option>
                             <option value="GBP">GBP (£)</option>
-                            <option value="ILS">ILS (₪)</option>
                           </>
                         )}
                       </select>
@@ -1526,7 +1533,7 @@ function Dashboard() {
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                       <span>{t.totalAmount}</span>
-                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isLocalIsraeliBusiness ? '' : (currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : currency === 'USD' ? 'USD' : 'ILS')}</span>
+                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isLocalIsraeliBusiness ? '' : (currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : currency === 'USD' ? 'USD' : '')}</span>
                     </div>
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
