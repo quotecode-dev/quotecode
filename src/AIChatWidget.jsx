@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MessageSquare, X, Send, Loader2 } from 'lucide-react';
-import { supabase } from '../supabaseClient';
+import { supabase } from './supabase';
 
 export default function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
