@@ -6,7 +6,7 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRo dD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1 CMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTkwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRo dD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1 CMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTkwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Ljwvc3ZnPg==";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -40,7 +40,7 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   );
 }
 
-// רכיב צ'אט AI מתוקן ויציב לחלוטין
+// רכיב צ'אט AI מתוקן הממוקם בצורה נקייה ליד הכפתור העליון
 function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -60,7 +60,7 @@ function AIChatWidget() {
 
     try {
       setTimeout(() => {
-        let reply = "הבנתי אותך. כדי לשלוח הצעת מחיר בווצאפ, לחץ על כפתור 'וואטסאפ' המופיע בשורת הפעולות של ההצעה בטבלה.";
+        let reply = "הבנתי אותך. כדי לשלוח הצעת מחיר בווצאפ, לחץ על אייקון הוואטסאפ (💬) בשורת הפעולות של ההצעה בטבלה.";
         if (userText.includes('מחיר') || userText.includes('הצעה')) {
           reply = "ניתן ליצור הצעת מחיר חדשה דרך טופס יצירת ההצעות במסך הראשי של המערכת.";
         } else if (userText.includes('סיסמה') || userText.includes('שחזור')) {
@@ -76,7 +76,7 @@ function AIChatWidget() {
   };
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', display: 'inline-block' }}>
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
@@ -85,7 +85,7 @@ function AIChatWidget() {
           💬 שירות לקוחות AI
         </button>
       ) : (
-        <div style={{ position: 'absolute', right: 0, top: '40px', width: '300px', background: 'white', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', border: '1px solid #e2e8f0', zIndex: 1000, overflow: 'hidden' }} dir="rtl">
+        <div style={{ position: 'absolute', right: 0, top: '45px', width: '320px', background: 'white', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', border: '1px solid #e2e8f0', zIndex: 1000, overflow: 'hidden' }} dir="rtl">
           <div style={{ background: '#4f46e5', color: 'white', padding: '10px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>שירות לקוחות ProFlow (AI)</span>
             <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}>✕</button>
@@ -802,22 +802,38 @@ function Dashboard() {
     exportToCSV(exportData, 'expenses_report.csv');
   };
 
-  // טיפול מתוקן בהתחברות, הרשמה ושחזור סיסמה
+  // טיפול מתוקן להרשמה (בדיקת משתמש קיים) והתחברות
   const handleAuth = async (e) => {
     e.preventDefault();
     setAuthError('');
     setAuthSuccess('');
 
     if (isSignUp) {
+      // בדיקה מוקדמת האם המשתמש כבר קיים בטבלת הגדרות העסק או ניסיון הרשמה
+      const { data: existingCheck } = await supabase
+        .from('business_settings')
+        .select('*')
+        .eq('email', emailInput)
+        .maybeSingle();
+
+      if (existingCheck) {
+        setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({ email: emailInput, password: passwordInput });
       if (error) {
-        if (error.message.includes('already registered')) {
+        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
           setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
         } else {
           setAuthError(error.message);
         }
       } else {
-        setAuthSuccess(isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש...' : 'Sign up successful! Initializing user profile...');
+        if (data?.user && data.user.identities && data.user.identities.length === 0) {
+          setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר.' : 'Email already exists! Please sign in.');
+        } else {
+          setAuthSuccess(isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש...' : 'Sign up successful! Initializing user profile...');
+        }
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: emailInput, password: passwordInput });
@@ -923,7 +939,7 @@ function Dashboard() {
     }
   }
 
-  // פונקציית שליחה בוואטסאפ
+  // פונקציית שליחה בוואטסאפ - מציגה אייקון בלבד (💬)
   const sendWhatsApp = (proposal) => {
     const clientNameVal = proposal.clients?.company_name || 'לקוח';
     const text = `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ₪${formatNum(proposal.total)}. בתוקף עד ${proposal.validUntil || 'N/A'}.`;
@@ -1606,12 +1622,13 @@ function Dashboard() {
                                 >
                                   {t.duplicate}
                                 </button>
+                                {/* אייקון ווטסאפ נקי בלבד בלי טקסט מיותר */}
                                 <button 
                                   title="שלח בוואטסאפ"
                                   onClick={() => sendWhatsApp(quote)}
-                                  style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem' }}
+                                  style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}
                                 >
-                                  💬 וואטסאפ
+                                  💬
                                 </button>
                                 <button 
                                   title="שלח אימייל"
