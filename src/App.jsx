@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import './App.css';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -1130,82 +1130,82 @@ function Dashboard() {
       
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
 
-      <div style={{ flex: '1 0 auto', padding: '20px' }}>
+      <div style={{ flex: '1 0 auto', padding: '15px' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-              <img src={bizLogoUrl && bizPlan === 'pro' ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '40px', maxWidth: '150px', objectFit: 'contain' }} />
+              <img src={bizLogoUrl && bizPlan === 'pro' ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
               {bizRole === 'super_admin' && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 8px', borderRadius: '4px' }}>SUPER ADMIN</span>}
-              <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{session.user.email}</span>
-              <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Sign Out</button>
+              <span style={{ fontSize: '0.85rem', color: '#64748b' }}>{session.user.email}</span>
+              <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>Sign Out</button>
             </div>
           </div>
 
           {statusMsg.text && statusMsg.text !== 'System connected to Supabase.' && (
-            <div style={{ padding: '15px', borderRadius: '8px', marginBottom: '20px', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b', fontWeight: 'bold', textAlign: 'center' }}>
+            <div style={{ padding: '12px', borderRadius: '8px', marginBottom: '20px', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b', fontWeight: 'bold', textAlign: 'center', fontSize: '0.9rem' }}>
               {statusMsg.text}
             </div>
           )}
 
           {trialEndsAt && !isTrialExpired && bizRole !== 'super_admin' && (
-            <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+            <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px', fontSize: '0.9rem' }}>
               <span>{isHebrew ? '🚀 תקופת ניסיון פעילה' : '🚀 Active Trial Period'}</span>
               <span>{isHebrew ? `נותרו עוד ${trialDaysLeft} ימים` : `${trialDaysLeft} days remaining`}</span>
             </div>
           )}
 
           {isTrialExpired && bizRole !== 'super_admin' && (
-            <div style={{ background: '#fee2e2', border: '1px solid #ef4444', color: '#b91c1c', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', fontWeight: '500' }}>
+            <div style={{ background: '#fee2e2', border: '1px solid #ef4444', color: '#b91c1c', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', fontWeight: '500', fontSize: '0.9rem' }}>
               {isHebrew ? '⚠️ תקופת הניסיון שלך הסתיימה. כדי להמשיך להפיק הצעות מחיר, אנא שדרג את החבילה.' : '⚠️ Your trial period has expired. Please upgrade to continue generating quotes.'}
             </div>
           )}
 
-          {/* כפתורי ניווט / טאבים מעודכנים */}
-          <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+          {/* כפתורי ניווט / טאבים רספונסיביים */}
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveTab('main')}
               style={{
-                padding: '12px 20px', borderRadius: '10px', border: activeTab === 'main' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'main' ? '#4f46e5' : 'white', color: activeTab === 'main' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'main' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'main' ? '#4f46e5' : 'white', color: activeTab === 'main' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
               }}
             >
-              {isHebrew ? '🏠 הצעות מחיר וניהול' : '🏠 Quotes & Dashboard'}
+              {isHebrew ? '🏠 הצעות מחיר' : '🏠 Quotes'}
             </button>
             <button
               onClick={() => setActiveTab('settings')}
               style={{
-                padding: '12px 20px', borderRadius: '10px', border: activeTab === 'settings' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'settings' ? '#4f46e5' : 'white', color: activeTab === 'settings' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'settings' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'settings' ? '#4f46e5' : 'white', color: activeTab === 'settings' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
               }}
             >
-              {isHebrew ? '⚙️ הגדרות עסק' : '⚙️ Business Settings'}
+              {isHebrew ? '⚙️ הגדרות עסק' : '⚙️ Settings'}
             </button>
             <button
               onClick={() => setActiveTab('clients')}
               style={{
-                padding: '12px 20px', borderRadius: '10px', border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'clients' ? '#4f46e5' : 'white', color: activeTab === 'clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'clients' ? '#4f46e5' : 'white', color: activeTab === 'clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
               }}
             >
-              {isHebrew ? '👥 ניהול לקוחות' : '👥 Clients Management'}
+              {isHebrew ? '👥 לקוחות' : '👥 Clients'}
             </button>
             {bizRole === 'super_admin' && (
               <>
                 <button
                   onClick={() => setActiveTab('finances')}
                   style={{
-                    padding: '12px 20px', borderRadius: '10px', border: activeTab === 'finances' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'finances' ? '#4f46e5' : 'white', color: activeTab === 'finances' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                    flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'finances' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'finances' ? '#4f46e5' : 'white', color: activeTab === 'finances' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
                 >
-                  {isHebrew ? '📊 הוצאות והכנסות' : '📊 Finances'}
+                  {isHebrew ? '📊 הוצאות/הכנסות' : '📊 Finances'}
                 </button>
                 <button
                   onClick={() => setActiveTab('admin_clients')}
                   style={{
-                    padding: '12px 20px', borderRadius: '10px', border: activeTab === 'admin_clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', color: activeTab === 'admin_clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                    flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'admin_clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', color: activeTab === 'admin_clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
                 >
-                  {isHebrew ? '👑 רשימת משתמשים' : '👑 Users Admin'}
+                  {isHebrew ? '👑 משתמשים' : '👑 Users Admin'}
                 </button>
               </>
             )}
@@ -1218,7 +1218,7 @@ function Dashboard() {
             <>
               {/* מדדים למשתמשים רגילים במסך הראשי */}
               {bizRole !== 'super_admin' && (
-                <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '25px' }}>
                   <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
                     <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
@@ -1236,22 +1236,22 @@ function Dashboard() {
               )}
 
               {/* היסטוריית הצעות מחיר */}
-              <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+              <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
-                  <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
+                  <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
                   
-                  <div style={{ display: 'flex', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', width: '100%', maxWidth: '450px' }}>
                     <input 
                       type="text" 
                       placeholder={t.searchQuote} 
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '250px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
+                      style={{ flex: '1 1 180px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem' }}
                     />
                     <select 
                       value={statusFilter} 
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
+                      style={{ flex: '1 1 120px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', fontSize: '0.9rem' }}
                     >
                       <option value="All">{t.filterStatus}</option>
                       <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
@@ -1265,13 +1265,13 @@ function Dashboard() {
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
                     <thead>
-                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                        <th style={{ padding: '12px' }}>{isHebrew ? 'מספר הצעה' : 'Quote #'}</th>
-                        <th style={{ padding: '12px' }}>{isHebrew ? 'לקוח' : 'Client'}</th>
-                        <th style={{ padding: '12px' }}>{t.status}</th>
-                        <th style={{ padding: '12px' }}>{t.total}</th>
-                        <th style={{ padding: '12px' }}>{t.validUntil}</th>
-                        <th style={{ padding: '12px' }}>{t.actions}</th>
+                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                        <th style={{ padding: '10px' }}>{isHebrew ? 'מספר הצעה' : 'Quote #'}</th>
+                        <th style={{ padding: '10px' }}>{isHebrew ? 'לקוח' : 'Client'}</th>
+                        <th style={{ padding: '10px' }}>{t.status}</th>
+                        <th style={{ padding: '10px' }}>{t.total}</th>
+                        <th style={{ padding: '10px' }}>{t.validUntil}</th>
+                        <th style={{ padding: '10px' }}>{t.actions}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1289,17 +1289,17 @@ function Dashboard() {
                           const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
                           return (
                             <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                              <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
-                              <td style={{ padding: '12px' }}>
+                              <td style={{ padding: '10px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
+                              <td style={{ padding: '10px' }}>
                                 <div style={{ fontWeight: '600', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
-                                <div style={{ fontSize: '0.8rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
                               </td>
-                              <td style={{ padding: '12px' }}>
+                              <td style={{ padding: '10px' }}>
                                 <select
                                   value={currentStatus}
                                   onChange={(e) => handleStatusChange(quote.id, e.target.value)}
                                   style={{
-                                    padding: '6px 10px',
+                                    padding: '5px 8px',
                                     borderRadius: '6px',
                                     fontSize: '0.8rem',
                                     fontWeight: '600',
@@ -1315,11 +1315,11 @@ function Dashboard() {
                                   <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
                                 </select>
                               </td>
-                              <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
+                              <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>
                                 {quoteSym}{formatNum(quote.total)}
                               </td>
-                              <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
-                              <td style={{ padding: '8px', display: 'flex', gap: '6px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
+                              <td style={{ padding: '10px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
+                              <td style={{ padding: '8px', display: 'flex', gap: '5px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
                                 <button 
                                   title={t.edit}
                                   onClick={() => handleEditClick(quote)}
@@ -1337,7 +1337,7 @@ function Dashboard() {
                                 <button 
                                   title={t.sendEmail}
                                   onClick={() => handleEmailQuote(quote)}
-                                  style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}
+                                  style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}
                                 >
                                   @
                                 </button>
@@ -1359,13 +1359,13 @@ function Dashboard() {
               </div>
 
               {/* טופס יצירת הצעה */}
-              <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
+              <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                   <div>
-                    <h2 style={{ color: '#1e293b', marginTop: 0, fontSize: '1.4rem', marginBottom: '4px' }}>
+                    <h2 style={{ color: '#1e293b', marginTop: 0, fontSize: '1.2rem', marginBottom: '4px' }}>
                       {editingQuoteId ? `${isHebrew ? 'עריכת הצעה #' : 'Editing Quote #'}${editingQuoteId.slice(0, 6)}` : t.appName}
                     </h2>
-                    <p style={{ color: '#64748b', margin: 0, fontSize: '0.9rem' }}>
+                    <p style={{ color: '#64748b', margin: 0, fontSize: '0.85rem' }}>
                       {editingQuoteId ? (isHebrew ? 'עדכן את פרטי ההצעה ושמור שינויים' : 'Modify the quote details below and save changes') : t.appSub}
                     </p>
                   </div>
@@ -1373,7 +1373,7 @@ function Dashboard() {
                     <button 
                       type="button" 
                       onClick={handleCancelEdit}
-                      style={{ background: '#f1f5f9', color: '#4f46e5', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}
+                      style={{ background: '#f1f5f9', color: '#4f46e5', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
                     >
                       {t.cancelEdit}
                     </button>
@@ -1482,7 +1482,7 @@ function Dashboard() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                     <h3 style={{ fontSize: '1rem', color: '#1e293b', margin: 0 }}>{t.quoteItems}</h3>
                     <div style={{ display: 'flex', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
-                      <select onChange={handleAddFromCatalog} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', background: 'white' }}>
+                      <select onChange={handleAddFromCatalog} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', background: 'white', fontSize: '0.85rem' }}>
                         <option value="">{t.quickAdd}</option>
                         {services.map(s => (
                           <option key={s.id} value={s.id}>{s.name} - {sym}{formatNum(s.price)}</option>
@@ -1493,13 +1493,13 @@ function Dashboard() {
                   </div>
 
                   {items.map((item, index) => (
-                    <div key={index} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr)) 40px', gap: '10px', marginBottom: '10px', alignItems: 'center', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
-                      <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
-                      <input type="number" placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
-                      <input type="number" placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
-                      <div style={{ fontWeight: '600', color: '#334155', textAlign: isHebrew ? 'left' : 'right' }}>{sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}</div>
+                    <div key={index} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr)) 40px', gap: '10px', marginBottom: '10px', alignItems: 'center', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                      <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
+                      <input type="number" placeholder="Qty" min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
+                      <input type="number" placeholder="Price" step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
+                      <div style={{ fontWeight: '600', color: '#334155', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.9rem' }}>{sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}</div>
                       {items.length > 1 ? (
-                        <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '10px 0', borderRadius: '6px', cursor: 'pointer', width: '100%', textAlign: 'center' }}>✕</button>
+                        <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '9px 0', borderRadius: '6px', cursor: 'pointer', width: '100%', textAlign: 'center' }}>✕</button>
                       ) : (
                         <div></div>
                       )}
@@ -1507,28 +1507,28 @@ function Dashboard() {
                   ))}
 
                   <div style={{ borderTop: '2px solid #f1f5f9', marginTop: '20px', paddingTop: '15px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row', fontSize: '0.9rem' }}>
                       <span>{isHebrew && clientType === 'private' ? (isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):') : t.subtotal}</span>
                       <span>{sym}{formatNum(subtotal)}</span>
                     </div>
                     {discount > 0 && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444', flexDirection: isHebrew ? 'row-reverse' : 'row', fontSize: '0.9rem' }}>
                         <span>{isHebrew ? `הנחה (${discount}%):` : `Discount (${discount}%):`}</span>
                         <span>-{sym}{formatNum(discountAmount)}</span>
                       </div>
                     )}
                     {isHebrew && clientType === 'business' && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row', fontSize: '0.9rem' }}>
                         <span>{t.vat}</span>
                         <span>{sym}{formatNum(taxAmount)}</span>
                       </div>
                     )}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                       <span>{t.totalAmount}</span>
                       <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isLocalIsraeliBusiness ? '' : (currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : currency === 'USD' ? 'USD' : '')}</span>
                     </div>
                     {isHebrew && clientType === 'private' && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
                         <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
                       </div>
@@ -1542,8 +1542,8 @@ function Dashboard() {
               </div>
 
               {/* קטלוג שירותים */}
-              <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-                <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
+              <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
                 
                 <form onSubmit={handleAddService} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
                   <input 
@@ -1552,7 +1552,7 @@ function Dashboard() {
                     value={newServiceName} 
                     onChange={(e) => setNewServiceName(e.target.value)} 
                     required 
-                    style={{ flex: '2 1 200px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} 
+                    style={{ flex: '2 1 180px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem' }} 
                   />
                   <input 
                     type="number" 
@@ -1561,20 +1561,20 @@ function Dashboard() {
                     value={newServicePrice} 
                     onChange={(e) => setNewServicePrice(e.target.value)} 
                     required 
-                    style={{ flex: '1 1 120px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} 
+                    style={{ flex: '1 1 100px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', fontSize: '0.9rem' }} 
                   />
-                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '9px 18px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
                     {t.addService}
                   </button>
                 </form>
 
                 <div style={{ overflowX: 'auto' }}>
-                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '400px' }}>
+                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '350px' }}>
                     <thead>
-                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                        <th style={{ padding: '12px' }}>{t.description}</th>
-                        <th style={{ padding: '12px' }}>{t.defaultPrice}</th>
-                        <th style={{ padding: '12px' }}>{t.actions}</th>
+                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                        <th style={{ padding: '10px' }}>{t.description}</th>
+                        <th style={{ padding: '10px' }}>{t.defaultPrice}</th>
+                        <th style={{ padding: '10px' }}>{t.actions}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1587,9 +1587,9 @@ function Dashboard() {
                       ) : (
                         services.map((svc) => (
                           <tr key={svc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                            <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{svc.name}</td>
-                            <td style={{ padding: '12px', color: '#4f46e5', fontWeight: '600' }}>{formatNum(svc.price)}</td>
-                            <td style={{ padding: '12px' }}>
+                            <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{svc.name}</td>
+                            <td style={{ padding: '10px', color: '#4f46e5', fontWeight: '600' }}>{formatNum(svc.price)}</td>
+                            <td style={{ padding: '10px' }}>
                                <button 
                                 title={t.delete}
                                 onClick={() => handleDeleteService(svc.id)}
@@ -1612,19 +1612,19 @@ function Dashboard() {
           {/* --- טאב: ניהול לקוחות מאובטח למשתמש --- */}
           {/* ========================================================= */}
           {activeTab === 'clients' && (
-            <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-              <h2 style={{ fontSize: '1.4rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
+            <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+              <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
                 {isHebrew ? '👥 ניהול לקוחות' : '👥 Clients Management'}
               </h2>
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '450px' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                      <th style={{ padding: '12px' }}>{isHebrew ? 'שם חברה / לקוח' : 'Company / Name'}</th>
-                      <th style={{ padding: '12px' }}>{isHebrew ? 'אימייל' : 'Email'}</th>
-                      <th style={{ padding: '12px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
-                      <th style={{ padding: '12px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
-                      <th style={{ padding: '12px' }}>{t.actions}</th>
+                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                      <th style={{ padding: '10px' }}>{isHebrew ? 'שם חברה / לקוח' : 'Company / Name'}</th>
+                      <th style={{ padding: '10px' }}>{isHebrew ? 'אימייל' : 'Email'}</th>
+                      <th style={{ padding: '10px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
+                      <th style={{ padding: '10px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
+                      <th style={{ padding: '10px' }}>{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1637,11 +1637,11 @@ function Dashboard() {
                     ) : (
                       clients.map((client) => (
                         <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                          <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{client.company_name}</td>
-                          <td style={{ padding: '12px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
-                          <td style={{ padding: '12px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
-                          <td style={{ padding: '12px', color: '#475569' }}>{client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}</td>
-                          <td style={{ padding: '12px' }}>
+                          <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{client.company_name}</td>
+                          <td style={{ padding: '10px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
+                          <td style={{ padding: '10px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
+                          <td style={{ padding: '10px', color: '#475569' }}>{client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}</td>
+                          <td style={{ padding: '10px' }}>
                             <button 
                               onClick={() => handleDeleteClient(client.id)}
                               style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
@@ -1662,12 +1662,12 @@ function Dashboard() {
           {/* --- טאב: הגדרות עסק אישיות --- */}
           {/* ========================================================= */}
           {activeTab === 'settings' && (
-            <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-              <h2 style={{ fontSize: '1.4rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
+            <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+              <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
                 {t.businessSettings}
               </h2>
               <form onSubmit={handleSaveSettings}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '20px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.businessNameLabel}</label>
                     <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
@@ -1702,32 +1702,32 @@ function Dashboard() {
           {/* --- טאב: הוצאות והכנסות (Super Admin בלבד) --- */}
           {/* ========================================================= */}
           {bizRole === 'super_admin' && activeTab === 'finances' && (
-             <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #4f46e5' }}>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
-                    <h2 style={{ fontSize: '1.4rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות' : 'Finances & Expenses'}</h2>
+             <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #4f46e5' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
+                    <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות' : 'Finances & Expenses'}</h2>
                  </div>
 
-                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
-                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
+                  <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
                   </div>
-                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
+                  <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
                   </div>
-                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
+                  <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalExpenses}</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#ef4444' }}>{sym}{formatNum(totalExpenses)}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444' }}>{sym}{formatNum(totalExpenses)}</div>
                   </div>
-                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
+                  <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.netProfit}</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: netProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(netProfit)}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: netProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(netProfit)}</div>
                   </div>
                  </div>
 
-                 <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-                    <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.expensesManagement}</h2>
+                 <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+                    <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.expensesManagement}</h2>
                     <form onSubmit={handleAddExpense} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
                       <input 
                         type="text" 
@@ -1735,7 +1735,7 @@ function Dashboard() {
                         value={expenseDesc} 
                         onChange={(e) => setExpenseDesc(e.target.value)} 
                         required 
-                        style={{ flex: '2 1 200px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} 
+                        style={{ flex: '2 1 180px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem' }} 
                       />
                       <input 
                         type="number" 
@@ -1744,32 +1744,32 @@ function Dashboard() {
                         value={expenseAmount} 
                         onChange={(e) => setExpenseAmount(e.target.value)} 
                         required 
-                        style={{ flex: '1 1 100px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} 
+                        style={{ flex: '1 1 90px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', fontSize: '0.9rem' }} 
                       />
                       <select 
                         value={expenseCategory} 
                         onChange={(e) => setExpenseCategory(e.target.value)}
-                        style={{ flex: '1 1 140px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
+                        style={{ flex: '1 1 130px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', fontSize: '0.9rem' }}
                       >
                         <option value="Hosting / Cloud">{isHebrew ? 'ענן ושרתים' : 'Hosting / Cloud'}</option>
                         <option value="Marketing">{isHebrew ? 'שיווק ופרסום' : 'Marketing'}</option>
                         <option value="Tools / Software">{isHebrew ? 'כלים ותוכנות' : 'Tools / Software'}</option>
                         <option value="Other">{isHebrew ? 'אחר' : 'Other'}</option>
                       </select>
-                      <button type="submit" style={{ background: '#ef4444', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                      <button type="submit" style={{ background: '#ef4444', color: 'white', border: 'none', padding: '9px 18px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
                         {t.addExpenseBtn}
                       </button>
                     </form>
 
                     <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '450px' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '400px' }}>
                         <thead>
-                          <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                            <th style={{ padding: '12px' }}>{t.description}</th>
-                            <th style={{ padding: '12px' }}>{isHebrew ? 'קטגוריה' : 'Category'}</th>
-                            <th style={{ padding: '12px' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
-                            <th style={{ padding: '12px' }}>{t.total}</th>
-                            <th style={{ padding: '12px' }}>{t.actions}</th>
+                          <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                            <th style={{ padding: '10px' }}>{t.description}</th>
+                            <th style={{ padding: '10px' }}>{isHebrew ? 'קטגוריה' : 'Category'}</th>
+                            <th style={{ padding: '10px' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
+                            <th style={{ padding: '10px' }}>{t.total}</th>
+                            <th style={{ padding: '10px' }}>{t.actions}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1782,11 +1782,11 @@ function Dashboard() {
                           ) : (
                             expenses.map((exp) => (
                               <tr key={exp.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                                <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{exp.description}</td>
-                                <td style={{ padding: '12px', color: '#64748b' }}>{exp.category}</td>
-                                <td style={{ padding: '12px', color: '#64748b' }}>{exp.expense_date}</td>
-                                <td style={{ padding: '12px', color: '#ef4444', fontWeight: '600' }}>{sym}{formatNum(exp.amount)}</td>
-                                <td style={{ padding: '12px' }}>
+                                <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{exp.description}</td>
+                                <td style={{ padding: '10px', color: '#64748b' }}>{exp.category}</td>
+                                <td style={{ padding: '10px', color: '#64748b' }}>{exp.expense_date}</td>
+                                <td style={{ padding: '10px', color: '#ef4444', fontWeight: '600' }}>{sym}{formatNum(exp.amount)}</td>
+                                <td style={{ padding: '10px' }}>
                                   <button 
                                     onClick={() => handleDeleteExpense(exp.id)}
                                     style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
@@ -1809,12 +1809,12 @@ function Dashboard() {
           {/* ========================================================= */}
           {bizRole === 'super_admin' && activeTab === 'admin_clients' && (
             <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #f59e0b' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
-                <h2 style={{ fontSize: '1.4rem', color: '#92400e', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  👑 Super Admin Panel - Users
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
+                <h2 style={{ fontSize: '1.2rem', color: '#92400e', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  👑 Super Admin - Users
                 </h2>
               </div>
-              <p style={{ color: '#b45309', marginBottom: '20px' }}>
+              <p style={{ color: '#b45309', marginBottom: '20px', fontSize: '0.9rem' }}>
                 {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות שלהם.' : 'View all registered users and manage their subscription plans.'}
               </p>
 
@@ -1824,34 +1824,34 @@ function Dashboard() {
                   placeholder={isHebrew ? "חיפוש משתמש (אימייל או שם עסק)..." : "Search user (email or business)..."} 
                   value={adminSearchTerm}
                   onChange={(e) => setAdminSearchTerm(e.target.value)}
-                  style={{ padding: '8px 12px', border: '1px solid #d97706', borderRadius: '6px', width: '300px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
+                  style={{ padding: '8px 12px', border: '1px solid #d97706', borderRadius: '6px', width: '280px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem' }}
                 />
               </div>
               
               <div style={{ overflowX: 'auto', background: 'white', borderRadius: '8px' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #fde68a', color: '#92400e', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                      <th style={{ padding: '12px' }}>ID</th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('email')}>
+                    <tr style={{ borderBottom: '2px solid #fde68a', color: '#92400e', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                      <th style={{ padding: '10px' }}>ID</th>
+                      <th style={{ padding: '10px', cursor: 'pointer' }} onClick={() => handleSort('email')}>
                         Email {sortField === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('business_name')}>
+                      <th style={{ padding: '10px', cursor: 'pointer' }} onClick={() => handleSort('business_name')}>
                         Business Name {sortField === 'business_name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('country')}>
+                      <th style={{ padding: '10px', cursor: 'pointer' }} onClick={() => handleSort('country')}>
                         Region / Country {sortField === 'country' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('plan')}>
+                      <th style={{ padding: '10px', cursor: 'pointer' }} onClick={() => handleSort('plan')}>
                         Current Plan {sortField === 'plan' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('role')}>
+                      <th style={{ padding: '10px', cursor: 'pointer' }} onClick={() => handleSort('role')}>
                         Role {sortField === 'role' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('trial_ends_at')}>
+                      <th style={{ padding: '10px', cursor: 'pointer' }} onClick={() => handleSort('trial_ends_at')}>
                         Trial Ends {sortField === 'trial_ends_at' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('last_sign_in')}>
+                      <th style={{ padding: '10px', cursor: 'pointer' }} onClick={() => handleSort('last_sign_in')}>
                         Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
                     </tr>
@@ -1865,48 +1865,48 @@ function Dashboard() {
                       </tr>
                     ) : (
                       filteredAdminAccounts.map(acc => (
-                        <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' }}>
-                          <td style={{ padding: '12px', color: '#92400e', fontSize: '0.85rem' }}>{acc.user_id?.slice(0,8)}...</td>
-                          <td style={{ padding: '12px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
-                          <td style={{ padding: '12px' }}>{acc.business_name}</td>
-                          <td style={{ padding: '12px' }}>
+                        <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7', fontSize: '0.9rem' }}>
+                          <td style={{ padding: '10px', color: '#92400e', fontSize: '0.8rem' }}>{acc.user_id?.slice(0,8)}...</td>
+                          <td style={{ padding: '10px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
+                          <td style={{ padding: '10px' }}>{acc.business_name}</td>
+                          <td style={{ padding: '10px' }}>
                             <span style={{
                               background: acc.country === 'Israel (Local)' ? '#dbeafe' : '#dcfce7',
                               color: acc.country === 'Israel (Local)' ? '#1e40af' : '#166534',
-                              padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'
+                              padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold'
                             }}>
                               {acc.country || 'Israel (Local)'}
                             </span>
                           </td>
-                          <td style={{ padding: '12px' }}>
+                          <td style={{ padding: '10px' }}>
                             <select 
                               value={acc.plan} 
                               onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
-                              style={{ padding: '6px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb' }}
+                              style={{ padding: '5px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb', fontSize: '0.85rem' }}
                             >
                               <option value="free">Free</option>
                               <option value="basic">Basic</option>
                               <option value="pro">Pro</option>
                             </select>
                           </td>
-                          <td style={{ padding: '12px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
+                          <td style={{ padding: '10px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
                             {acc.role}
                           </td>
-                          <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                          <td style={{ padding: '10px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                             {acc.trial_ends_at ? (
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
+                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
                                 <span>{new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}</span>
                                 <button 
                                   onClick={() => handleMakeLifetime(acc.id)} 
                                   title={isHebrew ? "הפוך למנוי לכל החיים (בטל תאריך תפוגה)" : "Make Lifetime (Remove expiration)"}
-                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', padding: 0 }}
                                 >
                                   ♾️
                                 </button>
                               </div>
                             ) : '-'}
                           </td>
-                          <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                          <td style={{ padding: '10px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                             {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                           </td>
                         </tr>
