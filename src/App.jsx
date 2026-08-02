@@ -679,6 +679,53 @@ function Dashboard() {
     else fetchExpenses();
   }
 
+  // פונקציית ייצוא ל-CSV
+  const exportToCSV = (dataArray, filename) => {
+    if (!dataArray || dataArray.length === 0) {
+      alert(isHebrew ? 'אין נתונים לייצוא.' : 'No data to export.');
+      return;
+    }
+    const keys = Object.keys(dataArray[0]);
+    const csvContent = [
+      keys.join(','),
+      ...dataArray.map(row => keys.map(key => JSON.stringify(row[key] ?? '')).join(','))
+    ].join('\n');
+
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportQuotes = () => {
+    const exportData = filteredQuotes.map(q => ({
+      ID: q.id,
+      Client: q.clients?.company_name || '',
+      Email: q.clients?.email || '',
+      Status: q.status,
+      Total: q.total,
+      ValidUntil: q.valid_until || '',
+      CreatedAt: q.created_at
+    }));
+    exportToCSV(exportData, 'quotes_report.csv');
+  };
+
+  const handleExportExpenses = () => {
+    const exportData = filteredExpensesForReport.map(e => ({
+      ID: e.id,
+      Description: e.description,
+      Category: e.category,
+      Amount: e.amount,
+      Date: e.expense_date,
+      Recurring: e.is_recurring ? 'Yes' : 'No'
+    }));
+    exportToCSV(exportData, 'expenses_report.csv');
+  };
+
   const handleAuth = async (e) => {
     e.preventDefault();
     if (isSignUp) {
@@ -835,13 +882,11 @@ function Dashboard() {
 
   const planLimit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : '∞';
 
-  // חישובים רגילים שמשמשים את שאר המערכת (המסך הראשי) כדי שלא יקרוס
   const totalQuotesCount = quotes.length;
   const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
   const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
   const netProfit = totalRevenue - totalExpenses;
 
-  // חישובים תחת טווח דוחות מתקדם המיועדים רק לטאב של ההוצאות והכנסות (אדמין)
   const now = new Date();
   const reportYear = now.getFullYear();
   const reportMonth = now.getMonth();
@@ -871,13 +916,13 @@ function Dashboard() {
       const qHalf = qDate.getMonth() < 6 ? 0 : 1;
       return qHalf === currentHalf;
     } else {
-      return true; // שנתי
+      return true;
     }
   });
 
   const filteredExpensesForReport = expenses.filter(exp => {
     const expDate = new Date(exp.expense_date);
-    if (exp.is_recurring) return true; // הוצאה חודשית קבועה ממשיכה אוטומטית לכל חודש/תקופה
+    if (exp.is_recurring) return true;
 
     if (financeReportType === 'custom') {
       if (!startDate && !endDate) return true;
@@ -909,7 +954,6 @@ function Dashboard() {
   const adminTotalExpenses = filteredExpensesForReport.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
   const adminNetProfit = adminTotalRevenue - adminTotalExpenses;
 
-  // הכנת הנתונים לגרף העמודות השנתי
   const monthNames = isHebrew ? ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'] : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   
   const chartData = monthNames.map((name, index) => {
@@ -1235,13 +1279,11 @@ function Dashboard() {
       <div style={{ flex: '1 0 auto', padding: '15px' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           
-          {/* הדר עליון (Header) עם מיקום מדויק של שירות הלקוחות בין הלוגו לפרטי המשתמש */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
               <img src={(bizLogoUrl && bizLogoUrl.trim() !== '' && bizPlan === 'pro') ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
             </div>
 
-            {/* כפתור שירות הלקוחות במרכז הבר העליון */}
             <div style={{ flex: '0 1 auto', textAlign: 'center' }}>
               <AIChatWidget />
             </div>
@@ -1272,7 +1314,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* כפתורי ניווט / טאבים רספונסיביים */}
           <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveTab('main')}
@@ -1320,12 +1361,8 @@ function Dashboard() {
             )}
           </div>
 
-          {/* ========================================================= */}
-          {/* --- טאב ראשי: הצעות מחיר וניהול --- */}
-          {/* ========================================================= */}
           {activeTab === 'main' && (
             <>
-              {/* מדדים למשתמשים רגילים במסך הראשי */}
               {bizRole !== 'super_admin' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '25px' }}>
                   <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
@@ -1344,10 +1381,17 @@ function Dashboard() {
                 </div>
               )}
 
-              {/* היסטוריית הצעות מחיר */}
               <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
-                  <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
+                    <button 
+                      onClick={handleExportQuotes}
+                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.8rem' }}
+                    >
+                      📥 {isHebrew ? 'ייצא לאקסל (CSV)' : 'Export CSV'}
+                    </button>
+                  </div>
                   
                   <div style={{ display: 'flex', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', width: '100%', maxWidth: '450px' }}>
                     <input 
@@ -1467,7 +1511,6 @@ function Dashboard() {
                 </div>
               </div>
 
-              {/* טופס יצירת הצעה */}
               <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                   <div>
@@ -1650,7 +1693,6 @@ function Dashboard() {
                 </form>
               </div>
 
-              {/* קטלוג שירותים */}
               <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
                 <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
                 
@@ -1717,9 +1759,6 @@ function Dashboard() {
             </>
           )}
 
-          {/* ========================================================= */}
-          {/* --- טאב: ניהול לקוחות מאובטח למשתמש --- */}
-          {/* ========================================================= */}
           {activeTab === 'clients' && (
             <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
               <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
@@ -1767,9 +1806,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* ========================================================= */}
-          {/* --- טאב: הגדרות עסק אישיות --- */}
-          {/* ========================================================= */}
           {activeTab === 'settings' && (
             <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
               <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
@@ -1807,15 +1843,11 @@ function Dashboard() {
             </div>
           )}
 
-          {/* ========================================================= */}
-          {/* --- טאב: הוצאות והכנסות (Super Admin בלבד עם דוחות מתקדמים) --- */}
-          {/* ========================================================= */}
           {bizRole === 'super_admin' && activeTab === 'finances' && (
              <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #4f46e5' }}>
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
                     <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
                     
-                    {/* בורר סוג דוח תקופתי מתקדם */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>{isHebrew ? 'סוג דוח:' : 'Report Type:'}</span>
                       <select 
@@ -1832,7 +1864,6 @@ function Dashboard() {
                     </div>
                  </div>
 
-                 {/* שדות תאריכים מותאמים אישית אם נבחר Custom */}
                  {financeReportType === 'custom' && (
                    <div style={{ background: 'white', padding: '15px', borderRadius: '8px', marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', border: '1px solid #cbd5e1' }}>
                      <div>
@@ -1865,7 +1896,6 @@ function Dashboard() {
                   </div>
                  </div>
 
-                 {/* Charts Section */}
                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', height: '350px' }} dir="ltr">
                    <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'סקירה שנתית - הכנסות מול הוצאות' : 'Yearly Overview - Income vs Expenses'}</h2>
                    <ResponsiveContainer width="100%" height="100%">
@@ -1882,7 +1912,16 @@ function Dashboard() {
                  </div>
 
                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-                    <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.expensesManagement}</h2>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                      <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0 }}>{t.expensesManagement}</h2>
+                      <button 
+                        onClick={handleExportExpenses}
+                        style={{ background: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.8rem' }}
+                      >
+                        📥 {isHebrew ? 'ייצא הוצאות לאקסל (CSV)' : 'Export Expenses CSV'}
+                      </button>
+                    </div>
+
                     <form onSubmit={handleAddExpense} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', alignItems: 'center' }}>
                       <input 
                         type="text" 
@@ -1969,9 +2008,6 @@ function Dashboard() {
              </div>
           )}
 
-          {/* ========================================================= */}
-          {/* --- טאב: רשימת משתמשים (Super Admin בלבד) --- */}
-          {/* ========================================================= */}
           {bizRole === 'super_admin' && activeTab === 'admin_clients' && (
             <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #f59e0b' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
