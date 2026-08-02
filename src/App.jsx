@@ -332,6 +332,9 @@ function Dashboard() {
 
   // טאבים ראשיים
   const [activeTab, setActiveTab] = useState('main');
+  const [financeReportType, setFinanceReportType] = useState('monthly');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   const [settingId, setSettingId] = useState(null);
   const [bizName, setBizName] = useState('ProFlow');
@@ -373,6 +376,7 @@ function Dashboard() {
   const [expenseDesc, setExpenseDesc] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('Hosting / Cloud');
+  const [isRecurring, setIsRecurring] = useState(false);
 
   const isLocalIsraeliBusiness = bizCountry === 'Israel (Local)';
 
@@ -652,6 +656,7 @@ function Dashboard() {
       description: expenseDesc,
       amount: Number(expenseAmount),
       category: expenseCategory,
+      is_recurring: isRecurring,
       expense_date: new Date().toISOString().split('T')[0]
     }]);
 
@@ -660,6 +665,7 @@ function Dashboard() {
     } else {
       setExpenseDesc('');
       setExpenseAmount('');
+      setIsRecurring(false);
       fetchExpenses();
       setStatusMsg({ text: isHebrew ? 'ההוצאה נוספה בהצלחה!' : 'Expense added successfully!', type: 'success' });
     }
@@ -828,9 +834,71 @@ function Dashboard() {
 
   const planLimit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : '∞';
 
-  const totalQuotesCount = quotes.length;
-  const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
-  const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+  // חישובים תחת טווח דוחות מתקדם (חודשי שמתאפס, רבעוני, חצי שנתי, שנתי, או טווח תאריכים אישי)
+  const now = new Date();
+  const reportYear = now.getFullYear();
+  const reportMonth = now.getMonth();
+
+  const filteredQuotesForReport = quotes.filter(q => {
+    if (!(q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid')) return false;
+    const qDate = new Date(q.created_at);
+
+    if (financeReportType === 'custom') {
+      if (!startDate && !endDate) return true;
+      const start = startDate ? new Date(startDate) : new Date(0);
+      const end = endDate ? new Date(endDate) : new Date();
+      end.setHours(23, 59, 59, 999);
+      return qDate >= start && qDate <= end;
+    }
+
+    if (qDate.getFullYear() !== reportYear) return false;
+
+    if (financeReportType === 'monthly') {
+      return qDate.getMonth() === reportMonth;
+    } else if (financeReportType === 'quarterly') {
+      const currentQuarter = Math.floor(reportMonth / 3);
+      const qQuarter = Math.floor(qDate.getMonth() / 3);
+      return qQuarter === currentQuarter;
+    } else if (financeReportType === 'half-yearly') {
+      const currentHalf = reportMonth < 6 ? 0 : 1;
+      const qHalf = qDate.getMonth() < 6 ? 0 : 1;
+      return qHalf === currentHalf;
+    } else {
+      return true; // שנתי
+    }
+  });
+
+  const filteredExpensesForReport = expenses.filter(exp => {
+    const expDate = new Date(exp.expense_date);
+    if (exp.is_recurring) return true; // הוצאה חודשית קבועה ממשיכה אוטומטית לכל חודש/תקופה
+
+    if (financeReportType === 'custom') {
+      if (!startDate && !endDate) return true;
+      const start = startDate ? new Date(startDate) : new Date(0);
+      const end = endDate ? new Date(endDate) : new Date();
+      end.setHours(23, 59, 59, 999);
+      return expDate >= start && expDate <= end;
+    }
+
+    if (expDate.getFullYear() !== reportYear) return false;
+
+    if (financeReportType === 'monthly') {
+      return expDate.getMonth() === reportMonth;
+    } else if (financeReportType === 'quarterly') {
+      const currentQuarter = Math.floor(reportMonth / 3);
+      const expQuarter = Math.floor(expDate.getMonth() / 3);
+      return expQuarter === currentQuarter;
+    } else if (financeReportType === 'half-yearly') {
+      const currentHalf = reportMonth < 6 ? 0 : 1;
+      const expHalf = expDate.getMonth() < 6 ? 0 : 1;
+      return expHalf === currentHalf;
+    } else {
+      return true;
+    }
+  });
+
+  const totalRevenue = filteredQuotesForReport.reduce((sum, q) => sum + Number(q.total || 0), 0);
+  const totalExpenses = filteredExpensesForReport.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
   const netProfit = totalRevenue - totalExpenses;
 
   const getCurrencySymbol = (curr) => {
@@ -1135,7 +1203,7 @@ function Dashboard() {
               <img src={(bizLogoUrl && bizLogoUrl.trim() !== '' && bizPlan === 'pro') ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
             </div>
 
-            {/* כפתור שירות הלקוחות במיקום המדויק באמצע */}
+            {/* כפתור שירות הלקוחות במרכז הבר העליון */}
             <div style={{ flex: '0 1 auto', textAlign: 'center' }}>
               <AIChatWidget />
             </div>
@@ -1233,7 +1301,7 @@ function Dashboard() {
                   </div>
                   <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(filteredQuotesForReport.reduce((sum, q) => sum + Number(q.total || 0), 0))}</div>
                   </div>
                 </div>
               )}
@@ -1702,13 +1770,43 @@ function Dashboard() {
           )}
 
           {/* ========================================================= */}
-          {/* --- טאב: הוצאות והכנסות (Super Admin בלבד) --- */}
+          {/* --- טאב: הוצאות והכנסות (Super Admin בלבד עם דוחות מתקדמים) --- */}
           {/* ========================================================= */}
           {bizRole === 'super_admin' && activeTab === 'finances' && (
              <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #4f46e5' }}>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
-                    <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות' : 'Finances & Expenses'}</h2>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
+                    <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
+                    
+                    {/* בורר סוג דוח תקופתי מתקדם */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#475569' }}>{isHebrew ? 'סוג דוח:' : 'Report Type:'}</span>
+                      <select 
+                        value={financeReportType} 
+                        onChange={(e) => setFinanceReportType(e.target.value)}
+                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', background: 'white', fontSize: '0.9rem', fontWeight: 'bold', color: '#4f46e5' }}
+                      >
+                        <option value="monthly">{isHebrew ? 'חודשי (מתחיל מאפס כל חודש)' : 'Monthly'}</option>
+                        <option value="quarterly">{isHebrew ? 'רבעוני (3 חודשים)' : 'Quarterly'}</option>
+                        <option value="half-yearly">{isHebrew ? 'חצי שנתי (6 חודשים)' : 'Half-Yearly'}</option>
+                        <option value="yearly">{isHebrew ? 'שנתי (12 חודשים)' : 'Yearly'}</option>
+                        <option value="custom">{isHebrew ? 'בחירת טווח תאריכים אישי' : 'Custom Date Range'}</option>
+                      </select>
+                    </div>
                  </div>
+
+                 {/* שדות תאריכים מותאמים אישית אם נבחר Custom */}
+                 {financeReportType === 'custom' && (
+                   <div style={{ background: 'white', padding: '15px', borderRadius: '8px', marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', border: '1px solid #cbd5e1' }}>
+                     <div>
+                       <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'מתאריך:' : 'Start Date:'}</label>
+                       <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
+                     </div>
+                     <div>
+                       <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'עד תאריך:' : 'End Date:'}</label>
+                       <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px' }} />
+                     </div>
+                   </div>
+                 )}
 
                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
                   <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
@@ -1731,7 +1829,7 @@ function Dashboard() {
 
                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
                     <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.expensesManagement}</h2>
-                    <form onSubmit={handleAddExpense} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+                    <form onSubmit={handleAddExpense} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', alignItems: 'center' }}>
                       <input 
                         type="text" 
                         placeholder={isHebrew ? 'תיאור ההוצאה (לדוגמה: אירוח שרת)' : 'Expense description'} 
@@ -1759,6 +1857,12 @@ function Dashboard() {
                         <option value="Tools / Software">{isHebrew ? 'כלים ותוכנות' : 'Tools / Software'}</option>
                         <option value="Other">{isHebrew ? 'אחר' : 'Other'}</option>
                       </select>
+
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem', cursor: 'pointer', fontWeight: '600', color: '#475569' }}>
+                        <input type="checkbox" checked={isRecurring} onChange={(e) => setIsRecurring(e.target.checked)} />
+                        {isHebrew ? 'הוצאה חודשית קבועה' : 'Recurring monthly'}
+                      </label>
+
                       <button type="submit" style={{ background: '#ef4444', color: 'white', border: 'none', padding: '9px 18px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
                         {t.addExpenseBtn}
                       </button>
@@ -1770,6 +1874,7 @@ function Dashboard() {
                           <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
                             <th style={{ padding: '10px' }}>{t.description}</th>
                             <th style={{ padding: '10px' }}>{isHebrew ? 'קטגוריה' : 'Category'}</th>
+                            <th style={{ padding: '10px' }}>{isHebrew ? 'סוג' : 'Type'}</th>
                             <th style={{ padding: '10px' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
                             <th style={{ padding: '10px' }}>{t.total}</th>
                             <th style={{ padding: '10px' }}>{t.actions}</th>
@@ -1778,7 +1883,7 @@ function Dashboard() {
                         <tbody>
                           {expenses.length === 0 ? (
                             <tr>
-                              <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                              <td colSpan="6" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
                                 {isHebrew ? 'אין הוצאות רשומות במערכת עדיין.' : 'No expenses recorded yet.'}
                               </td>
                             </tr>
@@ -1787,6 +1892,9 @@ function Dashboard() {
                               <tr key={exp.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
                                 <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{exp.description}</td>
                                 <td style={{ padding: '10px', color: '#64748b' }}>{exp.category}</td>
+                                <td style={{ padding: '10px', color: '#64748b' }}>
+                                  {exp.is_recurring ? (isHebrew ? '🔄 קבועה' : 'Recurring') : (isHebrew ? 'חד פעמית' : 'One-time')}
+                                </td>
                                 <td style={{ padding: '10px', color: '#64748b' }}>{exp.expense_date}</td>
                                 <td style={{ padding: '10px', color: '#ef4444', fontWeight: '600' }}>{sym}{formatNum(exp.amount)}</td>
                                 <td style={{ padding: '10px' }}>
