@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import './App.css';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUw LDQ1Ay0gMjAgTDYwIDM1IEw0MC0gNTUgTDYwIDc1IEw0NSA5MCBaIiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTQwIDUw TDc4IDIwIEw4NSAzNSBMNjUgNTUgTDg1IDc1IEw3MCA5MCBaIiBmaWxsPSIjMWUyOTNiIiBvcGFjaXR5PSIwLjkiLz48dGV4dCB4PSIxMDUiIHk9IjY2IiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDQiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMxZTE5M2IiPlBybzx0c3BhbiBmaWxsPSIjNGY0NmU1Ij5GbG93PC90c3Bhbj48L3RleHQ+PC9zdmc+";
+const DEFAULT_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 285 100' width='285' height='100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234f46e5'/%3E%3Cstop offset='100%25' stop-color='%2310b981'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M15 50 L45 20 L60 35 L40 55 L60 75 L45 90 Z' fill='url(%23g)'/%3E%3Cpath d='M40 50 L78 20 L85 35 L65 55 L85 75 L70 90 Z' fill='%231e293b' opacity='0.9'/%3E%3Ctext x='105' y='66' font-family='Segoe UI, Tahoma, sans-serif' font-size='44' font-weight='900' fill='%231e293b'%3EPro%3Ctspan fill='%234f46e5'%3EFlow%3C/tspan%3E%3C/text%3E%3C/svg%3E";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -151,13 +151,15 @@ function PublicQuote() {
   const bizPhone = settings?.phone || '';
   const isProPlan = settings?.plan === 'pro';
   const bizLogo = isProPlan ? (settings?.logo_url || '') : '';
+  const isLocalIsraeliBusiness = settings?.country === 'Israel (Local)';
 
   const getCurrencySymbol = (curr) => {
-    if (!curr) return '₪';
-    if (curr.includes('USD') || curr === 'USD') return '$';
-    if (curr.includes('EUR') || curr === 'EUR') return '€';
-    if (curr.includes('GBP') || curr === 'GBP') return '£';
-    return '₪';
+    if (isLocalIsraeliBusiness) return '₪';
+    if (!curr) return '$';
+    if (curr === 'EUR') return '€';
+    if (curr === 'GBP') return '£';
+    if (curr === 'ILS') return '₪';
+    return '$';
   };
   const quoteSym = getCurrencySymbol(quote.currency);
   const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1411,11 +1413,19 @@ function Dashboard() {
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'סוג לקוח (חובה)' : 'Client Type'}</label>
-                      <select name="clientType" value={clientType} onChange={(e) => {
+                      <select 
+                        name="clientType" 
+                        value={clientType} 
+                        onChange={(e) => {
                           const val = e.target.value;
                           setClientType(val);
+                          e.target.setCustomValidity('');
                           if (val === 'private') setTerms('');
-                        }} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
+                        }} 
+                        onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'אנא בחר סוג לקוח מהרשימה' : 'Please select a client type')}
+                        required 
+                        style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
+                      >
                         <option value="" disabled>{isHebrew ? 'בחר סוג לקוח...' : 'Select Client Type...'}</option>
                         <option value="business">{isHebrew ? 'עסקי (חברה/עוסק)' : 'Business'}</option>
                         <option value="private">{isHebrew ? 'פרטי (B2C)' : 'Private'}</option>
@@ -1472,7 +1482,12 @@ function Dashboard() {
                         <select 
                           name="terms" 
                           value={terms} 
-                          onChange={(e) => setTerms(e.target.value)} 
+                          onChange={(e) => {
+                            setTerms(e.target.value);
+                            e.target.setCustomValidity('');
+                          }} 
+                          onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'אנא בחר תנאי תשלום מהרשימה' : 'Please select payment terms')}
+                          required 
                           style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
                         >
                           <option value="" disabled>{isHebrew ? 'בחר תנאי תשלום...' : 'Select terms...'}</option>
