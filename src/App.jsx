@@ -151,14 +151,15 @@ function PublicQuote() {
   const bizPhone = settings?.phone || '';
   const isProPlan = settings?.plan === 'pro';
   const bizLogo = isProPlan ? (settings?.logo_url || '') : '';
+  const isLocalIsraeliBusiness = settings?.country === 'Israel (Local)';
 
   const getCurrencySymbol = (curr) => {
-    if (isHebrew) return '₪';
-    if (!curr) return '₪';
-    if (curr.includes('USD')) return '$';
-    if (curr.includes('EUR')) return '€';
-    if (curr.includes('GBP')) return '£';
-    return '₪';
+    if (isLocalIsraeliBusiness) return '₪';
+    if (!curr) return '$';
+    if (curr === 'EUR') return '€';
+    if (curr === 'GBP') return '£';
+    if (curr === 'ILS') return '₪';
+    return '$';
   };
   const quoteSym = getCurrencySymbol(quote.currency);
   const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -321,6 +322,8 @@ function Dashboard() {
   const browserLang = navigator.language || '';
   const isHebrew = browserLang.startsWith('he') || isIsraelZone;
 
+  const defaultTermsText = isHebrew ? 'שוטף + 30' : 'Net 30 days';
+
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -342,6 +345,7 @@ function Dashboard() {
   const [bizLogoUrl, setBizLogoUrl] = useState('');
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
+  const [bizCountry, setBizCountry] = useState('');
   const [trialEndsAt, setTrialEndsAt] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
@@ -362,11 +366,11 @@ function Dashboard() {
   const [clientPhone, setClientPhone] = useState('');
   const [clientType, setClientType] = useState('');
   
-  const [currency, setCurrency] = useState(isHebrew ? 'ILS' : 'USD');
+  const [currency, setCurrency] = useState('USD');
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [terms, setTerms] = useState(isHebrew ? 'שוטף + 30' : 'Net 30 days');
+  const [terms, setTerms] = useState('');
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
@@ -375,6 +379,8 @@ function Dashboard() {
   const [expenseDesc, setExpenseDesc] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('Hosting / Cloud');
+
+  const isLocalIsraeliBusiness = bizCountry === 'Israel (Local)';
 
   const t = {
     appName: bizName || 'ProFlow',
@@ -525,8 +531,13 @@ function Dashboard() {
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'free');
       setBizRole(data.role || 'user');
+      setBizCountry(data.country || '');
       setTrialEndsAt(data.trial_ends_at || null);
       
+      if (data.country === 'Israel (Local)') {
+        setCurrency('ILS');
+      }
+
       await supabase
         .from('business_settings')
         .update({ last_sign_in: nowIso, country: detectedCountry })
@@ -560,7 +571,11 @@ function Dashboard() {
         setBizEmail(newData.email);
         setBizPlan(newData.plan);
         setBizRole(newData.role);
+        setBizCountry(newData.country || '');
         setTrialEndsAt(null);
+        if (newData.country === 'Israel (Local)') {
+          setCurrency('ILS');
+        }
       } else {
         setSettingId(null);
         setBizPlan('free');
@@ -863,12 +878,12 @@ function Dashboard() {
   const netProfit = totalRevenue - totalExpenses;
 
   const getCurrencySymbol = (curr) => {
-    if (isHebrew) return '₪';
-    if (!curr) return '₪';
-    if (curr.includes('USD')) return '$';
-    if (curr.includes('EUR')) return '€';
-    if (curr.includes('GBP')) return '£';
-    return '₪';
+    if (isLocalIsraeliBusiness) return '₪';
+    if (!curr) return '$';
+    if (curr === 'EUR') return '€';
+    if (curr === 'GBP') return '£';
+    if (curr === 'ILS') return '₪';
+    return '$';
   };
   const sym = getCurrencySymbol(currency);
 
@@ -879,7 +894,7 @@ function Dashboard() {
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
     
-    if (isHebrew) {
+    if (isLocalIsraeliBusiness) {
       setCurrency('ILS');
     } else {
       setCurrency(quote.currency || 'USD');
@@ -906,7 +921,7 @@ function Dashboard() {
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
     
-    if (isHebrew) {
+    if (isLocalIsraeliBusiness) {
       setCurrency('ILS');
     } else {
       setCurrency(quote.currency || 'USD');
@@ -935,7 +950,7 @@ function Dashboard() {
     setValidUntil('');
     setDiscount(0);
     setTerms('');
-    setCurrency(isHebrew ? 'ILS' : 'USD');
+    setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
     setStatusMsg({ text: isHebrew ? 'העריכה בוטלה.' : 'Edit cancelled.', type: 'success' });
   };
@@ -980,7 +995,7 @@ function Dashboard() {
       const quotePayload = {
         client_id: clientId,
         client_type: clientType,
-        currency: isHebrew ? 'ILS' : currency,
+        currency: isLocalIsraeliBusiness ? 'ILS' : currency,
         subtotal: subtotal,
         tax_rate: taxRate,
         total: totalAmount,
@@ -1029,7 +1044,7 @@ function Dashboard() {
       setValidUntil('');
       setDiscount(0);
       setTerms('');
-      setCurrency(isHebrew ? 'ILS' : 'USD');
+      setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
       loadData();
     } catch (err) {
@@ -1278,7 +1293,7 @@ function Dashboard() {
                         </tr>
                       ) : (
                         filteredQuotes.map((quote) => {
-                          const quoteSym = getCurrencySymbol(quote.currency);
+                          const quoteSym = isLocalIsraeliBusiness ? '₪' : getCurrencySymbol(quote.currency);
                           const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
                           return (
                             <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
@@ -1412,7 +1427,7 @@ function Dashboard() {
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                       <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                        {isHebrew ? (
+                        {isLocalIsraeliBusiness ? (
                           <option value="ILS">ILS (₪)</option>
                         ) : (
                           <>
@@ -1511,7 +1526,7 @@ function Dashboard() {
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                       <span>{t.totalAmount}</span>
-                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isHebrew ? '' : (currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : currency === 'USD' ? 'USD' : 'ILS')}</span>
+                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isLocalIsraeliBusiness ? '' : (currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : currency === 'USD' ? 'USD' : 'ILS')}</span>
                     </div>
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
