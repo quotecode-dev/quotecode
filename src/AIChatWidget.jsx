@@ -2,10 +2,24 @@ import React, { useState } from 'react';
 import { MessageSquare, X, Send, Loader2, Sparkles } from 'lucide-react';
 import { supabase } from './supabase';
 
-export default function AIChatWidget() {
+export default function AIChatWidget({ bizRole }) {
+  // הסתרה מלאה ממנהל מערכת (Super Admin)
+  if (bizRole === 'super_admin') return null;
+
   const [isOpen, setIsOpen] = useState(false);
+
+  // זיהוי שפה אוטומטי לפי הדפדפן ואזור הזמן
+  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+  const browserLang = navigator.language || '';
+  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
+
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך היום?' }
+    { 
+      role: 'assistant', 
+      content: isHebrew 
+        ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך היום?' 
+        : 'Hello! I am your ProFlow AI assistant. How can I help you today?' 
+    }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,14 +44,17 @@ export default function AIChatWidget() {
       setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
     } catch (err) {
       console.error(err);
-      setMessages([...newMessages, { role: 'assistant', content: 'סליחה, אירעה שגיאה בקבלת התשובה. נסה שוב.' }]);
+      setMessages([...newMessages, { 
+        role: 'assistant', 
+        content: isHebrew ? 'סליחה, אירעה שגיאה בקבלת התשובה. נסה שוב.' : 'Sorry, an error occurred. Please try again.' 
+      }]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-[99999]" dir="rtl">
+    <div className="fixed bottom-6 right-6 z-[99999]" dir={isHebrew ? 'rtl' : 'ltr'}>
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
@@ -47,7 +64,7 @@ export default function AIChatWidget() {
             <MessageSquare className="w-5 h-5" />
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-indigo-600 animate-pulse"></span>
           </div>
-          <span>שירות לקוחות ותמיכה AI</span>
+          <span>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Customer Service'}</span>
         </button>
       ) : (
         <div className="bg-white rounded-2xl shadow-2xl w-80 sm:w-96 flex flex-col h-[520px] border border-gray-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200">
@@ -58,9 +75,9 @@ export default function AIChatWidget() {
                 <Sparkles className="w-5 h-5 text-indigo-200" />
               </div>
               <div>
-                <h3 className="font-bold text-sm">שירות לקוחות ProFlow</h3>
+                <h3 className="font-bold text-sm">{isHebrew ? 'שירות לקוחות ProFlow' : 'ProFlow Support'}</h3>
                 <span className="text-[11px] text-indigo-200 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-400 rounded-full inline-block"></span> זמין 24/7 לעזרה
+                  <span className="w-2 h-2 bg-green-400 rounded-full inline-block"></span> {isHebrew ? 'זמין 24/7 לעזרה' : 'Online 24/7'}
                 </span>
               </div>
             </div>
@@ -73,17 +90,17 @@ export default function AIChatWidget() {
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-right">
+          <div className={`flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 ${isHebrew ? 'text-right' : 'text-left'}`}>
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
+                className={`flex ${msg.role === 'user' ? (isHebrew ? 'justify-start' : 'justify-end') : (isHebrew ? 'justify-end' : 'justify-start')}`}
               >
                 <div
                   className={`max-w-[85%] p-3.5 rounded-2xl text-sm leading-relaxed ${
                     msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-bl-none shadow-sm'
-                      : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-br-none'
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : 'bg-white text-gray-800 shadow-sm border border-gray-100'
                   }`}
                 >
                   {msg.content}
@@ -91,9 +108,9 @@ export default function AIChatWidget() {
               </div>
             ))}
             {loading && (
-              <div className="flex justify-end">
+              <div className={`flex ${isHebrew ? 'justify-end' : 'justify-start'}`}>
                 <div className="bg-white text-gray-500 p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2 text-sm">
-                  <Loader2 className="w-4 h-4 animate-spin text-indigo-600" /> מעבד את השאלה...
+                  <Loader2 className="w-4 h-4 animate-spin text-indigo-600" /> {isHebrew ? 'מעבד את השאלה...' : 'Thinking...'}
                 </div>
               </div>
             )}
@@ -105,8 +122,8 @@ export default function AIChatWidget() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="כתוב הודעה לשירות הלקוחות..."
-              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 text-right bg-gray-50/50"
+              placeholder={isHebrew ? 'כתוב הודעה לשירות הלקוחות...' : 'Type a message to support...'}
+              className={`flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-gray-50/50 ${isHebrew ? 'text-right' : 'text-left'}`}
             />
             <button
               type="submit"
