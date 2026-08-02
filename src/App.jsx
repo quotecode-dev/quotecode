@@ -1188,22 +1188,13 @@ function Dashboard() {
             </div>
           )}
 
-          {/* --- כפתורי הטאבים מוצגים אך ורק ל-Super Admin --- */}
-          {bizRole === 'super_admin' && (
+          {/* --- כפתורי הטאבים מוצגים אך ורק ל-Super Admin במסך הראשי --- */}
+          {bizRole === 'super_admin' && activeTab === 'main' && (
             <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
               <button
                 onClick={() => setActiveTab('finances')}
                 style={{
-                  flex: 1,
-                  padding: '14px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  background: activeTab === 'finances' ? '#4f46e5' : 'white',
-                  color: activeTab === 'finances' ? 'white' : '#475569',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                  flex: 1, padding: '14px', borderRadius: '10px', border: '2px solid #4f46e5', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', background: 'white', color: '#4f46e5', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
                 }}
               >
                 {isHebrew ? '📊 הוצאות והכנסות' : '📊 Finances & Expenses'}
@@ -1211,16 +1202,7 @@ function Dashboard() {
               <button
                 onClick={() => setActiveTab('clients')}
                 style={{
-                  flex: 1,
-                  padding: '14px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  background: activeTab === 'clients' ? '#4f46e5' : 'white',
-                  color: activeTab === 'clients' ? 'white' : '#475569',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                  flex: 1, padding: '14px', borderRadius: '10px', border: '2px solid #4f46e5', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', background: 'white', color: '#4f46e5', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
                 }}
               >
                 {isHebrew ? '👥 רשימת לקוחות' : '👥 Clients List'}
@@ -1229,113 +1211,25 @@ function Dashboard() {
           )}
 
           {/* ========================================================= */}
-          {/* --- טאב 1: הוצאות והכנסות (מוצג רק בטאב הפיננסי) --- */}
+          {/* --- תצוגה מרכזית: מדדים (למשתמש רגיל), היסטוריה, יצירה, וקטלוג --- */}
           {/* ========================================================= */}
-          {activeTab === 'finances' && (
+          {(bizRole !== 'super_admin' || activeTab === 'main') && (
             <>
-              <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
-                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
-                  <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
-                  {bizPlan !== 'pro' && (
-                    <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginTop: '5px', fontWeight: 'bold' }}>
-                      {isHebrew ? `נוצרו החודש: ${monthlyQuotesCount} מתוך ${planLimit}` : `This month: ${monthlyQuotesCount} / ${planLimit}`}
-                    </div>
-                  )}
-                </div>
-                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
-                  <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
-                </div>
-                {bizRole === 'super_admin' && (
-                  <>
-                    <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
-                      <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalExpenses}</div>
-                      <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#ef4444' }}>{sym}{formatNum(totalExpenses)}</div>
-                    </div>
-                    <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
-                      <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.netProfit}</div>
-                      <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: netProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(netProfit)}</div>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* ניהול הוצאות עסק (למנהלים בלבד) */}
-              {bizRole === 'super_admin' && (
-                <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-                  <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.expensesManagement}</h2>
-                  <form onSubmit={handleAddExpense} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
-                    <input 
-                      type="text" 
-                      placeholder={isHebrew ? 'תיאור ההוצאה (לדוגמה: אירוח שרת)' : 'Expense description'} 
-                      value={expenseDesc} 
-                      onChange={(e) => setExpenseDesc(e.target.value)} 
-                      required 
-                      style={{ flex: '2 1 200px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} 
-                    />
-                    <input 
-                      type="number" 
-                      step="0.01" 
-                      placeholder={isHebrew ? 'סכום' : 'Amount'} 
-                      value={expenseAmount} 
-                      onChange={(e) => setExpenseAmount(e.target.value)} 
-                      required 
-                      style={{ flex: '1 1 100px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} 
-                    />
-                    <select 
-                      value={expenseCategory} 
-                      onChange={(e) => setExpenseCategory(e.target.value)}
-                      style={{ flex: '1 1 140px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
-                    >
-                      <option value="Hosting / Cloud">{isHebrew ? 'ענן ושרתים' : 'Hosting / Cloud'}</option>
-                      <option value="Marketing">{isHebrew ? 'שיווק ופרסום' : 'Marketing'}</option>
-                      <option value="Tools / Software">{isHebrew ? 'כלים ותוכנות' : 'Tools / Software'}</option>
-                      <option value="Other">{isHebrew ? 'אחר' : 'Other'}</option>
-                    </select>
-                    <button type="submit" style={{ background: '#ef4444', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-                      {t.addExpenseBtn}
-                    </button>
-                  </form>
-
-                  <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '450px' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                          <th style={{ padding: '12px' }}>{t.description}</th>
-                          <th style={{ padding: '12px' }}>{isHebrew ? 'קטגוריה' : 'Category'}</th>
-                          <th style={{ padding: '12px' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
-                          <th style={{ padding: '12px' }}>{t.total}</th>
-                          <th style={{ padding: '12px' }}>{t.actions}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {expenses.length === 0 ? (
-                          <tr>
-                            <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
-                              {isHebrew ? 'אין הוצאות רשומות במערכת עדיין.' : 'No expenses recorded yet.'}
-                            </td>
-                          </tr>
-                        ) : (
-                          expenses.map((exp) => (
-                            <tr key={exp.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                              <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{exp.description}</td>
-                              <td style={{ padding: '12px', color: '#64748b' }}>{exp.category}</td>
-                              <td style={{ padding: '12px', color: '#64748b' }}>{exp.expense_date}</td>
-                              <td style={{ padding: '12px', color: '#ef4444', fontWeight: '600' }}>{sym}{formatNum(exp.amount)}</td>
-                              <td style={{ padding: '12px' }}>
-                                <button 
-                                  onClick={() => handleDeleteExpense(exp.id)}
-                                  style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                                >
-                                  {t.delete}
-                                </button>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
+              {/* מדדים למשתמשים רגילים במסך הראשי */}
+              {bizRole !== 'super_admin' && (
+                <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
+                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
+                    {bizPlan !== 'pro' && (
+                      <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginTop: '5px', fontWeight: 'bold' }}>
+                        {isHebrew ? `נוצרו החודש: ${monthlyQuotesCount} מתוך ${planLimit}` : `This month: ${monthlyQuotesCount} / ${planLimit}`}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
                   </div>
                 </div>
               )}
@@ -1682,16 +1576,128 @@ function Dashboard() {
           )}
 
           {/* ========================================================= */}
-          {/* --- טאב 2: רשימת לקוחות בלבד (מוצג אך ורק כאשר activeTab === 'clients') --- */}
+          {/* --- טאב 1: הוצאות והכנסות (Super Admin בלבד) --- */}
+          {/* ========================================================= */}
+          {bizRole === 'super_admin' && activeTab === 'finances' && (
+             <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '20px', border: '2px solid #4f46e5' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
+                    <h2 style={{ fontSize: '1.4rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות' : 'Finances & Expenses'}</h2>
+                    <button 
+                      onClick={() => setActiveTab('main')}
+                      style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}
+                    >
+                      {isHebrew ? '🏠 חזרה למסך ראשי' : '🏠 Back to Main Screen'}
+                    </button>
+                 </div>
+
+                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
+                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
+                  </div>
+                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
+                  </div>
+                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalExpenses}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#ef4444' }}>{sym}{formatNum(totalExpenses)}</div>
+                  </div>
+                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.netProfit}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: netProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(netProfit)}</div>
+                  </div>
+                 </div>
+
+                 <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+                    <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.expensesManagement}</h2>
+                    <form onSubmit={handleAddExpense} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+                      <input 
+                        type="text" 
+                        placeholder={isHebrew ? 'תיאור ההוצאה (לדוגמה: אירוח שרת)' : 'Expense description'} 
+                        value={expenseDesc} 
+                        onChange={(e) => setExpenseDesc(e.target.value)} 
+                        required 
+                        style={{ flex: '2 1 200px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} 
+                      />
+                      <input 
+                        type="number" 
+                        step="0.01" 
+                        placeholder={isHebrew ? 'סכום' : 'Amount'} 
+                        value={expenseAmount} 
+                        onChange={(e) => setExpenseAmount(e.target.value)} 
+                        required 
+                        style={{ flex: '1 1 100px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} 
+                      />
+                      <select 
+                        value={expenseCategory} 
+                        onChange={(e) => setExpenseCategory(e.target.value)}
+                        style={{ flex: '1 1 140px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
+                      >
+                        <option value="Hosting / Cloud">{isHebrew ? 'ענן ושרתים' : 'Hosting / Cloud'}</option>
+                        <option value="Marketing">{isHebrew ? 'שיווק ופרסום' : 'Marketing'}</option>
+                        <option value="Tools / Software">{isHebrew ? 'כלים ותוכנות' : 'Tools / Software'}</option>
+                        <option value="Other">{isHebrew ? 'אחר' : 'Other'}</option>
+                      </select>
+                      <button type="submit" style={{ background: '#ef4444', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                        {t.addExpenseBtn}
+                      </button>
+                    </form>
+
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '450px' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                            <th style={{ padding: '12px' }}>{t.description}</th>
+                            <th style={{ padding: '12px' }}>{isHebrew ? 'קטגוריה' : 'Category'}</th>
+                            <th style={{ padding: '12px' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
+                            <th style={{ padding: '12px' }}>{t.total}</th>
+                            <th style={{ padding: '12px' }}>{t.actions}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {expenses.length === 0 ? (
+                            <tr>
+                              <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                                {isHebrew ? 'אין הוצאות רשומות במערכת עדיין.' : 'No expenses recorded yet.'}
+                              </td>
+                            </tr>
+                          ) : (
+                            expenses.map((exp) => (
+                              <tr key={exp.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                                <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{exp.description}</td>
+                                <td style={{ padding: '12px', color: '#64748b' }}>{exp.category}</td>
+                                <td style={{ padding: '12px', color: '#64748b' }}>{exp.expense_date}</td>
+                                <td style={{ padding: '12px', color: '#ef4444', fontWeight: '600' }}>{sym}{formatNum(exp.amount)}</td>
+                                <td style={{ padding: '12px' }}>
+                                  <button 
+                                    onClick={() => handleDeleteExpense(exp.id)}
+                                    style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                                  >
+                                    {t.delete}
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                 </div>
+             </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* --- טאב 2: רשימת לקוחות (Super Admin בלבד) --- */}
           {/* ========================================================= */}
           {bizRole === 'super_admin' && activeTab === 'clients' && (
-            <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '30px', border: '2px solid #f59e0b' }}>
+            <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '20px', border: '2px solid #f59e0b' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                 <h2 style={{ fontSize: '1.4rem', color: '#92400e', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
                   👑 Super Admin Panel
                 </h2>
                 <button 
-                  onClick={() => setActiveTab('finances')}
+                  onClick={() => setActiveTab('main')}
                   style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}
                 >
                   {isHebrew ? '🏠 חזרה למסך ראשי' : '🏠 Back to Main Screen'}
