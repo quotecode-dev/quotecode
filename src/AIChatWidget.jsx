@@ -55,7 +55,7 @@ export default function AIChatWidget() {
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2 cursor-pointer font-bold text-xs sm:text-sm"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full shadow-md transition flex items-center gap-2 cursor-pointer font-bold text-xs sm:text-sm"
         >
           <MessageSquare className="w-4 h-4" />
           <span>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Customer Service'}</span>
