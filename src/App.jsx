@@ -40,11 +40,11 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   );
 }
 
-// רכיב צ'אט AI ממוקם כחלון צף בצד ימין למעלה
-function AIChatWidget() {
+// רכיב צ'אט AI מותאם שפה (אנגלית למשתמש חו"ל, עברית לישראל)
+function AIChatWidget({ isHebrew }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: 'ai', text: 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך היום?' }
+    { sender: 'ai', text: isHebrew ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך היום?' : 'Hello! I am ProFlow AI assistant. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -60,17 +60,18 @@ function AIChatWidget() {
 
     try {
       setTimeout(() => {
-        let reply = "הבנתי אותך. כדי לשלוח הצעת מחיר בווצאפ, לחץ על אייקון הוואטסאפ (💬) בשורת הפעולות בטבלה.";
-        if (userText.includes('מחיר') || userText.includes('הצעה')) {
-          reply = "ניתן ליצור הצעת מחיר חדשה דרך טופס יצירת ההצעות במסך הראשי של המערכת.";
-        } else if (userText.includes('סיסמה') || userText.includes('שחזור')) {
-          reply = "אם שכחת סיסמה, תוכל להשתמש בכפתור 'שכחת סיסמה' במסך ההתחברות לקבלת קישור איפוס למייל.";
+        let reply = isHebrew 
+          ? "הבנתי אותך. כדי לשלוח הצעת מחיר בווצאפ, לחץ על אייקון הוואטסאפ (💬) בשורת הפעולות בטבלה."
+          : "I understand. To send a quote via WhatsApp, click the WhatsApp icon (💬) in the quote actions row.";
+        
+        if (userText.toLowerCase().includes('price') || userText.includes('מחיר') || userText.includes('הצעה')) {
+          reply = isHebrew ? "ניתן ליצור הצעת מחיר חדשה דרך טופס יצירת ההצעות במסך הראשי." : "You can create a new quote using the form on the main dashboard.";
         }
         setMessages(prev => [...prev, { sender: 'ai', text: reply }]);
         setLoading(false);
       }, 600);
     } catch (err) {
-      setMessages(prev => [...prev, { sender: 'ai', text: 'אירעה שגיאה בקבלת התשובה. נסה שוב.' }]);
+      setMessages(prev => [...prev, { sender: 'ai', text: isHebrew ? 'אירעה שגיאה. נסה שוב.' : 'An error occurred. Please try again.' }]);
       setLoading(false);
     }
   };
@@ -81,34 +82,34 @@ function AIChatWidget() {
         onClick={() => setIsOpen(!isOpen)}
         style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
       >
-        💬 שירות לקוחות AI
+        💬 {isHebrew ? 'שירות לקוחות AI' : 'AI Support'}
       </button>
 
       {isOpen && (
-        <div style={{ position: 'fixed', top: '75px', right: '25px', width: '320px', background: 'white', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', zIndex: 99999, overflow: 'hidden' }} dir="rtl">
+        <div style={{ position: 'fixed', top: '75px', right: '25px', width: '320px', background: 'white', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', zIndex: 99999, overflow: 'hidden' }} dir={isHebrew ? 'rtl' : 'ltr'}>
           <div style={{ background: '#4f46e5', color: 'white', padding: '10px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>שירות לקוחות ProFlow (AI)</span>
+            <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{isHebrew ? 'שירות לקוחות ProFlow (AI)' : 'ProFlow Support (AI)'}</span>
             <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}>✕</button>
           </div>
-          <div style={{ height: '220px', overflowY: 'auto', padding: '10px', fontSize: '0.85rem', background: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ height: '220px', overflowY: 'auto', padding: '10px', fontSize: '0.85rem', background: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '8px', textAlign: isHebrew ? 'right' : 'left' }}>
             {messages.map((m, idx) => (
-              <div key={idx} style={{ textAlign: m.sender === 'user' ? 'left' : 'right' }}>
+              <div key={idx} style={{ textAlign: m.sender === 'user' ? (isHebrew ? 'left' : 'right') : (isHebrew ? 'right' : 'left') }}>
                 <div style={{ display: 'inline-block', padding: '8px 12px', borderRadius: '8px', background: m.sender === 'user' ? '#4f46e5' : 'white', color: m.sender === 'user' ? 'white' : '#1e293b', border: m.sender === 'user' ? 'none' : '1px solid #e2e8f0', maxWidth: '85%', wordBreak: 'break-word' }}>
                   {m.text}
                 </div>
               </div>
             ))}
-            {loading && <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#64748b' }}>ה-AI חושב...</div>}
+            {loading && <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#64748b' }}>{isHebrew ? 'ה-AI חושב...' : 'AI is thinking...'}</div>}
           </div>
           <form onSubmit={handleSend} style={{ display: 'flex', padding: '8px', background: 'white', borderTop: '1px solid #e2e8f0', gap: '5px' }}>
             <input
               type="text"
-              placeholder="שאל משהו..."
+              placeholder={isHebrew ? "שאל משהו..." : "Ask something..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }}
+              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', textAlign: isHebrew ? 'right' : 'left' }}
             />
-            <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>שלח</button>
+            <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>{isHebrew ? 'שלח' : 'Send'}</button>
           </form>
         </div>
       )}
@@ -125,12 +126,9 @@ function PublicQuote() {
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
-  const [lang, setLang] = useState(() => {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const navLang = navigator.language || '';
-    return (navLang.startsWith('he') || tz === 'Asia/Jerusalem') ? 'he' : 'en';
-  });
-  const isHebrew = lang === 'he';
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const navLang = navigator.language || '';
+  const isHebrew = navLang.startsWith('he') || tz === 'Asia/Jerusalem';
 
   useEffect(() => {
     async function fetchData() {
@@ -268,7 +266,7 @@ function PublicQuote() {
         <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           <span style={{ fontSize: '0.9rem', color: '#64748b' }}>{isHebrew ? 'מסמך רשמי מאושר' : 'Official Document'}</span>
           <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => setLang(lang === 'he' ? 'en' : 'he')} style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
+            <button onClick={() => setLang(isHebrew ? 'en' : 'he')} style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
               🌐 {isHebrew ? 'English' : 'עברית'}
             </button>
             <button onClick={handleDownloadPDF} disabled={isGeneratingPDF} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: isGeneratingPDF ? 'wait' : 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '8px', opacity: isGeneratingPDF ? 0.7 : 1 }}>
@@ -390,9 +388,10 @@ function PublicQuote() {
 }
 
 function Dashboard() {
-  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
-  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
+  // זיהוי לפי אזור הזמן או שפת הדפדפן - אם לא ישראל, מציג באנגלית מלאה
+  const isHebrew = (browserLang.startsWith('he') || tz === 'Asia/Jerusalem') && !window.location.search.includes('lang=en');
 
   const defaultTermsText = isHebrew ? 'שוטף + 30' : 'Net 30 days';
 
@@ -802,15 +801,15 @@ function Dashboard() {
     exportToCSV(exportData, 'expenses_report.csv');
   };
 
-  // בדיקת אימייל קיים מול הטבלה ומול Auth
+  // מניעת רישום כפול אמיתית ומוחלטת (בדיקה מוקדמת בטבלה וב-Auth)
   const handleAuth = async (e) => {
     e.preventDefault();
     setAuthError('');
     setAuthSuccess('');
 
     if (isSignUp) {
-      // בדיקה מוקדמת האם האימייל כבר קיים בטבלת הגדרות העסק
-      const { data: existingBiz } = await supabase
+      // בדיקה קפדנית האם האימייל כבר קיים בטבלת הגדרות העסק או בטבלאות המערכת
+      const { data: existingBiz, error: checkErr } = await supabase
         .from('business_settings')
         .select('email')
         .eq('email', emailInput)
@@ -823,11 +822,7 @@ function Dashboard() {
 
       const { data, error } = await supabase.auth.signUp({ email: emailInput, password: passwordInput });
       if (error) {
-        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-          setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
-        } else {
-          setAuthError(error.message);
-        }
+        setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
       } else {
         if (data?.user && data.user.identities && data.user.identities.length === 0) {
           setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר.' : 'Email already exists! Please sign in.');
@@ -939,10 +934,11 @@ function Dashboard() {
     }
   }
 
-  // פונקציית וואטסאפ עם אייקון אמיתי נקי בלבד (💬)
   const sendWhatsApp = (proposal) => {
     const clientNameVal = proposal.clients?.company_name || 'לקוח';
-    const text = `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ₪${formatNum(proposal.total)}. בתוקף עד ${proposal.validUntil || 'N/A'}.`;
+    const text = isHebrew 
+      ? `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ₪${formatNum(proposal.total)}. בתוקף עד ${proposal.validUntil || 'N/A'}.`
+      : `Hi ${clientNameVal}, here is your quote #${proposal.id.slice(0, 6)} totaling ${sym}${formatNum(proposal.total)}. Valid until ${proposal.validUntil || 'N/A'}.`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
@@ -1420,7 +1416,7 @@ function Dashboard() {
             </div>
 
             <div style={{ flex: '0 1 auto', textAlign: 'center' }}>
-              <AIChatWidget />
+              <AIChatWidget isHebrew={isHebrew} />
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
@@ -1622,7 +1618,7 @@ function Dashboard() {
                                 >
                                   {t.duplicate}
                                 </button>
-                                {/* אייקון ווטסאפ נקי בלבד בלי טקסט */}
+                                {/* אייקון ווטסאפ נקי ומדויק */}
                                 <button 
                                   title="שלח בוואטסאפ"
                                   onClick={() => sendWhatsApp(quote)}
