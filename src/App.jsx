@@ -1228,7 +1228,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* --- תוכן טאב 1: הוצאות והכנסות (מוצג למשתמש רגיל או למנהל בטאב הנכון) --- */}
+          {/* --- תוכן טאב 1: הוצאות והכנסות (מוצג אך ורק בטאב הפיננסי למנהל או למשתמש רגיל) --- */}
           {(bizRole !== 'super_admin' || activeTab === 'finances') && (
             <>
               <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
@@ -1467,57 +1467,8 @@ function Dashboard() {
                   </table>
                 </div>
               </div>
-            </>
-          )}
 
-          {/* --- תוכן טאב 2: רשימת לקוחות בלבד (מוצג אך ורק כאשר activeTab === 'clients') --- */}
-          {bizRole === 'super_admin' && activeTab === 'clients' && (
-            <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-              <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
-              
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                      <th style={{ padding: '12px' }}>{t.clientName}</th>
-                      <th style={{ padding: '12px' }}>{t.clientEmail}</th>
-                      <th style={{ padding: '12px' }}>{t.clientPhone}</th>
-                      <th style={{ padding: '12px' }}>{t.actions}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {clients.length === 0 ? (
-                      <tr>
-                        <td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
-                          {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients found.'}
-                        </td>
-                      </tr>
-                    ) : (
-                      clients.map((client) => (
-                        <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                          <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{client.company_name || 'N/A'}</td>
-                          <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
-                          <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
-                          <td style={{ padding: '12px' }}>
-                            <button 
-                              onClick={() => handleDeleteClient(client.id)}
-                              style={{ background: '#f1f5f9', color: '#ef4444', border: '1px solid #cbd5e1', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                            >
-                              {t.delete}
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* טופס יצירת הצעה וקטלוג שירותים (מוצגים אך ורק בטאב הפיננסי עבור מנהל, או כרגיל למשתמש רגיל) */}
-          {(bizRole !== 'super_admin' || activeTab === 'finances') && (
-            <>
+              {/* טופס יצירת הצעה */}
               <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                   <div>
@@ -1661,6 +1612,7 @@ function Dashboard() {
                 </form>
               </div>
 
+              {/* קטלוג שירותים */}
               <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
                 <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
                 
@@ -1725,6 +1677,51 @@ function Dashboard() {
                 </div>
               </div>
             </>
+          )}
+
+          {/* --- תוכן טאב 2: רשימת לקוחות בלבד (מוצג אך ורק כאשר activeTab === 'clients') --- */}
+          {bizRole === 'super_admin' && activeTab === 'clients' && (
+            <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+              <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
+              
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                      <th style={{ padding: '12px' }}>{t.clientName}</th>
+                      <th style={{ padding: '12px' }}>{t.clientEmail}</th>
+                      <th style={{ padding: '12px' }}>{t.clientPhone}</th>
+                      <th style={{ padding: '12px' }}>{t.actions}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {clients.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                          {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients found.'}
+                        </td>
+                      </tr>
+                    ) : (
+                      clients.map((client) => (
+                        <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                          <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{client.company_name || 'N/A'}</td>
+                          <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
+                          <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
+                          <td style={{ padding: '12px' }}>
+                            <button 
+                              onClick={() => handleDeleteClient(client.id)}
+                              style={{ background: '#f1f5f9', color: '#ef4444', border: '1px solid #cbd5e1', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                            >
+                              {t.delete}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
           
           {bizRole === 'super_admin' && (
