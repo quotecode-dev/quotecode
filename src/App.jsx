@@ -410,7 +410,7 @@ function Dashboard() {
     servicesCatalog: isHebrew ? 'קטלוג שירותים ומוצרים' : 'Services & Products Catalog',
     expensesManagement: isHebrew ? 'ניהול הוצאות עסק' : 'Business Expenses Management',
     addExpenseBtn: isHebrew ? 'הוסף הוצאה' : 'Add Expense',
-    businessSettings: isHebrew ? 'הגדרות עסק וחבילה' : 'Business Settings & Plan',
+    businessSettings: isHebrew ? 'הגדרות עסק וחבילה' : 'Business Settings',
     saveSettings: isHebrew ? 'שמור הגדרות עסק' : 'Save Business Settings',
     businessNameLabel: isHebrew ? 'שם העסק' : 'Business Name',
     taxIdLabel: isHebrew ? 'ח.פ / עוסק מורשה / פטור' : 'Tax ID / Lic No',
@@ -1179,7 +1179,7 @@ function Dashboard() {
                 flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'settings' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'settings' ? '#4f46e5' : 'white', color: activeTab === 'settings' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
               }}
             >
-              {isHebrew ? '⚙️ הגדרות עסק' : '⚙️ Settings'}
+              {isHebrew ? '⚙️ הגדרות עסק' : '⚙️ Business Settings'}
             </button>
             <button
               onClick={() => setActiveTab('clients')}
