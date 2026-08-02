@@ -264,7 +264,7 @@ function PublicQuote() {
                 <div>{isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):'} {quoteSym}{formatNum(quoteSub)}</div>
                 {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
                 <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
-                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{isHebrew ? `(הסכום כולל מע"מ בסך ${quoteSym}${formatNum(quoteTaxAmount)})` : `(Includes VAT: ${quoteSym}${formatNum(quoteTaxAmount)})`}</div>
+                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{isHebrew ? `(הסכום כולל מע"מ בסך ${quoteSym}{formatNum(quoteTaxAmount)})` : `(Includes VAT: ${quoteSym}${formatNum(quoteTaxAmount)})`}</div>
               </>
             ) : (
               <>
@@ -1926,9 +1926,6 @@ function Dashboard() {
           {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
         </button>
       </footer>
-      
-      {/* הוספת ווידג'ט הצ'אט של ה-AI */}
-      <AIChatWidget />
     </div>
   );
 }
@@ -1940,6 +1937,8 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
       </Routes>
+      {/* הוספת ווידג'ט הצ'אט גלובלית מחוץ ל-Routes */}
+      <AIChatWidget />
     </Router>
   );
 }
