@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-
 import { supabase } from './supabase';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 import AIChatWidget from './AIChatWidget';
 
@@ -908,6 +909,36 @@ function Dashboard() {
   const adminTotalExpenses = filteredExpensesForReport.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
   const adminNetProfit = adminTotalRevenue - adminTotalExpenses;
 
+  // הכנת הנתונים לגרף העמודות השנתי
+  const monthNames = isHebrew ? ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'] : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  
+  const chartData = monthNames.map((name, index) => {
+    let income = 0;
+    let expense = 0;
+    
+    quotes.forEach(q => {
+      if (q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid') {
+        const d = new Date(q.created_at);
+        if (d.getFullYear() === reportYear && d.getMonth() === index) {
+          income += Number(q.total || 0);
+        }
+      }
+    });
+
+    expenses.forEach(exp => {
+      const d = new Date(exp.expense_date);
+      if (exp.is_recurring) {
+        if (d.getFullYear() < reportYear || (d.getFullYear() === reportYear && d.getMonth() <= index)) {
+          expense += Number(exp.amount || 0);
+        }
+      } else if (d.getFullYear() === reportYear && d.getMonth() === index) {
+        expense += Number(exp.amount || 0);
+      }
+    });
+
+    return { name, [isHebrew ? 'הכנסות' : 'Income']: income, [isHebrew ? 'הוצאות' : 'Expenses']: expense };
+  });
+
   const getCurrencySymbol = (curr) => {
     if (isLocalIsraeliBusiness) return '₪';
     if (!curr) return '$';
@@ -1210,7 +1241,7 @@ function Dashboard() {
               <img src={(bizLogoUrl && bizLogoUrl.trim() !== '' && bizPlan === 'pro') ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
             </div>
 
-            {/* כפתור שירות הלקוחות במיקום המדויק באמצע */}
+            {/* כפתור שירות הלקוחות במרכז הבר העליון */}
             <div style={{ flex: '0 1 auto', textAlign: 'center' }}>
               <AIChatWidget />
             </div>
@@ -1832,6 +1863,22 @@ function Dashboard() {
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.netProfit}</div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: adminNetProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(adminNetProfit)}</div>
                   </div>
+                 </div>
+
+                 {/* Charts Section */}
+                 <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', height: '350px' }}>
+                   <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{isHebrew ? 'סקירה שנתית - הכנסות מול הוצאות' : 'Yearly Overview - Income vs Expenses'}</h2>
+                   <ResponsiveContainer width="100%" height="100%">
+                     <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 25 }}>
+                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                       <XAxis dataKey="name" />
+                       <YAxis />
+                       <Tooltip formatter={(value) => `${sym}${formatNum(value)}`} />
+                       <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                       <Bar dataKey={isHebrew ? 'הכנסות' : 'Income'} fill="#22c55e" radius={[4, 4, 0, 0]} />
+                       <Bar dataKey={isHebrew ? 'הוצאות' : 'Expenses'} fill="#ef4444" radius={[4, 4, 0, 0]} />
+                     </BarChart>
+                   </ResponsiveContainer>
                  </div>
 
                  <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
