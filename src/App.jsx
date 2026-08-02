@@ -330,7 +330,7 @@ function Dashboard() {
   const [expenses, setExpenses] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
-  // טאבים ראשיים
+  // טאבים ראשיים ודוחות
   const [activeTab, setActiveTab] = useState('main');
   const [financeReportType, setFinanceReportType] = useState('monthly');
   const [startDate, setStartDate] = useState('');
@@ -834,7 +834,13 @@ function Dashboard() {
 
   const planLimit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : '∞';
 
-  // חישובים תחת טווח דוחות מתקדם (חודשי שמתאפס, רבעוני, חצי שנתי, שנתי, או טווח תאריכים אישי)
+  // חישובים רגילים שמשמשים את שאר המערכת (המסך הראשי) כדי שלא יקרוס
+  const totalQuotesCount = quotes.length;
+  const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
+  const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+  const netProfit = totalRevenue - totalExpenses;
+
+  // חישובים תחת טווח דוחות מתקדם המיועדים רק לטאב של ההוצאות והכנסות (אדמין)
   const now = new Date();
   const reportYear = now.getFullYear();
   const reportMonth = now.getMonth();
@@ -897,9 +903,10 @@ function Dashboard() {
     }
   });
 
-  const totalRevenue = filteredQuotesForReport.reduce((sum, q) => sum + Number(q.total || 0), 0);
-  const totalExpenses = filteredExpensesForReport.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
-  const netProfit = totalRevenue - totalExpenses;
+  const adminTotalQuotesCount = filteredQuotesForReport.length;
+  const adminTotalRevenue = filteredQuotesForReport.reduce((sum, q) => sum + Number(q.total || 0), 0);
+  const adminTotalExpenses = filteredExpensesForReport.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+  const adminNetProfit = adminTotalRevenue - adminTotalExpenses;
 
   const getCurrencySymbol = (curr) => {
     if (isLocalIsraeliBusiness) return '₪';
@@ -1203,7 +1210,7 @@ function Dashboard() {
               <img src={(bizLogoUrl && bizLogoUrl.trim() !== '' && bizPlan === 'pro') ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
             </div>
 
-            {/* כפתור שירות הלקוחות במרכז הבר העליון */}
+            {/* כפתור שירות הלקוחות במיקום המדויק באמצע */}
             <div style={{ flex: '0 1 auto', textAlign: 'center' }}>
               <AIChatWidget />
             </div>
@@ -1301,7 +1308,7 @@ function Dashboard() {
                   </div>
                   <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(filteredQuotesForReport.reduce((sum, q) => sum + Number(q.total || 0), 0))}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
                   </div>
                 </div>
               )}
@@ -1811,19 +1818,19 @@ function Dashboard() {
                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
                   <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>{adminTotalQuotesCount}</div>
                   </div>
                   <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(adminTotalRevenue)}</div>
                   </div>
                   <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalExpenses}</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444' }}>{sym}{formatNum(totalExpenses)}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444' }}>{sym}{formatNum(adminTotalExpenses)}</div>
                   </div>
                   <div style={{ background: 'white', padding: '15px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.netProfit}</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: netProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(netProfit)}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: adminNetProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(adminNetProfit)}</div>
                   </div>
                  </div>
 
@@ -1881,14 +1888,14 @@ function Dashboard() {
                           </tr>
                         </thead>
                         <tbody>
-                          {expenses.length === 0 ? (
+                          {filteredExpensesForReport.length === 0 ? (
                             <tr>
                               <td colSpan="6" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
-                                {isHebrew ? 'אין הוצאות רשומות במערכת עדיין.' : 'No expenses recorded yet.'}
+                                {isHebrew ? 'אין הוצאות בתקופה הנבחרת.' : 'No expenses in this period.'}
                               </td>
                             </tr>
                           ) : (
-                            expenses.map((exp) => (
+                            filteredExpensesForReport.map((exp) => (
                               <tr key={exp.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
                                 <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{exp.description}</td>
                                 <td style={{ padding: '10px', color: '#64748b' }}>{exp.category}</td>
