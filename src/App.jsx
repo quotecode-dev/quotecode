@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import './App.css';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -469,12 +469,11 @@ function Dashboard() {
     const { data, error } = await supabase
       .from('clients')
       .select('id, company_name, email, phone, client_type, created_at, user_id')
-      .or(`user_id.eq.${session.user.id},user_id.is.null`);
+      .eq('user_id', session.user.id);
     if (error) {
       console.error('Error fetching clients:', error.message);
     } else {
-      const filtered = (data || []).filter(c => c.user_id === session.user.id || c.user_id === null);
-      setClients(filtered);
+      setClients(data || []);
     }
   }
 
@@ -944,12 +943,12 @@ function Dashboard() {
       }
 
       let clientId;
-      const existingClient = clients.find(c => c.company_name?.toLowerCase() === clientName.toLowerCase());
+      const existingClient = clients.find(c => c.company_name?.toLowerCase() === clientName.toLowerCase() && c.user_id === session.user.id);
       
       if (existingClient) {
         clientId = existingClient.id;
-        if (clientPhone !== existingClient.phone || clientType !== existingClient.client_type || !existingClient.user_id) {
-          await supabase.from('clients').update({ phone: clientPhone, client_type: clientType, user_id: session.user.id }).eq('id', clientId);
+        if (clientPhone !== existingClient.phone || clientType !== existingClient.client_type) {
+          await supabase.from('clients').update({ phone: clientPhone, client_type: clientType }).eq('id', clientId);
         }
       } else {
         const { data: newClientData, error: clientError } = await supabase.from('clients').insert([{ company_name: clientName, email: clientEmail, phone: clientPhone, client_type: clientType, user_id: session.user.id }]).select();
@@ -1164,7 +1163,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* כפתורי ניווט / טאבים כולל ניהול לקוחות */}
+          {/* כפתורי ניווט / טאבים מעודכנים */}
           <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveTab('main')}
@@ -1610,7 +1609,7 @@ function Dashboard() {
           )}
 
           {/* ========================================================= */}
-          {/* --- טאב: ניהול לקוחות למשתמש --- */}
+          {/* --- טאב: ניהול לקוחות מאובטח למשתמש --- */}
           {/* ========================================================= */}
           {activeTab === 'clients' && (
             <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
