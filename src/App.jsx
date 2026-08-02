@@ -328,7 +328,7 @@ function Dashboard() {
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
   // טאבים ראשיים
-  const [activeTab, setActiveTab] = useState('finances');
+  const [activeTab, setActiveTab] = useState('main');
 
   const [settingId, setSettingId] = useState(null);
   const [bizName, setBizName] = useState('ProFlow');
