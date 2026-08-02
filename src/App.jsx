@@ -1228,7 +1228,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* --- תוכן טאב 1: הוצאות והכנסות --- */}
+          {/* --- טאב 1: הוצאות והכנסות (מוצג רק בטאב הפיננסי) --- */}
           {(bizRole !== 'super_admin' || activeTab === 'finances') && (
             <>
               <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
@@ -1722,115 +1722,6 @@ function Dashboard() {
                             >
                               {t.delete}
                             </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-          
-          {bizRole === 'super_admin' && (
-            <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '30px', border: '2px solid #f59e0b' }}>
-              <h2 style={{ fontSize: '1.4rem', color: '#92400e', margin: 0, marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                👑 Super Admin Panel
-              </h2>
-              <p style={{ color: '#b45309', marginBottom: '20px' }}>
-                {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות שלהם.' : 'View all registered users and manage their subscription plans.'}
-              </p>
-
-              <div style={{ marginBottom: '15px' }}>
-                <input 
-                  type="text" 
-                  placeholder={isHebrew ? "חיפוש משתמש (אימייל או שם עסק)..." : "Search user (email or business)..."} 
-                  value={adminSearchTerm}
-                  onChange={(e) => setAdminSearchTerm(e.target.value)}
-                  style={{ padding: '8px 12px', border: '1px solid #d97706', borderRadius: '6px', width: '300px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
-                />
-              </div>
-              
-              <div style={{ overflowX: 'auto', background: 'white', borderRadius: '8px' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #fde68a', color: '#92400e', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                      <th style={{ padding: '12px' }}>ID</th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('email')}>
-                        Email {sortField === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('business_name')}>
-                        Business Name {sortField === 'business_name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('country')}>
-                        Region / Country {sortField === 'country' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('plan')}>
-                        Current Plan {sortField === 'plan' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('role')}>
-                        Role {sortField === 'role' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('trial_ends_at')}>
-                        Trial Ends {sortField === 'trial_ends_at' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '12px', cursor: 'pointer' }} onClick={() => handleSort('last_sign_in')}>
-                        Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAdminAccounts.length === 0 ? (
-                      <tr>
-                        <td colSpan="8" style={{ textAlign: 'center', padding: '20px', color: '#92400e' }}>
-                          {isHebrew ? 'לא נמצאו משתמשים התואמים לחיפוש.' : 'No users found matching your search.'}
-                        </td>
-                      </tr>
-                    ) : (
-                      filteredAdminAccounts.map(acc => (
-                        <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7' }}>
-                          <td style={{ padding: '12px', color: '#92400e', fontSize: '0.85rem' }}>{acc.user_id?.slice(0,8)}...</td>
-                          <td style={{ padding: '12px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
-                          <td style={{ padding: '12px' }}>{acc.business_name}</td>
-                          <td style={{ padding: '12px' }}>
-                            <span style={{
-                              background: acc.country === 'Israel (Local)' ? '#dbeafe' : '#dcfce7',
-                              color: acc.country === 'Israel (Local)' ? '#1e40af' : '#166534',
-                              padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'
-                            }}>
-                              {acc.country || 'Israel (Local)'}
-                            </span>
-                          </td>
-                          <td style={{ padding: '12px' }}>
-                            <select 
-                              value={acc.plan} 
-                              onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
-                              style={{ padding: '6px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb' }}
-                            >
-                              <option value="free">Free</option>
-                              <option value="basic">Basic</option>
-                              <option value="pro">Pro</option>
-                            </select>
-                          </td>
-                          <td style={{ padding: '12px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
-                            {acc.role}
-                          </td>
-                          <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
-                            {acc.trial_ends_at ? (
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
-                                <span>{new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}</span>
-                                <button 
-                                  onClick={() => handleMakeLifetime(acc.id)} 
-                                  title={isHebrew ? "הפוך למנוי לכל החיים (בטל תאריך תפוגה)" : "Make Lifetime (Remove expiration)"}
-                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }}
-                                >
-                                  ♾️
-                                </button>
-                              </div>
-                            ) : '-'}
-                          </td>
-                          <td style={{ padding: '12px', fontSize: '0.85rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
-                            {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                           </td>
                         </tr>
                       ))
