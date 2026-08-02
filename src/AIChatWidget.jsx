@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { MessageSquare, X, Send, Loader2, Sparkles } from 'lucide-react';
 import { supabase } from './supabase';
 
-export default function AIChatWidget({ bizRole }) {
+export default function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
-  // זיהוי שפה אוטומטי לפי הדפדפן ואזור הזמן
+  // זיהוי שפה אוטומטי לפי אזור הזמן / שפת דפדפן
   const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
   const browserLang = navigator.language || '';
   const isHebrew = browserLang.startsWith('he') || isIsraelZone;
@@ -51,22 +51,16 @@ export default function AIChatWidget({ bizRole }) {
   };
 
   return (
-    <>
-      {/* מיקום עליון ליד פרטי המשתמש כפי שביקשת */}
-      <div className="flex justify-center mb-4 no-print" dir={isHebrew ? 'rtl' : 'ltr'}>
-        {!isOpen ? (
-          <button
-            onClick={() => setIsOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full shadow-md transition-all duration-300 flex items-center gap-2 cursor-pointer font-bold text-xs sm:text-sm border border-indigo-500 hover:scale-105"
-          >
-            <div className="relative">
-              <MessageSquare className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full border border-indigo-600 animate-pulse"></span>
-            </div>
-            <span>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Customer Service'}</span>
-          </button>
-        ) : null}
-      </div>
+    <div className="inline-block no-print" dir={isHebrew ? 'rtl' : 'ltr'}>
+      {!isOpen ? (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2 cursor-pointer font-bold text-xs sm:text-sm"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Customer Service'}</span>
+        </button>
+      ) : null}
 
       {/* חלון הצ'אט הצף שנפתח בעת לחיצה */}
       {isOpen && (
@@ -138,6 +132,6 @@ export default function AIChatWidget({ bizRole }) {
           </form>
         </div>
       )}
-    </>
+    </div>
   );
 }
