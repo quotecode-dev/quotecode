@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import './App.css';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -353,8 +353,6 @@ function Dashboard() {
   const [sortField, setSortField] = useState('email');
   const [sortDirection, setSortDirection] = useState('asc');
 
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [selectedPlanToUpgrade, setSelectedPlanToUpgrade] = useState(null);
   const [showAccessibility, setShowAccessibility] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -387,13 +385,9 @@ function Dashboard() {
     appSub: isHebrew ? 'מערכת ניהול עסק והצעות מחיר גלובלית' : 'Global SaaS Business & Quoting Platform',
     totalQuotes: isHebrew ? 'סך הכל הצעות' : 'TOTAL QUOTES',
     approvedPaid: isHebrew ? 'אושר / שולם' : 'APPROVED / PAID',
-    winRate: isHebrew ? 'אחוז הצלחה' : 'WIN RATE',
     totalRevenue: isHebrew ? 'סך הכנסות' : 'TOTAL REVENUE',
     totalExpenses: isHebrew ? 'סך הוצאות' : 'TOTAL EXPENSES',
     netProfit: isHebrew ? 'רווח נקי' : 'NET PROFIT',
-    analyticsTitle: isHebrew ? '📊 סיכום ומדדים עסקיים' : '📊 Business Analytics & Summary',
-    pendingQuotes: isHebrew ? 'הצעות ממתינות לטיפול (טיוטה/נשלח)' : 'Pending Quotes',
-    topClient: isHebrew ? 'לקוח מוביל' : 'Top Client',
     clientName: isHebrew ? 'שם הלקוח' : 'Client Name',
     clientEmail: isHebrew ? 'אימייל הלקוח' : 'Client Email',
     clientPhone: isHebrew ? 'טלפון הלקוח' : 'Client Phone',
@@ -401,13 +395,10 @@ function Dashboard() {
     status: isHebrew ? 'סטטוס' : 'Status',
     validUntil: isHebrew ? 'בתוקף עד' : 'Valid Until',
     discount: isHebrew ? 'הנחה (%)' : 'Discount (%)',
-    terms: isHebrew ? 'תנאים / הערות' : 'Terms / Notes',
     quoteItems: isHebrew ? 'פריטי ההצעה' : 'Quote Items',
     addItem: isHebrew ? '+ הוסף פריט ידנית' : '+ Add Custom Item',
     quickAdd: isHebrew ? 'בחר שירות מהקטלוג...' : 'Choose from catalog...',
     description: isHebrew ? 'תיאור' : 'Description',
-    qty: isHebrew ? 'כמות' : 'Qty',
-    price: isHebrew ? 'מחיר' : 'Price',
     total: isHebrew ? 'סה"כ' : 'Total',
     subtotal: isHebrew ? 'סכום ביניים:' : 'Subtotal:',
     vat: isHebrew ? 'מע"מ (18%):' : 'VAT (18%):',
@@ -424,7 +415,6 @@ function Dashboard() {
     businessNameLabel: isHebrew ? 'שם העסק' : 'Business Name',
     taxIdLabel: isHebrew ? 'ח.פ / עוסק מורשה / פטור' : 'Tax ID / Lic No',
     logoUrlLabel: isHebrew ? 'כתובת תמונת לוגו (URL)' : 'Logo Image URL',
-    planLabel: isHebrew ? 'סוג חבילה (Plan)' : 'Subscription Plan',
     addService: isHebrew ? 'הוסף לקטלוג' : 'Add to Catalog',
     serviceName: isHebrew ? 'שם השירות / המוצר' : 'Service Name',
     defaultPrice: isHebrew ? 'מחיר קבוע' : 'Default Price',
@@ -433,9 +423,6 @@ function Dashboard() {
     actions: isHebrew ? 'פעולות' : 'Actions',
     edit: isHebrew ? 'ערוך' : 'Edit',
     duplicate: isHebrew ? 'שכפל' : 'Duplicate',
-    pdfPrint: 'PDF',
-    sendEmail: isHebrew ? 'שלח למייל' : 'Send via Email',
-    sendWhatsApp: isHebrew ? 'שלח בוואטסאפ' : 'Send via WhatsApp',
     delete: isHebrew ? 'מחק' : 'Delete',
     clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management'
   };
@@ -754,6 +741,16 @@ function Dashboard() {
     else fetchServices();
   }
 
+  async function handleDeleteClient(clientId) {
+    if (!window.confirm(isHebrew ? 'למחוק לקוח זה? שים לב שהדבר עלול להשפיע על הצעות מחיר קשורות.' : 'Delete this client?')) return;
+    const { error } = await supabase.from('clients').delete().eq('id', clientId);
+    if (error) setStatusMsg({ text: 'Error deleting client: ' + error.message, type: 'error' });
+    else {
+      setStatusMsg({ text: isHebrew ? 'הלקוח נמחק בהצלחה.' : 'Client deleted successfully.', type: 'success' });
+      fetchClients();
+    }
+  }
+
   async function handleStatusChange(quoteId, newStatus) {
     const { error } = await supabase.from('quotes').update({ status: newStatus.toLowerCase() }).eq('id', quoteId);
     if (error) {
@@ -837,7 +834,6 @@ function Dashboard() {
   const planLimit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : '∞';
 
   const totalQuotesCount = quotes.length;
-  const approvedPaidCount = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').length;
   const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
   const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
   const netProfit = totalRevenue - totalExpenses;
@@ -1168,7 +1164,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* כפתורי ניווט / טאבים */}
+          {/* כפתורי ניווט / טאבים כולל ניהול לקוחות */}
           <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveTab('main')}
@@ -1186,6 +1182,14 @@ function Dashboard() {
             >
               {isHebrew ? '⚙️ הגדרות עסק' : '⚙️ Business Settings'}
             </button>
+            <button
+              onClick={() => setActiveTab('clients')}
+              style={{
+                padding: '12px 20px', borderRadius: '10px', border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'clients' ? '#4f46e5' : 'white', color: activeTab === 'clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+              }}
+            >
+              {isHebrew ? '👥 ניהול לקוחות' : '👥 Clients Management'}
+            </button>
             {bizRole === 'super_admin' && (
               <>
                 <button
@@ -1197,12 +1201,12 @@ function Dashboard() {
                   {isHebrew ? '📊 הוצאות והכנסות' : '📊 Finances'}
                 </button>
                 <button
-                  onClick={() => setActiveTab('clients')}
+                  onClick={() => setActiveTab('admin_clients')}
                   style={{
-                    padding: '12px 20px', borderRadius: '10px', border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'clients' ? '#4f46e5' : 'white', color: activeTab === 'clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                    padding: '12px 20px', borderRadius: '10px', border: activeTab === 'admin_clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', color: activeTab === 'admin_clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
                 >
-                  {isHebrew ? '👥 רשימת לקוחות' : '👥 Clients List'}
+                  {isHebrew ? '👑 רשימת משתמשים' : '👑 Users Admin'}
                 </button>
               </>
             )}
@@ -1527,7 +1531,7 @@ function Dashboard() {
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
-                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}${formatNum(taxAmount)})` : `(Includes VAT: ${sym}${formatNum(taxAmount)})`}</span>
+                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
                       </div>
                     )}
                   </div>
@@ -1603,6 +1607,56 @@ function Dashboard() {
                 </div>
               </div>
             </>
+          )}
+
+          {/* ========================================================= */}
+          {/* --- טאב: ניהול לקוחות למשתמש --- */}
+          {/* ========================================================= */}
+          {activeTab === 'clients' && (
+            <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+              <h2 style={{ fontSize: '1.4rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
+                {isHebrew ? '👥 ניהול לקוחות' : '👥 Clients Management'}
+              </h2>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                      <th style={{ padding: '12px' }}>{isHebrew ? 'שם חברה / לקוח' : 'Company / Name'}</th>
+                      <th style={{ padding: '12px' }}>{isHebrew ? 'אימייל' : 'Email'}</th>
+                      <th style={{ padding: '12px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
+                      <th style={{ padding: '12px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
+                      <th style={{ padding: '12px' }}>{t.actions}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {clients.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                          {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients recorded yet.'}
+                        </td>
+                      </tr>
+                    ) : (
+                      clients.map((client) => (
+                        <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                          <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{client.company_name}</td>
+                          <td style={{ padding: '12px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
+                          <td style={{ padding: '12px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
+                          <td style={{ padding: '12px', color: '#475569' }}>{client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}</td>
+                          <td style={{ padding: '12px' }}>
+                            <button 
+                              onClick={() => handleDeleteClient(client.id)}
+                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                            >
+                              {t.delete}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
 
           {/* ========================================================= */}
@@ -1752,13 +1806,13 @@ function Dashboard() {
           )}
 
           {/* ========================================================= */}
-          {/* --- טאב: רשימת לקוחות (Super Admin בלבד) --- */}
+          {/* --- טאב: רשימת משתמשים (Super Admin בלבד) --- */}
           {/* ========================================================= */}
-          {bizRole === 'super_admin' && activeTab === 'clients' && (
+          {bizRole === 'super_admin' && activeTab === 'admin_clients' && (
             <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #f59e0b' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                 <h2 style={{ fontSize: '1.4rem', color: '#92400e', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  👑 Super Admin Panel
+                  👑 Super Admin Panel - Users
                 </h2>
               </div>
               <p style={{ color: '#b45309', marginBottom: '20px' }}>
