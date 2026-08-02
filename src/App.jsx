@@ -882,7 +882,7 @@ function Dashboard() {
     if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
     else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
     else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
-    else { setCurrency(isHebrew ? 'ILS (₪)' : 'USD ($)'); }
+    else { setCurrency('ILS (₪)'); }
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
@@ -908,7 +908,7 @@ function Dashboard() {
     if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
     else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
     else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
-    else { setCurrency(isHebrew ? 'ILS (₪)' : 'USD ($)'); }
+    else { setCurrency('ILS (₪)'); }
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
@@ -974,7 +974,6 @@ function Dashboard() {
     if (!session?.user?.id) return;
 
     if (clientType === 'business' && (!terms || terms.trim() === '')) {
-      alert(isHebrew ? 'אנא בחר תנאי תשלום מהרשימה לפני שמירת ההצעה.' : 'Please select payment terms before saving.');
       setStatusMsg({ text: isHebrew ? 'שגיאה: חובה לבחור תנאי תשלום ללקוח עסקי.' : 'Error: Payment terms are required for business clients.', type: 'error' });
       return;
     }
@@ -1446,16 +1445,10 @@ function Dashboard() {
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                       <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                        {isHebrew ? (
-                          <option value="ILS (₪)">ILS (₪)</option>
-                        ) : (
-                          <>
-                            <option value="USD ($)">USD ($)</option>
-                            <option value="EUR (€)">EUR (€)</option>
-                            <option value="GBP (£)">GBP (£)</option>
-                            <option value="ILS (₪)">ILS (₪)</option>
-                          </>
-                        )}
+                        <option value="ILS (₪)">ILS (₪)</option>
+                        <option value="USD ($)">USD ($)</option>
+                        <option value="EUR (€)">EUR (€)</option>
+                        <option value="GBP (£)">GBP (£)</option>
                       </select>
                     </div>
                     <div>
