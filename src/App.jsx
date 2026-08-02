@@ -150,7 +150,7 @@ function PublicQuote() {
   const bizEmail = settings?.email || '';
   const bizPhone = settings?.phone || '';
   const isProPlan = settings?.plan === 'pro';
-  const bizLogo = isProPlan ? (settings?.logo_url || '') : '';
+  const bizLogo = (isProPlan && settings?.logo_url && settings.logo_url.trim() !== '') ? settings.logo_url : DEFAULT_LOGO;
   const isLocalIsraeliBusiness = settings?.country === 'Israel (Local)';
 
   const getCurrencySymbol = (curr) => {
@@ -211,11 +211,7 @@ function PublicQuote() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <div>
-              {bizLogo ? (
-                <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block' }} crossOrigin="anonymous" />
-              ) : (
-                <img src={DEFAULT_LOGO} alt="ProFlow" style={{ height: '40px', marginBottom: '8px', display: 'block' }} crossOrigin="anonymous" />
-              )}
+              <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block' }} crossOrigin="anonymous" />
               <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
                 {bizTaxId && `${isHebrew ? 'עוסק/ח.פ:' : 'Tax ID:'} ${bizTaxId} | `} {bizEmail} {bizPhone ? `| ${bizPhone}` : ''}
               </p>
@@ -1135,7 +1131,7 @@ function Dashboard() {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-              <img src={bizLogoUrl && bizPlan === 'pro' ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
+              <img src={(bizLogoUrl && bizLogoUrl.trim() !== '' && bizPlan === 'pro') ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
               {bizRole === 'super_admin' && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 8px', borderRadius: '4px' }}>SUPER ADMIN</span>}
