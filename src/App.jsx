@@ -1056,7 +1056,9 @@ function Dashboard() {
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
       loadData();
     } catch (err) {
+      console.error(err);
       setStatusMsg({ text: 'Error saving quote: ' + err.message, type: 'error' });
+      alert(isHebrew ? `שגיאה בשמירת ההצעה: ${err.message}` : `Error saving quote: ${err.message}`);
     }
   }
 
@@ -1184,6 +1186,12 @@ function Dashboard() {
               <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>Sign Out</button>
             </div>
           </div>
+
+          {statusMsg.text && statusMsg.text !== 'System connected to Supabase.' && (
+            <div style={{ padding: '15px', borderRadius: '8px', marginBottom: '20px', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b', fontWeight: 'bold', textAlign: 'center' }}>
+              {statusMsg.text}
+            </div>
+          )}
 
           {trialEndsAt && !isTrialExpired && bizRole !== 'super_admin' && (
             <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
