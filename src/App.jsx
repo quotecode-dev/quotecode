@@ -629,39 +629,6 @@ function Dashboard() {
     }
   }
 
-  async function handleClaimFreeTrial(e) {
-    e.preventDefault();
-    if (!settingId) {
-      setStatusMsg({ text: isHebrew ? 'אנא שמור את הגדרות העסק תחילה.' : 'Please save business settings first.', type: 'error' });
-      return;
-    }
-
-    const targetPlan = selectedPlanToUpgrade || 'pro';
-    const trialEndDate = new Date();
-    trialEndDate.setDate(trialEndDate.getDate() + 30);
-    const trialEndDateStr = trialEndDate.toISOString();
-
-    const { error } = await supabase
-      .from('business_settings')
-      .update({ plan: targetPlan, trial_ends_at: trialEndDateStr })
-      .eq('id', settingId);
-
-    if (error) {
-      setStatusMsg({ text: 'Error upgrading plan: ' + error.message, type: 'error' });
-    } else {
-      setBizPlan(targetPlan);
-      setTrialEndsAt(trialEndDateStr);
-      setShowUpgradeModal(false);
-      setSelectedPlanToUpgrade(null);
-      setStatusMsg({ 
-        text: isHebrew 
-          ? `🎉 שודרגת בהצלחה לחבילת ${targetPlan.toUpperCase()} לחודש ניסיון בחינם!` 
-          : `🎉 Successfully upgraded to ${targetPlan.toUpperCase()} for a 1-month free trial!`, 
-        type: 'success' 
-      });
-    }
-  }
-
   async function handleSaveSettings(e) {
     e.preventDefault();
     if (!session?.user?.id) return;
@@ -787,16 +754,6 @@ function Dashboard() {
     else fetchServices();
   }
 
-  async function handleDeleteClient(clientId) {
-    if (!window.confirm(isHebrew ? 'למחוק לקוח זה? שים לב שהדבר עלול להשפיע על הצעות מחיר קשורות.' : 'Delete this client?')) return;
-    const { error } = await supabase.from('clients').delete().eq('id', clientId);
-    if (error) setStatusMsg({ text: 'Error deleting client: ' + error.message, type: 'error' });
-    else {
-      setStatusMsg({ text: isHebrew ? 'הלקוח נמחק בהצלחה.' : 'Client deleted successfully.', type: 'success' });
-      fetchClients();
-    }
-  }
-
   async function handleStatusChange(quoteId, newStatus) {
     const { error } = await supabase.from('quotes').update({ status: newStatus.toLowerCase() }).eq('id', quoteId);
     if (error) {
@@ -813,7 +770,6 @@ function Dashboard() {
       return;
     }
 
-    // הוספת חלון אישור לפני שליחת האימייל
     const confirmMsg = isHebrew
       ? `האם לשלוח את הצעת המחיר לכתובת: ${quote.clients.email}?`
       : `Send quote to: ${quote.clients.email}?`;
@@ -882,8 +838,6 @@ function Dashboard() {
 
   const totalQuotesCount = quotes.length;
   const approvedPaidCount = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').length;
-  const pendingQuotesCount = quotes.filter(q => q.status?.toLowerCase() === 'draft' || q.status?.toLowerCase() === 'sent').length;
-  const winRate = totalQuotesCount > 0 ? Math.round((approvedPaidCount / totalQuotesCount) * 100) : 0;
   const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
   const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
   const netProfit = totalRevenue - totalExpenses;
@@ -1214,32 +1168,50 @@ function Dashboard() {
             </div>
           )}
 
-          {/* --- כפתורי הטאבים מוצגים אך ורק ל-Super Admin במסך הראשי --- */}
-          {bizRole === 'super_admin' && activeTab === 'main' && (
-            <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-              <button
-                onClick={() => setActiveTab('finances')}
-                style={{
-                  flex: 1, padding: '14px', borderRadius: '10px', border: '2px solid #4f46e5', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', background: 'white', color: '#4f46e5', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-                }}
-              >
-                {isHebrew ? '📊 הוצאות והכנסות' : '📊 Finances & Expenses'}
-              </button>
-              <button
-                onClick={() => setActiveTab('clients')}
-                style={{
-                  flex: 1, padding: '14px', borderRadius: '10px', border: '2px solid #4f46e5', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', background: 'white', color: '#4f46e5', boxShadow: '0 4px 6px rgba(0,0,0,0.05)'
-                }}
-              >
-                {isHebrew ? '👥 רשימת לקוחות' : '👥 Clients List'}
-              </button>
-            </div>
-          )}
+          {/* כפתורי ניווט / טאבים */}
+          <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveTab('main')}
+              style={{
+                padding: '12px 20px', borderRadius: '10px', border: activeTab === 'main' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'main' ? '#4f46e5' : 'white', color: activeTab === 'main' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+              }}
+            >
+              {isHebrew ? '🏠 הצעות מחיר וניהול' : '🏠 Quotes & Dashboard'}
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              style={{
+                padding: '12px 20px', borderRadius: '10px', border: activeTab === 'settings' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'settings' ? '#4f46e5' : 'white', color: activeTab === 'settings' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+              }}
+            >
+              {isHebrew ? '⚙️ הגדרות עסק' : '⚙️ Business Settings'}
+            </button>
+            {bizRole === 'super_admin' && (
+              <>
+                <button
+                  onClick={() => setActiveTab('finances')}
+                  style={{
+                    padding: '12px 20px', borderRadius: '10px', border: activeTab === 'finances' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'finances' ? '#4f46e5' : 'white', color: activeTab === 'finances' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  {isHebrew ? '📊 הוצאות והכנסות' : '📊 Finances'}
+                </button>
+                <button
+                  onClick={() => setActiveTab('clients')}
+                  style={{
+                    padding: '12px 20px', borderRadius: '10px', border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', background: activeTab === 'clients' ? '#4f46e5' : 'white', color: activeTab === 'clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                  }}
+                >
+                  {isHebrew ? '👥 רשימת לקוחות' : '👥 Clients List'}
+                </button>
+              </>
+            )}
+          </div>
 
           {/* ========================================================= */}
-          {/* --- תצוגה מרכזית: מדדים (למשתמש רגיל), היסטוריה, יצירה, וקטלוג --- */}
+          {/* --- טאב ראשי: הצעות מחיר וניהול --- */}
           {/* ========================================================= */}
-          {(bizRole !== 'super_admin' || activeTab === 'main') && (
+          {activeTab === 'main' && (
             <>
               {/* מדדים למשתמשים רגילים במסך הראשי */}
               {bizRole !== 'super_admin' && (
@@ -1365,13 +1337,6 @@ function Dashboard() {
                                   style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}
                                 >
                                   @
-                                </button>
-                                <button 
-                                  title={t.sendWhatsApp}
-                                  onClick={() => handleWhatsAppQuote(quote)}
-                                  style={{ background: '#dcfce7', color: '#166534', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                                >
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.88-.653-1.473-1.46-1.646-1.757-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                                 </button>
                                 <button 
                                   title={t.delete}
@@ -1641,18 +1606,52 @@ function Dashboard() {
           )}
 
           {/* ========================================================= */}
-          {/* --- טאב 1: הוצאות והכנסות (Super Admin בלבד) --- */}
+          {/* --- טאב: הגדרות עסק אישיות --- */}
+          {/* ========================================================= */}
+          {activeTab === 'settings' && (
+            <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+              <h2 style={{ fontSize: '1.4rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
+                {t.businessSettings}
+              </h2>
+              <form onSubmit={handleSaveSettings}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.businessNameLabel}</label>
+                    <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.taxIdLabel}</label>
+                    <input type="text" value={bizTaxId} onChange={(e) => setBizTaxId(e.target.value)} placeholder="516000000" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'אימייל עסק' : 'Business Email'}</label>
+                    <input type="email" value={bizEmail} onChange={(e) => setBizEmail(e.target.value)} placeholder="business@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'טלפון עסק' : 'Business Phone'}</label>
+                    <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="050-0000000" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '25px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.logoUrlLabel} {bizPlan !== 'pro' && <span style={{ color: '#f59e0b', fontSize: '0.75rem' }}>(דורש חבילת Pro)</span>}</label>
+                  <input type="url" value={bizLogoUrl} onChange={(e) => setBizLogoUrl(e.target.value)} placeholder="https://example.com/logo.png" disabled={bizPlan !== 'pro'} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: bizPlan !== 'pro' ? '#f1f5f9' : 'white' }} />
+                </div>
+
+                <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+                  {t.saveSettings}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* --- טאב: הוצאות והכנסות (Super Admin בלבד) --- */}
           {/* ========================================================= */}
           {bizRole === 'super_admin' && activeTab === 'finances' && (
-             <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '20px', border: '2px solid #4f46e5' }}>
+             <div style={{ background: '#f8fafc', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #4f46e5' }}>
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                     <h2 style={{ fontSize: '1.4rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות' : 'Finances & Expenses'}</h2>
-                    <button 
-                      onClick={() => setActiveTab('main')}
-                      style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}
-                    >
-                      {isHebrew ? '🏠 חזרה למסך ראשי' : '🏠 Back to Main Screen'}
-                    </button>
                  </div>
 
                  <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
@@ -1753,20 +1752,14 @@ function Dashboard() {
           )}
 
           {/* ========================================================= */}
-          {/* --- טאב 2: רשימת לקוחות (Super Admin בלבד) --- */}
+          {/* --- טאב: רשימת לקוחות (Super Admin בלבד) --- */}
           {/* ========================================================= */}
           {bizRole === 'super_admin' && activeTab === 'clients' && (
-            <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginTop: '20px', border: '2px solid #f59e0b' }}>
+            <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #f59e0b' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                 <h2 style={{ fontSize: '1.4rem', color: '#92400e', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
                   👑 Super Admin Panel
                 </h2>
-                <button 
-                  onClick={() => setActiveTab('main')}
-                  style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}
-                >
-                  {isHebrew ? '🏠 חזרה למסך ראשי' : '🏠 Back to Main Screen'}
-                </button>
               </div>
               <p style={{ color: '#b45309', marginBottom: '20px' }}>
                 {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות שלהם.' : 'View all registered users and manage their subscription plans.'}
