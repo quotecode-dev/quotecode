@@ -1228,7 +1228,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* --- תוכן טאב 1: הוצאות והכנסות (מוצג כברירת מחדל או ל-Admin) --- */}
+          {/* --- תוכן טאב 1: הוצאות והכנסות (מוצג למשתמש רגיל או למנהל בטאב הנכון) --- */}
           {(bizRole !== 'super_admin' || activeTab === 'finances') && (
             <>
               <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
@@ -1470,7 +1470,7 @@ function Dashboard() {
             </>
           )}
 
-          {/* --- תוכן טאב 2: רשימת לקוחות (למנהלים בלבד) --- */}
+          {/* --- תוכן טאב 2: רשימת לקוחות (למנהלים בלבד, בתוך הטאב הנכון) --- */}
           {bizRole === 'super_admin' && activeTab === 'clients' && (
             <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
               <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
@@ -1515,7 +1515,7 @@ function Dashboard() {
             </div>
           )}
 
-          {/* טופס יצירת/עריכת הצעה וקטלוג שירותים מוצגים בטאב הכספים או כברירת מחדל למשתמשים רגילים */}
+          {/* טופס יצירת הצעה וקטלוג שירותים מוצגים רק בטאב הפיננסי (למנהל) או כרגיל (למשתמש) */}
           {(bizRole !== 'super_admin' || activeTab === 'finances') && (
             <>
               <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
