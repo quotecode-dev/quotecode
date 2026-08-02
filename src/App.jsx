@@ -316,12 +316,6 @@ function PublicQuote() {
 }
 
 function Dashboard() {
-  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
-  const browserLang = navigator.language || '';
-  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
-
-  const defaultCurrency = isHebrew ? 'ILS (₪)' : 'USD ($)';
-
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -363,7 +357,7 @@ function Dashboard() {
   const [clientPhone, setClientPhone] = useState('');
   const [clientType, setClientType] = useState('');
   
-  const [currency, setCurrency] = useState(defaultCurrency);
+  const [currency, setCurrency] = useState('ILS (₪)');
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -376,6 +370,12 @@ function Dashboard() {
   const [expenseDesc, setExpenseDesc] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
   const [expenseCategory, setExpenseCategory] = useState('Hosting / Cloud');
+
+  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
+  const browserLang = navigator.language || '';
+  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
+
+  const defaultTermsText = isHebrew ? 'שוטף + 30' : 'Net 30 days';
 
   const t = {
     appName: bizName || 'ProFlow',
@@ -864,10 +864,6 @@ function Dashboard() {
   const netProfit = totalRevenue - totalExpenses;
 
   const getCurrencySymbol = (curr) => {
-    if (!curr) return '₪';
-    if (curr.includes('EUR')) return '€';
-    if (curr.includes('GBP')) return '£';
-    if (curr.includes('USD')) return '$';
     return '₪';
   };
   const sym = getCurrencySymbol(currency);
@@ -878,11 +874,7 @@ function Dashboard() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
-    
-    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
-    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
-    else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
-    else { setCurrency(isHebrew ? 'ILS (₪)' : 'USD ($)'); }
+    setCurrency('ILS (₪)');
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
@@ -904,11 +896,7 @@ function Dashboard() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
-    
-    if (quote.currency === 'EUR') { setCurrency('EUR (€)'); } 
-    else if (quote.currency === 'GBP') { setCurrency('GBP (£)'); } 
-    else if (quote.currency === 'USD') { setCurrency('USD ($)'); } 
-    else { setCurrency(isHebrew ? 'ILS (₪)' : 'USD ($)'); }
+    setCurrency('ILS (₪)');
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
@@ -964,7 +952,7 @@ function Dashboard() {
     setClientType('');
     setValidUntil('');
     setDiscount(0);
-    setTerms('');
+    setTerms(defaultTermsText);
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
     setStatusMsg({ text: 'Edit cancelled.', type: 'success' });
   };
@@ -972,6 +960,12 @@ function Dashboard() {
   async function handleSaveQuote(e) {
     e.preventDefault();
     if (!session?.user?.id) return;
+
+    if (clientType === 'business' && (!terms || terms.trim() === '')) {
+      alert(isHebrew ? 'אנא בחר תנאי תשלום מהרשימה לפני שמירת ההצעה.' : 'Please select payment terms before saving.');
+      setStatusMsg({ text: isHebrew ? 'שגיאה: חובה לבחור תנאי תשלום ללקוח עסקי.' : 'Error: Payment terms are required for business clients.', type: 'error' });
+      return;
+    }
 
     try {
       if (!editingQuoteId && bizRole !== 'super_admin') {
@@ -1001,10 +995,7 @@ function Dashboard() {
         clientId = newClientData[0].id;
       }
 
-      let dbCurrency = 'USD';
-      if (currency.includes('ILS')) dbCurrency = 'ILS';
-      else if (currency.includes('EUR')) dbCurrency = 'EUR';
-      else if (currency.includes('GBP')) dbCurrency = 'GBP';
+      const dbCurrency = 'ILS';
 
       const quotePayload = {
         client_id: clientId,
@@ -1052,7 +1043,7 @@ function Dashboard() {
       setClientType('');
       setValidUntil('');
       setDiscount(0);
-      setTerms('');
+      setTerms(defaultTermsText);
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
       loadData();
     } catch (err) {
@@ -1436,10 +1427,7 @@ function Dashboard() {
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.currency}</label>
                       <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}>
-                        {isHebrew && <option>ILS (₪)</option>}
-                        <option>USD ($)</option>
-                        <option>EUR (€)</option>
-                        <option>GBP (£)</option>
+                        <option value="ILS (₪)">ILS (₪)</option>
                       </select>
                     </div>
                     <div>
@@ -1524,7 +1512,7 @@ function Dashboard() {
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 'bold', color: '#1e293b', marginTop: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                       <span>{t.totalAmount}</span>
-                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {currency.includes('EUR') ? 'EUR' : currency.includes('GBP') ? 'GBP' : currency.includes('USD') ? 'USD' : 'ILS'}</span>
+                      <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} ILS</span>
                     </div>
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
