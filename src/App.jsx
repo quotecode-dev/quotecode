@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import './App.css';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgU2Fucy1zZXJpZiIgZm9udC1zaXplPSI0NCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzFlMjkzYiI+UHJvPHRzcGFuIGZpbGw9IiM0ZjQ2ZTUiPkZsb3c8L3RzcGFuPjwvdGV4dD48L3N2Zz4=";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUw LDQ1Ay0gMjAgTDYwIDM1IEw0MC0gNTUgTDYwIDc1IEw0NSA5MCBaIiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTTQwIDUw TDc4IDIwIEw4NSAzNSBMNjUgNTUgTDg1IDc1IEw3MCA5MCBaIiBmaWxsPSIjMWUyOTNiIiBvcGFjaXR5PSIwLjkiLz48dGV4dCB4PSIxMDUiIHk9IjY2IiBmb250LWZhbWlseT0iU2Vnb2UgVUksIFNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDQiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMxZTE5M2IiPlBybzx0c3BhbiBmaWxsPSIjNGY0NmU1Ij5GbG93PC90c3Bhbj48L3RleHQ+PC9zdmc+";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -324,7 +324,11 @@ function Dashboard() {
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
   const [services, setServices] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
+
+  // טאבים ראשיים
+  const [activeTab, setActiveTab] = useState('finances');
 
   const [settingId, setSettingId] = useState(null);
   const [bizName, setBizName] = useState('ProFlow');
@@ -364,6 +368,10 @@ function Dashboard() {
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
 
+  const [expenseDesc, setExpenseDesc] = useState('');
+  const [expenseAmount, setExpenseAmount] = useState('');
+  const [expenseCategory, setExpenseCategory] = useState('Hosting / Cloud');
+
   const t = {
     appName: bizName || 'ProFlow',
     appSub: isHebrew ? 'מערכת ניהול עסק והצעות מחיר גלובלית' : 'Global SaaS Business & Quoting Platform',
@@ -371,6 +379,8 @@ function Dashboard() {
     approvedPaid: isHebrew ? 'אושר / שולם' : 'APPROVED / PAID',
     winRate: isHebrew ? 'אחוז הצלחה' : 'WIN RATE',
     totalRevenue: isHebrew ? 'סך הכנסות' : 'TOTAL REVENUE',
+    totalExpenses: isHebrew ? 'סך הוצאות' : 'TOTAL EXPENSES',
+    netProfit: isHebrew ? 'רווח נקי' : 'NET PROFIT',
     analyticsTitle: isHebrew ? '📊 סיכום ומדדים עסקיים' : '📊 Business Analytics & Summary',
     pendingQuotes: isHebrew ? 'הצעות ממתינות לטיפול (טיוטה/נשלח)' : 'Pending Quotes',
     topClient: isHebrew ? 'לקוח מוביל' : 'Top Client',
@@ -397,6 +407,8 @@ function Dashboard() {
     cancelEdit: isHebrew ? 'ביטול עריכה' : 'Cancel Edit',
     recentHistory: isHebrew ? 'היסטוריית הצעות מחיר' : 'Recent Quotes History',
     servicesCatalog: isHebrew ? 'קטלוג שירותים ומוצרים' : 'Services & Products Catalog',
+    expensesManagement: isHebrew ? 'ניהול הוצאות עסק' : 'Business Expenses Management',
+    addExpenseBtn: isHebrew ? 'הוסף הוצאה' : 'Add Expense',
     businessSettings: isHebrew ? 'הגדרות עסק וחבילה' : 'Business Settings & Plan',
     saveSettings: isHebrew ? 'שמור הגדרות עסק' : 'Save Business Settings',
     businessNameLabel: isHebrew ? 'שם העסק' : 'Business Name',
@@ -440,6 +452,7 @@ function Dashboard() {
     await fetchQuotes();
     await fetchClients();
     await fetchServices();
+    await fetchExpenses();
     await fetchSettings();
   }
 
@@ -458,16 +471,31 @@ function Dashboard() {
     if (!session?.user?.id) return;
     const { data, error } = await supabase
       .from('clients')
-      .select('id, company_name, email, phone, client_type, created_at')
-      .eq('user_id', session.user.id);
-    if (error) console.error('Error fetching clients:', error.message);
-    else setClients(data || []);
+      .select('id, company_name, email, phone, client_type, created_at, user_id')
+      .or(`user_id.eq.${session.user.id},user_id.is.null`);
+    if (error) {
+      console.error('Error fetching clients:', error.message);
+    } else {
+      const filtered = (data || []).filter(c => c.user_id === session.user.id || c.user_id === null);
+      setClients(filtered);
+    }
   }
 
   async function fetchServices() {
     const { data, error } = await supabase.from('services').select('*').order('created_at', { ascending: true });
     if (error) console.error('Error fetching services:', error.message);
     else setServices(data || []);
+  }
+
+  async function fetchExpenses() {
+    if (!session?.user?.id) return;
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('expense_date', { ascending: false });
+    if (error) console.error('Error fetching expenses:', error.message);
+    else setExpenses(data || []);
   }
 
   async function fetchSettings() {
@@ -643,6 +671,35 @@ function Dashboard() {
     }
   }
 
+  async function handleAddExpense(e) {
+    e.preventDefault();
+    if (!session?.user?.id) return;
+
+    const { error } = await supabase.from('expenses').insert([{
+      user_id: session.user.id,
+      description: expenseDesc,
+      amount: Number(expenseAmount),
+      category: expenseCategory,
+      expense_date: new Date().toISOString().split('T')[0]
+    }]);
+
+    if (error) {
+      setStatusMsg({ text: 'Error adding expense: ' + error.message, type: 'error' });
+    } else {
+      setExpenseDesc('');
+      setExpenseAmount('');
+      fetchExpenses();
+      setStatusMsg({ text: isHebrew ? 'ההוצאה נוספה בהצלחה!' : 'Expense added successfully!', type: 'success' });
+    }
+  }
+
+  async function handleDeleteExpense(expenseId) {
+    if (!window.confirm(isHebrew ? 'למחוק הוצאה זו?' : 'Delete this expense?')) return;
+    const { error } = await supabase.from('expenses').delete().eq('id', expenseId);
+    if (error) setStatusMsg({ text: 'Error deleting expense: ' + error.message, type: 'error' });
+    else fetchExpenses();
+  }
+
   const handleAuth = async (e) => {
     e.preventDefault();
     if (isSignUp) {
@@ -727,38 +784,43 @@ function Dashboard() {
     }
   }
 
-  // פתיחת Gmail ישירות בדפדפן עם הנתונים מוכנים לשליחה
-  const handleEmailQuote = (quote) => {
+  const handleEmailQuote = async (quote) => {
     if (!quote.clients?.email) {
       alert(isHebrew ? 'ללקוח זה אין כתובת אימייל מעודכנת.' : 'This client does not have an email address.');
       return;
     }
 
-    const quoteSym = getCurrencySymbol(quote.currency);
-    const qIsPrivate = quote.client_type === 'private';
-    const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
-    const quoteDiscountAmount = (quoteSub * (quote.discount || 0)) / 100;
-    const qBaseAmount = quoteSub - quoteDiscountAmount;
-    const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isHebrew ? 0.18 : 0.00);
-    const hasVat = quoteTaxRate > 0;
-    
-    let qTotalAmount = 0;
-    if (hasVat && qIsPrivate) {
-      qTotalAmount = qBaseAmount;
-    } else {
-      qTotalAmount = qBaseAmount + (qBaseAmount * quoteTaxRate);
+    setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך הענן...' : 'Sending email via cloud...', type: 'success' });
+
+    try {
+      const quoteSym = getCurrencySymbol(quote.currency);
+      const quoteLink = `${window.location.origin}/quote/${quote.id}`;
+      
+      const { error } = await supabase.functions.invoke('send-quote-email', {
+        body: {
+          to: quote.clients.email,
+          clientName: quote.clients.company_name,
+          quoteId: quote.id,
+          total: formatNum(quote.total),
+          currencySymbol: quoteSym,
+          quoteLink: quoteLink,
+          businessName: bizName
+        }
+      });
+
+      if (error) throw error;
+      setStatusMsg({ text: isHebrew ? '📧 האימייל נשלח בהצלחה ללקוח!' : '📧 Email sent successfully!', type: 'success' });
+    } catch (err) {
+      console.error("Email send error:", err);
+      const quoteSym = getCurrencySymbol(quote.currency);
+      const quoteLink = `${window.location.origin}/quote/${quote.id}`;
+      const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
+      const body = isHebrew
+        ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
+        : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
+
+      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
-    
-    const quoteTotal = quote.total > qBaseAmount ? quote.total : qTotalAmount;
-    const quoteLink = `${window.location.origin}/quote/${quote.id}`;
-
-    const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
-    const body = isHebrew
-      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quoteTotal)}\n\nלצפייה בהצעה המלאה והורדה כ-PDF לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
-      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quoteTotal)}\n\nView and download your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
-
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(quote.clients.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(gmailUrl, '_blank');
   };
 
   const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -793,6 +855,8 @@ function Dashboard() {
   const pendingQuotesCount = quotes.filter(q => q.status?.toLowerCase() === 'draft' || q.status?.toLowerCase() === 'sent').length;
   const winRate = totalQuotesCount > 0 ? Math.round((approvedPaidCount / totalQuotesCount) * 100) : 0;
   const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
+  const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+  const netProfit = totalRevenue - totalExpenses;
 
   const getCurrencySymbol = (curr) => {
     if (!curr) return '₪';
@@ -920,8 +984,8 @@ function Dashboard() {
       
       if (existingClient) {
         clientId = existingClient.id;
-        if (clientPhone !== existingClient.phone || clientType !== existingClient.client_type) {
-          await supabase.from('clients').update({ phone: clientPhone, client_type: clientType }).eq('id', clientId);
+        if (clientPhone !== existingClient.phone || clientType !== existingClient.client_type || !existingClient.user_id) {
+          await supabase.from('clients').update({ phone: clientPhone, client_type: clientType, user_id: session.user.id }).eq('id', clientId);
         }
       } else {
         const { data: newClientData, error: clientError } = await supabase.from('clients').insert([{ company_name: clientName, email: clientEmail, phone: clientPhone, client_type: clientType, user_id: session.user.id }]).select();
@@ -1124,178 +1188,324 @@ function Dashboard() {
             </div>
           )}
 
-          <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '25px' }}>
-            <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
-              {bizPlan !== 'pro' && (
-                <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginTop: '5px', fontWeight: 'bold' }}>
-                  {isHebrew ? `נוצרו החודש: ${monthlyQuotesCount} מתוך ${planLimit}` : `This month: ${monthlyQuotesCount} / ${planLimit}`}
-                </div>
-              )}
-            </div>
-            <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #eab308' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #eab308' }}>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.approvedPaid}</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{approvedPaidCount}</div>
-            </div>
-            <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #a855f7' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #a855f7' }}>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.winRate}</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#a855f7' }}>{winRate}%</div>
-            </div>
-            <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
-            </div>
+          {/* --- כפתורי המעבר (טאבים) הראשיים --- */}
+          <div style={{ display: 'flex', gap: '15px', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+            <button
+              onClick={() => setActiveTab('finances')}
+              style={{
+                flex: 1,
+                padding: '14px',
+                borderRadius: '10px',
+                border: 'none',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                background: activeTab === 'finances' ? '#4f46e5' : 'white',
+                color: activeTab === 'finances' ? 'white' : '#475569',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+              }}
+            >
+              {isHebrew ? '📊 הוצאות והכנסות' : '📊 Finances & Expenses'}
+            </button>
+            <button
+              onClick={() => setActiveTab('clients')}
+              style={{
+                flex: 1,
+                padding: '14px',
+                borderRadius: '10px',
+                border: 'none',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                background: activeTab === 'clients' ? '#4f46e5' : 'white',
+                color: activeTab === 'clients' ? 'white' : '#475569',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+              }}
+            >
+              {isHebrew ? '👥 רשימת לקוחות' : '👥 Clients List'}
+            </button>
           </div>
 
-          {/* --- אזור אנליטיקה וסיכומים מתקדמים --- */}
-          <div style={{ background: 'white', padding: '20px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '25px', border: '1px solid #e2e8f0' }}>
-            <h3 style={{ fontSize: '1rem', color: '#1e293b', marginTop: 0, marginBottom: '15px' }}>{t.analyticsTitle}</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
-              <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>{t.pendingQuotes}</div>
-                <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#d97706', marginTop: '5px' }}>{pendingQuotesCount}</div>
-              </div>
-              <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600' }}>{t.topClient}</div>
-                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1e293b', marginTop: '5px' }}>
-                  {clients.length > 0 ? clients[0].company_name : (isHebrew ? 'אין לקוחות' : 'No clients')}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {statusMsg.text && (
-            <div style={{ padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', fontWeight: '500', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b' }}>
-              {statusMsg.text}
-            </div>
-          )}
-
-          <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.businessSettings}</h2>
-            
-            {bizPlan !== 'pro' && (
-              <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', padding: '12px 16px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
-                <span style={{ color: '#92400e', fontSize: '0.9rem', fontWeight: '600' }}>
-                  {isHebrew ? '⭐ רוצה להוסיף את הלוגו שלך להצעות המחיר ולשדרג את מיתוג העסק? שדרג עכשיו לחבילת Pro!' : '⭐ Want to add your logo and upgrade your business branding? Upgrade to Pro!'}
-                </span>
-                <button 
-                  type="button" 
-                  onClick={() => setShowUpgradeModal(true)} 
-                  style={{ background: '#d97706', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.8rem' }}
-                >
-                  {isHebrew ? 'שדרג חבילה' : 'Upgrade Plan'}
-                </button>
-              </div>
-            )}
-
-            {/* --- מודאל / חלונית בחירת חבילות ושדרוג --- */}
-            {showUpgradeModal && (
-              <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' }}>
-                <div style={{ background: 'white', padding: '30px', borderRadius: '12px', width: '100%', maxWidth: '500px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', textAlign: isHebrew ? 'right' : 'left' }}>
-                  <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.4rem', marginBottom: '10px' }}>
-                    {isHebrew ? '🚀 בחירת מסלול ושדרוג עסק' : '🚀 Choose Plan & Upgrade'}
-                  </h3>
-                  <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>
-                    {isHebrew ? 'בחר את החבילה המתאימה לעסק שלך:' : 'Select the best plan for your business:'}
-                  </p>
-
-                  {!selectedPlanToUpgrade ? (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
-                      <div onClick={() => setSelectedPlanToUpgrade('basic')} style={{ border: '2px solid #cbd5e1', padding: '20px', borderRadius: '8px', cursor: 'pointer', textAlign: 'center', background: '#f8fafc' }}>
-                        <h4 style={{ margin: '0 0 10px 0', color: '#1e293b' }}>Basic</h4>
-                        <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4f46e5', margin: '0 0 10px 0' }}>{isHebrew ? '₪99 /mo' : '$29 /mo'}</p>
-                        <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{isHebrew ? 'עד 20 הצעות בחודש' : 'Up to 20 quotes'}</span>
-                      </div>
-                      <div onClick={() => setSelectedPlanToUpgrade('pro')} style={{ border: '2px solid #4f46e5', padding: '20px', borderRadius: '8px', cursor: 'pointer', textAlign: 'center', background: '#eef2ff' }}>
-                        <h4 style={{ margin: '0 0 10px 0', color: '#4f46e5' }}>Pro ⭐</h4>
-                        <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#4f46e5', margin: '0 0 10px 0' }}>{isHebrew ? '₪199 /mo' : '$49 /mo'}</p>
-                        <span style={{ fontSize: '0.8rem', color: '#4f46e5', fontWeight: 'bold' }}>{isHebrew ? 'לוגו אישי + ללא הגבלה' : 'Logo + Unlimited'}</span>
-                      </div>
+          {/* --- תוכן טאב 1: הוצאות והכנסות --- */}
+          {activeTab === 'finances' && (
+            <>
+              <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
+                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
+                  {bizPlan !== 'pro' && (
+                    <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginTop: '5px', fontWeight: 'bold' }}>
+                      {isHebrew ? `נוצרו החודש: ${monthlyQuotesCount} מתוך ${planLimit}` : `This month: ${monthlyQuotesCount} / ${planLimit}`}
                     </div>
-                  ) : (
-                    <form onSubmit={handleClaimFreeTrial}>
-                      <div style={{ background: '#f1f5f9', padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: '600', color: '#334155' }}>
-                          {isHebrew ? `מסלול נבחר: ${selectedPlanToUpgrade.toUpperCase()}` : `Selected: ${selectedPlanToUpgrade.toUpperCase()}`}
-                        </span>
-                        <button type="button" onClick={() => setSelectedPlanToUpgrade(null)} style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontSize: '0.85rem' }}>
-                          {isHebrew ? 'שנה מסלול' : 'Change plan'}
-                        </button>
-                      </div>
-
-                      <div style={{ padding: '20px', background: '#f0fdf4', border: '1px solid #22c55e', borderRadius: '8px', marginBottom: '20px', textAlign: 'center' }}>
-                        <h4 style={{ margin: '0 0 10px 0', color: '#166534', fontSize: '1.2rem' }}>
-                          {isHebrew ? '🎁 מבצע השקה מיוחד!' : '🎁 Launch Special!'}
-                        </h4>
-                        <p style={{ margin: 0, color: '#15803d', fontSize: '0.95rem' }}>
-                          {isHebrew 
-                            ? `קבל את מסלול ה-${selectedPlanToUpgrade.toUpperCase()} בחינם לחודש שלם! ללא צורך בהזנת פרטי אשראי.` 
-                            : `Get the ${selectedPlanToUpgrade.toUpperCase()} plan for FREE for a whole month! No credit card required.`}
-                        </p>
-                      </div>
-
-                      <button type="submit" style={{ width: '100%', background: '#10b981', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', marginBottom: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                        {isHebrew ? '🚀 ממש חודש חינם עכשיו' : '🚀 Claim Free Month Now'}
-                      </button>
-                    </form>
                   )}
-
-                  <button type="button" onClick={() => { setShowUpgradeModal(false); setSelectedPlanToUpgrade(null); }} style={{ width: '100%', background: '#f1f5f9', color: '#64748b', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
-                    {isHebrew ? 'סגור' : 'Cancel'}
-                  </button>
+                </div>
+                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalRevenue}</div>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#22c55e' }}>{sym}{formatNum(totalRevenue)}</div>
+                </div>
+                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalExpenses}</div>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#ef4444' }}>{sym}{formatNum(totalExpenses)}</div>
+                </div>
+                <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.netProfit}</div>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: netProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(netProfit)}</div>
                 </div>
               </div>
-            )}
 
-            <form onSubmit={handleSaveSettings}>
-              <div className="settings-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '15px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.businessNameLabel}</label>
-                  <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.taxIdLabel}</label>
-                  <input type="text" value={bizTaxId} onChange={(e) => setBizTaxId(e.target.value)} placeholder="123456789" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'אימייל העסק' : 'Business Email'}</label>
-                  <input type="email" value={bizEmail} onChange={(e) => setBizEmail(e.target.value)} placeholder="business@email.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'טלפון העסק' : 'Business Phone'}</label>
-                  <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="+972..." style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.logoUrlLabel}</label>
+              {/* ניהול הוצאות עסק */}
+              <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+                <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.expensesManagement}</h2>
+                <form onSubmit={handleAddExpense} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
                   <input 
                     type="text" 
-                    value={bizLogoUrl} 
-                    onChange={(e) => setBizLogoUrl(e.target.value)} 
-                    disabled={bizPlan !== 'pro'} 
-                    placeholder={bizPlan === 'pro' ? "https://.../logo.png" : (isHebrew ? "זמין בחבילת Pro בלבד" : "Available on Pro Plan only")} 
-                    style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: bizPlan !== 'pro' ? '#f1f5f9' : 'white' }} 
+                    placeholder={isHebrew ? 'תיאור ההוצאה (לדוגמה: אירוח שרת)' : 'Expense description'} 
+                    value={expenseDesc} 
+                    onChange={(e) => setExpenseDesc(e.target.value)} 
+                    required 
+                    style={{ flex: '2 1 200px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} 
                   />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.planLabel}</label>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    placeholder={isHebrew ? 'סכום' : 'Amount'} 
+                    value={expenseAmount} 
+                    onChange={(e) => setExpenseAmount(e.target.value)} 
+                    required 
+                    style={{ flex: '1 1 100px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} 
+                  />
                   <select 
-                    value={bizPlan} 
-                    onChange={(e) => setBizPlan(e.target.value)} 
-                    disabled={true} 
-                    style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#f1f5f9', boxSizing: 'border-box', color: '#64748b' }}
+                    value={expenseCategory} 
+                    onChange={(e) => setExpenseCategory(e.target.value)}
+                    style={{ flex: '1 1 140px', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
                   >
-                    <option value="free">Free ({isHebrew ? 'חינמי' : 'Free'})</option>
-                    <option value="basic">Basic ({isHebrew ? 'בסיסי' : 'Basic'})</option>
-                    <option value="pro">Pro ({isHebrew ? 'מתקדם' : 'Pro'})</option>
+                    <option value="Hosting / Cloud">{isHebrew ? 'ענן ושרתים' : 'Hosting / Cloud'}</option>
+                    <option value="Marketing">{isHebrew ? 'שיווק ופרסום' : 'Marketing'}</option>
+                    <option value="Tools / Software">{isHebrew ? 'כלים ותוכנות' : 'Tools / Software'}</option>
+                    <option value="Other">{isHebrew ? 'אחר' : 'Other'}</option>
                   </select>
+                  <button type="submit" style={{ background: '#ef4444', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                    {t.addExpenseBtn}
+                  </button>
+                </form>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '450px' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                        <th style={{ padding: '12px' }}>{t.description}</th>
+                        <th style={{ padding: '12px' }}>{isHebrew ? 'קטגוריה' : 'Category'}</th>
+                        <th style={{ padding: '12px' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
+                        <th style={{ padding: '12px' }}>{t.total}</th>
+                        <th style={{ padding: '12px' }}>{t.actions}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {expenses.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                            {isHebrew ? 'אין הוצאות רשומות במערכת עדיין.' : 'No expenses recorded yet.'}
+                          </td>
+                        </tr>
+                      ) : (
+                        expenses.map((exp) => (
+                          <tr key={exp.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                            <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{exp.description}</td>
+                            <td style={{ padding: '12px', color: '#64748b' }}>{exp.category}</td>
+                            <td style={{ padding: '12px', color: '#64748b' }}>{exp.expense_date}</td>
+                            <td style={{ padding: '12px', color: '#ef4444', fontWeight: '600' }}>{sym}{formatNum(exp.amount)}</td>
+                            <td style={{ padding: '12px' }}>
+                              <button 
+                                onClick={() => handleDeleteExpense(exp.id)}
+                                style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                              >
+                                {t.delete}
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <button type="submit" style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
-                {t.saveSettings}
-              </button>
-            </form>
-          </div>
+
+              {/* היסטוריית הצעות מחיר */}
+              <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
+                  <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
+                  
+                  <div style={{ display: 'flex', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+                    <input 
+                      type="text" 
+                      placeholder={t.searchQuote} 
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '250px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
+                    />
+                    <select 
+                      value={statusFilter} 
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
+                    >
+                      <option value="All">{t.filterStatus}</option>
+                      <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
+                      <option value="sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
+                      <option value="approved">{isHebrew ? 'אושר' : 'Approved'}</option>
+                      <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                        <th style={{ padding: '12px' }}>{isHebrew ? 'מספר הצעה' : 'Quote #'}</th>
+                        <th style={{ padding: '12px' }}>{isHebrew ? 'לקוח' : 'Client'}</th>
+                        <th style={{ padding: '12px' }}>{t.status}</th>
+                        <th style={{ padding: '12px' }}>{t.total}</th>
+                        <th style={{ padding: '12px' }}>{t.validUntil}</th>
+                        <th style={{ padding: '12px' }}>{t.actions}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredQuotes.length === 0 ? (
+                        <tr>
+                          <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                            {quotes.length === 0 
+                              ? (isHebrew ? 'לא נמצאו הצעות מחיר במסד הנתונים.' : 'No quotes found in the database.') 
+                              : (isHebrew ? 'לא נמצאו תוצאות לחיפוש הנוכחי.' : 'No results found for this search.')}
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredQuotes.map((quote) => {
+                          const quoteSym = getCurrencySymbol(quote.currency);
+                          const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
+                          return (
+                            <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                              <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
+                              <td style={{ padding: '12px' }}>
+                                <div style={{ fontWeight: '600', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
+                                <div style={{ fontSize: '0.8rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
+                              </td>
+                              <td style={{ padding: '12px' }}>
+                                <select
+                                  value={currentStatus}
+                                  onChange={(e) => handleStatusChange(quote.id, e.target.value)}
+                                  style={{
+                                    padding: '6px 10px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600',
+                                    background: currentStatus === 'approved' ? '#dcfce7' : currentStatus === 'paid' ? '#dbeafe' : currentStatus === 'sent' ? '#fef9c3' : '#f1f5f9',
+                                    color: currentStatus === 'approved' ? '#166534' : currentStatus === 'paid' ? '#1e40af' : currentStatus === 'sent' ? '#854d0e' : '#475569',
+                                    border: '1px solid #cbd5e1',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
+                                  <option value="sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
+                                  <option value="approved">{isHebrew ? 'אושר' : 'Approved'}</option>
+                                  <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
+                                </select>
+                              </td>
+                              <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
+                                {quoteSym}{formatNum(quote.total)}
+                              </td>
+                              <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
+                              <td style={{ padding: '8px', display: 'flex', gap: '6px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
+                                <button 
+                                  title={t.edit}
+                                  onClick={() => handleEditClick(quote)}
+                                  style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                                >
+                                  {t.edit}
+                                </button>
+                                <button 
+                                  title={t.duplicate}
+                                  onClick={() => handleDuplicateQuote(quote)}
+                                  style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                                >
+                                  {t.duplicate}
+                                </button>
+                                <button 
+                                  title={t.sendEmail}
+                                  onClick={() => handleEmailQuote(quote)}
+                                  style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}
+                                >
+                                  @
+                                </button>
+                                <button 
+                                  title={t.sendWhatsApp}
+                                  onClick={() => handleWhatsAppQuote(quote)}
+                                  style={{ background: '#dcfce7', color: '#166534', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                                >
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.88-.653-1.473-1.46-1.646-1.757-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                                </button>
+                                <button 
+                                  title={t.delete}
+                                  onClick={() => handleDeleteQuote(quote.id)}
+                                  style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                                >
+                                  {t.delete}
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* --- תוכן טאב 2: רשימת לקוחות --- */}
+          {activeTab === 'clients' && (
+            <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
+              <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
+              
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                      <th style={{ padding: '12px' }}>{t.clientName}</th>
+                      <th style={{ padding: '12px' }}>{t.clientEmail}</th>
+                      <th style={{ padding: '12px' }}>{t.clientPhone}</th>
+                      <th style={{ padding: '12px' }}>{t.actions}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {clients.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                          {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients found.'}
+                        </td>
+                      </tr>
+                    ) : (
+                      clients.map((client) => (
+                        <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                          <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{client.company_name || 'N/A'}</td>
+                          <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
+                          <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
+                          <td style={{ padding: '12px' }}>
+                            <button 
+                              onClick={() => handleDeleteClient(client.id)}
+                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                            >
+                              {t.delete}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
@@ -1438,179 +1648,6 @@ function Dashboard() {
                 {editingQuoteId ? t.updateQuote : t.generateSave}
               </button>
             </form>
-          </div>
-
-          {/* --- ניהול לקוחות (Clients Management) --- */}
-          <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-            <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.clientsManagement}</h2>
-            
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '500px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                    <th style={{ padding: '12px' }}>{t.clientName}</th>
-                    <th style={{ padding: '12px' }}>{t.clientEmail}</th>
-                    <th style={{ padding: '12px' }}>{t.clientPhone}</th>
-                    <th style={{ padding: '12px' }}>{t.actions}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {clients.length === 0 ? (
-                    <tr>
-                      <td colSpan="4" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
-                        {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients found.'}
-                      </td>
-                    </tr>
-                  ) : (
-                    clients.map((client) => (
-                      <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                        <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{client.company_name || 'N/A'}</td>
-                        <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
-                        <td style={{ padding: '12px', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
-                        <td style={{ padding: '12px' }}>
-                          <button 
-                            onClick={() => handleDeleteClient(client.id)}
-                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                          >
-                            {t.delete}
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* --- היסטוריית הצעות מחיר --- */}
-          <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
-              <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
-              
-              <div style={{ display: 'flex', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
-                <input 
-                  type="text" 
-                  placeholder={t.searchQuote} 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '250px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
-                />
-                <select 
-                  value={statusFilter} 
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box' }}
-                >
-                  <option value="All">{t.filterStatus}</option>
-                  <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
-                  <option value="sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
-                  <option value="approved">{isHebrew ? 'אושר' : 'Approved'}</option>
-                  <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
-                </select>
-              </div>
-            </div>
-
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                    <th style={{ padding: '12px' }}>{isHebrew ? 'מספר הצעה' : 'Quote #'}</th>
-                    <th style={{ padding: '12px' }}>{isHebrew ? 'לקוח' : 'Client'}</th>
-                    <th style={{ padding: '12px' }}>{t.status}</th>
-                    <th style={{ padding: '12px' }}>{t.total}</th>
-                    <th style={{ padding: '12px' }}>{t.validUntil}</th>
-                    <th style={{ padding: '12px' }}>{t.actions}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredQuotes.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
-                        {quotes.length === 0 
-                          ? (isHebrew ? 'לא נמצאו הצעות מחיר במסד הנתונים.' : 'No quotes found in the database.') 
-                          : (isHebrew ? 'לא נמצאו תוצאות לחיפוש הנוכחי.' : 'No results found for this search.')}
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredQuotes.map((quote) => {
-                      const quoteSym = getCurrencySymbol(quote.currency);
-                      const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
-                      return (
-                        <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                          <td style={{ padding: '12px', fontWeight: '600', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
-                          <td style={{ padding: '12px' }}>
-                            <div style={{ fontWeight: '600', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
-                            <div style={{ fontSize: '0.8rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
-                          </td>
-                          <td style={{ padding: '12px' }}>
-                            <select
-                              value={currentStatus}
-                              onChange={(e) => handleStatusChange(quote.id, e.target.value)}
-                              style={{
-                                padding: '6px 10px',
-                                borderRadius: '6px',
-                                fontSize: '0.8rem',
-                                fontWeight: '600',
-                                background: currentStatus === 'approved' ? '#dcfce7' : currentStatus === 'paid' ? '#dbeafe' : currentStatus === 'sent' ? '#fef9c3' : '#f1f5f9',
-                                color: currentStatus === 'approved' ? '#166534' : currentStatus === 'paid' ? '#1e40af' : currentStatus === 'sent' ? '#854d0e' : '#475569',
-                                border: '1px solid #cbd5e1',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
-                              <option value="sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
-                              <option value="approved">{isHebrew ? 'אושר' : 'Approved'}</option>
-                              <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
-                            </select>
-                          </td>
-                          <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>
-                            {quoteSym}{formatNum(quote.total)}
-                          </td>
-                          <td style={{ padding: '12px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
-                          <td style={{ padding: '8px', display: 'flex', gap: '6px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
-                            <button 
-                              title={t.edit}
-                              onClick={() => handleEditClick(quote)}
-                              style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                            >
-                              {t.edit}
-                            </button>
-                            <button 
-                              title={t.duplicate}
-                              onClick={() => handleDuplicateQuote(quote)}
-                              style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                            >
-                              {t.duplicate}
-                            </button>
-                            <button 
-                              title={t.sendEmail}
-                              onClick={() => handleEmailQuote(quote)}
-                              style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center' }}
-                            >
-                              @
-                            </button>
-                            <button 
-                              title={t.sendWhatsApp}
-                              onClick={() => handleWhatsAppQuote(quote)}
-                              style={{ background: '#dcfce7', color: '#166534', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.88-.653-1.473-1.46-1.646-1.757-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                            </button>
-                            <button 
-                              title={t.delete}
-                              onClick={() => handleDeleteQuote(quote.id)}
-                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                            >
-                              {t.delete}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
           </div>
 
           <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
