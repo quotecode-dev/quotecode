@@ -37,11 +37,11 @@ export default function AIChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-5 left-5 z-50">
+    <div className="fixed bottom-5 right-5 z-[99999]" dir="rtl">
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition flex items-center justify-center"
+          className="bg-indigo-600 text-white p-4 rounded-full shadow-2xl hover:bg-indigo-700 transition flex items-center justify-center cursor-pointer"
           title="שירות לקוחות AI"
         >
           <MessageSquare className="w-6 h-6" />
@@ -53,23 +53,23 @@ export default function AIChatWidget() {
             <h3 className="font-semibold flex items-center gap-2">
               <MessageSquare className="w-5 h-5" /> תמיכת AI - ProFlow
             </h3>
-            <button onClick={() => setIsOpen(false)} className="text-white hover:text-gray-200">
+            <button onClick={() => setIsOpen(false)} className="text-white hover:text-gray-200 cursor-pointer">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50 text-right">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}
               >
                 <div
                   className={`max-w-[80%] p-3 rounded-2xl text-sm ${
                     msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-br-none'
-                      : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-none'
+                      ? 'bg-indigo-600 text-white rounded-bl-none'
+                      : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-br-none'
                   }`}
                 >
                   {msg.content}
@@ -77,7 +77,7 @@ export default function AIChatWidget() {
               </div>
             ))}
             {loading && (
-              <div className="flex justify-start">
+              <div className="flex justify-end">
                 <div className="bg-white text-gray-500 p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2 text-sm">
                   <Loader2 className="w-4 h-4 animate-spin text-indigo-600" /> חושב...
                 </div>
@@ -92,12 +92,12 @@ export default function AIChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="שאל אותנו משהו..."
-              className="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-600"
+              className="flex-1 border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-600 text-right"
             />
             <button
               type="submit"
               disabled={loading}
-              className="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50 flex items-center justify-center"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition disabled:opacity-50 flex items-center justify-center cursor-pointer"
             >
               <Send className="w-4 h-4" />
             </button>
