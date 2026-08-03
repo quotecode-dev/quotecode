@@ -6,7 +6,7 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnGIg3MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRo dD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1 CMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTkwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Ljwvc3ZnPg==";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD05OTAiIGZpbGw9IiMxZTI5M2IiPlBybzx0c3BhbiBmaWxsPSIjNGY0NmU1Ij5GbG93PC90c3Bhbj48L3RleHQ+PC9zdmc+";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -1341,7 +1341,6 @@ function Dashboard() {
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }} dir={isHebrew ? 'rtl' : 'ltr'}>
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
           
-          {/* לוגו האתר המקורי */}
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
             <img src={DEFAULT_LOGO} alt="ProFlow Logo" style={{ height: '45px', maxWidth: '180px', objectFit: 'contain', marginBottom: '12px', display: 'block', margin: '0 auto' }} />
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>
