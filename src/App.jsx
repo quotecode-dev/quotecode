@@ -758,7 +758,7 @@ function PublicQuote() {
 
       <footer className="no-print" style={{ textAlign: 'center', padding: '20px', marginTop: '40px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
         <p style={{ margin: '0 0 5px 0' }}>
-          Powered by <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business & Quoting Platform'}
+          מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.
         </p>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
           {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
@@ -2975,14 +2975,14 @@ function Dashboard() {
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
         <button onClick={() => { setIsCreatingQuote(true); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>➕</span>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' => 'חיפוש', marginBottom: '2px' }}>➕</span>
           {isHebrew ? 'חדש' : 'New'}
         </button>
       </div>
 
       <footer className="no-print" style={{ textAlign: 'center', padding: '20px', marginTop: '40px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
         <p style={{ margin: '0 0 5px 0' }}>
-          Powered by <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business & Quoting Platform'}
+          מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.
         </p>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
           {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
