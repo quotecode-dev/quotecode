@@ -6,6 +6,8 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
+const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 function ProFlowLogo({ size = 45 }) {
   return (
     <div dir="ltr" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', flexDirection: 'row' }}>
@@ -353,7 +355,7 @@ function PublicQuote() {
         const currentViews = (quoteData.view_count || 0) + 1;
         const { error: updateErr } = await supabase.from('quotes').update({ view_count: currentViews }).eq('id', id);
         if (updateErr) {
-          console.warn("Could not update view_count (column may not exist in database yet):", updateErr.message);
+          console.warn("Could not update view_count:", updateErr.message);
         } else {
           quoteData.view_count = currentViews;
         }
@@ -446,7 +448,6 @@ function PublicQuote() {
     return '$';
   };
   const quoteSym = getCurrencySymbol(quote.currency);
-  const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const quoteSub = quote.subtotal || quote.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || 0;
   const quoteDiscount = quote.discount || 0;
@@ -580,7 +581,7 @@ function PublicQuote() {
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -1244,8 +1245,6 @@ function Dashboard() {
     callback();
   };
 
-  const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
   const discountAmount = (subtotal * Number(discount)) / 100;
   const baseAmount = subtotal - discountAmount;
@@ -1380,8 +1379,7 @@ function Dashboard() {
     if (curr === 'ILS') return '₪';
     return '$';
   };
-  const quoteSym = getCurrencySymbol(quote.currency);
-  const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const sym = getCurrencySymbol(currency);
 
   const showQuoteForm = isCreatingQuote || editingQuoteId !== null;
 
@@ -2789,7 +2787,7 @@ function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
-        <button onClick={() => { setIsCreatingQuote(true); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { setActiveTab('creating'); setIsCreatingQuote(true); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>➕</span>
           {isHebrew ? 'חדש' : 'New'}
         </button>
