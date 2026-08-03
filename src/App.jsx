@@ -1888,7 +1888,7 @@ function DashboardContent({ session }) {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
               {isSuperAdmin && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.7rem', fontWeight: 'bold', padding: '4px 6px', borderRadius: '6px' }}>SUPER ADMIN</span>}
-              <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{session.user.email}</span>
+              <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{session?.user?.email}</span>
               <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}>Sign Out</button>
             </div>
           </div>
