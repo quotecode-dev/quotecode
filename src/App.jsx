@@ -1341,14 +1341,9 @@ function Dashboard() {
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }} dir={isHebrew ? 'rtl' : 'ltr'}>
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
           
-          {/* לוגו PROFLOW FTI מעודכן */}
+          {/* לוגו האתר המקורי */}
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '15px' }}>
-              <div style={{ width: '50px', height: '50px', background: '#4f46e5', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', marginBottom: '8px' }}>
-                <span style={{ color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>P</span>
-              </div>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: '900', color: '#1e293b', margin: 0, letterSpacing: '0.05em' }}>PROFLOW FTI</h1>
-            </div>
+            <img src={DEFAULT_LOGO} alt="ProFlow Logo" style={{ height: '45px', maxWidth: '180px', objectFit: 'contain', marginBottom: '12px', display: 'block', margin: '0 auto' }} />
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>
               {isSignUp 
                 ? (isHebrew ? 'יצירת חשבון חדש במערכת' : 'Create a new account') 
