@@ -570,7 +570,7 @@ function PublicQuote() {
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -1977,7 +1977,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
+                                      position: 'absolute', bottom: '130%', right: '0', left: 'auto',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -1998,7 +1998,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
+                                      position: 'absolute', bottom: '130%', right: '0', left: 'auto',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -2021,7 +2021,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
+                                      position: 'absolute', bottom: '130%', right: '0', left: 'auto',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -2051,7 +2051,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
+                                      position: 'absolute', bottom: '130%', right: '0', left: 'auto',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -2705,11 +2705,14 @@ function Dashboard() {
                               {acc.country || 'Israel (Local)'}
                             </span>
                           </td>
-                          <td style={{ padding: '10px' }}>
+                          <td style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ background: '#f1f5f9', padding: '3px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', color: '#475569' }}>
+                              {acc.plan ? acc.plan.toUpperCase() : 'Free'}
+                            </span>
                             <select 
-                              value={acc.plan ? acc.plan.toLowerCase() : ''} 
+                              defaultValue="" 
                               onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
-                              style={{ padding: '5px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb', fontSize: '0.85rem' }}
+                              style={{ padding: '4px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb', fontSize: '0.8rem', cursor: 'pointer' }}
                             >
                               <option value="" disabled>{isHebrew ? 'בחר מנוי...' : 'Select Plan...'}</option>
                               <option value="free">Free</option>
