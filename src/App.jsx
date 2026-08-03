@@ -1703,6 +1703,15 @@ function Dashboard() {
         .feature-lock-tooltip {
           animation: popupBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
+        /* הסתרת סרגל הניווט התחתון במסכי מחשב רחבים והצגתו בניידים בלבד */
+        .mobile-bottom-nav {
+          display: none !important;
+        }
+        @media (max-width: 768px) {
+          .mobile-bottom-nav {
+            display: flex !important;
+          }
+        }
       `}</style>
 
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
@@ -2111,7 +2120,7 @@ function Dashboard() {
                     required 
                     style={{ flex: '1 1 90px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', fontSize: '0.85rem', background: '#f8fafc' }} 
                   />
-                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
+                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
                     {t.addService}
                   </button>
                 </form>
@@ -2783,8 +2792,8 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <div className="no-print" style={{ display: 'flex', position: 'fixed', bottom: 0, left: 0, width: '100%', background: '#1e293b', color: 'white', justifyContent: 'space-around', padding: '12px 0', zIndex: 9998, boxShadow: '0 -4px 15px rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      {/* Mobile Bottom Navigation Bar (מוצג בנייד בלבד ומסתתר במחשב) */}
+      <div className="no-print mobile-bottom-nav" style={{ display: 'flex', position: 'fixed', bottom: 0, left: 0, width: '100%', background: '#1e293b', color: 'white', justifyContent: 'space-around', padding: '12px 0', zIndex: 9998, boxShadow: '0 -4px 15px rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'main' && !showQuoteForm ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>📄</span>
           {isHebrew ? 'הצעות' : 'Quotes'}
