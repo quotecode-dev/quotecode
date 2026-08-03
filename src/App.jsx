@@ -6,6 +6,12 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
+// ==========================================
+// TODO / FUTURE ARCHITECTURE NOTE (מנויים ושינוי מסלולים):
+// לקראת חיבור מערכת הסליקה (Stripe/Tranzilla), יש להוסיף כאן מנגנון לשינוי מסלולים 
+// אמצע תקופה (Upgrade/Downgrade עם חישוב יחסי - Proration).
+// ==========================================
+
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function ProFlowLogo({ size = 45 }) {
@@ -1777,6 +1783,9 @@ function Dashboard() {
     isTrialExpired = trialDaysLeft <= 0;
   }
 
+  // בדיקה האם המנוי עומד לפוג בתוך 7 ימים או פחות
+  const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 7 && trialDaysLeft > 0 && !isSuperAdmin;
+
   if (!session) {
     return (
       <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }}>
@@ -1905,7 +1914,15 @@ function Dashboard() {
             </div>
           )}
 
-          {trialEndsAt && !isTrialExpired && !isSuperAdmin && (
+          {/* התרעת תפוגה קרובה */}
+          {isExpiringSoon && (
+            <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#991b1b', padding: '12px 20px', borderRadius: '10px', marginBottom: '15px', fontWeight: 'bold', textAlign: 'center', fontSize: '0.9rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
+              <span>⚠️</span>
+              <span>{isHebrew ? `שים לב: המנוי שלך עומד להסתיים בעוד ${trialDaysLeft} ימים! מומלץ לשדרג או לחדש בהקדם.` : `Warning: Your subscription expires in ${trialDaysLeft} days!`}</span>
+            </div>
+          )}
+
+          {trialEndsAt && !isTrialExpired && !isSuperAdmin && !isExpiringSoon && (
             <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '10px 16px', borderRadius: '8px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px', fontSize: '0.85rem' }}>
               <span>{isHebrew ? '🚀 תקופת ניסיון פעילה' : '🚀 Active Trial Period'}</span>
               <span>{isHebrew ? `נותרו עוד ${trialDaysLeft} ימים` : `${trialDaysLeft} days remaining`}</span>
