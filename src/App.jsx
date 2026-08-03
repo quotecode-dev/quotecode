@@ -889,6 +889,7 @@ function Dashboard() {
   }
 
   async function handleAdminPlanChange(accountId, newPlan) {
+    if (!newPlan) return;
     const updatePayload = { plan: newPlan };
     
     if (newPlan !== 'free') {
@@ -1118,7 +1119,7 @@ function Dashboard() {
 
   async function handleAddService(e) {
     e.preventDefault();
-    const { error } = await supabase.services.insert([{ name: newServiceName, price: Number(newServicePrice) }]);
+    const { error } = await supabase.from('services').insert([{ name: newServiceName, price: Number(newServicePrice) }]);
     if (error) setStatusMsg({ text: 'Error adding service: ' + error.message, type: 'error' });
     else {
       setNewServiceName('');
@@ -1954,7 +1955,7 @@ function Dashboard() {
                                 {quoteSym}{formatNum(quote.total)}
                               </td>
                               <td style={{ padding: '10px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
-                              <td style={{ padding: '8px', display: 'flex', gap: '5px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
+                              <td style={{ padding: '8px', display: 'flex', gap: '5px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end', position: 'relative' }}>
                                 
                                 {/* VIEW (All plans) */}
                                 <button 
@@ -1976,9 +1977,9 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)',
+                                      position: 'absolute', bottom: '130%', right: isHebrew ? '0' : 'auto', left: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
                                     }}>
                                       {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
@@ -1997,9 +1998,9 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)',
+                                      position: 'absolute', bottom: '130%', right: isHebrew ? '0' : 'auto', left: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
                                     }}>
                                       {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
@@ -2020,9 +2021,9 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)',
+                                      position: 'absolute', bottom: '130%', right: isHebrew ? '0' : 'auto', left: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
                                     }}>
                                       {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
@@ -2050,9 +2051,9 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)',
+                                      position: 'absolute', bottom: '130%', right: isHebrew ? '0' : 'auto', left: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
                                     }}>
                                       {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
@@ -2706,10 +2707,11 @@ function Dashboard() {
                           </td>
                           <td style={{ padding: '10px' }}>
                             <select 
-                              value={acc.plan ? acc.plan.toLowerCase() : 'free'} 
+                              value={acc.plan ? acc.plan.toLowerCase() : ''} 
                               onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
                               style={{ padding: '5px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb', fontSize: '0.85rem' }}
                             >
+                              <option value="" disabled>{isHebrew ? 'בחר מנוי...' : 'Select Plan...'}</option>
                               <option value="free">Free</option>
                               <option value="basic">Basic</option>
                               <option value="pro">Pro</option>
