@@ -1935,19 +1935,21 @@ function Dashboard() {
                                 <div style={{ fontWeight: '700', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
                                 <div style={{ fontSize: '0.75rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
                               </td>
-                              <td style={{ padding: '14px 10px' }}>
+                              <td style={{ padding: '14px 10px', verticalAlign: 'middle' }}>
                                 <select
                                   value={currentStatus}
                                   onChange={(e) => handleStatusChange(quote.id, e.target.value)}
                                   style={{
-                                    padding: '6px 10px',
+                                    padding: '6px 12px',
                                     borderRadius: '8px',
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.85rem',
                                     fontWeight: '700',
                                     background: currentStatus === 'approved' ? '#dcfce7' : currentStatus === 'paid' ? '#dbeafe' : currentStatus === 'sent' ? '#fef9c3' : '#f1f5f9',
                                     color: currentStatus === 'approved' ? '#166534' : currentStatus === 'paid' ? '#1e40af' : currentStatus === 'sent' ? '#854d0e' : '#475569',
                                     border: '1px solid #cbd5e1',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    display: 'inline-block',
+                                    verticalAlign: 'middle'
                                   }}
                                 >
                                   <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
@@ -1960,112 +1962,114 @@ function Dashboard() {
                                 {quoteSym}{formatNum(quote.total)}
                               </td>
                               <td style={{ padding: '14px 10px', color: '#64748b', fontWeight: '600' }}>{quote.valid_until || '-'}</td>
-                              <td style={{ padding: '10px', display: 'flex', gap: '6px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end', position: 'relative' }}>
-                                
-                                {/* VIEW (All plans) */}
-                                <button 
-                                  title={isHebrew ? "צפה במסמך המקורי" : "View"}
-                                  onClick={() => window.open(`/quote/${quote.id}`, '_blank')}
-                                  style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.75rem' }}
-                                >
-                                  {isHebrew ? 'צפה' : 'View'}
-                                </button>
-
-                                {/* EDIT (Basic+) */}
-                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                              <td style={{ padding: '14px 10px', verticalAlign: 'middle' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexDirection: isHebrew ? 'row-reverse' : 'row', justifyContent: isHebrew ? 'flex-start' : 'flex-end', flexWrap: 'nowrap' }}>
+                                  
+                                  {/* VIEW (All plans) */}
                                   <button 
-                                    title={t.edit}
-                                    onClick={() => handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote))}
-                                    style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.75rem' }}
+                                    title={isHebrew ? "צפה במסמך המקורי" : "View"}
+                                    onClick={() => window.open(`/quote/${quote.id}`, '_blank')}
+                                    style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
                                   >
-                                    {t.edit}
+                                    {isHebrew ? 'צפה' : 'View'}
                                   </button>
-                                  {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
-                                    <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
-                                      background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                      fontWeight: '600'
-                                    }}>
-                                      {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
-                                    </div>
-                                  )}
-                                </div>
 
-                                {/* DUPLICATE (Basic+) */}
-                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                  {/* EDIT (Basic+) */}
+                                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    <button 
+                                      title={t.edit}
+                                      onClick={() => handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote))}
+                                      style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+                                    >
+                                      {t.edit}
+                                    </button>
+                                    {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
+                                      <div className="feature-lock-tooltip" style={{
+                                        position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
+                                        background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                        fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                        fontWeight: '600'
+                                      }}>
+                                        {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* DUPLICATE (Basic+) */}
+                                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    <button 
+                                      title={t.duplicate}
+                                      onClick={() => handleProtectedAction(quote.id, 'duplicate', () => handleDuplicateQuote(quote))}
+                                      style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+                                    >
+                                      {t.duplicate}
+                                    </button>
+                                    {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
+                                      <div className="feature-lock-tooltip" style={{
+                                        position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
+                                        background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                        fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                        fontWeight: '600'
+                                      }}>
+                                        {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* WHATSAPP (Pro only) */}
+                                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    <button 
+                                      title="שלח בוואטסאפ"
+                                      onClick={() => handleProtectedAction(quote.id, 'whatsapp', () => sendWhatsApp(quote))}
+                                      style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    >
+                                      <svg style={{ width: '16px', height: '16px', fill: '#065f46' }} viewBox="0 0 24 24">
+                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                      </svg>
+                                    </button>
+                                    {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
+                                      <div className="feature-lock-tooltip" style={{
+                                        position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
+                                        background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                        fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                        fontWeight: '600'
+                                      }}>
+                                        {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* EMAIL (All plans) */}
                                   <button 
-                                    title={t.duplicate}
-                                    onClick={() => handleProtectedAction(quote.id, 'duplicate', () => handleDuplicateQuote(quote))}
-                                    style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.75rem' }}
+                                    title="שלח אימייל"
+                                    onClick={() => setPendingEmailQuote(quote)}
+                                    style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}
                                   >
-                                    {t.duplicate}
+                                    @
                                   </button>
-                                  {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
-                                    <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
-                                      background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                      fontWeight: '600'
-                                    }}>
-                                      {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
-                                    </div>
-                                  )}
+
+                                  {/* DELETE (Pro only) */}
+                                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    <button 
+                                      title={t.delete}
+                                      onClick={() => handleProtectedAction(quote.id, 'delete', () => handleDeleteQuote(quote.id))}
+                                      style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+                                    >
+                                      {t.delete}
+                                    </button>
+                                    {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
+                                      <div className="feature-lock-tooltip" style={{
+                                        position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
+                                        background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                        fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                        fontWeight: '600'
+                                      }}>
+                                        {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
+                                      </div>
+                                    )}
+                                  </div>
+
                                 </div>
-
-                                {/* WHATSAPP (Pro only) */}
-                                <div style={{ position: 'relative', display: 'inline-block' }}>
-                                  <button 
-                                    title="שלח בוואטסאפ"
-                                    onClick={() => handleProtectedAction(quote.id, 'whatsapp', () => sendWhatsApp(quote))}
-                                    style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                  >
-                                    <svg style={{ width: '16px', height: '16px', fill: '#065f46' }} viewBox="0 0 24 24">
-                                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                                    </svg>
-                                  </button>
-                                  {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
-                                    <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
-                                      background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                      fontWeight: '600'
-                                    }}>
-                                      {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* EMAIL (All plans) */}
-                                <button 
-                                  title="שלח אימייל"
-                                  onClick={() => setPendingEmailQuote(quote)}
-                                  style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}
-                                >
-                                  @
-                                </button>
-
-                                {/* DELETE (Pro only) */}
-                                <div style={{ position: 'relative', display: 'inline-block' }}>
-                                  <button 
-                                    title={t.delete}
-                                    onClick={() => handleProtectedAction(quote.id, 'delete', () => handleDeleteQuote(quote.id))}
-                                    style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.75rem' }}
-                                  >
-                                    {t.delete}
-                                  </button>
-                                  {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
-                                    <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
-                                      background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                      fontWeight: '600'
-                                    }}>
-                                      {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
-                                    </div>
-                                  )}
-                                </div>
-
                               </td>
                             </tr>
                           );
@@ -2640,13 +2644,13 @@ function Dashboard() {
           )}
 
           {isSuperAdmin && activeTab === 'admin_clients' && (
-            <div style={{ background: '#fef3c7', padding: '30px', borderRadius: '16px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)', border: '2px solid #f59e0b' }}>
+            <div style={{ background: 'white', padding: '30px', borderRadius: '16px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
-                <h2 style={{ fontSize: '1.2rem', color: '#92400e', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h2 style={{ fontSize: '1.2rem', color: '#1e293b', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
                   👑 Super Admin - Users
                 </h2>
               </div>
-              <p style={{ color: '#b45309', marginBottom: '20px', fontSize: '0.9rem' }}>
+              <p style={{ color: '#64748b', marginBottom: '20px', fontSize: '0.9rem' }}>
                 {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות שלהם.' : 'View all registered users and manage their subscription plans.'}
               </p>
 
@@ -2656,14 +2660,14 @@ function Dashboard() {
                   placeholder={isHebrew ? "חיפוש משתמש (אימייל או שם עסק)..." : "Search user (email or business)..."} 
                   value={adminSearchTerm}
                   onChange={(e) => setAdminSearchTerm(e.target.value)}
-                  style={{ padding: '10px 14px', border: '1px solid #d97706', borderRadius: '8px', width: '280px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', background: 'white' }}
+                  style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', width: '280px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', background: '#f8fafc' }}
                 />
               </div>
               
               <div style={{ overflowX: 'auto', background: 'white', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #fde68a', color: '#92400e', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <th style={{ padding: '12px 10px' }}>ID</th>
                       <th style={{ padding: '12px 10px', cursor: 'pointer' }} onClick={() => handleSort('email')}>
                         Email {sortField === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
@@ -2691,16 +2695,16 @@ function Dashboard() {
                   <tbody>
                     {filteredAdminAccounts.length === 0 ? (
                       <tr>
-                        <td colSpan="8" style={{ textAlign: 'center', padding: '40px', color: '#92400e' }}>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
                           {isHebrew ? 'לא נמצאו משתמשים התואמים לחיפוש.' : 'No users found matching your search.'}
                         </td>
                       </tr>
                     ) : (
                       filteredAdminAccounts.map(acc => (
-                        <tr key={acc.id} style={{ borderBottom: '1px solid #fef3c7', fontSize: '0.9rem' }}>
-                          <td style={{ padding: '14px 10px', color: '#92400e', fontSize: '0.8rem' }}>{acc.user_id?.slice(0,8)}...</td>
-                          <td style={{ padding: '14px 10px', fontWeight: 'bold' }}>{acc.email || 'N/A'}</td>
-                          <td style={{ padding: '14px 10px' }}>{acc.business_name}</td>
+                        <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                          <td style={{ padding: '14px 10px', color: '#64748b', fontSize: '0.8rem' }}>{acc.user_id?.slice(0,8)}...</td>
+                          <td style={{ padding: '14px 10px', fontWeight: 'bold', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
+                          <td style={{ padding: '14px 10px', color: '#334155' }}>{acc.business_name}</td>
                           <td style={{ padding: '14px 10px' }}>
                             <span style={{
                               background: acc.country === 'Israel (Local)' ? '#dbeafe' : '#dcfce7',
@@ -2728,7 +2732,7 @@ function Dashboard() {
                               <select 
                                 defaultValue="" 
                                 onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
-                                style={{ padding: '6px 10px', borderRadius: '8px', border: '1px solid #d97706', background: '#fffbeb', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}
+                                style={{ padding: '6px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.85rem', fontWeight: '600', cursor: 'pointer' }}
                               >
                                 <option value="" disabled>{isHebrew ? 'שדרג מנוי...' : 'Change Plan...'}</option>
                                 <option value="free">Free</option>
