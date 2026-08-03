@@ -1848,7 +1848,7 @@ function Dashboard() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
                     <span>🔥</span>
                     <span>
-                      {isHebrew ? 'הצעה חמה! לקוח צפה בהצעה מספרקות מספר פעמים ועדיין לא חתם. כדאי ליצור קשר!' : 'Hot Quote! A client viewed a quote multiple times without signing.'}
+                      {isHebrew ? 'הצעה חמה! לקוח צפה בהצעה מספר פעמים ועדיין לא חתם. כדאי ליצור קשר!' : 'Hot Quote! A client viewed a quote multiple times without signing.'}
                     </span>
                   </div>
                 </div>
@@ -1923,11 +1923,9 @@ function Dashboard() {
                             <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
                               <td style={{ padding: '10px 6px', fontWeight: '400', color: '#4f46e5' }}>
                                 #{quote.id.slice(0, 6)}
-                                {quote.view_count > 0 && (
-                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', marginLeft: '8px', marginRight: '8px', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem', color: '#64748b' }} title={isHebrew ? `נצפתה ${quote.view_count} פעמים` : `Viewed ${quote.view_count} times`}>
-                                    👁️ {quote.view_count}
-                                  </span>
-                                )}
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', marginLeft: '8px', marginRight: '8px', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem', color: '#64748b' }} title={isHebrew ? `נצפתה ${quote.view_count || 0} פעמים` : `Viewed ${quote.view_count || 0} times`}>
+                                  👁️ {quote.view_count || 0}
+                                </span>
                               </td>
                               <td style={{ padding: '10px 6px' }}>
                                 <div style={{ fontWeight: '400', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
