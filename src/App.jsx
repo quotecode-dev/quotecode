@@ -6,7 +6,7 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRo dD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1 CMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTkwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Ljwvc3ZnPg==";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnGIg3MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRo dD0iTTQwIDUwIEw3OCAyMCBMODUgMzUgTDY1IDU1 CMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iOTkwIiBmaWxsPSIjMWUyOTNiIj5Qcm88dHNwYW4gZmlsbD0iIzRmNDZlNSI+RmxvdzwvdHNwYW4+PC90ZXh0Ljwvc3ZnPg==";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -40,7 +40,6 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   );
 }
 
-// רכיב צ'אט AI מותאם שפה (אנגלית למשתמש חו"ל, עברית לישראל)
 function AIChatWidget({ isHebrew }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -390,7 +389,6 @@ function PublicQuote() {
 function Dashboard() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
-  // זיהוי לפי אזור הזמן או שפת הדפדפן - אם לא ישראל, מציג באנגלית מלאה
   const isHebrew = (browserLang.startsWith('he') || tz === 'Asia/Jerusalem') && !window.location.search.includes('lang=en');
 
   const defaultTermsText = isHebrew ? 'שוטף + 30' : 'Net 30 days';
@@ -801,14 +799,12 @@ function Dashboard() {
     exportToCSV(exportData, 'expenses_report.csv');
   };
 
-  // מניעת רישום כפול אמיתית ומוחלטת (בדיקה מוקדמת בטבלה וב-Auth)
   const handleAuth = async (e) => {
     e.preventDefault();
     setAuthError('');
     setAuthSuccess('');
 
     if (isSignUp) {
-      // בדיקה קפדנית האם האימייל כבר קיים בטבלת הגדרות העסק או בטבלאות המערכת
       const { data: existingBiz, error: checkErr } = await supabase
         .from('business_settings')
         .select('email')
@@ -1298,15 +1294,6 @@ function Dashboard() {
     }
   }
 
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-
   const filteredQuotes = quotes.filter(quote => {
     const matchesSearch = (quote.clients?.company_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
                           quote.id.toLowerCase().includes(searchTerm.toLowerCase());
@@ -1353,8 +1340,15 @@ function Dashboard() {
     return (
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }} dir={isHebrew ? 'rtl' : 'ltr'}>
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
+          
+          {/* לוגו PROFLOW FTI מעודכן */}
           <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-            <img src={DEFAULT_LOGO} alt="" style={{ height: '60px', marginBottom: '10px', display: 'block', margin: '0 auto' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '15px' }}>
+              <div style={{ width: '50px', height: '50px', background: '#4f46e5', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', marginBottom: '8px' }}>
+                <span style={{ color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}>P</span>
+              </div>
+              <h1 style={{ fontSize: '1.25rem', fontWeight: '900', color: '#1e293b', margin: 0, letterSpacing: '0.05em' }}>PROFLOW FTI</h1>
+            </div>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>
               {isSignUp 
                 ? (isHebrew ? 'יצירת חשבון חדש במערכת' : 'Create a new account') 
@@ -1618,7 +1612,6 @@ function Dashboard() {
                                 >
                                   {t.duplicate}
                                 </button>
-                                {/* אייקון ווטסאפ נקי ומדויק */}
                                 <button 
                                   title="שלח בוואטסאפ"
                                   onClick={() => sendWhatsApp(quote)}
