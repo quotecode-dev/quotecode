@@ -126,7 +126,7 @@ function AIChatWidget({ isHebrew }) {
               placeholder={isHebrew ? "שאל משהו..." : "Ask something..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', textAlign: isHebrew ? 'right' : 'left' }}
+              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff' }}
             />
             <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>{isHebrew ? 'שלח' : 'Send'}</button>
           </form>
@@ -1416,8 +1416,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -1886,7 +1886,7 @@ function Dashboard() {
                   </div>
 
                   {items.map((item, index) => (
-                    <div key={index} style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '10px', marginBottom: '10px', alignItems: 'stretch', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                    <div key={index} style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '10px', marginBottom: '10px', alignItems: 'stretch' }}>
                       <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
                       <input type="number" placeholder={isHebrew ? 'כמות' : 'Qty'} min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
                       <input type="number" placeholder={isHebrew ? 'מחיר' : 'Price'} step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
