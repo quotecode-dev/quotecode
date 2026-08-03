@@ -569,7 +569,7 @@ function PublicQuote() {
                 <div>{isHebrew ? 'סכום ביניים:' : 'Subtotal:'} <span dir="ltr">{quoteSym}{formatNum(quoteSub)}</span></div>
                 {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} <span dir="ltr">-{quoteSym}{formatNum(quoteDiscountAmount)}</span></div>}
                 {hasVat && <div style={{ marginTop: '6px' }}>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'} <span dir="ltr">{quoteSym}{formatNum(quoteTaxAmount)}</span></div>}
-                <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} <span dir="ltr">{quoteSym}{formatNum(quoteTotal)}</span></div>
+                <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px'}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} <span dir="ltr">{quoteSym}{formatNum(quoteTotal)}</span></div>
               </>
             )}
           </div>
@@ -580,7 +580,7 @@ function PublicQuote() {
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -1181,9 +1181,21 @@ function Dashboard() {
   const sendWhatsApp = (proposal) => {
     const clientNameVal = proposal.clients?.company_name || 'לקוח';
     const clientPhoneVal = proposal.clients?.phone ? proposal.clients.phone.replace(/\D/g, '') : '';
+    const isBiz = (proposal.client_type || proposal.clients?.client_type) === 'business';
+    const baseSub = proposal.subtotal || proposal.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || proposal.total;
+    
+    // Check if discount was applied, let's use the exact final amount or clear + VAT formula matching the document
+    const quoteSub = proposal.subtotal || 0;
+    const quoteDiscount = proposal.discount || 0;
+    const discountedBase = quoteSub - ((quoteSub * quoteDiscount) / 100);
+
+    const priceStr = isBiz 
+      ? `₪${formatNum(discountedBase > 0 ? discountedBase : proposal.total)} + מע"מ` 
+      : `₪${formatNum(proposal.total)}`;
+
     const text = isHebrew 
-      ? `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ₪${formatNum(proposal.total)}. בתוקף עד ${proposal.valid_until || 'N/A'}.\n\nלצפייה בהצעה:\n${window.location.origin}/quote/${proposal.id}`
-      : `Hi ${clientNameVal}, here is your quote #${proposal.id.slice(0, 6)} totaling ${sym}${formatNum(proposal.total)}. Valid until ${proposal.valid_until || 'N/A'}.\n\nView quote:\n${window.location.origin}/quote/${proposal.id}`;
+      ? `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ${priceStr}. בתוקף עד ${proposal.valid_until || 'N/A'}.\n\nלצפייה בהצעה:\n${window.location.origin}/quote/${proposal.id}`
+      : `Hi ${clientNameVal}, here is your quote #${proposal.id.slice(0, 6)} totaling ${isHebrew ? priceStr : `${sym}${formatNum(proposal.total)} + VAT`}. Valid until ${proposal.valid_until || 'N/A'}.\n\nView quote:\n${window.location.origin}/quote/${proposal.id}`;
     
     const url = clientPhoneVal 
       ? `https://wa.me/${clientPhoneVal}?text=${encodeURIComponent(text)}`
@@ -2520,7 +2532,7 @@ function Dashboard() {
                     <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalRevenue}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#22c55e' }}>{sym}{formatNum(adminTotalRevenue)}</div>
                   </div>
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
                     <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalExpenses}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ef4444' }}>{sym}{formatNum(adminTotalExpenses)}</div>
                   </div>
