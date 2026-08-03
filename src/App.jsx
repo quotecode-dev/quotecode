@@ -753,13 +753,16 @@ function PublicQuote() {
               </div>
             )}
           </div>
+
+          {/* כיתוב מיתוג ProFlow בתוך המסגרת למטה */}
+          <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
+            מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.
+          </div>
+
         </div>
       </div>
 
       <footer className="no-print" style={{ textAlign: 'center', padding: '20px', marginTop: '40px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
-        <p style={{ margin: '0 0 5px 0' }}>
-          מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.
-        </p>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
           {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
         </button>
@@ -1545,6 +1548,15 @@ function Dashboard() {
   const showQuoteForm = isCreatingQuote || editingQuoteId !== null;
 
   const handleEditClick = (quote) => {
+    // בדיקה משפטית ואבטחית: מניעת עריכת הצעת מחיר שכבר אושרה ונחתמה על ידי הלקוח
+    if (quote.status?.toLowerCase() === 'approved' || quote.status?.toLowerCase() === 'paid' || quote.signature) {
+      alert(isHebrew 
+        ? '⚠️ אזהרה משפטית: לא ניתן לערוך הצעת מחיר שכבר אושרה ונחתמה על ידי הלקוח! לפי החוק והתקנים העסקיים, מסמך חתום הינו חוזה מחייב נעול. כדי לבצע שינויים יש לשכפל את ההצעה או ליצור הצעה חדשה.' 
+        : 'Cannot edit an approved/signed quote.'
+      );
+      return;
+    }
+
     setEditingQuoteId(quote.id);
     setIsCreatingQuote(false);
     setClientName(quote.clients?.company_name || '');
@@ -1635,6 +1647,14 @@ function Dashboard() {
     }
 
     try {
+      if (editingQuoteId) {
+        const originalQuote = quotes.find(q => q.id === editingQuoteId);
+        if (originalQuote && (originalQuote.status?.toLowerCase() === 'approved' || originalQuote.status?.toLowerCase() === 'paid' || originalQuote.signature)) {
+          setStatusMsg({ text: isHebrew ? '⚠️ שגיאה משפטית: לא ניתן לעדכן הצעה שכבר אושרה ונחתמה!' : 'Cannot update approved/signed quote.', type: 'error' });
+          return;
+        }
+      }
+
       if (!editingQuoteId && !isSuperAdmin) {
         const limit = bizPlan.toLowerCase() === 'free' ? 5 : bizPlan.toLowerCase() === 'basic' ? 20 : Infinity;
         if (monthlyQuotesCount >= limit) {
@@ -2109,6 +2129,7 @@ function Dashboard() {
                         filteredQuotes.map((quote) => {
                           const quoteSym = isLocalIsraeliBusiness ? '₪' : getCurrencySymbol(quote.currency);
                           const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
+                          const isLocked = currentStatus === 'approved' || currentStatus === 'paid' || quote.signature;
                           return (
                             <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
                               <td style={{ padding: '10px 6px', fontWeight: '400', color: '#4f46e5' }}>
@@ -2161,14 +2182,14 @@ function Dashboard() {
                                     {isHebrew ? 'צפה' : 'View'}
                                   </button>
 
-                                  {/* EDIT (Basic+) */}
+                                  {/* EDIT (Basic+) - נעול אם חתום/מאושר */}
                                   <div style={{ position: 'relative', display: 'inline-block' }}>
                                     <button 
-                                      title={t.edit}
+                                      title={isLocked ? (isHebrew ? 'לא ניתן לערוך הצעה חתומה/מאושרת' : 'Cannot edit signed quote') : t.edit}
                                       onClick={() => handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote))}
-                                      style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '0 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.75rem', height: '26px', boxSizing: 'border-box', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                                      style={{ background: isLocked ? '#f1f5f9' : '#fef3c7', color: isLocked ? '#94a3b8' : '#b45309', border: 'none', padding: '0 10px', borderRadius: '4px', cursor: isLocked ? 'not-allowed' : 'pointer', fontWeight: '400', fontSize: '0.75rem', height: '26px', boxSizing: 'border-box', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                                     >
-                                      {t.edit}
+                                      {isLocked ? '🔒 נעול' : t.edit}
                                     </button>
                                     {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
                                       <div className="feature-lock-tooltip" style={{
@@ -2981,9 +3002,6 @@ function Dashboard() {
       </div>
 
       <footer className="no-print" style={{ textAlign: 'center', padding: '20px', marginTop: '40px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
-        <p style={{ margin: '0 0 5px 0' }}>
-          מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.
-        </p>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
           {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
         </button>
