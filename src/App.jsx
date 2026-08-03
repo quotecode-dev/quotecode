@@ -83,7 +83,7 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
           {/* מנוי Basic */}
           <div style={{ border: '2px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי בסיסי (Basic)' : 'Basic Plan'}</h3>
-            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '15px' }}>₪79 <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span></div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '15px' }}>₪49 <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span></div>
             <ul style={{ margin: '0 0 20px 0', padding: isHebrew ? '0 20px 0 0' : '0 0 0 20px', color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', flex: 1 }}>
               <li>{isHebrew ? 'עד 20 הצעות מחיר בחודש' : 'Up to 20 quotes/month'}</li>
               <li>{isHebrew ? 'עריכה ושכפול הצעות מחיר' : 'Edit & duplicate quotes'}</li>
@@ -99,7 +99,7 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
           <div style={{ border: '2px solid #4f46e5', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: 'white', boxShadow: '0 10px 15px -3px rgba(79, 70, 229, 0.1)' }}>
             <div style={{ background: '#4f46e5', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', alignSelf: 'flex-start', marginBottom: '8px' }}>POPULAR</div>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי PRO (מומלץ)' : 'PRO Plan (Recommended)'}</h3>
-            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '15px' }}>₪149 <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span></div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '15px' }}>₪99 <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span></div>
             <ul style={{ margin: '0 0 20px 0', padding: isHebrew ? '0 20px 0 0' : '0 0 0 20px', color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', flex: 1 }}>
               <li>{isHebrew ? 'הצעות מחיר ללא הגבלה (∞)' : 'Unlimited quotes (∞)'}</li>
               <li>{isHebrew ? 'שליחת הצעות מחיר ישירות בווצאפ' : 'Send quotes directly via WhatsApp'}</li>
@@ -2925,20 +2925,6 @@ function Dashboard() {
 }
 
 export default function App() {
-  const [session, setSession] = useState(null);
-  
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   return (
     <Router>
       <Routes>
