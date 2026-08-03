@@ -611,6 +611,7 @@ function Dashboard() {
   const [trialEndsAt, setTrialEndsAt] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
+  const [clientSearchTerm, setClientSearchTerm] = useState('');
   
   const [sortField, setSortField] = useState('email');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -1170,7 +1171,7 @@ function Dashboard() {
         ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
         : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
 
-      window.location.href = `mailto:‌${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
   };
 
@@ -1514,6 +1515,13 @@ function Dashboard() {
                           quote.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || (quote.status || 'draft').toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
+  });
+
+  const filteredClients = clients.filter(client => {
+    const term = clientSearchTerm.toLowerCase();
+    return (client.company_name && client.company_name.toLowerCase().includes(term)) ||
+           (client.email && client.email.toLowerCase().includes(term)) ||
+           (client.tax_id && client.tax_id.toLowerCase().includes(term));
   });
 
   const filteredAdminAccounts = allAccounts.filter(acc => {
@@ -2204,45 +2212,86 @@ function Dashboard() {
           )}
 
           {activeTab === 'clients' && (
-            <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-              <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginTop: 0, marginBottom: '20px' }}>
-                {isHebrew ? '👥 ניהול לקוחות' : '👥 Clients Management'}
-              </h2>
+            <div style={{ background: 'white', padding: '25px', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+              
+              {/* Header & Search */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5' }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 style={{ fontSize: '1.25rem', color: '#1e293b', margin: 0, fontWeight: '700' }}>
+                      {isHebrew ? 'ניהול ספר לקוחות (CRM)' : 'Clients Management'}
+                    </h2>
+                    <p style={{ color: '#64748b', fontSize: '0.85rem', margin: '2px 0 0 0' }}>
+                      {isHebrew ? `סה"כ ${filteredClients.length} לקוחות רשומים במערכת` : `${filteredClients.length} total clients`}
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ width: '100%', maxWidth: '300px' }}>
+                  <input 
+                    type="text" 
+                    placeholder={isHebrew ? "חיפוש לקוח לפי שם, אימייל או ח.פ..." : "Search client..."} 
+                    value={clientSearchTerm}
+                    onChange={(e) => setClientSearchTerm(e.target.value)}
+                    style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', background: '#eff6ff' }}
+                  />
+                </div>
+              </div>
+
               <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '450px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '650px' }}>
                   <thead>
-                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
-                      <th style={{ padding: '10px' }}>{isHebrew ? 'שם חברה / לקוח' : 'Company / Name'}</th>
+                    <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#475569', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                      <th style={{ padding: '14px' }}>{isHebrew ? 'שם חברה / לקוח' : 'Company / Name'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'ח.פ / ת.ז' : 'Tax ID'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'אימייל' : 'Email'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'כתובת' : 'Address'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'תנאי תשלום' : 'Payment Terms'}</th>
-                      <th style={{ padding: '10px' }}>{t.actions}</th>
+                      <th style={{ padding: '10px', textAlign: isHebrew ? 'left' : 'right' }}>{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {clients.length === 0 ? (
+                    {filteredClients.length === 0 ? (
                       <tr>
-                        <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
-                          {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients recorded yet.'}
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '40px', color: '#94a3b8', fontSize: '0.95rem' }}>
+                          {isHebrew ? 'לא נמצאו לקוחות התואמים את החיפוש.' : 'No clients found.'}
                         </td>
                       </tr>
                     ) : (
-                      clients.map((client) => (
-                        <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                          <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{client.company_name}</td>
-                          <td style={{ padding: '10px', color: '#475569' }}>{client.tax_id || '-'}</td>
+                      filteredClients.map((client) => (
+                        <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                          <td style={{ padding: '14px', fontWeight: '700', color: '#1e293b' }}>{client.company_name}</td>
+                          <td style={{ padding: '10px', color: '#475569' }}><span dir="ltr">{client.tax_id || '-'}</span></td>
                           <td style={{ padding: '10px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
                           <td style={{ padding: '10px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
                           <td style={{ padding: '10px', color: '#475569' }}>{client.address || '-'}</td>
-                          <td style={{ padding: '10px', color: '#475569' }}>{client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}</td>
-                          <td style={{ padding: '10px', color: '#475569' }}>{client.terms || '-'}</td>
                           <td style={{ padding: '10px' }}>
+                            <span style={{
+                              background: client.client_type === 'business' ? '#dbeafe' : '#f3f4f6',
+                              color: client.client_type === 'business' ? '#1e40af' : '#374151',
+                              padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold'
+                            }}>
+                              {client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px', color: '#4f46e5', fontWeight: '600' }}>
+                            {client.terms ? (
+                              <span style={{ background: '#e0e7ff', padding: '3px 8px', borderRadius: '6px', fontSize: '0.8rem' }}>
+                                {client.terms}
+                              </span>
+                            ) : '-'}
+                          </td>
+                          <td style={{ padding: '10px', textAlign: isHebrew ? 'left' : 'right' }}>
                             <button 
                               onClick={() => handleDeleteClient(client.id)}
-                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
                             >
                               {t.delete}
                             </button>
