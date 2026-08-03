@@ -60,6 +60,40 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   );
 }
 
+function EmailConfirmModal({ isOpen, onClose, onConfirm, clientEmail, isHebrew }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div style={{ background: 'white', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '420px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', textAlign: 'center', animation: 'popupBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards' }}>
+        
+        <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px auto', fontSize: '1.4rem' }}>
+          ✉️
+        </div>
+
+        <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.25rem', marginBottom: '10px', fontWeight: '700' }}>
+          {isHebrew ? 'שליחת הצעת מחיר במייל' : 'Send Quote via Email'}
+        </h3>
+        
+        <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.5' }}>
+          {isHebrew ? 'האם לשלוח את הצעת המחיר לכתובת:' : 'Do you want to send the quote to:'}
+          <br />
+          <strong style={{ color: '#1e293b', direction: 'ltr', display: 'inline-block', marginTop: '5px' }}>{clientEmail}</strong>
+        </p>
+
+        <div style={{ display: 'flex', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+          <button onClick={onClose} style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem' }}>
+            {isHebrew ? 'ביטול' : 'Cancel'}
+          </button>
+          <button onClick={onConfirm} style={{ flex: 1, background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.25)' }}>
+            {isHebrew ? 'כן, שלח מייל' : 'Yes, Send'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AIChatWidget({ isHebrew }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -645,6 +679,8 @@ function Dashboard() {
   const [expenseCategory, setExpenseCategory] = useState('Hosting / Cloud');
   const [isRecurring, setIsRecurring] = useState(false);
 
+  const [pendingEmailQuote, setPendingEmailQuote] = useState(null);
+
   const isLocalIsraeliBusiness = bizCountry === 'Israel (Local)';
   const isSuperAdmin = bizRole === 'super_admin';
   const isPro = isSuperAdmin || bizPlan.toLowerCase() === 'pro';
@@ -1082,7 +1118,7 @@ function Dashboard() {
 
   async function handleAddService(e) {
     e.preventDefault();
-    const { error } = await supabase.from('services').insert([{ name: newServiceName, price: Number(newServicePrice) }]);
+    const { error } = await supabase.services.insert([{ name: newServiceName, price: Number(newServicePrice) }]);
     if (error) setStatusMsg({ text: 'Error adding service: ' + error.message, type: 'error' });
     else {
       setNewServiceName('');
@@ -1140,18 +1176,7 @@ function Dashboard() {
     window.open(url, '_blank');
   };
 
-  const handleEmailQuote = async (quote) => {
-    if (!quote.clients?.email) {
-      alert(isHebrew ? 'ללקוח זה אין כתובת אימייל מעודכנת.' : 'This client does not have an email address.');
-      return;
-    }
-
-    const confirmMsg = isHebrew
-      ? `האם לשלוח את הצעת המחיר לכתובת: ${quote.clients.email}?`
-      : `Send quote to: ${quote.clients.email}?`;
-
-    if (!window.confirm(confirmMsg)) return;
-
+  const executeEmailSend = async (quote) => {
     setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך הענן...' : 'Sending email via cloud...', type: 'success' });
 
     try {
@@ -1656,6 +1681,18 @@ function Dashboard() {
       `}</style>
 
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
+      
+      <EmailConfirmModal 
+        isOpen={pendingEmailQuote !== null} 
+        onClose={() => setPendingEmailQuote(null)} 
+        onConfirm={() => {
+          const q = pendingEmailQuote;
+          setPendingEmailQuote(null);
+          executeEmailSend(q);
+        }}
+        clientEmail={pendingEmailQuote?.clients?.email || ''}
+        isHebrew={isHebrew}
+      />
 
       <div style={{ flex: '1 0 auto', padding: '15px' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -1996,7 +2033,7 @@ function Dashboard() {
                                 {/* EMAIL (All plans) */}
                                 <button 
                                   title="שלח אימייל"
-                                  onClick={() => handleEmailQuote(quote)}
+                                  onClick={() => setPendingEmailQuote(quote)}
                                   style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}
                                 >
                                   @
