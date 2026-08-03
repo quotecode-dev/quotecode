@@ -6,6 +6,27 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
+// רכיב לוגו מובנה נקי ומעוצב שאינו נשבר לעולם
+function ProFlowLogo({ size = 45 }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+      <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="proflowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#4f46e5" />
+            <stop offset="100%" stopColor="#10b981" />
+          </linearGradient>
+        </defs>
+        <path d="M15 50 L45 20 L60 35 L40 55 L60 75 L45 90 Z" fill="url(#proflowGrad)" />
+        <path d="M40 50 L78 20 L85 35 L65 55 L85 75 L70 90 Z" fill="#1e293b" opacity="0.9" />
+      </svg>
+      <span style={{ fontSize: `${size * 0.4}px`, fontWeight: '900', color: '#1e293b', letterSpacing: '-0.03em' }}>
+        Pro<span style={{ color: '#4f46e5' }}>Flow</span>
+      </span>
+    </div>
+  );
+}
+
 const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD05OTAiIGZpbGw9IiMxZTI5M2IiPlBybzx0c3BhbiBmaWxsPSIjNGY0NmU1Ij5GbG93PC90c3Bhbj48L3RleHQ+PC9zdmc+";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
@@ -1341,9 +1362,9 @@ function Dashboard() {
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }} dir={isHebrew ? 'rtl' : 'ltr'}>
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
           
-          <div style={{ textAlign: 'center', marginBottom: '25px' }}>
-            <img src={DEFAULT_LOGO} alt="ProFlow Logo" style={{ height: '45px', maxWidth: '180px', objectFit: 'contain', marginBottom: '12px', display: 'block', margin: '0 auto' }} />
-            <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '5px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <ProFlowLogo size={50} />
+            <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
               {isSignUp 
                 ? (isHebrew ? 'יצירת חשבון חדש במערכת' : 'Create a new account') 
                 : (isHebrew ? 'התחברות למערכת הניהול' : 'Sign in to your dashboard')}
@@ -1400,7 +1421,11 @@ function Dashboard() {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-              <img src={(bizLogoUrl && bizLogoUrl.trim() !== '' && bizPlan === 'pro') ? bizLogoUrl : DEFAULT_LOGO} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
+              {(bizLogoUrl && bizLogoUrl.trim() !== '' && bizPlan === 'pro') ? (
+                <img src={bizLogoUrl} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
+              ) : (
+                <ProFlowLogo size={32} />
+              )}
             </div>
 
             <div style={{ flex: '0 1 auto', textAlign: 'center' }}>
