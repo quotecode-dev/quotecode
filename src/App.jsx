@@ -294,7 +294,7 @@ function PublicQuote() {
     async function fetchData() {
       const { data: quoteData } = await supabase
         .from('quotes')
-        .select(`*, clients ( company_name, email, phone, client_type, tax_id, address ), quote_items ( * )`)
+        .select(`*, clients ( company_name, email, phone, client_type, tax_id, address, terms ), quote_items ( * )`)
         .eq('id', id)
         .single();
       
@@ -423,6 +423,8 @@ function PublicQuote() {
       quoteTotal = baseAmount + quoteTaxAmount;
   }
 
+  const quoteTerms = quote.terms || quote.clients?.terms || '';
+
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333', display: 'flex', flexDirection: 'column' }}>
       
@@ -531,10 +533,10 @@ function PublicQuote() {
           <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '20px' }}>
             
             <div style={{ flex: 1, minWidth: '250px' }}>
-              {quote.terms && (
+              {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quote.terms}</p>
+                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -720,7 +722,7 @@ function Dashboard() {
     if (!session?.user?.id) return;
     const { data, error } = await supabase
       .from('quotes')
-      .select(`*, clients ( company_name, email, phone, client_type, tax_id, address ), quote_items ( * )`)
+      .select(`*, clients ( company_name, email, phone, client_type, tax_id, address, terms ), quote_items ( * )`)
       .eq('user_id', session.user.id)
       .order('created_at', { ascending: false });
     if (error) console.error('Error fetching quotes:', error.message);
@@ -731,7 +733,7 @@ function Dashboard() {
     if (!session?.user?.id) return;
     const { data, error } = await supabase
       .from('clients')
-      .select('id, company_name, email, phone, client_type, created_at, user_id, tax_id, address')
+      .select('id, company_name, email, phone, client_type, created_at, user_id, tax_id, address, terms')
       .eq('user_id', session.user.id);
     if (error) {
       console.error('Error fetching clients:', error.message);
@@ -1168,7 +1170,7 @@ function Dashboard() {
         ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
         : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
 
-      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = `mailto:‌${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
   };
 
@@ -1333,7 +1335,7 @@ function Dashboard() {
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0); 
-    setTerms(quote.terms || '');
+    setTerms(quote.terms || quote.clients?.terms || '');
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1365,7 +1367,7 @@ function Dashboard() {
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0);
-    setTerms(quote.terms || '');
+    setTerms(quote.terms || quote.clients?.terms || '');
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1419,13 +1421,22 @@ function Dashboard() {
       let clientId;
       const existingClient = clients.find(c => c.company_name?.toLowerCase() === clientName.toLowerCase() && c.user_id === session.user.id);
       
+      const clientPayload = {
+        company_name: clientName,
+        email: clientEmail,
+        phone: clientPhone,
+        client_type: clientType,
+        tax_id: clientTaxId,
+        address: clientAddress,
+        terms: clientType === 'business' ? terms : null,
+        user_id: session.user.id
+      };
+
       if (existingClient) {
         clientId = existingClient.id;
-        if (clientPhone !== existingClient.phone || clientType !== existingClient.client_type || clientTaxId !== existingClient.tax_id || clientAddress !== existingClient.address) {
-          await supabase.from('clients').update({ phone: clientPhone, client_type: clientType, tax_id: clientTaxId, address: clientAddress }).eq('id', clientId);
-        }
+        await supabase.from('clients').update(clientPayload).eq('id', clientId);
       } else {
-        const { data: newClientData, error: clientError } = await supabase.from('clients').insert([{ company_name: clientName, email: clientEmail, phone: clientPhone, client_type: clientType, tax_id: clientTaxId, address: clientAddress, user_id: session.user.id }]).select();
+        const { data: newClientData, error: clientError } = await supabase.from('clients').insert([clientPayload]).select();
         if (clientError) throw clientError;
         clientId = newClientData[0].id;
       }
@@ -1442,7 +1453,7 @@ function Dashboard() {
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
         discount: Number(discount),
-        terms: terms,
+        terms: clientType === 'business' ? terms : null,
         user_id: session.user.id
       };
 
@@ -2005,7 +2016,19 @@ function Dashboard() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientName}</label>
-                      <input type="text" name="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff' }} />
+                      <input type="text" name="clientName" value={clientName} onChange={(e) => {
+                        const val = e.target.value;
+                        setClientName(val);
+                        const found = clients.find(c => c.company_name?.toLowerCase() === val.toLowerCase());
+                        if (found) {
+                          if (found.client_type) setClientType(found.client_type);
+                          if (found.email) setClientEmail(found.email);
+                          if (found.phone) setClientPhone(found.phone);
+                          if (found.tax_id) setClientTaxId(found.tax_id);
+                          if (found.address) setClientAddress(found.address);
+                          if (found.terms) setTerms(found.terms);
+                        }
+                      }} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff' }} />
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'סוג לקוח (חובה)' : 'Client Type'}</label>
@@ -2195,13 +2218,14 @@ function Dashboard() {
                       <th style={{ padding: '10px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'כתובת' : 'Address'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
+                      <th style={{ padding: '10px' }}>{isHebrew ? 'תנאי תשלום' : 'Payment Terms'}</th>
                       <th style={{ padding: '10px' }}>{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {clients.length === 0 ? (
                       <tr>
-                        <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                           {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients recorded yet.'}
                         </td>
                       </tr>
@@ -2214,6 +2238,7 @@ function Dashboard() {
                           <td style={{ padding: '10px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
                           <td style={{ padding: '10px', color: '#475569' }}>{client.address || '-'}</td>
                           <td style={{ padding: '10px', color: '#475569' }}>{client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}</td>
+                          <td style={{ padding: '10px', color: '#475569' }}>{client.terms || '-'}</td>
                           <td style={{ padding: '10px' }}>
                             <button 
                               onClick={() => handleDeleteClient(client.id)}
