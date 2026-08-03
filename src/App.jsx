@@ -84,7 +84,7 @@ function AIChatWidget({ isHebrew }) {
           : "I understand. To send a quote via WhatsApp, click the WhatsApp icon (💬) in the quote actions row.";
         
         if (userText.toLowerCase().includes('price') || userText.includes('מחיר') || userText.includes('הצעה')) {
-          reply = isHebrew ? "ניתן ליצור הצעת מחיר חדשה דרך טופס יצירת ההצעות במסך הראשי." : "You can create a new quote using the form on the main dashboard.";
+          reply = isHebrew ? "ניתן ליצור הצעת מחיר חדשה דרך כפתור 'צור הצעת מחיר חדשה' במסך הראשי." : "You can create a new quote using the 'Create New Quote' button on the main dashboard.";
         }
         setMessages(prev => [...prev, { sender: 'ai', text: reply }]);
         setLoading(false);
@@ -126,7 +126,7 @@ function AIChatWidget({ isHebrew }) {
               placeholder={isHebrew ? "שאל משהו..." : "Ask something..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff' }}
+              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', textAlign: isHebrew ? 'right' : 'left' }}
             />
             <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>{isHebrew ? 'שלח' : 'Send'}</button>
           </form>
@@ -427,6 +427,7 @@ function Dashboard() {
   const [statusMsg, setStatusMsg] = useState({ text: 'System connected to Supabase.', type: 'success' });
 
   const [activeTab, setActiveTab] = useState('main');
+  const [isCreatingQuote, setIsCreatingQuote] = useState(false);
   const [financeReportType, setFinanceReportType] = useState('monthly');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -1142,8 +1143,11 @@ function Dashboard() {
   };
   const sym = getCurrencySymbol(currency);
 
+  const showQuoteForm = isCreatingQuote || editingQuoteId !== null;
+
   const handleEditClick = (quote) => {
     setEditingQuoteId(quote.id);
+    setIsCreatingQuote(false);
     setClientName(quote.clients?.company_name || '');
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
@@ -1173,6 +1177,7 @@ function Dashboard() {
 
   const handleDuplicateQuote = (quote) => {
     setEditingQuoteId(null); 
+    setIsCreatingQuote(true);
     setClientName(quote.clients?.company_name || '');
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
@@ -1202,6 +1207,7 @@ function Dashboard() {
 
   const handleCancelEdit = () => {
     setEditingQuoteId(null);
+    setIsCreatingQuote(false);
     setClientName('');
     setClientEmail('');
     setClientPhone('');
@@ -1211,7 +1217,7 @@ function Dashboard() {
     setTerms('');
     setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
-    setStatusMsg({ text: isHebrew ? 'העריכה בוטלה.' : 'Edit cancelled.', type: 'success' });
+    setStatusMsg({ text: isHebrew ? 'הפעולה בוטלה. הנה רשימת ההצעות.' : 'Action cancelled. Here are your quotes.', type: 'success' });
   };
 
   async function handleSaveQuote(e) {
@@ -1297,7 +1303,9 @@ function Dashboard() {
           : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}${formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`), 
         type: 'success' 
       });
+      
       setEditingQuoteId(null);
+      setIsCreatingQuote(false);
       setClientName('');
       setClientEmail('');
       setClientPhone('');
@@ -1308,6 +1316,7 @@ function Dashboard() {
       setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
       loadData();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error(err);
       setStatusMsg({ text: isHebrew ? `שגיאה בשמירת ההצעה: ${err.message}` : `Error saving quote: ${err.message}`, type: 'error' });
@@ -1407,8 +1416,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -1459,7 +1468,7 @@ function Dashboard() {
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
             <button
-              onClick={() => setActiveTab('main')}
+              onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
               style={{
                 flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'main' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'main' ? '#4f46e5' : 'white', color: activeTab === 'main' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
               }}
@@ -1467,7 +1476,7 @@ function Dashboard() {
               {isHebrew ? '🏠 הצעות מחיר' : '🏠 Quotes'}
             </button>
             <button
-              onClick={() => setActiveTab('settings')}
+              onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
               style={{
                 flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'settings' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'settings' ? '#4f46e5' : 'white', color: activeTab === 'settings' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
               }}
@@ -1475,7 +1484,7 @@ function Dashboard() {
               {isHebrew ? '⚙️ הגדרות עסק' : '⚙️ Business Settings'}
             </button>
             <button
-              onClick={() => setActiveTab('clients')}
+              onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
               style={{
                 flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'clients' ? '#4f46e5' : 'white', color: activeTab === 'clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
               }}
@@ -1485,7 +1494,7 @@ function Dashboard() {
             {bizRole === 'super_admin' && (
               <>
                 <button
-                  onClick={() => setActiveTab('finances')}
+                  onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
                   style={{
                     flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'finances' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'finances' ? '#4f46e5' : 'white', color: activeTab === 'finances' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
@@ -1493,7 +1502,7 @@ function Dashboard() {
                   {isHebrew ? '📊 הוצאות/הכנסות' : '📊 Finances'}
                 </button>
                 <button
-                  onClick={() => setActiveTab('admin_clients')}
+                  onClick={() => { setActiveTab('admin_clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
                   style={{
                     flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'admin_clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', color: activeTab === 'admin_clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
@@ -1504,7 +1513,8 @@ function Dashboard() {
             )}
           </div>
 
-          {activeTab === 'main' && (
+          {/* מראה את טבלת ההיסטוריה והסטטיסטיקות רק אם אנחנו לא במסך יצירה/עריכה */}
+          {activeTab === 'main' && !showQuoteForm && (
             <>
               {bizRole !== 'super_admin' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '25px' }}>
@@ -1529,8 +1539,14 @@ function Dashboard() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0 }}>{t.recentHistory}</h2>
                     <button 
+                      onClick={() => setIsCreatingQuote(true)}
+                      style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.2)' }}
+                    >
+                      ➕ {isHebrew ? 'צור הצעת מחיר חדשה' : 'Create New Quote'}
+                    </button>
+                    <button 
                       onClick={handleExportQuotes}
-                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.8rem' }}
+                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}
                     >
                       📥 {isHebrew ? 'ייצא לאקסל (CSV)' : 'Export CSV'}
                     </button>
@@ -1663,25 +1679,91 @@ function Dashboard() {
                 </div>
               </div>
 
+              <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+                <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
+                
+                <form onSubmit={handleAddService} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+                  <input 
+                    type="text" 
+                    placeholder={t.serviceName} 
+                    value={newServiceName} 
+                    onChange={(e) => setNewServiceName(e.target.value)} 
+                    required 
+                    style={{ flex: '2 1 180px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', background: '#eff6ff' }} 
+                  />
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    placeholder={t.defaultPrice} 
+                    value={newServicePrice} 
+                    onChange={(e) => setNewServicePrice(e.target.value)} 
+                    required 
+                    style={{ flex: '1 1 100px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', fontSize: '0.9rem', background: '#eff6ff' }} 
+                  />
+                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '9px 18px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
+                    {t.addService}
+                  </button>
+                </form>
+
+                <div style={{ overflowX: 'auto' }}>
+                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '350px' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                        <th style={{ padding: '10px' }}>{t.description}</th>
+                        <th style={{ padding: '10px' }}>{t.defaultPrice}</th>
+                        <th style={{ padding: '10px' }}>{t.actions}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {services.length === 0 ? (
+                        <tr>
+                          <td colSpan="3" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                            {isHebrew ? 'הקטלוג שלך ריק. הוסף שירותים למעלה.' : 'Your catalog is empty. Add services above.'}
+                          </td>
+                        </tr>
+                      ) : (
+                        services.map((svc) => (
+                          <tr key={svc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                            <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{svc.name}</td>
+                            <td style={{ padding: '10px', color: '#4f46e5', fontWeight: '600' }}>{formatNum(svc.price)}</td>
+                            <td style={{ padding: '10px' }}>
+                               <button 
+                            title={t.delete}
+                            onClick={() => handleDeleteService(svc.id)}
+                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                            >
+                              {t.delete}
+                            </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* מראה את טופס היצירה / עריכה רק כאשר המשתמש לוחץ על יצירה או עריכה */}
+          {activeTab === 'main' && showQuoteForm && (
               <div style={{ background: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : 'none' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                   <div>
                     <h2 style={{ color: '#1e293b', marginTop: 0, fontSize: '1.2rem', marginBottom: '4px' }}>
-                      {editingQuoteId ? `${isHebrew ? 'עריכת הצעה #' : 'Editing Quote #'}${editingQuoteId.slice(0, 6)}` : t.appName}
+                      {editingQuoteId ? `${isHebrew ? 'עריכת הצעה #' : 'Editing Quote #'}${editingQuoteId.slice(0, 6)}` : (isHebrew ? 'יצירת הצעת מחיר חדשה' : 'Create New Quote')}
                     </h2>
                     <p style={{ color: '#64748b', margin: 0, fontSize: '0.85rem' }}>
-                      {editingQuoteId ? (isHebrew ? 'עדכן את פרטי ההצעה ושמור שינויים' : 'Modify the quote details below and save changes') : t.appSub}
+                      {isHebrew ? 'הזן את פרטי ההצעה ושמור את השינויים' : 'Enter the quote details and save changes'}
                     </p>
                   </div>
-                  {editingQuoteId && (
-                    <button 
-                      type="button" 
-                      onClick={handleCancelEdit}
-                      style={{ background: '#f1f5f9', color: '#4f46e5', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}
-                    >
-                      {t.cancelEdit}
-                    </button>
-                  )}
+                  <button 
+                    type="button" 
+                    onClick={handleCancelEdit}
+                    style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}
+                  >
+                    {isHebrew ? 'ביטול וחזרה לרשימה' : 'Cancel & Return'}
+                  </button>
                 </div>
 
                 <form onSubmit={handleSaveQuote}>
@@ -1794,7 +1876,6 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* כותרות עמודות פריטי ההצעה מתוקנות */}
                   <div style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '10px', marginBottom: '6px', padding: '0 10px', fontSize: '0.8rem', color: '#64748b', fontWeight: 'bold' }}>
                     <div>{isHebrew ? 'תיאור פריט' : 'Description'}</div>
                     <div>{isHebrew ? 'כמות' : 'Qty'}</div>
@@ -1853,71 +1934,6 @@ function Dashboard() {
                   </button>
                 </form>
               </div>
-
-              <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-                <h2 style={{ fontSize: '1.1rem', color: '#1e293b', margin: 0, marginBottom: '20px' }}>{t.servicesCatalog}</h2>
-                
-                <form onSubmit={handleAddService} style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
-                  <input 
-                    type="text" 
-                    placeholder={t.serviceName} 
-                    value={newServiceName} 
-                    onChange={(e) => setNewServiceName(e.target.value)} 
-                    required 
-                    style={{ flex: '2 1 180px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', background: '#eff6ff' }} 
-                  />
-                  <input 
-                    type="number" 
-                    step="0.01" 
-                    placeholder={t.defaultPrice} 
-                    value={newServicePrice} 
-                    onChange={(e) => setNewServicePrice(e.target.value)} 
-                    required 
-                    style={{ flex: '1 1 100px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', fontSize: '0.9rem', background: '#eff6ff' }} 
-                  />
-                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '9px 18px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
-                    {t.addService}
-                  </button>
-                </form>
-
-                <div style={{ overflowX: 'auto' }}>
-                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '350px' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
-                        <th style={{ padding: '10px' }}>{t.description}</th>
-                        <th style={{ padding: '10px' }}>{t.defaultPrice}</th>
-                        <th style={{ padding: '10px' }}>{t.actions}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {services.length === 0 ? (
-                        <tr>
-                          <td colSpan="3" style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
-                            {isHebrew ? 'הקטלוג שלך ריק. הוסף שירותים למעלה.' : 'Your catalog is empty. Add services above.'}
-                          </td>
-                        </tr>
-                      ) : (
-                        services.map((svc) => (
-                          <tr key={svc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                            <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{svc.name}</td>
-                            <td style={{ padding: '10px', color: '#4f46e5', fontWeight: '600' }}>{formatNum(svc.price)}</td>
-                            <td style={{ padding: '10px' }}>
-                               <button 
-                            title={t.delete}
-                            onClick={() => handleDeleteService(svc.id)}
-                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                            >
-                              {t.delete}
-                            </button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </>
           )}
 
           {activeTab === 'clients' && (
