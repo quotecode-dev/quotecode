@@ -99,15 +99,29 @@ function AIChatWidget({ isHebrew }) {
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}
+        style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 18px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.3)', display: 'flex', alignItems: 'center', gap: '8px' }}
       >
-        💬 {isHebrew ? 'שירות לקוחות AI' : 'AI Support'}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h2a3 3 0 0 1 3 3v2h1a2 2 0 0 1 0 4h-1v1a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-1H4a2 2 0 0 1 0-4h1v-2a3 3 0 0 1 3-3h2V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 4 0Z" fill="currentColor"/>
+          <circle cx="9" cy="12" r="1.5" fill="#4f46e5"/>
+          <circle cx="15" cy="12" r="1.5" fill="#4f46e5"/>
+          <path d="M10 16c.5.5 1.2.8 2 .8s1.5-.3 2-.8" stroke="#4f46e5" strokeWidth="1.5" strokeLinecap="round"/>
+        </svg>
+        {isHebrew ? 'שירות לקוחות AI' : 'AI Support'}
       </button>
 
       {isOpen && (
         <div style={{ position: 'fixed', top: '75px', right: '25px', width: '320px', background: 'white', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', zIndex: 99999, overflow: 'hidden' }} dir={isHebrew ? 'rtl' : 'ltr'}>
           <div style={{ background: '#4f46e5', color: 'white', padding: '10px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{isHebrew ? 'שירות לקוחות ProFlow (AI)' : 'ProFlow Support (AI)'}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h2a3 3 0 0 1 3 3v2h1a2 2 0 0 1 0 4h-1v1a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-1H4a2 2 0 0 1 0-4h1v-2a3 3 0 0 1 3-3h2V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 4 0Z" fill="currentColor"/>
+                <circle cx="9" cy="12" r="1.5" fill="#4f46e5"/>
+                <circle cx="15" cy="12" r="1.5" fill="#4f46e5"/>
+                <path d="M10 16c.5.5 1.2.8 2 .8s1.5-.3 2-.8" stroke="#4f46e5" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{isHebrew ? 'שירות לקוחות ProFlow (AI)' : 'ProFlow Support (AI)'}</span>
+            </div>
             <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}>✕</button>
           </div>
           <div style={{ height: '220px', overflowY: 'auto', padding: '10px', fontSize: '0.85rem', background: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '8px', textAlign: isHebrew ? 'right' : 'left' }}>
@@ -382,7 +396,7 @@ function PublicQuote() {
             {quote.terms && (
               <div style={{ textAlign: isHebrew ? 'right' : 'left' }}>
                 <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                <p style={{ margin: 0, color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quote.terms}</p>
+                <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quote.terms}</p>
               </div>
             )}
 
