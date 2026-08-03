@@ -1977,7 +1977,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', right: '0', left: 'auto',
+                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -1998,7 +1998,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', right: '0', left: 'auto',
+                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -2021,7 +2021,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', right: '0', left: 'auto',
+                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -2051,7 +2051,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', right: '0', left: 'auto',
+                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -2705,20 +2705,32 @@ function Dashboard() {
                               {acc.country || 'Israel (Local)'}
                             </span>
                           </td>
-                          <td style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ background: '#f1f5f9', padding: '3px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', color: '#475569' }}>
-                              {acc.plan ? acc.plan.toUpperCase() : 'Free'}
-                            </span>
-                            <select 
-                              defaultValue="" 
-                              onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
-                              style={{ padding: '4px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb', fontSize: '0.8rem', cursor: 'pointer' }}
-                            >
-                              <option value="" disabled>{isHebrew ? 'בחר מנוי...' : 'Select Plan...'}</option>
-                              <option value="free">Free</option>
-                              <option value="basic">Basic</option>
-                              <option value="pro">Pro</option>
-                            </select>
+                          <td style={{ padding: '10px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <span style={{ 
+                                background: '#f1f5f9', 
+                                padding: '4px 10px', 
+                                borderRadius: '6px', 
+                                fontSize: '0.8rem', 
+                                fontWeight: 'bold', 
+                                color: '#475569',
+                                minWidth: '65px',
+                                textAlign: 'center',
+                                display: 'inline-block'
+                              }}>
+                                {acc.plan ? acc.plan.toUpperCase() : 'Free'}
+                              </span>
+                              <select 
+                                defaultValue="" 
+                                onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
+                                style={{ padding: '5px 8px', borderRadius: '6px', border: '1px solid #d97706', background: '#fffbeb', fontSize: '0.85rem', cursor: 'pointer' }}
+                              >
+                                <option value="" disabled>{isHebrew ? 'שדרג מנוי...' : 'Change Plan...'}</option>
+                                <option value="free">Free</option>
+                                <option value="basic">Basic</option>
+                                <option value="pro">Pro</option>
+                              </select>
+                            </div>
                           </td>
                           <td style={{ padding: '10px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
                             {acc.role}
