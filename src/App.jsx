@@ -570,7 +570,7 @@ function PublicQuote() {
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -1170,10 +1170,15 @@ function Dashboard() {
 
   const sendWhatsApp = (proposal) => {
     const clientNameVal = proposal.clients?.company_name || 'לקוח';
+    const clientPhoneVal = proposal.clients?.phone ? proposal.clients.phone.replace(/\D/g, '') : '';
     const text = isHebrew 
-      ? `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ₪${formatNum(proposal.total)}. בתוקף עד ${proposal.validUntil || 'N/A'}.`
-      : `Hi ${clientNameVal}, here is your quote #${proposal.id.slice(0, 6)} totaling ${sym}${formatNum(proposal.total)}. Valid until ${proposal.validUntil || 'N/A'}.`;
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      ? `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ₪${formatNum(proposal.total)}. בתוקף עד ${proposal.valid_until || 'N/A'}.\n\nלצפייה בהצעה:\n${window.location.origin}/quote/${proposal.id}`
+      : `Hi ${clientNameVal}, here is your quote #${proposal.id.slice(0, 6)} totaling ${sym}${formatNum(proposal.total)}. Valid until ${proposal.valid_until || 'N/A'}.\n\nView quote:\n${window.location.origin}/quote/${proposal.id}`;
+    
+    const url = clientPhoneVal 
+      ? `https://wa.me/${clientPhoneVal}?text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
+      
     window.open(url, '_blank');
   };
 
@@ -2403,14 +2408,14 @@ function Dashboard() {
                             <span style={{
                               background: client.client_type === 'business' ? '#dbeafe' : '#f1f5f9',
                               color: client.client_type === 'business' ? '#1e40af' : '#475569',
-                              padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold'
+                              padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold'
                             }}>
                               {client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}
                             </span>
                           </td>
-                          <td style={{ padding: '14px 10px', color: '#4f46e5', fontWeight: '700' }}>
+                          <td style={{ padding: '14px 10px', color: '#4f46e5', fontWeight: '600' }}>
                             {client.terms ? (
-                              <span style={{ background: '#e0e7ff', padding: '4px 10px', borderRadius: '6px', fontSize: '0.8rem' }}>
+                              <span style={{ background: '#e0e7ff', padding: '3px 8px', borderRadius: '6px', fontSize: '0.8rem' }}>
                                 {client.terms}
                               </span>
                             ) : '-'}
@@ -2462,7 +2467,7 @@ function Dashboard() {
                   <input type="url" value={bizLogoUrl} onChange={(e) => setBizLogoUrl(e.target.value)} placeholder="https://example.com/logo.png" disabled={bizPlan !== 'pro'} style={{ width: '100%', padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: bizPlan !== 'pro' ? '#f1f5f9' : '#f8fafc', fontSize: '0.95rem' }} />
                 </div>
 
-                <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)' }}>
+                <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
                   {t.saveSettings}
                 </button>
               </form>
