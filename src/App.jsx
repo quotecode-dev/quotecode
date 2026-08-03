@@ -153,7 +153,7 @@ function PublicQuote() {
     async function fetchData() {
       const { data: quoteData } = await supabase
         .from('quotes')
-        .select(`*, clients ( company_name, email, phone, client_type ), quote_items ( * )`)
+        .select(`*, clients ( company_name, email, phone, client_type, tax_id, address ), quote_items ( * )`)
         .eq('id', id)
         .single();
       
@@ -320,7 +320,16 @@ function PublicQuote() {
           <div style={{ marginBottom: '40px', textAlign: isHebrew ? 'right' : 'left' }}>
             <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'הוכן עבור:' : 'Prepared For:'}</p>
             <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>{quote.clients?.company_name || 'N/A'}</p>
+            {quote.clients?.tax_id && (
+               <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '14px' }}>{isHebrew ? 'ח.פ / ת.ז:' : 'Tax ID:'} {quote.clients.tax_id}</p>
+            )}
             <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '15px' }}>{quote.clients?.email || ''}</p>
+            {quote.clients?.phone && (
+               <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '15px' }}>{quote.clients.phone}</p>
+            )}
+            {quote.clients?.address && (
+               <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '15px' }}>{quote.clients.address}</p>
+            )}
           </div>
 
           <div style={{ overflowX: 'auto' }}>
@@ -458,6 +467,8 @@ function Dashboard() {
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [clientType, setClientType] = useState('');
+  const [clientTaxId, setClientTaxId] = useState('');
+  const [clientAddress, setClientAddress] = useState('');
   
   const [currency, setCurrency] = useState('USD');
   const [quoteStatus, setQuoteStatus] = useState('Draft');
@@ -553,7 +564,7 @@ function Dashboard() {
     if (!session?.user?.id) return;
     const { data, error } = await supabase
       .from('quotes')
-      .select(`*, clients ( company_name, email, phone, client_type ), quote_items ( * )`)
+      .select(`*, clients ( company_name, email, phone, client_type, tax_id, address ), quote_items ( * )`)
       .eq('user_id', session.user.id)
       .order('created_at', { ascending: false });
     if (error) console.error('Error fetching quotes:', error.message);
@@ -564,7 +575,7 @@ function Dashboard() {
     if (!session?.user?.id) return;
     const { data, error } = await supabase
       .from('clients')
-      .select('id, company_name, email, phone, client_type, created_at, user_id')
+      .select('id, company_name, email, phone, client_type, created_at, user_id, tax_id, address')
       .eq('user_id', session.user.id);
     if (error) {
       console.error('Error fetching clients:', error.message);
@@ -1152,6 +1163,8 @@ function Dashboard() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
+    setClientTaxId(quote.clients?.tax_id || '');
+    setClientAddress(quote.clients?.address || '');
     
     if (isLocalIsraeliBusiness) {
       setCurrency('ILS');
@@ -1182,6 +1195,8 @@ function Dashboard() {
     setClientEmail(quote.clients?.email || '');
     setClientPhone(quote.clients?.phone || '');
     setClientType(quote.client_type || quote.clients?.client_type || '');
+    setClientTaxId(quote.clients?.tax_id || '');
+    setClientAddress(quote.clients?.address || '');
     
     if (isLocalIsraeliBusiness) {
       setCurrency('ILS');
@@ -1212,6 +1227,8 @@ function Dashboard() {
     setClientEmail('');
     setClientPhone('');
     setClientType('');
+    setClientTaxId('');
+    setClientAddress('');
     setValidUntil('');
     setDiscount(0);
     setTerms('');
@@ -1248,11 +1265,11 @@ function Dashboard() {
       
       if (existingClient) {
         clientId = existingClient.id;
-        if (clientPhone !== existingClient.phone || clientType !== existingClient.client_type) {
-          await supabase.from('clients').update({ phone: clientPhone, client_type: clientType }).eq('id', clientId);
+        if (clientPhone !== existingClient.phone || clientType !== existingClient.client_type || clientTaxId !== existingClient.tax_id || clientAddress !== existingClient.address) {
+          await supabase.from('clients').update({ phone: clientPhone, client_type: clientType, tax_id: clientTaxId, address: clientAddress }).eq('id', clientId);
         }
       } else {
-        const { data: newClientData, error: clientError } = await supabase.from('clients').insert([{ company_name: clientName, email: clientEmail, phone: clientPhone, client_type: clientType, user_id: session.user.id }]).select();
+        const { data: newClientData, error: clientError } = await supabase.from('clients').insert([{ company_name: clientName, email: clientEmail, phone: clientPhone, client_type: clientType, tax_id: clientTaxId, address: clientAddress, user_id: session.user.id }]).select();
         if (clientError) throw clientError;
         clientId = newClientData[0].id;
       }
@@ -1310,6 +1327,8 @@ function Dashboard() {
       setClientEmail('');
       setClientPhone('');
       setClientType('');
+      setClientTaxId('');
+      setClientAddress('');
       setValidUntil('');
       setDiscount(0);
       setTerms('');
@@ -1801,6 +1820,14 @@ function Dashboard() {
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.clientPhone}</label>
                       <input type="text" name="clientPhone" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+1 (555) 0192" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
                     </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'ח.פ / עוסק / ת.ז' : 'Tax ID / ID'}</label>
+                      <input type="text" name="clientTaxId" value={clientTaxId} onChange={(e) => setClientTaxId(e.target.value)} placeholder={isHebrew ? "לדוגמה: 512345678" : "e.g. 512345678"} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'כתובת' : 'Address'}</label>
+                      <input type="text" name="clientAddress" value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder={isHebrew ? "רחוב, עיר, מיקוד" : "123 Main St, City"} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff' }} />
+                    </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '20px' }}>
@@ -1853,10 +1880,10 @@ function Dashboard() {
                         style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#eff6ff', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
                       >
                         <option value="" disabled>{isHebrew ? 'בחר תנאי תשלום...' : 'Select terms...'}</option>
-                        <option value="תשלום בגמר העבודה">תשלום בגמר העבודה</option>
-                        <option value="30 יום מגמר העבודה">30 יום מגמר העבודה</option>
-                        <option value="שוטף 30">שוטף 30</option>
-                        {terms && !["תשלום בגמר העבודה", "30 יום מגמר העבודה", "שוטף 30"].includes(terms) && (
+                        <option value={isHebrew ? "תשלום בגמר העבודה" : "Payment on completion"}>{isHebrew ? "תשלום בגמר העבודה" : "Payment on completion"}</option>
+                        <option value={isHebrew ? "30 יום מגמר העבודה" : "Net 30 days"}>{isHebrew ? "30 יום מגמר העבודה" : "Net 30 days"}</option>
+                        <option value={isHebrew ? "שוטף 30" : "EOM + 30 days"}>{isHebrew ? "שוטף 30" : "EOM + 30 days"}</option>
+                        {terms && !["תשלום בגמר העבודה", "30 יום מגמר העבודה", "שוטף 30", "Payment on completion", "Net 30 days", "EOM + 30 days"].includes(terms) && (
                           <option value={terms}>{terms}</option>
                         )}
                       </select>
@@ -1886,7 +1913,7 @@ function Dashboard() {
                   </div>
 
                   {items.map((item, index) => (
-                    <div key={index} style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '10px', marginBottom: '10px', alignItems: 'stretch' }}>
+                    <div key={index} style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '10px', marginBottom: '10px', alignItems: 'stretch', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
                       <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
                       <input type="number" placeholder={isHebrew ? 'כמות' : 'Qty'} min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
                       <input type="number" placeholder={isHebrew ? 'מחיר' : 'Price'} step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
@@ -1947,8 +1974,10 @@ function Dashboard() {
                   <thead>
                     <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontSize: '0.8rem', textTransform: 'uppercase' }}>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'שם חברה / לקוח' : 'Company / Name'}</th>
+                      <th style={{ padding: '10px' }}>{isHebrew ? 'ח.פ / ת.ז' : 'Tax ID'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'אימייל' : 'Email'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
+                      <th style={{ padding: '10px' }}>{isHebrew ? 'כתובת' : 'Address'}</th>
                       <th style={{ padding: '10px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
                       <th style={{ padding: '10px' }}>{t.actions}</th>
                     </tr>
@@ -1956,7 +1985,7 @@ function Dashboard() {
                   <tbody>
                     {clients.length === 0 ? (
                       <tr>
-                        <td colSpan="5" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                        <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                           {isHebrew ? 'אין לקוחות רשומים במערכת עדיין.' : 'No clients recorded yet.'}
                         </td>
                       </tr>
@@ -1964,8 +1993,10 @@ function Dashboard() {
                       clients.map((client) => (
                         <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
                           <td style={{ padding: '10px', fontWeight: '600', color: '#1e293b' }}>{client.company_name}</td>
+                          <td style={{ padding: '10px', color: '#475569' }}>{client.tax_id || '-'}</td>
                           <td style={{ padding: '10px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
                           <td style={{ padding: '10px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
+                          <td style={{ padding: '10px', color: '#475569' }}>{client.address || '-'}</td>
                           <td style={{ padding: '10px', color: '#475569' }}>{client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}</td>
                           <td style={{ padding: '10px' }}>
                             <button 
