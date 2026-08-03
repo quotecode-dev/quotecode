@@ -892,6 +892,15 @@ function DashboardContent() {
   const [sortField, setSortField] = useState('email');
   const [sortDirection, setSortDirection] = useState('asc');
 
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
 
@@ -1279,60 +1288,6 @@ function DashboardContent() {
     }));
     exportToCSV(exportData, 'expenses_report.csv');
   };
-
-  const handleAuth = async (e) => {
-    e.preventDefault();
-    setAuthError('');
-    setAuthSuccess('');
-
-    if (isSignUp) {
-      const { data: existingBiz, error: checkErr } = await supabase
-        .from('business_settings')
-        .select('email')
-        .eq('email', emailInput)
-        .maybeSingle();
-
-      if (existingBiz) {
-        setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signUp({ email: emailInput, password: passwordInput });
-      if (error) {
-        setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
-      } else {
-        if (data?.user && data.user.identities && data.user.identities.length === 0) {
-          setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר.' : 'Email already exists! Please sign in.');
-        } else {
-          setAuthSuccess(isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש...' : 'Sign up successful! Initializing user profile...');
-        }
-      }
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email: emailInput, password: passwordInput });
-      if (error) {
-        setAuthError(isHebrew ? 'שגיאה בהתחברות: בדוק את האימייל והסיסמה או השתמש בשחזור סיסמה.' : 'Login error: check your credentials or reset password.');
-      } else {
-        setStatusMsg({ text: isHebrew ? 'התחברת בהצלחה' : 'Logged in successfully', type: 'success' });
-      }
-    }
-  };
-
-  const handleForgotPassword = async () => {
-    if (!emailInput) {
-      setAuthError(isHebrew ? 'נא להזין כתובת אימייל בתיבת האימייל למעלה לשחזור סיסמה.' : 'Please enter your email above to reset password.');
-      return;
-    }
-    const { error } = await supabase.auth.resetPasswordForEmail(emailInput, {
-      redirectTo: window.location.origin,
-    });
-    if (error) {
-      setAuthError(error.message);
-    } else {
-      setAuthSuccess(isHebrew ? 'קישור לשחזור סיסמה נשלח לאימייל שלך בהצלחה.' : 'Password reset link sent to your email.');
-    }
-  };
-
-  const handleSignOut = async () => await supabase.auth.signOut();
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
