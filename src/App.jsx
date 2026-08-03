@@ -34,7 +34,7 @@ function ProFlowLogo({ size = 45 }) {
   );
 }
 
-const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNGY0NmU1Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTBiOTgxIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHBhdGggZD0iTTE1IDUwIEw0NSAyMCBMNjAgMzUgTDQwIDU1IEw2MCA3NSBMNDUgOTAgWiIgZmlsbD0idXJsKCNnKSIvPjxwYXRo dD0iTS00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD05OTAiIGZpbGw9IiMxZTI5M2IiPlBybzx0c3BhbiBmaWxsPSIjNGY0NmU1Ij5GbG93PC90c3Bhbj48L3RleHQ+PC9zdmc+";
+const DEFAULT_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMTAwIiB3aWR0aD0iMjg1IiBoZWlnaHQ9IjEwMCI+PGRlZnM+PGxpbmVhckdyYWRpZW50 idPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvffNldD0iMCUiIHN0b3AtY29sb3I9IiM0ZjQ2ZTUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMxMGI5ODEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNMTUgNTAgTDQ1IDIwIEw2MCAzNSBMNDAgNTUgTDYwIDc1IEw0NSA5MCBaIiBmaWxsPSJ1cmwoI2cpIi8+PHBhdGggZD0iTS00MCA1MCBMNzggMjAgTDg1IDM1IEw2NSA1NSBMODUgNzUgTDcwIDkwIFoiIGZpbGw9IiMxZTI5M2IiIG9wYWNpdHk9IjAuOSIvPjx0ZXh0IHg9IjEwNSIgeT0iNjYiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgVGFob21hLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD05OTAiIGZpbGw9IiMxZTI5M2IiPlBybzx0c3BhbiBmaWxsPSIjNGY0NmU1Ij5GbG93PC90c3Bhbj48L3RleHQ+PC9zdmc+";
 
 function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   if (!isOpen) return null;
@@ -608,16 +608,21 @@ function PublicQuote() {
             </div>
           )}
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
-            <div>
-              <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block' }} crossOrigin="anonymous" />
+          {/* ראש המסמך מותאם לסטנדרט ישראלי: לוגו ופרטי עסק בימין, כותרת ותאריכים בשמאל */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: 'row', flexWrap: 'wrap', gap: '15px' }}>
+            
+            {/* צד ימין: לוגו ופרטי העסק */}
+            <div style={{ textAlign: 'right' }}>
+              <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block', marginLeft: 'auto', marginRight: '0' }} crossOrigin="anonymous" />
               <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
-                {bizTaxId && <span>{isHebrew ? 'עוסק/ח.פ:' : 'Tax ID:'} <span dir="ltr">{bizTaxId}</span> | </span>} 
-                <span dir="ltr">{bizEmail}</span> 
-                {bizPhone && <span> | <span dir="ltr">{bizPhone}</span></span>}
+                {bizPhone && <span dir="ltr">{bizPhone}</span>}
+                {bizEmail && <span> | <span dir="ltr">{bizEmail}</span></span>}
+                {bizTaxId && <span> | {isHebrew ? 'עוסק/ח.פ:' : 'Tax ID:'} <span dir="ltr">{bizTaxId}</span></span>}
               </p>
             </div>
-            <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
+
+            {/* צד שמאל: כותרת הצעת מחיר ותאריכים */}
+            <div style={{ textAlign: 'left' }}>
               <h2 style={{ margin: 0, color: '#111827', fontSize: '22px', textTransform: 'uppercase' }}>{isHebrew ? 'הצעת מחיר' : 'QUOTE'}</h2>
               <p style={{ margin: '4px 0 0', color: '#6b7280', fontSize: '14px' }} dir="ltr">#{quote.id.slice(0, 8).toUpperCase()}</p>
               <p style={{ margin: '2px 0 0', color: '#6b7280', fontSize: '14px' }}>{isHebrew ? 'תאריך:' : 'Date:'} <span dir="ltr">{new Date(quote.created_at).toLocaleDateString('en-US')}</span></p>
@@ -725,7 +730,7 @@ function PublicQuote() {
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -1783,7 +1788,6 @@ function Dashboard() {
     isTrialExpired = trialDaysLeft <= 0;
   }
 
-  // בדיקה האם המנוי עומד לפוג בתוך 7 ימים או פחות
   const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 7 && trialDaysLeft > 0 && !isSuperAdmin;
 
   if (!session) {
@@ -1914,7 +1918,6 @@ function Dashboard() {
             </div>
           )}
 
-          {/* התרעת תפוגה קרובה */}
           {isExpiringSoon && (
             <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#991b1b', padding: '12px 20px', borderRadius: '10px', marginBottom: '15px', fontWeight: 'bold', textAlign: 'center', fontSize: '0.9rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
               <span>⚠️</span>
@@ -2993,7 +2996,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={() => <Dashboard />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
       </Routes>
     </Router>
