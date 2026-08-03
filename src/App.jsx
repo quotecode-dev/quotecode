@@ -1808,7 +1808,7 @@ function Dashboard() {
                       <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }} />
                       <input type="number" placeholder={isHebrew ? 'כמות' : 'Qty'} min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
                       <input type="number" placeholder={isHebrew ? 'מחיר' : 'Price'} step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box' }} />
-                      <div style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontWeight: '600', color: '#334155', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.9rem', boxSizing: 'border-box' }}>
+                      <div style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#eff6ff', fontWeight: '600', color: '#334155', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.9rem', boxSizing: 'border-box', width: '100%' }}>
                         {sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}
                       </div>
                       {items.length > 1 ? (
