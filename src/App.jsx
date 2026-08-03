@@ -6,7 +6,6 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
-// רכיב לוגו קבוע - חצים משמאל והטקסט מימין
 function ProFlowLogo({ size = 45 }) {
   return (
     <div dir="ltr" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', flexDirection: 'row' }}>
@@ -1750,39 +1749,37 @@ function Dashboard() {
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.validUntil}</label>
                       <input type="date" name="validUntil" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
                     </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '25px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{t.discount}</label>
                       <input type="number" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
                     </div>
-                    {clientType === 'business' && (
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'תנאי תשלום (חובה לעסקי)' : 'Payment Terms'}</label>
-                        <select 
-                          name="terms" 
-                          value={terms} 
-                          onChange={(e) => {
-                            setTerms(e.target.value);
-                            e.target.setCustomValidity('');
-                          }} 
-                          onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר תנאי תשלום' : 'Select payment terms')}
-                          onInput={(e) => e.target.setCustomValidity('')}
-                          required 
-                          style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
-                        >
-                          <option value="" disabled>{isHebrew ? 'בחר תנאי תשלום...' : 'Select terms...'}</option>
-                          <option value="תשלום בגמר העבודה">תשלום בגמר העבודה</option>
-                          <option value="30 יום מגמר העבודה">30 יום מגמר העבודה</option>
-                          <option value="שוטף 30">שוטף 30</option>
-                          {terms && !["תשלום בגמר העבודה", "30 יום מגמר העבודה", "שוטף 30"].includes(terms) && (
-                            <option value={terms}>{terms}</option>
-                          )}
-                        </select>
-                      </div>
-                    )}
                   </div>
+
+                  {clientType === 'business' && (
+                    <div style={{ marginBottom: '25px' }}>
+                      <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'תנאי תשלום (חובה לעסקי)' : 'Payment Terms'}</label>
+                      <select 
+                        name="terms" 
+                        value={terms} 
+                        onChange={(e) => {
+                          setTerms(e.target.value);
+                          e.target.setCustomValidity('');
+                        }} 
+                        onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר תנאי תשלום' : 'Select payment terms')}
+                        onInput={(e) => e.target.setCustomValidity('')}
+                        required 
+                        style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left' }}
+                      >
+                        <option value="" disabled>{isHebrew ? 'בחר תנאי תשלום...' : 'Select terms...'}</option>
+                        <option value="תשלום בגמר העבודה">תשלום בגמר העבודה</option>
+                        <option value="30 יום מגמר העבודה">30 יום מגמר העבודה</option>
+                        <option value="שוטף 30">שוטף 30</option>
+                        {terms && !["תשלום בגמר העבודה", "30 יום מגמר העבודה", "שוטף 30"].includes(terms) && (
+                          <option value={terms}>{terms}</option>
+                        )}
+                      </select>
+                    </div>
+                  )}
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                     <h3 style={{ fontSize: '1rem', color: '#1e293b', margin: 0 }}>{t.quoteItems}</h3>
