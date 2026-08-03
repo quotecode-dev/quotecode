@@ -374,7 +374,7 @@ function PublicQuote() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const navLang = navigator.language || '';
   const browserHebrew = navLang.startsWith('he') || tz === 'Asia/Jerusalem';
-  const isHebrew = settings ? isLocalIsraeliBusiness : browserHebrew;
+  const isHebrew = settings ? isLocalIsraeliBusiness : (browserHebrew || isLocalIsraeliBusiness);
 
   const handleClientApproveClick = () => {
     setShowSignatureModal(true);
@@ -569,7 +569,7 @@ function PublicQuote() {
                 <div>{isHebrew ? 'סכום ביניים:' : 'Subtotal:'} <span dir="ltr">{quoteSym}{formatNum(quoteSub)}</span></div>
                 {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} <span dir="ltr">-{quoteSym}{formatNum(quoteDiscountAmount)}</span></div>}
                 {hasVat && <div style={{ marginTop: '6px' }}>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'} <span dir="ltr">{quoteSym}{formatNum(quoteTaxAmount)}</span></div>}
-                <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px'}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} <span dir="ltr">{quoteSym}{formatNum(quoteTotal)}</span></div>
+                <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} <span dir="ltr">{quoteSym}{formatNum(quoteTotal)}</span></div>
               </>
             )}
           </div>
@@ -580,7 +580,7 @@ function PublicQuote() {
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -794,7 +794,8 @@ function Dashboard() {
   }
 
   async function fetchServices() {
-    const { data, error } = await supabase.from('services').select('*').order('created_at', { ascending: true });
+    if (!session?.user?.id) return;
+    const { data, error } = await supabase.from('services').select('*').eq('user_id', session.user.id).order('created_at', { ascending: true });
     if (error) console.error('Error fetching services:', error.message);
     else setServices(data || []);
   }
@@ -1129,7 +1130,8 @@ function Dashboard() {
 
   async function handleAddService(e) {
     e.preventDefault();
-    const { error } = await supabase.from('services').insert([{ name: newServiceName, price: Number(newServicePrice) }]);
+    if (!session?.user?.id) return;
+    const { error } = await supabase.from('services').insert([{ name: newServiceName, price: Number(newServicePrice), user_id: session.user.id }]);
     if (error) setStatusMsg({ text: 'Error adding service: ' + error.message, type: 'error' });
     else {
       setNewServiceName('');
@@ -1182,9 +1184,6 @@ function Dashboard() {
     const clientNameVal = proposal.clients?.company_name || 'לקוח';
     const clientPhoneVal = proposal.clients?.phone ? proposal.clients.phone.replace(/\D/g, '') : '';
     const isBiz = (proposal.client_type || proposal.clients?.client_type) === 'business';
-    const baseSub = proposal.subtotal || proposal.quote_items?.reduce((sum, item) => sum + Number(item.total_price || 0), 0) || proposal.total;
-    
-    // Check if discount was applied, let's use the exact final amount or clear + VAT formula matching the document
     const quoteSub = proposal.subtotal || 0;
     const quoteDiscount = proposal.discount || 0;
     const discountedBase = quoteSub - ((quoteSub * quoteDiscount) / 100);
@@ -2112,7 +2111,7 @@ function Dashboard() {
                     required 
                     style={{ flex: '1 1 90px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', fontSize: '0.85rem', background: '#f8fafc' }} 
                   />
-                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
+                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
                     {t.addService}
                   </button>
                 </form>
