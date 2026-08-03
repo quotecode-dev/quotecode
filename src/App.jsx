@@ -63,34 +63,72 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
 }
 
 function PricingModal({ isOpen, onClose, isHebrew }) {
+  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'yearly'
+
   if (!isOpen) return null;
 
   return (
     <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
-      <div style={{ background: 'white', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '700px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', textAlign: isHebrew ? 'right' : 'left', position: 'relative' }}>
+      <div style={{ background: 'white', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '720px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', textAlign: isHebrew ? 'right' : 'left', position: 'relative' }}>
         
         <button onClick={onClose} style={{ position: 'absolute', top: '15px', [isHebrew ? 'left' : 'right']: '15px', background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕</button>
 
         <h2 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.5rem', textAlign: 'center', marginBottom: '5px' }}>
           {isHebrew ? '🚀 שדרג את העסק שלך עם ProFlow' : '🚀 Upgrade Your Business with ProFlow'}
         </h2>
-        <p style={{ color: '#64748b', textAlign: 'center', marginBottom: '25px', fontSize: '0.9rem' }}>
+        <p style={{ color: '#64748b', textAlign: 'center', marginBottom: '20px', fontSize: '0.9rem' }}>
           {isHebrew ? 'בחר את המסלול המתאים ביותר לצרכים שלך והתחל לעבוד ללא הגבלות' : 'Choose the best plan for your needs and work without limits'}
         </p>
+
+        {/* מתג בחירה בין חודשי לשנתי */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '25px' }}>
+          <div style={{ background: '#f1f5f9', padding: '4px', borderRadius: '30px', display: 'flex', gap: '4px', border: '1px solid #cbd5e1' }}>
+            <button
+              onClick={() => setBillingCycle('monthly')}
+              style={{
+                background: billingCycle === 'monthly' ? '#4f46e5' : 'transparent',
+                color: billingCycle === 'monthly' ? 'white' : '#475569',
+                border: 'none', padding: '8px 20px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s'
+              }}
+            >
+              {isHebrew ? 'חיוב חודשי' : 'Monthly Billing'}
+            </button>
+            <button
+              onClick={() => setBillingCycle('yearly')}
+              style={{
+                background: billingCycle === 'yearly' ? '#4f46e5' : 'transparent',
+                color: billingCycle === 'yearly' ? 'white' : '#475569',
+                border: 'none', padding: '8px 20px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
+              }}
+            >
+              {isHebrew ? 'חיוב שנתי (חודשיים מתנה! 20% הנחה)' : 'Yearly Billing (2 Months Free!)'}
+            </button>
+          </div>
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '25px' }}>
           
           {/* מנוי Basic */}
           <div style={{ border: '2px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי בסיסי (Basic)' : 'Basic Plan'}</h3>
-            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '15px' }}>₪49 <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span></div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '5px' }}>
+              {billingCycle === 'monthly' ? '₪49' : '₪39'} 
+              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span>
+            </div>
+            {billingCycle === 'yearly' && (
+              <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 'bold', marginBottom: '15px' }}>
+                {isHebrew ? 'חיוב שנתי של ₪468 (חסוך ₪120 בשנה)' : 'Billed annually at ₪468'}
+              </div>
+            )}
+            {billingCycle === 'monthly' && <div style={{ height: '20px', marginBottom: '15px' }}></div>}
+            
             <ul style={{ margin: '0 0 20px 0', padding: isHebrew ? '0 20px 0 0' : '0 0 0 20px', color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', flex: 1 }}>
               <li>{isHebrew ? 'עד 20 הצעות מחיר בחודש' : 'Up to 20 quotes/month'}</li>
               <li>{isHebrew ? 'עריכה ושכפול הצעות מחיר' : 'Edit & duplicate quotes'}</li>
               <li>{isHebrew ? 'קטלוג מוצרים אישי' : 'Personal product catalog'}</li>
               <li>{isHebrew ? 'הפקת קובצי PDF רשמיים' : 'Official PDF exports'}</li>
             </ul>
-            <button onClick={() => { alert(isHebrew ? 'לשדרוג מיידי למסלול Basic, פנה לתמיכה או למנהל המערכת.' : 'Please contact support to upgrade to Basic.'); onClose(); }} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
+            <button onClick={() => { alert(isHebrew ? `לשדרוג מיידי למסלול Basic (${billingCycle === 'yearly' ? 'שנתי' : 'חודשי'}), פנה לתמיכה.` : 'Please contact support to upgrade.'); onClose(); }} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
               {isHebrew ? 'בחר מסלול Basic' : 'Select Basic'}
             </button>
           </div>
@@ -99,7 +137,17 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
           <div style={{ border: '2px solid #4f46e5', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: 'white', boxShadow: '0 10px 15px -3px rgba(79, 70, 229, 0.1)' }}>
             <div style={{ background: '#4f46e5', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', alignSelf: 'flex-start', marginBottom: '8px' }}>POPULAR</div>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי PRO (מומלץ)' : 'PRO Plan (Recommended)'}</h3>
-            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '15px' }}>₪99 <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span></div>
+            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '5px' }}>
+              {billingCycle === 'monthly' ? '₪99' : '₪79'} 
+              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span>
+            </div>
+            {billingCycle === 'yearly' && (
+              <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 'bold', marginBottom: '15px' }}>
+                {isHebrew ? 'חיוב שנתי של ₪948 (חסוך ₪240 בשנה)' : 'Billed annually at ₪948'}
+              </div>
+            )}
+            {billingCycle === 'monthly' && <div style={{ height: '20px', marginBottom: '15px' }}></div>}
+
             <ul style={{ margin: '0 0 20px 0', padding: isHebrew ? '0 20px 0 0' : '0 0 0 20px', color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', flex: 1 }}>
               <li>{isHebrew ? 'הצעות מחיר ללא הגבלה (∞)' : 'Unlimited quotes (∞)'}</li>
               <li>{isHebrew ? 'שליחת הצעות מחיר ישירות בווצאפ' : 'Send quotes directly via WhatsApp'}</li>
@@ -107,7 +155,7 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
               <li>{isHebrew ? 'מחיקה וניהול מתקדם של הצעות' : 'Advanced quote management & deletion'}</li>
               <li>{isHebrew ? 'מעקב צפיות חכם (הצעות חמות)' : 'Smart view tracking (Hot quotes)'}</li>
             </ul>
-            <button onClick={() => { alert(isHebrew ? 'לשדרוג מיידי למסלול PRO, פנה לתמיכה או למנהל המערכת.' : 'Please contact support to upgrade to PRO.'); onClose(); }} style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem', boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)' }}>
+            <button onClick={() => { alert(isHebrew ? `לשדרוג מיידי למסלול PRO (${billingCycle === 'yearly' ? 'שנתי' : 'חודשי'}), פנה לתמיכה.` : 'Please contact support to upgrade.'); onClose(); }} style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem', boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)' }}>
               {isHebrew ? 'בחר מסלול PRO' : 'Select PRO'}
             </button>
           </div>
@@ -671,7 +719,7 @@ function PublicQuote() {
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -2465,7 +2513,7 @@ function Dashboard() {
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
-                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}${formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
+                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
                       </div>
                     )}
                   </div>
