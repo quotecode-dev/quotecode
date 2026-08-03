@@ -353,12 +353,11 @@ function PublicQuote() {
 
       if (quoteData) {
         const currentViews = (quoteData.view_count || 0) + 1;
-        const { error: updateErr } = await supabase.from('quotes').update({ view_count: currentViews }).eq('id', id);
-        if (updateErr) {
-          console.warn("Could not update view_count:", updateErr.message);
-        } else {
-          quoteData.view_count = currentViews;
+        const { error: rpcErr } = await supabase.rpc('increment_quote_views', { quote_id: id });
+        if (rpcErr) {
+          await supabase.from('quotes').update({ view_count: currentViews }).eq('id', id);
         }
+        quoteData.view_count = currentViews;
       }
 
       setQuote(quoteData);
@@ -581,7 +580,7 @@ function PublicQuote() {
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                  <p style={{ margin: '0', color: '#64748b', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
 
@@ -2521,7 +2520,7 @@ function Dashboard() {
                     <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalRevenue}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#22c55e' }}>{sym}{formatNum(adminTotalRevenue)}</div>
                   </div>
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
                     <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalExpenses}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ef4444' }}>{sym}{formatNum(adminTotalExpenses)}</div>
                   </div>
@@ -2787,7 +2786,7 @@ function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
-        <button onClick={() => { setActiveTab('creating'); setIsCreatingQuote(true); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { setIsCreatingQuote(true); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>➕</span>
           {isHebrew ? 'חדש' : 'New'}
         </button>
