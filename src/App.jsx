@@ -62,6 +62,67 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   );
 }
 
+function PricingModal({ isOpen, onClose, isHebrew }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div style={{ background: 'white', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '700px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', textAlign: isHebrew ? 'right' : 'left', position: 'relative' }}>
+        
+        <button onClick={onClose} style={{ position: 'absolute', top: '15px', [isHebrew ? 'left' : 'right']: '15px', background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕</button>
+
+        <h2 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.5rem', textAlign: 'center', marginBottom: '5px' }}>
+          {isHebrew ? '🚀 שדרג את העסק שלך עם ProFlow' : '🚀 Upgrade Your Business with ProFlow'}
+        </h2>
+        <p style={{ color: '#64748b', textAlign: 'center', marginBottom: '25px', fontSize: '0.9rem' }}>
+          {isHebrew ? 'בחר את המסלול המתאים ביותר לצרכים שלך והתחל לעבוד ללא הגבלות' : 'Choose the best plan for your needs and work without limits'}
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '25px' }}>
+          
+          {/* מנוי Basic */}
+          <div style={{ border: '2px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי בסיסי (Basic)' : 'Basic Plan'}</h3>
+            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '15px' }}>₪79 <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span></div>
+            <ul style={{ margin: '0 0 20px 0', padding: isHebrew ? '0 20px 0 0' : '0 0 0 20px', color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', flex: 1 }}>
+              <li>{isHebrew ? 'עד 20 הצעות מחיר בחודש' : 'Up to 20 quotes/month'}</li>
+              <li>{isHebrew ? 'עריכה ושכפול הצעות מחיר' : 'Edit & duplicate quotes'}</li>
+              <li>{isHebrew ? 'קטלוג מוצרים אישי' : 'Personal product catalog'}</li>
+              <li>{isHebrew ? 'הפקת קובצי PDF רשמיים' : 'Official PDF exports'}</li>
+            </ul>
+            <button onClick={() => { alert(isHebrew ? 'לשדרוג מיידי למסלול Basic, פנה לתמיכה או למנהל המערכת.' : 'Please contact support to upgrade to Basic.'); onClose(); }} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
+              {isHebrew ? 'בחר מסלול Basic' : 'Select Basic'}
+            </button>
+          </div>
+
+          {/* מנוי PRO */}
+          <div style={{ border: '2px solid #4f46e5', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: 'white', boxShadow: '0 10px 15px -3px rgba(79, 70, 229, 0.1)' }}>
+            <div style={{ background: '#4f46e5', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', alignSelf: 'flex-start', marginBottom: '8px' }}>POPULAR</div>
+            <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי PRO (מומלץ)' : 'PRO Plan (Recommended)'}</h3>
+            <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '15px' }}>₪149 <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span></div>
+            <ul style={{ margin: '0 0 20px 0', padding: isHebrew ? '0 20px 0 0' : '0 0 0 20px', color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', flex: 1 }}>
+              <li>{isHebrew ? 'הצעות מחיר ללא הגבלה (∞)' : 'Unlimited quotes (∞)'}</li>
+              <li>{isHebrew ? 'שליחת הצעות מחיר ישירות בווצאפ' : 'Send quotes directly via WhatsApp'}</li>
+              <li>{isHebrew ? 'הוספת לוגו עסקי מותאם אישית' : 'Custom business logo upload'}</li>
+              <li>{isHebrew ? 'מחיקה וניהול מתקדם של הצעות' : 'Advanced quote management & deletion'}</li>
+              <li>{isHebrew ? 'מעקב צפיות חכם (הצעות חמות)' : 'Smart view tracking (Hot quotes)'}</li>
+            </ul>
+            <button onClick={() => { alert(isHebrew ? 'לשדרוג מיידי למסלול PRO, פנה לתמיכה או למנהל המערכת.' : 'Please contact support to upgrade to PRO.'); onClose(); }} style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem', boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)' }}>
+              {isHebrew ? 'בחר מסלול PRO' : 'Select PRO'}
+            </button>
+          </div>
+
+        </div>
+
+        <div style={{ textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
+          {isHebrew ? 'יש לך שאלות? צור איתנו קשר דרך עוזר ה-AI או במייל.' : 'Have questions? Contact us via AI assistant or email.'}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 function EmailConfirmModal({ isOpen, onClose, onConfirm, clientEmail, isHebrew }) {
   if (!isOpen) return null;
 
@@ -692,6 +753,7 @@ function Dashboard() {
   const [sortDirection, setSortDirection] = useState('asc');
 
   const [showAccessibility, setShowAccessibility] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -1744,6 +1806,7 @@ function Dashboard() {
       `}</style>
 
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
+      <PricingModal isOpen={showPricingModal} onClose={() => setShowPricingModal(false)} isHebrew={isHebrew} />
       
       <EmailConfirmModal 
         isOpen={pendingEmailQuote !== null} 
@@ -1769,8 +1832,16 @@ function Dashboard() {
               )}
             </div>
 
-            <div style={{ flex: '0 1 auto', textAlign: 'center' }}>
+            <div style={{ flex: '0 1 auto', textAlign: 'center', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <AIChatWidget isHebrew={isHebrew} />
+              {!isPro && !isSuperAdmin && (
+                <button
+                  onClick={() => setShowPricingModal(true)}
+                  style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  ⭐ {isHebrew ? 'שדרג חבילה' : 'Upgrade Plan'}
+                </button>
+              )}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -2854,6 +2925,20 @@ function Dashboard() {
 }
 
 export default function App() {
+  const [session, setSession] = useState(null);
+  
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <Router>
       <Routes>
