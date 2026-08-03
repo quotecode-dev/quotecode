@@ -1407,8 +1407,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
