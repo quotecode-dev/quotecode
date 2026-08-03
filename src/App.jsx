@@ -351,8 +351,12 @@ function PublicQuote() {
 
       if (quoteData) {
         const currentViews = (quoteData.view_count || 0) + 1;
-        await supabase.from('quotes').update({ view_count: currentViews }).eq('id', id);
-        quoteData.view_count = currentViews;
+        const { error: updateErr } = await supabase.from('quotes').update({ view_count: currentViews }).eq('id', id);
+        if (updateErr) {
+          console.warn("Could not update view_count (column may not exist in database yet):", updateErr.message);
+        } else {
+          quoteData.view_count = currentViews;
+        }
       }
 
       setQuote(quoteData);
@@ -1376,7 +1380,8 @@ function Dashboard() {
     if (curr === 'ILS') return '₪';
     return '$';
   };
-  const sym = getCurrencySymbol(currency);
+  const quoteSym = getCurrencySymbol(quote.currency);
+  const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const showQuoteForm = isCreatingQuote || editingQuoteId !== null;
 
