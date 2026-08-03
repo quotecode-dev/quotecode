@@ -647,8 +647,8 @@ function Dashboard() {
 
   const isLocalIsraeliBusiness = bizCountry === 'Israel (Local)';
   const isSuperAdmin = bizRole === 'super_admin';
-  const isPro = isSuperAdmin || bizPlan === 'pro';
-  const isBasicOrAbove = isPro || bizPlan === 'basic';
+  const isPro = isSuperAdmin || bizPlan.toLowerCase() === 'pro';
+  const isBasicOrAbove = isPro || bizPlan.toLowerCase() === 'basic';
 
   const t = {
     appName: bizName || 'ProFlow',
@@ -1228,7 +1228,7 @@ function Dashboard() {
     return qDate.getMonth() === currentMonth && qDate.getFullYear() === currentYear;
   }).length;
 
-  const planLimit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : '∞';
+  const planLimit = bizPlan.toLowerCase() === 'free' ? 5 : bizPlan.toLowerCase() === 'basic' ? 20 : '∞';
 
   const totalQuotesCount = quotes.length;
   const totalRevenue = quotes.filter(q => q.status?.toLowerCase() === 'approved' || q.status?.toLowerCase() === 'paid').reduce((sum, q) => sum + Number(q.total || 0), 0);
@@ -1434,8 +1434,8 @@ function Dashboard() {
     }
 
     try {
-      if (!editingQuoteId && bizRole !== 'super_admin') {
-        const limit = bizPlan === 'free' ? 5 : bizPlan === 'basic' ? 20 : Infinity;
+      if (!editingQuoteId && !isSuperAdmin) {
+        const limit = bizPlan.toLowerCase() === 'free' ? 5 : bizPlan.toLowerCase() === 'basic' ? 20 : Infinity;
         if (monthlyQuotesCount >= limit) {
           setStatusMsg({ 
             text: isHebrew 
@@ -2669,7 +2669,7 @@ function Dashboard() {
                           </td>
                           <td style={{ padding: '10px' }}>
                             <select 
-                              value={acc.plan} 
+                              value={acc.plan ? acc.plan.toLowerCase() : 'free'} 
                               onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
                               style={{ padding: '5px', borderRadius: '4px', border: '1px solid #d97706', background: '#fffbeb', fontSize: '0.85rem' }}
                             >
