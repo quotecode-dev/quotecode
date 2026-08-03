@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
 import { supabase } from './supabase';
 import html2canvas from 'html2canvas';
@@ -163,6 +163,123 @@ function AIChatWidget({ isHebrew }) {
   );
 }
 
+function SignaturePadModal({ isOpen, onClose, onSave, isHebrew }) {
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const getCoordinates = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    let clientX, clientY;
+
+    if (e.nativeEvent && e.nativeEvent.touches && e.nativeEvent.touches.length > 0) {
+      clientX = e.nativeEvent.touches[0].clientX;
+      clientY = e.nativeEvent.touches[0].clientY;
+    } else if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX || (e.nativeEvent && e.nativeEvent.clientX);
+      clientY = e.clientY || (e.nativeEvent && e.nativeEvent.clientY);
+    }
+
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top
+    };
+  };
+
+  const startDrawing = (e) => {
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+    const { x, y } = getCoordinates(e);
+    const ctx = canvasRef.current.getContext('2d');
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const handleSave = () => {
+    const canvas = canvasRef.current;
+    const dataUrl = canvas.toDataURL('image/png');
+    onSave(dataUrl);
+  };
+
+  return (
+    <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div style={{ background: 'white', padding: '25px', borderRadius: '16px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+        <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.3rem', marginBottom: '10px' }}>
+          {isHebrew ? '✍️ חתימה דיגיטלית' : '✍️ Digital Signature'}
+        </h3>
+        <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '20px', marginTop: 0 }}>
+          {isHebrew ? 'אנא חתום בתוך המסגרת כדי לאשר את הצעת המחיר.' : 'Please sign within the box below to approve this quote.'}
+        </p>
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+          <canvas
+            ref={canvasRef}
+            width={320}
+            height={180}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={stopDrawing}
+            style={{ border: '2px dashed #cbd5e1', borderRadius: '8px', background: '#f8fafc', cursor: 'crosshair', touchAction: 'none', maxWidth: '100%' }}
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '25px' }}>
+          <button onClick={clearCanvas} style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' }}>
+            {isHebrew ? '🧹 נקה חתימה' : '🧹 Clear'}
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+          <button onClick={onClose} style={{ flex: 1, background: 'white', color: '#64748b', border: '1px solid #cbd5e1', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem' }}>
+            {isHebrew ? 'ביטול' : 'Cancel'}
+          </button>
+          <button onClick={handleSave} style={{ flex: 2, background: '#10b981', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)' }}>
+            {isHebrew ? '✔️ אשר וחתום' : '✔️ Approve & Sign'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PublicQuote() {
   const { id } = useParams();
   const [quote, setQuote] = useState(null);
@@ -171,6 +288,7 @@ function PublicQuote() {
   const [approvedSuccess, setApprovedSuccess] = useState(false);
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
 
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const navLang = navigator.language || '';
@@ -211,25 +329,26 @@ function PublicQuote() {
     fetchData();
   }, [id]);
 
-  const handleClientApprove = async () => {
-    const confirmMsg = isHebrew 
-      ? 'לחיצה על אישור הצעה זו מהווה הסכמתך לביצוע העבודה. האם להמשיך?' 
-      : 'Clicking approve means you agree to proceed with the work. Do you want to continue?';
+  const handleClientApproveClick = () => {
+    setShowSignatureModal(true);
+  };
 
-    if (!window.confirm(confirmMsg)) return;
+  const processApprovalWithSignature = async (signatureDataUrl) => {
+    const { error: updateError } = await supabase
+      .from('quotes')
+      .update({ status: 'approved', signature: signatureDataUrl })
+      .eq('id', id);
 
-    const { error: rpcError } = await supabase.rpc('approve_quote_public', { quote_id: id });
-
-    if (!rpcError) {
+    if (!updateError) {
+      setQuote(prev => ({ ...prev, status: 'approved', signature: signatureDataUrl }));
       setApprovedSuccess(true);
+      setShowSignatureModal(false);
     } else {
-      const { error: updateError } = await supabase
-        .from('quotes')
-        .update({ status: 'approved' })
-        .eq('id', id);
-
-      if (!updateError) {
+      const { error: rpcError } = await supabase.rpc('approve_quote_public', { quote_id: id });
+      if (!rpcError) {
+        setQuote(prev => ({ ...prev, status: 'approved' }));
         setApprovedSuccess(true);
+        setShowSignatureModal(false);
       } else {
         alert(isHebrew ? `שגיאה באישור ההצעה: ${updateError.message}` : `Error: ${updateError.message}`);
       }
@@ -307,6 +426,7 @@ function PublicQuote() {
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333', display: 'flex', flexDirection: 'column' }}>
       
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
+      <SignaturePadModal isOpen={showSignatureModal} onClose={() => setShowSignatureModal(false)} onSave={processApprovalWithSignature} isHebrew={isHebrew} />
 
       <div style={{ flex: '1 0 auto' }}>
         <div className="no-print" style={{ maxWidth: '800px', margin: '0 auto 20px auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
@@ -325,7 +445,7 @@ function PublicQuote() {
           
           {approvedSuccess && (
             <div data-html2canvas-ignore="true" style={{ background: '#dcfce7', border: '1px solid #22c55e', color: '#166534', padding: '15px 20px', borderRadius: '8px', marginBottom: '25px', textAlign: 'center', fontWeight: 'bold' }}>
-              {isHebrew ? '✅ הצעת המחיר אושרה בהצלחה על ידך! תודה רבה.' : '✅ Quote successfully approved! Thank you for your business.'}
+              {isHebrew ? '✅ הצעת המחיר אושרה ונחתמה בהצלחה על ידך! תודה רבה.' : '✅ Quote successfully approved & signed! Thank you for your business.'}
             </div>
           )}
 
@@ -406,19 +526,26 @@ function PublicQuote() {
 
           <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '20px' }}>
             
-            {quote.terms && (
-              <div style={{ textAlign: isHebrew ? 'right' : 'left' }}>
-                <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quote.terms}</p>
-              </div>
-            )}
+            <div style={{ flex: 1, minWidth: '250px' }}>
+              {quote.terms && (
+                <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
+                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quote.terms}</p>
+                </div>
+              )}
 
-            {!quote.terms && <div></div>}
+              {quote.signature && (
+                <div style={{ textAlign: isHebrew ? 'right' : 'left', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'חתימת לקוח מאושרת:' : 'Approved Client Signature:'}</p>
+                  <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '80px', display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
+                </div>
+              )}
+            </div>
 
-            {!approvedSuccess && (
+            {!approvedSuccess && !quote.signature && (
               <div data-html2canvas-ignore="true" className="no-print">
                 <button 
-                  onClick={handleClientApprove}
+                  onClick={handleClientApproveClick}
                   style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
                 >
                   {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
@@ -2132,7 +2259,7 @@ function Dashboard() {
 
           {bizRole === 'super_admin' && activeTab === 'finances' && (
              <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #4f46e5' }}>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
                     <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
