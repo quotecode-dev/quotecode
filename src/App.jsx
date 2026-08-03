@@ -388,13 +388,17 @@ function SignaturePadModal({ isOpen, onClose, onSave, isHebrew }) {
 
   return (
     <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
-      <div style={{ background: 'white', padding: '25px', borderRadius: '16px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+      <div style={{ background: 'white', padding: '25px', borderRadius: '16px', width: '100%', maxWidth: '420px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', textAlign: 'center' }}>
         <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.3rem', marginBottom: '10px' }}>
-          {isHebrew ? '✍️ חתימה דיגיטלית' : '✍️ Digital Signature'}
+          {isHebrew ? '✍️ חתימה דיגיטלית ואישור הזמנה' : '✍️ Digital Signature & Approval'}
         </h3>
-        <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '20px', marginTop: 0 }}>
+        <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '15px', marginTop: 0 }}>
           {isHebrew ? 'אנא חתום בתוך המסגרת כדי לאשר את הצעת המחיר.' : 'Please sign within the box below to approve this quote.'}
         </p>
+
+        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '10px 12px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.8rem', fontWeight: 'bold', lineHeight: '1.4' }}>
+          {isHebrew ? '⚠️ בלחיצה על "אשר וחתום" הינך מאשר את הפרטים בהצעה.' : 'By clicking approve and sign, you confirm the details in the quote.'}
+        </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
           <canvas
@@ -754,9 +758,9 @@ function PublicQuote() {
             )}
           </div>
 
-          {/* כיתוב מיתוג ProFlow בתוך המסגרת למטה */}
+          {/* כיתוב מיתוג ProFlow כקישור דינמי בתוך המסגרת למטה */}
           <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
-            מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.
+            מסמך זה נערך ע"י <a href="https://proflow.co.il" target="_blank" rel="noopener noreferrer" style={{ color: '#4f46e5', fontWeight: 'bold', textDecoration: 'none' }}>ProFlow</a> - התוכנה שעושה לעסקים את החיים קלים.
           </div>
 
         </div>
@@ -1548,7 +1552,6 @@ function Dashboard() {
   const showQuoteForm = isCreatingQuote || editingQuoteId !== null;
 
   const handleEditClick = (quote) => {
-    // בדיקה משפטית ואבטחית: מניעת עריכת הצעת מחיר שכבר אושרה ונחתמה על ידי הלקוח
     if (quote.status?.toLowerCase() === 'approved' || quote.status?.toLowerCase() === 'paid' || quote.signature) {
       alert(isHebrew 
         ? '⚠️ אזהרה משפטית: לא ניתן לערוך הצעת מחיר שכבר אושרה ונחתמה על ידי הלקוח! לפי החוק והתקנים העסקיים, מסמך חתום הינו חוזה מחייב נעול. כדי לבצע שינויים יש לשכפל את ההצעה או ליצור הצעה חדשה.' 
@@ -3014,7 +3017,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={() => <Dashboard />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
       </Routes>
     </Router>
