@@ -1501,44 +1501,90 @@ function Dashboard() {
             <button
               onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
               style={{
-                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'main' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'main' ? '#4f46e5' : 'white', color: activeTab === 'main' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', 
+                border: activeTab === 'main' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', 
+                background: activeTab === 'main' ? '#4f46e5' : 'white', 
+                color: activeTab === 'main' ? 'white' : '#475569', 
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              {isHebrew ? '🏠 הצעות מחיר' : '🏠 Quotes'}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              {isHebrew ? 'הצעות מחיר' : 'Quotes'}
             </button>
             <button
               onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
               style={{
-                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'settings' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'settings' ? '#4f46e5' : 'white', color: activeTab === 'settings' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', 
+                border: activeTab === 'settings' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', 
+                background: activeTab === 'settings' ? '#4f46e5' : 'white', 
+                color: activeTab === 'settings' ? 'white' : '#475569', 
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              {isHebrew ? '⚙️ הגדרות עסק' : '⚙️ Business Settings'}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              {isHebrew ? 'הגדרות עסק' : 'Business Settings'}
             </button>
             <button
               onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
               style={{
-                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'clients' ? '#4f46e5' : 'white', color: activeTab === 'clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', 
+                border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', 
+                background: activeTab === 'clients' ? '#4f46e5' : 'white', 
+                color: activeTab === 'clients' ? 'white' : '#475569', 
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              {isHebrew ? '👥 לקוחות' : '👥 Clients'}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              {isHebrew ? 'לקוחות' : 'Clients'}
             </button>
             {bizRole === 'super_admin' && (
               <>
                 <button
                   onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
                   style={{
-                    flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'finances' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'finances' ? '#4f46e5' : 'white', color: activeTab === 'finances' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                    flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', 
+                    border: activeTab === 'finances' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                    fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', 
+                    background: activeTab === 'finances' ? '#4f46e5' : 'white', 
+                    color: activeTab === 'finances' ? 'white' : '#475569', 
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                   }}
                 >
-                  {isHebrew ? '📊 הוצאות/הכנסות' : '📊 Finances'}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                  {isHebrew ? 'הוצאות/הכנסות' : 'Finances'}
                 </button>
                 <button
                   onClick={() => { setActiveTab('admin_clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
                   style={{
-                    flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', border: activeTab === 'admin_clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', color: activeTab === 'admin_clients' ? 'white' : '#475569', boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                    flex: '1 1 auto', minWidth: '130px', padding: '10px 15px', borderRadius: '10px', 
+                    border: activeTab === 'admin_clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                    fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', 
+                    background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', 
+                    color: activeTab === 'admin_clients' ? 'white' : '#475569', 
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                   }}
                 >
-                  {isHebrew ? '👑 משתמשים' : '👑 Users Admin'}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="2 4 5 16 19 16 22 4 16 9 12 3 8 9"></polygon><line x1="5" y1="20" x2="19" y2="20"></line>
+                  </svg>
+                  {isHebrew ? 'משתמשים' : 'Users Admin'}
                 </button>
               </>
             )}
