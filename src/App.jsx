@@ -365,7 +365,7 @@ function PublicQuote() {
                 <div>{isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):'} {quoteSym}{formatNum(quoteSub)}</div>
                 {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} -{quoteSym}{formatNum(quoteDiscountAmount)}</div>}
                 <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} {quoteSym}{formatNum(quoteTotal)}</div>
-                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{isHebrew ? `(הסכום כולל מע"מ בסך ${quoteSym}{formatNum(quoteTaxAmount)})` : `(Includes VAT: ${quoteSym}${formatNum(quoteTaxAmount)})`}</div>
+                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{isHebrew ? `(הסכום כולל מע"מ בסך ${quoteSym}${formatNum(quoteTaxAmount)})` : `(Includes VAT: ${quoteSym}${formatNum(quoteTaxAmount)})`}</div>
               </>
             ) : (
               <>
@@ -1950,7 +1950,7 @@ function Dashboard() {
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
-                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
+                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}${formatNum(taxAmount)})` : `(Includes VAT: ${sym}${formatNum(taxAmount)})`}</span>
                       </div>
                     )}
                   </div>
