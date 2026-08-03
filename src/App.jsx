@@ -373,7 +373,7 @@ function PublicQuote() {
             {quote.terms && (
               <div style={{ textAlign: isHebrew ? 'right' : 'left' }}>
                 <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
-                <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quote.terms}</p>
+                <p style={{ margin: 0, color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quote.terms}</p>
               </div>
             )}
 
@@ -1407,8 +1407,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -1794,17 +1794,17 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* כותרות עמודות פריטי ההצעה */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 40px', gap: '10px', marginBottom: '6px', padding: '0 10px', fontSize: '0.8rem', color: '#64748b', fontWeight: 'bold' }}>
+                  {/* כותרות עמודות פריטי ההצעה מתוקנות */}
+                  <div style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '10px', marginBottom: '6px', padding: '0 10px', fontSize: '0.8rem', color: '#64748b', fontWeight: 'bold' }}>
                     <div>{isHebrew ? 'תיאור פריט' : 'Description'}</div>
                     <div>{isHebrew ? 'כמות' : 'Qty'}</div>
                     <div>{isHebrew ? 'מחיר יחידה' : 'Unit Price'}</div>
                     <div>{isHebrew ? 'סה"כ' : 'Total'}</div>
-                    <div></div>
+                    {items.length > 1 && <div></div>}
                   </div>
 
                   {items.map((item, index) => (
-                    <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 40px', gap: '10px', marginBottom: '10px', alignItems: 'stretch', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                    <div key={index} style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '10px', marginBottom: '10px', alignItems: 'stretch', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
                       <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
                       <input type="number" placeholder={isHebrew ? 'כמות' : 'Qty'} min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
                       <input type="number" placeholder={isHebrew ? 'מחיר' : 'Price'} step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: '#eff6ff', fontSize: '0.9rem', color: '#334155' }} />
@@ -1813,10 +1813,8 @@ function Dashboard() {
                         {sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}
                       </div>
 
-                      {items.length > 1 ? (
+                      {items.length > 1 && (
                         <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '9px 0', borderRadius: '6px', cursor: 'pointer', width: '100%', textAlign: 'center', height: '100%' }}>✕</button>
-                      ) : (
-                        <div></div>
                       )}
                     </div>
                   ))}
