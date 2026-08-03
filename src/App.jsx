@@ -612,6 +612,7 @@ function Dashboard() {
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
   const [clientSearchTerm, setClientSearchTerm] = useState('');
+  const [activeTooltip, setActiveTooltip] = useState({ quoteId: null, action: null, msg: '' });
   
   const [sortField, setSortField] = useState('email');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -645,6 +646,9 @@ function Dashboard() {
   const [isRecurring, setIsRecurring] = useState(false);
 
   const isLocalIsraeliBusiness = bizCountry === 'Israel (Local)';
+  const isSuperAdmin = bizRole === 'super_admin';
+  const isPro = isSuperAdmin || bizPlan === 'pro';
+  const isBasicOrAbove = isPro || bizPlan === 'basic';
 
   const t = {
     appName: bizName || 'ProFlow',
@@ -1175,6 +1179,30 @@ function Dashboard() {
     }
   };
 
+  const handleProtectedAction = (quoteId, actionType, callback) => {
+    if (actionType === 'edit' || actionType === 'duplicate') {
+      if (!isBasicOrAbove) {
+        setActiveTooltip({ 
+          quoteId, 
+          action: actionType, 
+          msg: isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+' 
+        });
+        return;
+      }
+    }
+    if (actionType === 'whatsapp' || actionType === 'delete') {
+      if (!isPro) {
+        setActiveTooltip({ 
+          quoteId, 
+          action: actionType, 
+          msg: isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers' 
+        });
+        return;
+      }
+    }
+    callback();
+  };
+
   const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
@@ -1616,6 +1644,17 @@ function Dashboard() {
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
+      <style>{`
+        @keyframes popupBounce {
+          0% { transform: scale(0.6) translateY(8px); opacity: 0; }
+          70% { transform: scale(1.05) translateY(-2px); opacity: 1; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .feature-lock-tooltip {
+          animation: popupBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+      `}</style>
+
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
 
       <div style={{ flex: '1 0 auto', padding: '15px' }}>
@@ -1635,7 +1674,7 @@ function Dashboard() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
-              {bizRole === 'super_admin' && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 8px', borderRadius: '4px' }}>SUPER ADMIN</span>}
+              {isSuperAdmin && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 8px', borderRadius: '4px' }}>SUPER ADMIN</span>}
               <span style={{ fontSize: '0.85rem', color: '#64748b' }}>{session.user.email}</span>
               <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>Sign Out</button>
             </div>
@@ -1647,14 +1686,14 @@ function Dashboard() {
             </div>
           )}
 
-          {trialEndsAt && !isTrialExpired && bizRole !== 'super_admin' && (
+          {trialEndsAt && !isTrialExpired && !isSuperAdmin && (
             <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px', fontSize: '0.9rem' }}>
               <span>{isHebrew ? '🚀 תקופת ניסיון פעילה' : '🚀 Active Trial Period'}</span>
               <span>{isHebrew ? `נותרו עוד ${trialDaysLeft} ימים` : `${trialDaysLeft} days remaining`}</span>
             </div>
           )}
 
-          {isTrialExpired && bizRole !== 'super_admin' && (
+          {isTrialExpired && !isSuperAdmin && (
             <div style={{ background: '#fee2e2', border: '1px solid #ef4444', color: '#b91c1c', padding: '12px 20px', borderRadius: '8px', marginBottom: '20px', fontWeight: '500', fontSize: '0.9rem' }}>
               {isHebrew ? '⚠️ תקופת הניסיון שלך הסתיימה. כדי להמשיך להפיק הצעות מחיר, אנא שדרג את החבילה.' : '⚠️ Your trial period has expired. Please upgrade to continue generating quotes.'}
             </div>
@@ -1717,7 +1756,7 @@ function Dashboard() {
               </svg>
               {isHebrew ? 'לקוחות' : 'Clients'}
             </button>
-            {bizRole === 'super_admin' && (
+            {isSuperAdmin && (
               <>
                 <button
                   onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
@@ -1763,12 +1802,12 @@ function Dashboard() {
           {/* מראה את טבלת ההיסטוריה והסטטיסטיקות רק אם אנחנו לא במסך יצירה/עריכה */}
           {activeTab === 'main' && !showQuoteForm && (
             <>
-              {bizRole !== 'super_admin' && (
+              {!isSuperAdmin && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px', marginBottom: '25px' }}>
                   <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
                     <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '5px' }}>{t.totalQuotes}</div>
                     <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#1e293b' }}>{totalQuotesCount}</div>
-                    {bizPlan !== 'pro' && (
+                    {!isPro && (
                       <div style={{ fontSize: '0.75rem', color: '#f59e0b', marginTop: '5px', fontWeight: 'bold' }}>
                         {isHebrew ? `נוצרו החודש: ${monthlyQuotesCount} מתוך ${planLimit}` : `This month: ${monthlyQuotesCount} / ${planLimit}`}
                       </div>
@@ -1879,6 +1918,8 @@ function Dashboard() {
                               </td>
                               <td style={{ padding: '10px', color: '#64748b' }}>{quote.valid_until || '-'}</td>
                               <td style={{ padding: '8px', display: 'flex', gap: '5px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
+                                
+                                {/* VIEW (All plans) */}
                                 <button 
                                   title={isHebrew ? "צפה במסמך המקורי" : "View"}
                                   onClick={() => window.open(`/quote/${quote.id}`, '_blank')}
@@ -1886,29 +1927,73 @@ function Dashboard() {
                                 >
                                   {isHebrew ? 'צפה' : 'View'}
                                 </button>
-                                <button 
-                                  title={t.edit}
-                                  onClick={() => handleEditClick(quote)}
-                                  style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                                >
-                                  {t.edit}
-                                </button>
-                                <button 
-                                  title={t.duplicate}
-                                  onClick={() => handleDuplicateQuote(quote)}
-                                  style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                                >
-                                  {t.duplicate}
-                                </button>
-                                <button 
-                                  title="שלח בוואטסאפ"
-                                  onClick={() => sendWhatsApp(quote)}
-                                  style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                                >
-                                  <svg style={{ width: '16px', height: '16px', fill: '#065f46' }} viewBox="0 0 24 24">
-                                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                                  </svg>
-                                </button>
+
+                                {/* EDIT (Basic+) */}
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                  <button 
+                                    title={t.edit}
+                                    onClick={() => handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote))}
+                                    style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                                  >
+                                    {t.edit}
+                                  </button>
+                                  {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
+                                    <div className="feature-lock-tooltip" style={{
+                                      position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)',
+                                      background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                      fontWeight: '600'
+                                    }}>
+                                      {activeTooltip.msg}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* DUPLICATE (Basic+) */}
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                  <button 
+                                    title={t.duplicate}
+                                    onClick={() => handleProtectedAction(quote.id, 'duplicate', () => handleDuplicateQuote(quote))}
+                                    style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                                  >
+                                    {t.duplicate}
+                                  </button>
+                                  {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
+                                    <div className="feature-lock-tooltip" style={{
+                                      position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)',
+                                      background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                      fontWeight: '600'
+                                    }}>
+                                      {activeTooltip.msg}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* WHATSAPP (Pro only) */}
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                  <button 
+                                    title="שלח בוואטסאפ"
+                                    onClick={() => handleProtectedAction(quote.id, 'whatsapp', () => sendWhatsApp(quote))}
+                                    style={{ background: '#d1fae5', color: '#065f46', border: 'none', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                  >
+                                    <svg style={{ width: '16px', height: '16px', fill: '#065f46' }} viewBox="0 0 24 24">
+                                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                    </svg>
+                                  </button>
+                                  {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
+                                    <div className="feature-lock-tooltip" style={{
+                                      position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)',
+                                      background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                      fontWeight: '600'
+                                    }}>
+                                      {activeTooltip.msg}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* EMAIL (All plans) */}
                                 <button 
                                   title="שלח אימייל"
                                   onClick={() => handleEmailQuote(quote)}
@@ -1916,13 +2001,28 @@ function Dashboard() {
                                 >
                                   @
                                 </button>
-                                <button 
-                                  title={t.delete}
-                                  onClick={() => handleDeleteQuote(quote.id)}
-                                  style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
-                                >
-                                  {t.delete}
-                                </button>
+
+                                {/* DELETE (Pro only) */}
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                  <button 
+                                    title={t.delete}
+                                    onClick={() => handleProtectedAction(quote.id, 'delete', () => handleDeleteQuote(quote.id))}
+                                    style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}
+                                  >
+                                    {t.delete}
+                                  </button>
+                                  {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
+                                    <div className="feature-lock-tooltip" style={{
+                                      position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)',
+                                      background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                      fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                      fontWeight: '600'
+                                    }}>
+                                      {activeTooltip.msg}
+                                    </div>
+                                  )}
+                                </div>
+
                               </td>
                             </tr>
                           );
@@ -2199,12 +2299,12 @@ function Dashboard() {
                     {isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
-                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}${formatNum(taxAmount)})` : `(Includes VAT: ${sym}${formatNum(taxAmount)})`}</span>
+                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}${formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
                       </div>
                     )}
                   </div>
 
-                  <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} disabled={isTrialExpired && bizRole !== 'super_admin'}>
+                  <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#2563eb', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', marginTop: '25px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} disabled={isTrialExpired && !isSuperAdmin}>
                     {editingQuoteId ? t.updateQuote : t.generateSave}
                   </button>
                 </form>
@@ -2331,7 +2431,7 @@ function Dashboard() {
             </div>
           )}
 
-          {bizRole === 'super_admin' && activeTab === 'finances' && (
+          {isSuperAdmin && activeTab === 'finances' && (
              <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #4f46e5' }}>
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
                     <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
@@ -2496,7 +2596,7 @@ function Dashboard() {
              </div>
           )}
 
-          {bizRole === 'super_admin' && activeTab === 'admin_clients' && (
+          {isSuperAdmin && activeTab === 'admin_clients' && (
             <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #f59e0b' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
                 <h2 style={{ fontSize: '1.2rem', color: '#92400e', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
