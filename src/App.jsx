@@ -126,7 +126,7 @@ function AIChatWidget({ isHebrew }) {
               placeholder={isHebrew ? "שאל משהו..." : "Ask something..."}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', textAlign: isHebrew ? 'right' : 'left' }}
+              style={{ flex: 1, padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem', textAlign: isHebrew ? 'right' : 'left', background: '#eff6ff' }}
             />
             <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.85rem', cursor: 'pointer' }}>{isHebrew ? 'שלח' : 'Send'}</button>
           </form>
@@ -1407,8 +1407,8 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -1542,12 +1542,12 @@ function Dashboard() {
                       placeholder={t.searchQuote} 
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ flex: '1 1 180px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem' }}
+                      style={{ flex: '1 1 180px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', background: '#eff6ff' }}
                     />
                     <select 
                       value={statusFilter} 
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      style={{ flex: '1 1 120px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', boxSizing: 'border-box', fontSize: '0.9rem' }}
+                      style={{ flex: '1 1 120px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#eff6ff', boxSizing: 'border-box', fontSize: '0.9rem' }}
                     >
                       <option value="All">{t.filterStatus}</option>
                       <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
@@ -1784,7 +1784,7 @@ function Dashboard() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                     <h3 style={{ fontSize: '1rem', color: '#1e293b', margin: 0 }}>{t.quoteItems}</h3>
                     <div style={{ display: 'flex', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
-                      <select onChange={handleAddFromCatalog} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', background: 'white', fontSize: '0.85rem' }}>
+                      <select onChange={handleAddFromCatalog} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#eff6ff', fontSize: '0.85rem' }}>
                         <option value="">{t.quickAdd}</option>
                         {services.map(s => (
                           <option key={s.id} value={s.id}>{s.name} - {sym}{formatNum(s.price)}</option>
@@ -1864,7 +1864,7 @@ function Dashboard() {
                     value={newServiceName} 
                     onChange={(e) => setNewServiceName(e.target.value)} 
                     required 
-                    style={{ flex: '2 1 180px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem' }} 
+                    style={{ flex: '2 1 180px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', background: '#eff6ff' }} 
                   />
                   <input 
                     type="number" 
@@ -1873,7 +1873,7 @@ function Dashboard() {
                     value={newServicePrice} 
                     onChange={(e) => setNewServicePrice(e.target.value)} 
                     required 
-                    style={{ flex: '1 1 100px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', fontSize: '0.9rem' }} 
+                    style={{ flex: '1 1 100px', padding: '9px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', fontSize: '0.9rem', background: '#eff6ff' }} 
                   />
                   <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '9px 18px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
                     {t.addService}
