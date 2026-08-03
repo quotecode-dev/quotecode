@@ -559,17 +559,47 @@ function PublicQuote() {
           <div style={{ textAlign: isHebrew ? 'left' : 'right', color: '#4b5563', fontSize: '15px' }}>
             {hasVat && isPrivate ? (
               <>
-                <div>{isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):'} <span dir="ltr">{quoteSym}{formatNum(quoteSub)}</span></div>
-                {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} <span dir="ltr">-{quoteSym}{formatNum(quoteDiscountAmount)}</span></div>}
-                <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} <span dir="ltr">{quoteSym}{formatNum(quoteTotal)}</span></div>
-                <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{isHebrew ? `(הסכום כולל מע"מ בסך ` : `(Includes VAT: `}<span dir="ltr">{quoteSym}{formatNum(quoteTaxAmount)}</span>)</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px' }}>
+                  <span>{isHebrew ? 'סה"כ ללא מע"מ:' : 'Subtotal (Inc. VAT):'}</span>
+                  <span dir="ltr">{quoteSym}{formatNum(quoteSub)}</span>
+                </div>
+                {quoteDiscount > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px', color: '#ef4444', fontWeight: '600' }}>
+                    <span>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`}</span>
+                    <span dir="ltr">-{quoteSym}{formatNum(quoteDiscountAmount)}</span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px' }}>
+                  <span>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'}</span>
+                  <span dir="ltr">{quoteSym}{formatNum(quoteTaxAmount)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px', borderTop: '2px solid #e5e7eb', paddingTop: '8px' }}>
+                  <span>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'}</span>
+                  <span dir="ltr">{quoteSym}{formatNum(quoteTotal)}</span>
+                </div>
               </>
             ) : (
               <>
-                <div>{isHebrew ? 'סכום ביניים:' : 'Subtotal:'} <span dir="ltr">{quoteSym}{formatNum(quoteSub)}</span></div>
-                {quoteDiscount > 0 && <div style={{ color: '#ef4444', fontWeight: '600', marginTop: '6px' }}>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`} <span dir="ltr">-{quoteSym}{formatNum(quoteDiscountAmount)}</span></div>}
-                {hasVat && <div style={{ marginTop: '6px' }}>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'} <span dir="ltr">{quoteSym}{formatNum(quoteTaxAmount)}</span></div>}
-                <div style={{ fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px' }}>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'} <span dir="ltr">{quoteSym}{formatNum(quoteTotal)}</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px' }}>
+                  <span>{isHebrew ? 'סה"כ ללא מע"מ:' : 'Subtotal:'}</span>
+                  <span dir="ltr">{quoteSym}{formatNum(baseAmount)}</span>
+                </div>
+                {quoteDiscount > 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px', color: '#ef4444', fontWeight: '600' }}>
+                    <span>{isHebrew ? `הנחה (${quoteDiscount}%):` : `Discount (${quoteDiscount}%):`}</span>
+                    <span dir="ltr">-{quoteSym}{formatNum(quoteDiscountAmount)}</span>
+                  </div>
+                )}
+                {hasVat && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px' }}>
+                    <span>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'}</span>
+                    <span dir="ltr">{quoteSym}{formatNum(quoteTaxAmount)}</span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', fontSize: '22px', fontWeight: '900', color: '#4f46e5', marginTop: '12px', borderTop: '2px solid #e5e7eb', paddingTop: '8px' }}>
+                  <span>{isHebrew ? 'סה"כ לתשלום:' : 'Total Amount:'}</span>
+                  <span dir="ltr">{quoteSym}{formatNum(quoteTotal)}</span>
+                </div>
               </>
             )}
           </div>
@@ -1703,7 +1733,6 @@ function Dashboard() {
         .feature-lock-tooltip {
           animation: popupBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-        /* הסתרת סרגל הניווט התחתון במסכי מחשב רחבים והצגתו בניידים בלבד */
         .mobile-bottom-nav {
           display: none !important;
         }
@@ -2792,7 +2821,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation Bar (מוצג בנייד בלבד ומסתתר במחשב) */}
+      {/* Mobile Bottom Navigation Bar */}
       <div className="no-print mobile-bottom-nav" style={{ display: 'flex', position: 'fixed', bottom: 0, left: 0, width: '100%', background: '#1e293b', color: 'white', justifyContent: 'space-around', padding: '12px 0', zIndex: 9998, boxShadow: '0 -4px 15px rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'main' && !showQuoteForm ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>📄</span>
