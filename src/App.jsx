@@ -349,6 +349,12 @@ function PublicQuote() {
         settingsData = data;
       }
 
+      if (quoteData) {
+        const currentViews = (quoteData.view_count || 0) + 1;
+        await supabase.from('quotes').update({ view_count: currentViews }).eq('id', id);
+        quoteData.view_count = currentViews;
+      }
+
       setQuote(quoteData);
       setSettings(settingsData || { business_name: 'ProFlow', plan: 'free' });
       if (quoteData && (quoteData.status === 'approved' || quoteData.status === 'paid')) {
@@ -1836,6 +1842,18 @@ function Dashboard() {
                 </div>
               )}
 
+              {/* הודעת הצעה חמה (Hot Quote Alert Banner) */}
+              {quotes.some(q => (q.view_count || 0) >= 3 && q.status !== 'approved' && q.status !== 'paid') && (
+                <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#991b1b', padding: '12px 20px', borderRadius: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
+                    <span>🔥</span>
+                    <span>
+                      {isHebrew ? 'הצעה חמה! לקוח צפה בהצעה מספרקות מספר פעמים ועדיין לא חתם. כדאי ליצור קשר!' : 'Hot Quote! A client viewed a quote multiple times without signing.'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               <div style={{ background: 'white', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)', border: '1px solid #f1f5f9', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1903,7 +1921,14 @@ function Dashboard() {
                           const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
                           return (
                             <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
-                              <td style={{ padding: '10px 6px', fontWeight: '400', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
+                              <td style={{ padding: '10px 6px', fontWeight: '400', color: '#4f46e5' }}>
+                                #{quote.id.slice(0, 6)}
+                                {quote.view_count > 0 && (
+                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', marginLeft: '8px', marginRight: '8px', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem', color: '#64748b' }} title={isHebrew ? `נצפתה ${quote.view_count} פעמים` : `Viewed ${quote.view_count} times`}>
+                                    👁️ {quote.view_count}
+                                  </span>
+                                )}
+                              </td>
                               <td style={{ padding: '10px 6px' }}>
                                 <div style={{ fontWeight: '400', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
                                 <div style={{ fontSize: '0.7rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
