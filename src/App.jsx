@@ -1977,7 +1977,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', right: isHebrew ? '0' : 'auto', left: isHebrew ? 'auto' : '0',
+                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -1998,7 +1998,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', right: isHebrew ? '0' : 'auto', left: isHebrew ? 'auto' : '0',
+                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -2021,7 +2021,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', right: isHebrew ? '0' : 'auto', left: isHebrew ? 'auto' : '0',
+                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
@@ -2051,7 +2051,7 @@ function Dashboard() {
                                   </button>
                                   {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
                                     <div className="feature-lock-tooltip" style={{
-                                      position: 'absolute', bottom: '130%', right: isHebrew ? '0' : 'auto', left: isHebrew ? 'auto' : '0',
+                                      position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                       background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
