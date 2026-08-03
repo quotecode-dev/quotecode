@@ -1684,18 +1684,6 @@ function Dashboard() {
         .feature-lock-tooltip {
           animation: popupBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-        
-        /* אופטימיזציה לטבלאות במידות מסך קטנות */
-        @media (max-width: 768px) {
-          th, td {
-            padding: 8px 6px !important;
-            font-size: 0.8rem !important;
-          }
-          button {
-            padding: 6px 10px !important;
-            font-size: 0.75rem !important;
-          }
-        }
       `}</style>
 
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
@@ -1754,8 +1742,77 @@ function Dashboard() {
             </div>
           )}
 
-          <div style={{ display: 'none', gap: '8px', marginBottom: '15px', flexWrap: 'wrap' }} className="desktop-nav">
-             {/* Desktop nav hidden, using mobile bottom nav instead */}
+          {/* תפריט ניווט עליון שוחזר והוצג כראוי */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '15px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
+              style={{
+                flex: '1 1 auto', minWidth: '110px', padding: '8px 12px', borderRadius: '8px', 
+                border: activeTab === 'main' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', 
+                background: activeTab === 'main' ? '#4f46e5' : 'white', 
+                color: activeTab === 'main' ? 'white' : '#475569', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+              }}
+            >
+              {isHebrew ? 'הצעות מחיר' : 'Quotes'}
+            </button>
+            <button
+              onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
+              style={{
+                flex: '1 1 auto', minWidth: '110px', padding: '8px 12px', borderRadius: '8px', 
+                border: activeTab === 'settings' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', 
+                background: activeTab === 'settings' ? '#4f46e5' : 'white', 
+                color: activeTab === 'settings' ? 'white' : '#475569', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+              }}
+            >
+              {isHebrew ? 'הגדרות עסק' : 'Business Settings'}
+            </button>
+            <button
+              onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
+              style={{
+                flex: '1 1 auto', minWidth: '110px', padding: '8px 12px', borderRadius: '8px', 
+                border: activeTab === 'clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', 
+                background: activeTab === 'clients' ? '#4f46e5' : 'white', 
+                color: activeTab === 'clients' ? 'white' : '#475569', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+              }}
+            >
+              {isHebrew ? 'לקוחות' : 'Clients'}
+            </button>
+            {isSuperAdmin && (
+              <>
+                <button
+                  onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
+                  style={{
+                    flex: '1 1 auto', minWidth: '110px', padding: '8px 12px', borderRadius: '8px', 
+                    border: activeTab === 'finances' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                    fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', 
+                    background: activeTab === 'finances' ? '#4f46e5' : 'white', 
+                    color: activeTab === 'finances' ? 'white' : '#475569', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                  }}
+                >
+                  {isHebrew ? 'הוצאות/הכנסות' : 'Finances'}
+                </button>
+                <button
+                  onClick={() => { setActiveTab('admin_clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
+                  style={{
+                    flex: '1 1 auto', minWidth: '110px', padding: '8px 12px', borderRadius: '8px', 
+                    border: activeTab === 'admin_clients' ? '2px solid #4f46e5' : '1px solid #cbd5e1', 
+                    fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', 
+                    background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', 
+                    color: activeTab === 'admin_clients' ? 'white' : '#475569', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
+                  }}
+                >
+                  {isHebrew ? 'משתמשים' : 'Users Admin'}
+                </button>
+              </>
+            )}
           </div>
 
           {/* מראה את טבלת ההיסטוריה והסטטיסטיקות רק אם אנחנו לא במסך יצירה/עריכה */}
@@ -1780,9 +1837,21 @@ function Dashboard() {
               )}
 
               <div style={{ background: 'white', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)', border: '1px solid #f1f5f9', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <h2 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>{t.recentHistory}</h2>
+                    <button 
+                      onClick={() => setIsCreatingQuote(true)}
+                      style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)' }}
+                    >
+                      ➕ {isHebrew ? 'צור הצעת מחיר חדשה' : 'Create New Quote'}
+                    </button>
+                    <button 
+                      onClick={handleExportQuotes}
+                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)' }}
+                    >
+                      📥 {isHebrew ? 'ייצא לאקסל (CSV)' : 'Export CSV'}
+                    </button>
                   </div>
                   
                   <div style={{ display: 'flex', gap: '8px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', width: '100%', maxWidth: '400px' }}>
@@ -1833,10 +1902,10 @@ function Dashboard() {
                           const quoteSym = isLocalIsraeliBusiness ? '₪' : getCurrencySymbol(quote.currency);
                           const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
                           return (
-                            <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
-                              <td style={{ padding: '10px 6px', fontWeight: '700', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
+                            <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85_rem' }}>
+                              <td style={{ padding: '10px 6px', fontWeight: '400', color: '#4f46e5' }}>#{quote.id.slice(0, 6)}</td>
                               <td style={{ padding: '10px 6px' }}>
-                                <div style={{ fontWeight: '700', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
+                                <div style={{ fontWeight: '400', color: '#1e293b' }}>{quote.clients?.company_name || 'N/A'}</div>
                                 <div style={{ fontSize: '0.7rem', color: '#64748b', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients?.email}</div>
                               </td>
                               <td style={{ padding: '10px 6px', verticalAlign: 'middle' }}>
@@ -1847,7 +1916,7 @@ function Dashboard() {
                                     padding: '4px 8px',
                                     borderRadius: '6px',
                                     fontSize: '0.75rem',
-                                    fontWeight: '700',
+                                    fontWeight: '400',
                                     background: currentStatus === 'approved' ? '#dcfce7' : currentStatus === 'paid' ? '#dbeafe' : currentStatus === 'sent' ? '#fef9c3' : '#f1f5f9',
                                     color: currentStatus === 'approved' ? '#166534' : currentStatus === 'paid' ? '#1e40af' : currentStatus === 'sent' ? '#854d0e' : '#475569',
                                     border: '1px solid #cbd5e1',
@@ -1863,10 +1932,10 @@ function Dashboard() {
                                   <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
                                 </select>
                               </td>
-                              <td style={{ padding: '10px 6px', fontWeight: '800', color: '#1e293b' }}>
+                              <td style={{ padding: '10px 6px', fontWeight: '400', color: '#1e293b' }}>
                                 {quoteSym}{formatNum(quote.total)}
                               </td>
-                              <td style={{ padding: '10px 6px', color: '#64748b', fontWeight: '600' }}>{quote.valid_until || '-'}</td>
+                              <td style={{ padding: '10px 6px', color: '#64748b', fontWeight: '400' }}>{quote.valid_until || '-'}</td>
                               <td style={{ padding: '10px 6px', verticalAlign: 'middle' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row', justifyContent: isHebrew ? 'flex-start' : 'flex-end', flexWrap: 'nowrap' }}>
                                   
@@ -1874,7 +1943,7 @@ function Dashboard() {
                                   <button 
                                     title={isHebrew ? "צפה במסמך המקורי" : "View"}
                                     onClick={() => window.open(`/quote/${quote.id}`, '_blank')}
-                                    style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                                    style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.7rem', whiteSpace: 'nowrap' }}
                                   >
                                     {isHebrew ? 'צפה' : 'View'}
                                   </button>
@@ -1884,7 +1953,7 @@ function Dashboard() {
                                     <button 
                                       title={t.edit}
                                       onClick={() => handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote))}
-                                      style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                                      style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.7rem', whiteSpace: 'nowrap' }}
                                     >
                                       {t.edit}
                                     </button>
@@ -1893,7 +1962,7 @@ function Dashboard() {
                                         position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                         background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                         fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                        fontWeight: '600'
+                                        fontWeight: '400'
                                       }}>
                                         {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
                                       </div>
@@ -1905,7 +1974,7 @@ function Dashboard() {
                                     <button 
                                       title={t.duplicate}
                                       onClick={() => handleProtectedAction(quote.id, 'duplicate', () => handleDuplicateQuote(quote))}
-                                      style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                                      style={{ background: '#ccfbf1', color: '#115e59', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.7rem', whiteSpace: 'nowrap' }}
                                     >
                                       {t.duplicate}
                                     </button>
@@ -1914,7 +1983,7 @@ function Dashboard() {
                                         position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                         background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                         fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                        fontWeight: '600'
+                                        fontWeight: '400'
                                       }}>
                                         {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
                                       </div>
@@ -1937,7 +2006,7 @@ function Dashboard() {
                                         position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                         background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                         fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                        fontWeight: '600'
+                                        fontWeight: '400'
                                       }}>
                                         {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
                                       </div>
@@ -1948,7 +2017,7 @@ function Dashboard() {
                                   <button 
                                     title="שלח אימייל"
                                     onClick={() => setPendingEmailQuote(quote)}
-                                    style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem', display: 'flex', alignItems: 'center' }}
+                                    style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.75rem', display: 'flex', alignItems: 'center' }}
                                   >
                                     @
                                   </button>
@@ -1958,7 +2027,7 @@ function Dashboard() {
                                     <button 
                                       title={t.delete}
                                       onClick={() => handleProtectedAction(quote.id, 'delete', () => handleDeleteQuote(quote.id))}
-                                      style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '0.7rem', whiteSpace: 'nowrap' }}
+                                      style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.7rem', whiteSpace: 'nowrap' }}
                                     >
                                       {t.delete}
                                     </button>
@@ -1967,7 +2036,7 @@ function Dashboard() {
                                         position: 'absolute', bottom: '130%', left: isHebrew ? '0' : 'auto', right: isHebrew ? 'auto' : '0',
                                         background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                         fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 99999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                        fontWeight: '600'
+                                        fontWeight: '400'
                                       }}>
                                         {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
                                       </div>
@@ -2030,13 +2099,13 @@ function Dashboard() {
                       ) : (
                         services.map((svc) => (
                           <tr key={svc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
-                            <td style={{ padding: '10px 6px', fontWeight: '700', color: '#1e293b' }}>{svc.name}</td>
-                            <td style={{ padding: '10px 6px', color: '#4f46e5', fontWeight: '800' }}>{formatNum(svc.price)}</td>
+                            <td style={{ padding: '10px 6px', fontWeight: '400', color: '#1e293b' }}>{svc.name}</td>
+                            <td style={{ padding: '10px 6px', color: '#4f46e5', fontWeight: '400' }}>{formatNum(svc.price)}</td>
                             <td style={{ padding: '10px 6px' }}>
                                <button 
                             title={t.delete}
                             onClick={() => handleDeleteService(svc.id)}
-                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '0.7rem' }}
+                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.7rem' }}
                             >
                               {t.delete}
                             </button>
@@ -2075,7 +2144,7 @@ function Dashboard() {
                 <form onSubmit={handleSaveQuote}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '15px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.clientName}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.clientName}</label>
                       <input type="text" name="clientName" value={clientName} onChange={(e) => {
                         const val = e.target.value;
                         setClientName(val);
@@ -2091,7 +2160,7 @@ function Dashboard() {
                       }} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'סוג לקוח (חובה)' : 'Client Type'}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'סוג לקוח (חובה)' : 'Client Type'}</label>
                       <select 
                         name="clientType" 
                         value={clientType} 
@@ -2104,7 +2173,7 @@ function Dashboard() {
                         onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר סוג לקוח' : 'Select client type')}
                         onInput={(e) => e.target.setCustomValidity('')}
                         required 
-                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.9rem', fontWeight: '600' }}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.9rem', fontWeight: '400' }}
                       >
                         <option value="" disabled>{isHebrew ? 'בחר סוג לקוח...' : 'Select Client Type...'}</option>
                         <option value="business">{isHebrew ? 'עסקי (חברה/עוסק)' : 'Business'}</option>
@@ -2112,27 +2181,27 @@ function Dashboard() {
                       </select>
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.clientEmail}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.clientEmail}</label>
                       <input type="email" name="clientEmail" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="contact@acme.com" required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.clientPhone}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.clientPhone}</label>
                       <input type="text" name="clientPhone" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+1 (555) 0192" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'ח.פ / עוסק / ת.ז' : 'Tax ID / ID'}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'ח.פ / עוסק / ת.ז' : 'Tax ID / ID'}</label>
                       <input type="text" name="clientTaxId" value={clientTaxId} onChange={(e) => setClientTaxId(e.target.value)} placeholder={isHebrew ? "לדוגמה: 512345678" : "e.g. 512345678"} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'כתובת' : 'Address'}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'כתובת' : 'Address'}</label>
                       <input type="text" name="clientAddress" value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder={isHebrew ? "רחוב, עיר, מיקוד" : "123 Main St, City"} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '15px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.currency}</label>
-                      <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.9rem', fontWeight: '600' }}>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.currency}</label>
+                      <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.9rem', fontWeight: '400' }}>
                         {isLocalIsraeliBusiness ? (
                           <option value="ILS">ILS (₪)</option>
                         ) : (
@@ -2145,8 +2214,8 @@ function Dashboard() {
                       </select>
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.status}</label>
-                      <select name="quoteStatus" value={quoteStatus} onChange={(e) => setQuoteStatus(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.9rem', fontWeight: '600' }}>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.status}</label>
+                      <select name="quoteStatus" value={quoteStatus} onChange={(e) => setQuoteStatus(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.9rem', fontWeight: '400' }}>
                         <option value="Draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
                         <option value="Sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
                         <option value="Approved">{isHebrew ? 'אושר' : 'Approved'}</option>
@@ -2154,18 +2223,18 @@ function Dashboard() {
                       </select>
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.validUntil}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.validUntil}</label>
                       <input type="date" name="validUntil" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.discount}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.discount}</label>
                       <input type="number" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                   </div>
 
                   {clientType === 'business' && (
                     <div style={{ marginBottom: '20px' }}>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תנאי תשלום (חובה לעסקי)' : 'Payment Terms'}</label>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תנאי תשלום (חובה לעסקי)' : 'Payment Terms'}</label>
                       <select 
                         name="terms" 
                         value={terms} 
@@ -2176,7 +2245,7 @@ function Dashboard() {
                         onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר תנאי תשלום' : 'Select payment terms')}
                         onInput={(e) => e.target.setCustomValidity('')}
                         required 
-                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', fontWeight: '600' }}
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', fontWeight: '400' }}
                       >
                         <option value="" disabled>{isHebrew ? 'בחר תנאי תשלום...' : 'Select terms...'}</option>
                         <option value={isHebrew ? "תשלום בגמר העבודה" : "Payment on completion"}>{isHebrew ? "תשלום בגמר העבודה" : "Payment on completion"}</option>
@@ -2192,13 +2261,13 @@ function Dashboard() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                     <h3 style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>{t.quoteItems}</h3>
                     <div style={{ display: 'flex', gap: '8px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
-                      <select onChange={handleAddFromCatalog} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.8rem', fontWeight: '600' }}>
+                      <select onChange={handleAddFromCatalog} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.8rem', fontWeight: '400' }}>
                         <option value="">{t.quickAdd}</option>
                         {services.map(s => (
                           <option key={s.id} value={s.id}>{s.name} - {sym}{formatNum(s.price)}</option>
                         ))}
                       </select>
-                      <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.8rem' }}>{t.addItem}</button>
+                      <button type="button" onClick={addItem} style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: '400', fontSize: '0.8rem' }}>{t.addItem}</button>
                     </div>
                   </div>
 
@@ -2217,7 +2286,7 @@ function Dashboard() {
                       <input type="number" placeholder={isHebrew ? 'כמות' : 'Qty'} min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
                       <input type="number" placeholder={isHebrew ? 'מחיר' : 'Price'} step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
                       
-                      <div style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontWeight: '700', color: '#334155', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.85rem', boxSizing: 'border-box', width: '100%', display: 'flex', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end', height: '100%' }}>
+                      <div style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontWeight: '400', color: '#334155', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.85rem', boxSizing: 'border-box', width: '100%', display: 'flex', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end', height: '100%' }}>
                         {sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}
                       </div>
 
@@ -2233,7 +2302,7 @@ function Dashboard() {
                       <span>{sym}{formatNum(subtotal)}</span>
                     </div>
                     {discount > 0 && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: '#ef4444', flexDirection: isHebrew ? 'row-reverse' : 'row', fontSize: '0.85rem', fontWeight: '600' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: '#ef4444', flexDirection: isHebrew ? 'row-reverse' : 'row', fontSize: '0.85rem', fontWeight: '400' }}>
                         <span>{isHebrew ? `הנחה (${discount}%):` : `Discount (${discount}%):`}</span>
                         <span>-{sym}{formatNum(discountAmount)}</span>
                       </div>
@@ -2308,7 +2377,7 @@ function Dashboard() {
                     ) : (
                       filteredClients.map((client) => (
                         <tr key={client.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '10px 6px', fontWeight: '700', color: '#1e293b' }}>{client.company_name}</td>
+                          <td style={{ padding: '10px 6px', fontWeight: '400', color: '#1e293b' }}>{client.company_name}</td>
                           <td style={{ padding: '10px 6px', color: '#475569' }}><span dir="ltr">{client.tax_id || '-'}</span></td>
                           <td style={{ padding: '10px 6px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.email || '-'}</td>
                           <td style={{ padding: '10px 6px', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{client.phone || '-'}</td>
@@ -2317,12 +2386,12 @@ function Dashboard() {
                             <span style={{
                               background: client.client_type === 'business' ? '#dbeafe' : '#f1f5f9',
                               color: client.client_type === 'business' ? '#1e40af' : '#475569',
-                              padding: '4px 6px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold'
+                              padding: '4px 6px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '400'
                             }}>
                               {client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}
                             </span>
                           </td>
-                          <td style={{ padding: '10px 6px', color: '#4f46e5', fontWeight: '600' }}>
+                          <td style={{ padding: '10px 6px', color: '#4f46e5', fontWeight: '400' }}>
                             {client.terms ? (
                               <span style={{ background: '#e0e7ff', padding: '3px 6px', borderRadius: '6px', fontSize: '0.75rem' }}>
                                 {client.terms}
@@ -2332,7 +2401,7 @@ function Dashboard() {
                           <td style={{ padding: '10px 6px' }}>
                             <button 
                               onClick={() => handleDeleteClient(client.id)}
-                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700', fontSize: '0.7rem' }}
+                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.7rem' }}
                             >
                               {t.delete}
                             </button>
@@ -2354,25 +2423,25 @@ function Dashboard() {
               <form onSubmit={handleSaveSettings}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.businessNameLabel}</label>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.businessNameLabel}</label>
                     <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.taxIdLabel}</label>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.taxIdLabel}</label>
                     <input type="text" value={bizTaxId} onChange={(e) => setBizTaxId(e.target.value)} placeholder="516000000" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'אימייל עסק' : 'Business Email'}</label>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'אימייל עסק' : 'Business Email'}</label>
                     <input type="email" value={bizEmail} onChange={(e) => setBizEmail(e.target.value)} placeholder="business@example.com" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'טלפון עסק' : 'Business Phone'}</label>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'טלפון עסק' : 'Business Phone'}</label>
                     <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="050-0000000" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                   </div>
                 </div>
 
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>{t.logoUrlLabel} {bizPlan !== 'pro' && <span style={{ color: '#f59e0b', fontSize: '0.75rem' }}>(דורש חבילת Pro)</span>}</label>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.logoUrlLabel} {bizPlan !== 'pro' && <span style={{ color: '#f59e0b', fontSize: '0.75rem' }}>(דורש חבילת Pro)</span>}</label>
                   <input type="url" value={bizLogoUrl} onChange={(e) => setBizLogoUrl(e.target.value)} placeholder="https://example.com/logo.png" disabled={bizPlan !== 'pro'} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: bizPlan !== 'pro' ? '#f1f5f9' : '#f8fafc', fontSize: '0.9rem' }} />
                 </div>
 
@@ -2389,7 +2458,7 @@ function Dashboard() {
                     <h2 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#475569' }}>{isHebrew ? 'סוג דוח:' : 'Report Type:'}</span>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#475569' }}>{isHebrew ? 'סוג דוח:' : 'Report Type:'}</span>
                       <select 
                         value={financeReportType} 
                         onChange={(e) => setFinanceReportType(e.target.value)}
@@ -2407,11 +2476,11 @@ function Dashboard() {
                  {financeReportType === 'custom' && (
                    <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', border: '1px solid #e2e8f0' }}>
                      <div>
-                       <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'מתאריך:' : 'Start Date:'}</label>
+                       <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'מתאריך:' : 'Start Date:'}</label>
                        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontSize: '0.85rem' }} />
                      </div>
                      <div>
-                       <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '700', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'עד תאריך:' : 'End Date:'}</label>
+                       <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'עד תאריך:' : 'End Date:'}</label>
                        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontSize: '0.85rem' }} />
                      </div>
                    </div>
@@ -2419,19 +2488,19 @@ function Dashboard() {
 
                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
                   <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '700', marginBottom: '4px' }}>{t.totalQuotes}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalQuotes}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#1e293b' }}>{adminTotalQuotesCount}</div>
                   </div>
                   <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '700', marginBottom: '4px' }}>{t.totalRevenue}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalRevenue}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#22c55e' }}>{sym}{formatNum(adminTotalRevenue)}</div>
                   </div>
                   <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '700', marginBottom: '4px' }}>{t.totalExpenses}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalExpenses}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ef4444' }}>{sym}{formatNum(adminTotalExpenses)}</div>
                   </div>
                   <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '700', marginBottom: '4px' }}>{t.netProfit}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.netProfit}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: '900', color: adminNetProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(adminNetProfit)}</div>
                   </div>
                  </div>
@@ -2483,7 +2552,7 @@ function Dashboard() {
                       <select 
                         value={expenseCategory} 
                         onChange={(e) => setExpenseCategory(e.target.value)}
-                        style={{ flex: '1 1 120px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: 'white', boxSizing: 'border-box', fontSize: '0.85rem', fontWeight: '600' }}
+                        style={{ flex: '1 1 120px', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: 'white', boxSizing: 'border-box', fontSize: '0.85rem', fontWeight: '400' }}
                       >
                         <option value="Hosting / Cloud">{isHebrew ? 'ענן ושרתים' : 'Hosting / Cloud'}</option>
                         <option value="Marketing">{isHebrew ? 'שיווק ופרסום' : 'Marketing'}</option>
@@ -2491,7 +2560,7 @@ function Dashboard() {
                         <option value="Other">{isHebrew ? 'אחר' : 'Other'}</option>
                       </select>
 
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '700', color: '#475569' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600', color: '#475569' }}>
                         <input type="checkbox" checked={isRecurring} onChange={(e) => setIsRecurring(e.target.checked)} />
                         {isHebrew ? 'הוצאה חודשית קבועה' : 'Recurring monthly'}
                       </label>
@@ -2523,17 +2592,17 @@ function Dashboard() {
                           ) : (
                             filteredExpensesForReport.map((exp) => (
                               <tr key={exp.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
-                                <td style={{ padding: '10px 6px', fontWeight: '700', color: '#1e293b' }}>{exp.description}</td>
+                                <td style={{ padding: '10px 6px', fontWeight: '400', color: '#1e293b' }}>{exp.description}</td>
                                 <td style={{ padding: '10px 6px', color: '#64748b' }}>{exp.category}</td>
                                 <td style={{ padding: '10px 6px', color: '#64748b' }}>
                                   {exp.is_recurring ? (isHebrew ? '🔄 קבועה' : 'Recurring') : (isHebrew ? 'חד פעמית' : 'One-time')}
                                 </td>
                                 <td style={{ padding: '10px 6px', color: '#64748b' }}>{exp.expense_date}</td>
-                                <td style={{ padding: '10px 6px', color: '#ef4444', fontWeight: '800' }}>{sym}{formatNum(exp.amount)}</td>
+                                <td style={{ padding: '10px 6px', color: '#ef4444', fontWeight: '400' }}>{sym}{formatNum(exp.amount)}</td>
                                 <td style={{ padding: '10px 6px' }}>
                                   <button 
                                     onClick={() => handleDeleteExpense(exp.id)}
-                                    style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: '700', fontSize: '0.7rem' }}
+                                    style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: '400', fontSize: '0.7rem' }}
                                   >
                                     {t.delete}
                                   </button>
@@ -2608,25 +2677,25 @@ function Dashboard() {
                       filteredAdminAccounts.map(acc => (
                         <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
                           <td style={{ padding: '10px 6px', color: '#64748b', fontSize: '0.75rem' }}>{acc.user_id?.slice(0,8)}...</td>
-                          <td style={{ padding: '10px 6px', fontWeight: 'bold', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
+                          <td style={{ padding: '10px 6px', fontWeight: '400', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
                           <td style={{ padding: '10px 6px', color: '#334155' }}>{acc.business_name}</td>
                           <td style={{ padding: '10px 6px' }}>
                             <span style={{
-                              background: acc.country === 'Local' || acc.country === 'Israel (Local)' ? '#dbeafe' : '#dcfce7',
-                              color: acc.country === 'Local' || acc.country === 'Israel (Local)' ? '#1e40af' : '#166534',
+                              background: '#dbeafe',
+                              color: '#1e40af',
                               padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem'
                             }}>
-                              {acc.country === 'Israel (Local)' ? 'Local' : (acc.country || 'Local')}
+                              Local
                             </span>
                           </td>
                           <td style={{ padding: '10px 6px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <span style={{ 
                                 background: '#f1f5f9', 
-                                padding: '4px 8px', 
+                                padding: '4px 10px', 
                                 borderRadius: '6px', 
                                 fontSize: '0.75rem', 
-                                fontWeight: '700', 
+                                fontWeight: '400', 
                                 color: '#475569',
                                 minWidth: '55px',
                                 textAlign: 'center',
@@ -2637,7 +2706,7 @@ function Dashboard() {
                               <select 
                                 defaultValue="" 
                                 onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
-                                style={{ padding: '4px 6px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer' }}
+                                style={{ padding: '4px 6px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.75rem', fontWeight: '400', cursor: 'pointer' }}
                               >
                                 <option value="" disabled>{isHebrew ? 'שדרג...' : 'Change...'}</option>
                                 <option value="free">Free</option>
@@ -2646,7 +2715,7 @@ function Dashboard() {
                               </select>
                             </div>
                           </td>
-                          <td style={{ padding: '10px 6px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: 'bold' }}>
+                          <td style={{ padding: '10px 6px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: '400' }}>
                             {acc.role}
                           </td>
                           <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
