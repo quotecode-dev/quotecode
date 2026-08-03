@@ -95,18 +95,36 @@ function AIChatWidget({ isHebrew }) {
     }
   };
 
+  const modernBotSVG = (
+    <svg width="24" height="24" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="botBase" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#ffffff"/>
+          <stop offset="100%" stopColor="#e2e8f0"/>
+        </linearGradient>
+        <linearGradient id="botScreen" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1e293b"/>
+          <stop offset="100%" stopColor="#0f172a"/>
+        </linearGradient>
+      </defs>
+      <rect x="10" y="45" width="80" height="20" rx="10" fill="#6366f1" />
+      <rect x="47" y="10" width="6" height="25" fill="#cbd5e1" />
+      <circle cx="50" cy="10" r="8" fill="#38bdf8" />
+      <rect x="20" y="25" width="60" height="55" rx="22" fill="url(#botBase)" stroke="#cbd5e1" strokeWidth="2" />
+      <rect x="28" y="38" width="44" height="28" rx="10" fill="url(#botScreen)" />
+      <circle cx="40" cy="52" r="4" fill="#38bdf8" />
+      <circle cx="60" cy="52" r="4" fill="#38bdf8" />
+      <path d="M46 60 Q 50 64 54 60" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 18px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.3)', display: 'flex', alignItems: 'center', gap: '8px' }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h2a3 3 0 0 1 3 3v2h1a2 2 0 0 1 0 4h-1v1a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-1H4a2 2 0 0 1 0-4h1v-2a3 3 0 0 1 3-3h2V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 4 0Z" fill="currentColor"/>
-          <circle cx="9" cy="12" r="1.5" fill="#4f46e5"/>
-          <circle cx="15" cy="12" r="1.5" fill="#4f46e5"/>
-          <path d="M10 16c.5.5 1.2.8 2 .8s1.5-.3 2-.8" stroke="#4f46e5" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
+        {modernBotSVG}
         {isHebrew ? 'שירות לקוחות AI' : 'AI Support'}
       </button>
 
@@ -114,12 +132,7 @@ function AIChatWidget({ isHebrew }) {
         <div style={{ position: 'fixed', top: '75px', right: '25px', width: '320px', background: 'white', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', zIndex: 99999, overflow: 'hidden' }} dir={isHebrew ? 'rtl' : 'ltr'}>
           <div style={{ background: '#4f46e5', color: 'white', padding: '10px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h2a3 3 0 0 1 3 3v2h1a2 2 0 0 1 0 4h-1v1a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3v-1H4a2 2 0 0 1 0-4h1v-2a3 3 0 0 1 3-3h2V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 4 0Z" fill="currentColor"/>
-                <circle cx="9" cy="12" r="1.5" fill="#4f46e5"/>
-                <circle cx="15" cy="12" r="1.5" fill="#4f46e5"/>
-                <path d="M10 16c.5.5 1.2.8 2 .8s1.5-.3 2-.8" stroke="#4f46e5" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
+              {modernBotSVG}
               <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{isHebrew ? 'שירות לקוחות ProFlow (AI)' : 'ProFlow Support (AI)'}</span>
             </div>
             <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}>✕</button>
@@ -1458,8 +1471,8 @@ function Dashboard() {
       <div style={{ flex: '1 0 auto', padding: '15px' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '15px 25px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               {(bizLogoUrl && bizLogoUrl.trim() !== '' && bizPlan === 'pro') ? (
                 <img src={bizLogoUrl} alt="" style={{ height: '36px', maxWidth: '150px', objectFit: 'contain' }} />
               ) : (
@@ -1471,7 +1484,7 @@ function Dashboard() {
               <AIChatWidget isHebrew={isHebrew} />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
               {bizRole === 'super_admin' && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 8px', borderRadius: '4px' }}>SUPER ADMIN</span>}
               <span style={{ fontSize: '0.85rem', color: '#64748b' }}>{session.user.email}</span>
               <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem' }}>Sign Out</button>
@@ -1497,7 +1510,7 @@ function Dashboard() {
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
             <button
               onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
               style={{
@@ -1510,8 +1523,9 @@ function Dashboard() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 10L12 3l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10z" fill={activeTab === 'main' ? '#c7d2fe' : '#e0e7ff'} />
+                <path d="M9 22V12h6v10" fill={activeTab === 'main' ? '#fff' : '#4f46e5'} />
               </svg>
               {isHebrew ? 'הצעות מחיר' : 'Quotes'}
             </button>
@@ -1527,9 +1541,9 @@ function Dashboard() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" fill={activeTab === 'settings' ? '#c7d2fe' : '#e0e7ff'} />
+                <circle cx="12" cy="12" r="4" fill={activeTab === 'settings' ? '#fff' : '#4f46e5'} />
               </svg>
               {isHebrew ? 'הגדרות עסק' : 'Business Settings'}
             </button>
@@ -1545,8 +1559,11 @@ function Dashboard() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <circle cx="16" cy="8" r="4" fill={activeTab === 'clients' ? '#c7d2fe' : '#a5b4fc'} />
+                <path d="M23 21v-2a4 4 0 0 0-4-4h-2.5" stroke={activeTab === 'clients' ? '#c7d2fe' : '#a5b4fc'} strokeWidth="2" strokeLinecap="round" />
+                <circle cx="9" cy="8" r="4" fill={activeTab === 'clients' ? '#fff' : '#4f46e5'} />
+                <path d="M15 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" fill={activeTab === 'clients' ? '#fff' : '#4f46e5'} />
               </svg>
               {isHebrew ? 'לקוחות' : 'Clients'}
             </button>
@@ -1564,8 +1581,10 @@ function Dashboard() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                   }}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="14" width="4" height="6" rx="1" fill={activeTab === 'finances' ? '#c7d2fe' : '#a5b4fc'} />
+                    <rect x="10" y="8" width="4" height="12" rx="1" fill={activeTab === 'finances' ? '#fff' : '#4f46e5'} />
+                    <rect x="17" y="4" width="4" height="16" rx="1" fill={activeTab === 'finances' ? '#c7d2fe' : '#a5b4fc'} />
                   </svg>
                   {isHebrew ? 'הוצאות/הכנסות' : 'Finances'}
                 </button>
@@ -1581,8 +1600,9 @@ function Dashboard() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
                   }}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="2 4 5 16 19 16 22 4 16 9 12 3 8 9"></polygon><line x1="5" y1="20" x2="19" y2="20"></line>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 19h18v2H3v-2z" fill={activeTab === 'admin_clients' ? '#c7d2fe' : '#a5b4fc'} />
+                    <path d="M2 5l4 9h12l4-9-5 4-5-6-5 6-5-4z" fill={activeTab === 'admin_clients' ? '#fff' : '#4f46e5'} />
                   </svg>
                   {isHebrew ? 'משתמשים' : 'Users Admin'}
                 </button>
@@ -2112,7 +2132,7 @@ function Dashboard() {
 
           {bizRole === 'super_admin' && activeTab === 'finances' && (
              <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #4f46e5' }}>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
                     <h2 style={{ fontSize: '1.2rem', color: '#1e293b', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
@@ -2277,7 +2297,7 @@ function Dashboard() {
 
           {bizRole === 'super_admin' && activeTab === 'admin_clients' && (
             <div style={{ background: '#fef3c7', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '2px solid #f59e0b' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
                 <h2 style={{ fontSize: '1.2rem', color: '#92400e', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
                   👑 Super Admin - Users
                 </h2>
