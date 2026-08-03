@@ -1876,6 +1876,7 @@ function Dashboard() {
                     </div>
                   </div>
 
+                  {/* כותרות עמודות פריטי ההצעה מתוקנות */}
                   <div style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '10px', marginBottom: '6px', padding: '0 10px', fontSize: '0.8rem', color: '#64748b', fontWeight: 'bold' }}>
                     <div>{isHebrew ? 'תיאור פריט' : 'Description'}</div>
                     <div>{isHebrew ? 'כמות' : 'Qty'}</div>
