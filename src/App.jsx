@@ -612,7 +612,7 @@ function Dashboard() {
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
   const [clientSearchTerm, setClientSearchTerm] = useState('');
-  const [activeTooltip, setActiveTooltip] = useState({ quoteId: null, action: null, msg: '' });
+  const [activeTooltip, setActiveTooltip] = useState({ quoteId: null, action: null });
   
   const [sortField, setSortField] = useState('email');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -863,10 +863,16 @@ function Dashboard() {
       updatePayload.trial_ends_at = null;
     }
 
-    const { error } = await supabase.from('business_settings').update(updatePayload).eq('id', accountId);
+    const { data, error } = await supabase
+      .from('business_settings')
+      .update(updatePayload)
+      .eq('id', accountId)
+      .select();
     
     if (error) {
       setStatusMsg({ text: 'Error updating user plan: ' + error.message, type: 'error' });
+    } else if (!data || data.length === 0) {
+      setStatusMsg({ text: 'Error: RLS policy blocked update on business_settings.', type: 'error' });
     } else {
       setStatusMsg({ text: 'User plan updated successfully!', type: 'success' });
       fetchAllAccounts();
@@ -1182,21 +1188,15 @@ function Dashboard() {
   const handleProtectedAction = (quoteId, actionType, callback) => {
     if (actionType === 'edit' || actionType === 'duplicate') {
       if (!isBasicOrAbove) {
-        setActiveTooltip({ 
-          quoteId, 
-          action: actionType, 
-          msg: isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+' 
-        });
+        setActiveTooltip({ quoteId, action: actionType });
+        setTimeout(() => setActiveTooltip({ quoteId: null, action: null }), 2500);
         return;
       }
     }
     if (actionType === 'whatsapp' || actionType === 'delete') {
       if (!isPro) {
-        setActiveTooltip({ 
-          quoteId, 
-          action: actionType, 
-          msg: isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers' 
-        });
+        setActiveTooltip({ quoteId, action: actionType });
+        setTimeout(() => setActiveTooltip({ quoteId: null, action: null }), 2500);
         return;
       }
     }
@@ -1944,7 +1944,7 @@ function Dashboard() {
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
                                     }}>
-                                      {activeTooltip.msg}
+                                      {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
                                     </div>
                                   )}
                                 </div>
@@ -1965,7 +1965,7 @@ function Dashboard() {
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
                                     }}>
-                                      {activeTooltip.msg}
+                                      {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
                                     </div>
                                   )}
                                 </div>
@@ -1988,7 +1988,7 @@ function Dashboard() {
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
                                     }}>
-                                      {activeTooltip.msg}
+                                      {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
                                     </div>
                                   )}
                                 </div>
@@ -2018,7 +2018,7 @@ function Dashboard() {
                                       fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 9999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
                                       fontWeight: '600'
                                     }}>
-                                      {activeTooltip.msg}
+                                      {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
                                     </div>
                                   )}
                                 </div>
