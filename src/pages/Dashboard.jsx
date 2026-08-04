@@ -1139,7 +1139,7 @@ export default function Dashboard() {
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
         discount: Number(discount || 0),
-        terms: terms,
+        terms: clientType === 'business' ? terms : null,
         notes: notes,
         user_id: session.user.id
       };
@@ -1889,7 +1889,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.discount}</label>
-                      <input type="number" name="discount" value={discount} onFocus={(e) => { if (e.target.value === '0') setDiscount(''); }} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" placeholder="0" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
+                      <input type="text" name="discount" value={discount} onFocus={(e) => { if (e.target.value === '0') setDiscount(''); }} onChange={(e) => setDiscount(e.target.value)} placeholder="0" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                   </div>
 
@@ -1940,8 +1940,8 @@ export default function Dashboard() {
                   {items.map((item, index) => (
                     <div key={index} style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '8px', marginBottom: '8px', alignItems: 'stretch', background: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                       <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
-                      <input type="number" placeholder="1" min="1" value={item.quantity} onFocus={(e) => { if (e.target.value === '0') handleItemChange(index, 'quantity', ''); }} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
-                      <input type="number" placeholder="0.00" step="0.01" value={item.unit_price} onFocus={(e) => { if (e.target.value === '0') handleItemChange(index, 'unit_price', ''); }} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
+                      <input type="text" placeholder="1" value={item.quantity} onFocus={(e) => { if (e.target.value === '0') handleItemChange(index, 'quantity', ''); }} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
+                      <input type="text" placeholder="0.00" value={item.unit_price} onFocus={(e) => { if (e.target.value === '0') handleItemChange(index, 'unit_price', ''); }} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
                       
                       <div style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontWeight: '400', color: '#334155', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.85rem', boxSizing: 'border-box', width: '100%', display: 'flex', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end', height: '100%' }}>
                         {sym}{formatNum(Number(item.quantity || 0) * Number(item.unit_price || 0))}

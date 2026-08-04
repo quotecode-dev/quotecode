@@ -11,7 +11,6 @@ export default function PublicQuote() {
   const [error, setError] = useState(null);
   const [approved, setApproved] = useState(false);
 
-  // Signature canvas state
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasSigned, setHasSigned] = useState(false);
@@ -42,7 +41,6 @@ export default function PublicQuote() {
     }
   };
 
-  // Canvas drawing handlers
   const startDrawing = (e) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -209,7 +207,7 @@ export default function PublicQuote() {
         </table>
 
         {/* Totals */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHebrew ? 'flex-end' : 'flex-start', gap: '8px', marginBottom: '40px', background: '#f8fafc', padding: '20px', borderRadius: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHebrew ? 'flex-end' : 'flex-start', gap: '8px', marginBottom: '30px', background: '#f8fafc', padding: '20px', borderRadius: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '250px', fontSize: '1rem', color: '#475569' }}>
             <span>{isHebrew ? 'סיכום ביניים:' : 'Subtotal:'}</span>
             <span style={{ fontWeight: 'bold' }}>{subtotal.toLocaleString()} {currencySymbol}</span>
@@ -225,6 +223,21 @@ export default function PublicQuote() {
             <span style={{ color: '#4f46e5' }}>{total.toLocaleString()} {currencySymbol}</span>
           </div>
         </div>
+
+        {/* Terms & Notes Display */}
+        {quote.terms && (
+          <div style={{ marginBottom: '20px', background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.85rem', lineHeight: '1.5', color: '#475569' }}>
+            <strong style={{ display: 'block', marginBottom: '5px', color: '#1e293b' }}>{isHebrew ? 'תקנון ותנאים:' : 'Terms & Conditions:'}</strong>
+            <div style={{ whiteSpace: 'pre-wrap' }}>{quote.terms}</div>
+          </div>
+        )}
+
+        {quote.notes && (
+          <div style={{ marginBottom: '30px', background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.85rem', lineHeight: '1.5', color: '#475569' }}>
+            <strong style={{ display: 'block', marginBottom: '5px', color: '#1e293b' }}>{isHebrew ? 'הערות נוספות:' : 'Additional Notes:'}</strong>
+            <div style={{ whiteSpace: 'pre-wrap' }}>{quote.notes}</div>
+          </div>
+        )}
 
         {/* Signature & Approval Section */}
         <div style={{ marginBottom: '40px' }}>
