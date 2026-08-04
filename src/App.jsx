@@ -22,9 +22,8 @@ const DEFAULT_TERMS_HEB = `תנאים כלליים:
 
 const DEFAULT_TERMS_ENG = `General Terms:
 1. Validity: This quote is valid for 30 days from issuance.
-2. Prices: Prices include VAT unless stated otherwise.
-3. Payment: Payment shall be made in cash or via bank transfer as agreed in advance.
-4. Delivery: Product delivery within 30 business days from order confirmation and payment.`;
+2. Payment: Payment shall be made in cash or via bank transfer as agreed in advance.
+3. Delivery: Product delivery within 30 business days from order confirmation and payment.`;
 
 function ProFlowLogo({ size = 45 }) {
   return (
@@ -552,7 +551,21 @@ function PublicQuote() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      // Page break logic for multi-page PDFs
+      let heightLeft = pdfHeight;
+      let position = 0;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+      
       pdf.save(`Quote_${quote.id.slice(0, 8).toUpperCase()}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -588,7 +601,7 @@ function PublicQuote() {
   const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
   const baseAmount = quoteSub - quoteDiscountAmount;
   
-  // רק עסק מקומי ישראלי מחשב מע"מ
+  // VAT is calculated ONLY for local Israeli businesses
   const quoteTaxRate = (isLocalIsraeliBusiness && quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : 0.00;
   const hasVat = isLocalIsraeliBusiness && quoteTaxRate > 0;
   
@@ -605,7 +618,6 @@ function PublicQuote() {
 
   const fallbackTerms = isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG;
   
-  // תיקון הגירה - זיהוי הצעות ישנות לפי זה ש-notes הוא null
   let displayTerms = quote.terms;
   let displayNotes = quote.notes;
 
@@ -740,6 +752,7 @@ function PublicQuote() {
                     <span dir="ltr">-{quoteSym}{formatNum(quoteDiscountAmount)}</span>
                   </div>
                 )}
+                {/* מע"מ מוסתר לחלוטין ללקוחות שאינם עסקים מקומיים */}
                 {hasVat && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px' }}>
                     <span>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'}</span>
@@ -885,7 +898,7 @@ function Dashboard() {
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [terms, setTerms] = useState(''); 
+  const [terms, setTerms] = useState(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG); 
   const [notes, setNotes] = useState('');
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
@@ -2480,13 +2493,19 @@ function Dashboard() {
                         if (found) {
                           if (found.client_type) {
                              setClientType(found.client_type);
-                             if (found.client_type === 'business' && (!terms || terms.trim() === '')) setTerms(defaultTerms);
-                             if (found.client_type === 'private') setTerms('');
+                             if (found.client_type === 'business') {
+                               // רק אם השדה באמת ריק, נדחוף את הדיפולט. אם יש כבר תקנון, נשמור עליו.
+                               if (!terms || terms.trim() === '') {
+                                  setTerms(defaultTerms);
+                               }
+                             }
                           }
                           if (found.email) setClientEmail(found.email);
                           if (found.phone) setClientPhone(found.phone);
                           if (found.tax_id) setClientTaxId(found.tax_id);
                           if (found.address) setClientAddress(found.address);
+                          // שימוש בשדה notes להערות, בלי לדרוס את terms
+                          if (found.notes) setNotes(found.notes);
                         }
                       }} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
@@ -2501,8 +2520,6 @@ function Dashboard() {
                           e.target.setCustomValidity('');
                           if (val === 'business' && (!terms || terms.trim() === '')) {
                             setTerms(defaultTerms);
-                          } else if (val === 'private') {
-                            setTerms('');
                           }
                         }} 
                         onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר סוג לקוח' : 'Select client type')}
