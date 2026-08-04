@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from './supabase';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -449,6 +449,94 @@ function SignaturePadModal({ isOpen, onClose, onSave, isHebrew }) {
   );
 }
 
+// ==========================================
+// LANDING PAGE - GLOBAL (ENGLISH)
+// ==========================================
+function LandingGlobal() {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard');
+      } else {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        if (tz === 'Asia/Jerusalem' && !window.location.search.includes('force=en')) {
+          navigate('/he');
+        }
+      }
+    });
+  }, [navigate]);
+
+  return (
+    <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', minHeight: '100vh', background: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
+      <header style={{ padding: '20px 40px', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+        <ProFlowLogo size={40} />
+        <button onClick={() => navigate('/dashboard')} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.2)' }}>
+          Login / Get Started
+        </button>
+      </header>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '60px 20px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '3.5rem', color: '#1e293b', marginBottom: '20px', fontWeight: '900', maxWidth: '800px', lineHeight: '1.2' }}>
+          Streamline Your Quoting Process
+        </h1>
+        <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', marginBottom: '40px', lineHeight: '1.6' }}>
+          Create professional, customized quotes in seconds. Manage your clients, track expenses, and grow your business with ProFlow.
+        </p>
+        <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '15px 40px', borderRadius: '10px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)' }}>
+          Start Free Trial
+        </button>
+      </main>
+      <footer style={{ background: '#1e293b', color: '#94a3b8', padding: '30px', textAlign: 'center', fontSize: '0.9rem' }}>
+        &copy; {new Date().getFullYear()} ProFlow SaaS. All rights reserved.
+      </footer>
+    </div>
+  );
+}
+
+// ==========================================
+// LANDING PAGE - LOCAL (HEBREW)
+// ==========================================
+function LandingLocal() {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard');
+      }
+    });
+  }, [navigate]);
+
+  return (
+    <div dir="rtl" style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', minHeight: '100vh', background: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
+      <header style={{ padding: '20px 40px', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+        <ProFlowLogo size={40} />
+        <div style={{display: 'flex', gap: '20px', alignItems: 'center'}}>
+          <a href="/?force=en" style={{fontSize: '0.95rem', color: '#64748b', textDecoration: 'none', fontWeight: '600'}}>English</a>
+          <button onClick={() => navigate('/dashboard')} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.2)' }}>
+            התחבר / הירשם
+          </button>
+        </div>
+      </header>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '60px 20px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '3.5rem', color: '#1e293b', marginBottom: '20px', fontWeight: '900', maxWidth: '800px', lineHeight: '1.2' }}>
+          הפקת הצעות מחיר בקליק
+        </h1>
+        <p style={{ fontSize: '1.25rem', color: '#64748b', maxWidth: '600px', marginBottom: '40px', lineHeight: '1.6' }}>
+          צור הצעות מחיר מקצועיות, נהל לקוחות (CRM), עקוב אחר הכנסות והוצאות, וסגור עסקאות מהר יותר עם חתימה דיגיטלית מובנית.
+        </p>
+        <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '15px 40px', borderRadius: '10px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)' }}>
+          התחל עכשיו בחינם
+        </button>
+      </main>
+      <footer style={{ background: '#1e293b', color: '#94a3b8', padding: '30px', textAlign: 'center', fontSize: '0.9rem' }}>
+        &copy; {new Date().getFullYear()} ProFlow ישראל. כל הזכויות שמורות.
+      </footer>
+    </div>
+  );
+}
+
 function PublicQuote() {
   const { id } = useParams();
   const [quote, setQuote] = useState(null);
@@ -551,7 +639,6 @@ function PublicQuote() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       
-      // Page break logic for multi-page PDFs
       let heightLeft = pdfHeight;
       let position = 0;
       const pageHeight = pdf.internal.pageSize.getHeight();
@@ -601,7 +688,6 @@ function PublicQuote() {
   const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
   const baseAmount = quoteSub - quoteDiscountAmount;
   
-  // VAT is calculated ONLY for local Israeli businesses
   const quoteTaxRate = (isLocalIsraeliBusiness && quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : 0.00;
   const hasVat = isLocalIsraeliBusiness && quoteTaxRate > 0;
   
@@ -752,7 +838,6 @@ function PublicQuote() {
                     <span dir="ltr">-{quoteSym}{formatNum(quoteDiscountAmount)}</span>
                   </div>
                 )}
-                {/* מע"מ מוסתר לחלוטין ללקוחות שאינם עסקים מקומיים */}
                 {hasVat && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px' }}>
                     <span>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'}</span>
@@ -769,8 +854,29 @@ function PublicQuote() {
 
           <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', gap: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
             
-            {/* צד ימין (טקסטים) */}
-            <div style={{ flex: 1, minWidth: '250px', maxWidth: '500px', textAlign: isHebrew ? 'right' : 'left' }}>
+            <div style={{ order: isHebrew ? 1 : 2, display: 'flex', flexDirection: 'column', alignItems: isHebrew ? 'flex-start' : 'flex-end', minWidth: '200px' }}>
+              {!approvedSuccess && !quote.signature && (
+                <div data-html2canvas-ignore="true" className="no-print" style={{ marginBottom: '15px' }}>
+                  <button 
+                    onClick={handleClientApproveClick}
+                    style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%' }}
+                  >
+                    {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
+                  </button>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '8px', textAlign: 'center' }}>
+                    {isHebrew ? 'חתימה דיגיטלית מהירה' : 'Quick Digital Signature'}
+                  </div>
+                </div>
+              )}
+              {quote.signature && (
+                <div style={{ textAlign: isHebrew ? 'right' : 'left', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'חתימת לקוח מאושרת:' : 'Approved Client Signature:'}</p>
+                  <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '80px', display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
+                </div>
+              )}
+            </div>
+
+            <div style={{ order: isHebrew ? 2 : 1, flex: 1, minWidth: '250px', maxWidth: '600px', textAlign: isHebrew ? 'right' : 'left' }}>
               {displayTerms && isBusinessClient && (
                 <div style={{ marginBottom: '20px' }}>
                   <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '6px' }}>{isHebrew ? 'תקנון ותנאים (עסקי)' : 'Terms & Conditions'}</p>
@@ -788,29 +894,8 @@ function PublicQuote() {
                   </div>
                 </div>
               )}
-
-              {quote.signature && (
-                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
-                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'חתימת לקוח מאושרת:' : 'Approved Client Signature:'}</p>
-                  <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '80px', display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
-                </div>
-              )}
             </div>
 
-            {/* צד שמאל (כפתור) */}
-            {!approvedSuccess && !quote.signature && (
-              <div data-html2canvas-ignore="true" className="no-print" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '200px' }}>
-                <button 
-                  onClick={handleClientApproveClick}
-                  style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%' }}
-                >
-                  {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
-                </button>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '8px', textAlign: 'center' }}>
-                  {isHebrew ? 'חתימה דיגיטלית מהירה' : 'Quick Digital Signature'}
-                </div>
-              </div>
-            )}
           </div>
 
           <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
@@ -2494,7 +2579,6 @@ function Dashboard() {
                           if (found.client_type) {
                              setClientType(found.client_type);
                              if (found.client_type === 'business') {
-                               // רק אם השדה באמת ריק, נדחוף את הדיפולט. אם יש כבר תקנון, נשמור עליו.
                                if (!terms || terms.trim() === '') {
                                   setTerms(defaultTerms);
                                }
@@ -2504,7 +2588,6 @@ function Dashboard() {
                           if (found.phone) setClientPhone(found.phone);
                           if (found.tax_id) setClientTaxId(found.tax_id);
                           if (found.address) setClientAddress(found.address);
-                          // שימוש בשדה notes להערות, בלי לדרוס את terms
                           if (found.notes) setNotes(found.notes);
                         }
                       }} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
@@ -2713,13 +2796,14 @@ function Dashboard() {
                       <th style={{ padding: '8px 6px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
                       <th style={{ padding: '8px 6px' }}>{isHebrew ? 'כתובת' : 'Address'}</th>
                       <th style={{ padding: '8px 6px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
+                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'תנאי תשלום' : 'Payment Terms'}</th>
                       <th style={{ padding: '8px 6px' }}>{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredClients.length === 0 ? (
                       <tr>
-                        <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                           {isHebrew ? 'לא נמצאו לקוחות התואמים את החיפוש.' : 'No clients found.'}
                         </td>
                       </tr>
@@ -2739,6 +2823,13 @@ function Dashboard() {
                             }}>
                               {client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}
                             </span>
+                          </td>
+                          <td style={{ padding: '10px 6px', color: '#4f46e5', fontWeight: '400' }}>
+                            {client.terms ? (
+                              <span style={{ background: '#e0e7ff', padding: '3px 6px', borderRadius: '6px', fontSize: '0.75rem' }}>
+                                {client.terms}
+                              </span>
+                            ) : '-'}
                           </td>
                           <td style={{ padding: '10px 6px' }}>
                             <button 
@@ -3136,7 +3227,9 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<LandingGlobal />} />
+        <Route path="/he" element={<LandingLocal />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
       </Routes>
     </Router>
