@@ -80,10 +80,16 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
   );
 }
 
-function PricingModal({ isOpen, onClose, isHebrew }) {
+function PricingModal({ isOpen, onClose, isHebrew, isLocalIsraeliBusiness }) {
   const [billingCycle, setBillingCycle] = useState('monthly');
 
   if (!isOpen) return null;
+
+  const currencySymbol = isLocalIsraeliBusiness ? '₪' : '$';
+  const basicMonthly = isLocalIsraeliBusiness ? '₪49' : '$49';
+  const basicYearly = isLocalIsraeliBusiness ? '₪39' : '$39';
+  const proMonthly = isLocalIsraeliBusiness ? '₪99' : '$99';
+  const proYearly = isLocalIsraeliBusiness ? '₪79' : '$79';
 
   return (
     <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
@@ -128,12 +134,12 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
           <div style={{ border: '2px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי בסיסי (Basic)' : 'Basic Plan'}</h3>
             <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '5px' }}>
-              {billingCycle === 'monthly' ? '₪49' : '₪39'} 
+              {billingCycle === 'monthly' ? basicMonthly : basicYearly} 
               <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span>
             </div>
             {billingCycle === 'yearly' && (
               <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 'bold', marginBottom: '15px' }}>
-                {isHebrew ? 'חיוב שנתי של ₪468 (חסוך ₪120 בשנה)' : 'Billed annually at ₪468'}
+                {isHebrew ? 'חיוב שנתי (חסוך 20% בשנה)' : 'Billed annually (Save 20%)'}
               </div>
             )}
             {billingCycle === 'monthly' && <div style={{ height: '20px', marginBottom: '15px' }}></div>}
@@ -153,12 +159,12 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
             <div style={{ background: '#4f46e5', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', alignSelf: 'flex-start', marginBottom: '8px' }}>POPULAR</div>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי PRO (מומלץ)' : 'PRO Plan (Recommended)'}</h3>
             <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '5px' }}>
-              {billingCycle === 'monthly' ? '₪99' : '₪79'} 
+              {billingCycle === 'monthly' ? proMonthly : proYearly} 
               <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>{isHebrew ? '/ חודש' : '/ month'}</span>
             </div>
             {billingCycle === 'yearly' && (
               <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 'bold', marginBottom: '15px' }}>
-                {isHebrew ? 'חיוב שנתי של ₪948 (חסוך ₪240 בשנה)' : 'Billed annually at ₪948'}
+                {isHebrew ? 'חיוב שנתי (חסוך 20% בשנה)' : 'Billed annually (Save 20%)'}
               </div>
             )}
             {billingCycle === 'monthly' && <div style={{ height: '20px', marginBottom: '15px' }}></div>}
@@ -584,7 +590,7 @@ function PublicQuote() {
   
   // רק עסק מקומי ישראלי מחשב מע"מ
   const quoteTaxRate = (isLocalIsraeliBusiness && quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : 0.00;
-  const hasVat = quoteTaxRate > 0;
+  const hasVat = isLocalIsraeliBusiness && quoteTaxRate > 0;
   
   let quoteTaxAmount = 0;
   let quoteTotal = 0;
@@ -597,7 +603,6 @@ function PublicQuote() {
       quoteTotal = baseAmount + quoteTaxAmount;
   }
 
-  // תקנון יוצג רק ללקוח עסקי ולא ללקוח פרטי
   const quoteTerms = isBusinessClient ? (settings?.default_terms || '') : '';
   const quoteNotes = quote.terms || quote.clients?.terms || '';
 
@@ -741,7 +746,6 @@ function PublicQuote() {
           <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '20px' }}>
             
             <div style={{ flex: 1, minWidth: '250px' }}>
-              {/* הצגת תקנון רק לעסקי */}
               {quoteTerms && isBusinessClient && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '15px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תקנון ותנאים' : 'Terms & Conditions'}</p>
@@ -749,7 +753,6 @@ function PublicQuote() {
                 </div>
               )}
 
-              {/* הצגת הערות אישיות להצעה (לכל סוג לקוח אם קיימות) */}
               {quoteNotes && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '15px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'הערות להצעה' : 'Quote Notes'}</p>
@@ -858,8 +861,8 @@ function Dashboard() {
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [terms, setTerms] = useState(''); // תקנון קבוע
-  const [notes, setNotes] = useState(''); // הערות ספציפיות להצעה
+  const [terms, setTerms] = useState('');
+  const [notes, setNotes] = useState('');
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
@@ -1936,7 +1939,7 @@ function Dashboard() {
       `}</style>
 
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
-      <PricingModal isOpen={showPricingModal} onClose={() => setShowPricingModal(false)} isHebrew={isHebrew} />
+      <PricingModal isOpen={showPricingModal} onClose={() => setShowPricingModal(false)} isHebrew={isHebrew} isLocalIsraeliBusiness={isLocalIsraeliBusiness} />
       
       <EmailConfirmModal 
         isOpen={pendingEmailQuote !== null} 
@@ -3041,7 +3044,7 @@ function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>👥</span>
           {isHebrew ? 'לקוחות' : 'Clients'}
         </button>
-        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
