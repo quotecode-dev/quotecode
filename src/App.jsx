@@ -2830,4 +2830,196 @@ function Dashboard() {
                             filteredExpensesForReport.map((exp) => (
                               <tr key={exp.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
                                 <td style={{ padding: '10px 6px', fontWeight: '400', color: '#1e293b' }}>{exp.description}</td>
-                                <td style={{ padding: '10px 6px', color: '#64748b' }}>{expאני מודל שפה, ולא תיכננו אותי לעזור במקרה הזה.
+                                <td style={{ padding: '10px 6px', color: '#64748b' }}>{exp.category}</td>
+                                <td style={{ padding: '10px 6px', color: '#64748b' }}>
+                                  {exp.is_recurring ? (isHebrew ? '🔄 קבועה' : 'Recurring') : (isHebrew ? 'חד פעמית' : 'One-time')}
+                                </td>
+                                <td style={{ padding: '10px 6px', color: '#64748b' }}>{exp.expense_date}</td>
+                                <td style={{ padding: '10px 6px', color: '#ef4444', fontWeight: '400' }}>{sym}{formatNum(exp.amount)}</td>
+                                <td style={{ padding: '10px 6px' }}>
+                                  <button 
+                                    onClick={() => handleDeleteExpense(exp.id)}
+                                    style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '4px 8px', borderRadius: '6px', cursor: 'pointer', fontWeight: '400', fontSize: '0.7rem' }}
+                                  >
+                                    {t.delete}
+                                  </button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                 </div>
+             </div>
+          )}
+
+          {isSuperAdmin && activeTab === 'admin_clients' && (
+            <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
+                <h2 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  👑 Super Admin - Users
+                </h2>
+              </div>
+              <p style={{ color: '#64748b', marginBottom: '15px', fontSize: '0.85rem' }}>
+                {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות שלהם.' : 'View all registered users and manage their subscription plans.'}
+              </p>
+
+              <div style={{ marginBottom: '15px' }}>
+                <input 
+                  type="text" 
+                  placeholder={isHebrew ? "חיפוש משתמש (אימייל או שם עסק)..." : "Search user (email or business)..."} 
+                  value={adminSearchTerm}
+                  onChange={(e) => setAdminSearchTerm(e.target.value)}
+                  style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', width: '250px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', background: '#f8fafc' }}
+                />
+              </div>
+              
+              <div style={{ overflowX: 'auto', background: 'white', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      <th style={{ padding: '8px 6px' }}>ID</th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => handleSort('email')}>
+                        Email {sortField === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => handleSort('business_name')}>
+                        Business Name {sortField === 'business_name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => handleSort('country')}>
+                        Region {sortField === 'country' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => handleSort('plan')}>
+                        Current Plan {sortField === 'plan' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => handleSort('role')}>
+                        Role {sortField === 'role' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => handleSort('trial_ends_at')}>
+                        Trial Ends {sortField === 'trial_ends_at' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => handleSort('last_sign_in')}>
+                        Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredAdminAccounts.length === 0 ? (
+                      <tr>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                          {isHebrew ? 'לא נמצאו משתמשים התואמים לחיפוש.' : 'No users found matching your search.'}
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredAdminAccounts.map(acc => (
+                        <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
+                          <td style={{ padding: '10px 6px', color: '#64748b', fontSize: '0.75rem' }}>{acc.user_id?.slice(0,8)}...</td>
+                          <td style={{ padding: '10px 6px', fontWeight: '400', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
+                          <td style={{ padding: '10px 6px', color: '#334155' }}>{acc.business_name}</td>
+                          <td style={{ padding: '10px 6px' }}>
+                            <span style={{
+                              background: '#dbeafe',
+                              color: '#1e40af',
+                              padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem'
+                            }}>
+                              Local
+                            </span>
+                          </td>
+                          <td style={{ padding: '10px 6px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ 
+                                background: '#f1f5f9', 
+                                padding: '4px 10px', 
+                                borderRadius: '6px', 
+                                fontSize: '0.75rem', 
+                                fontWeight: '400', 
+                                color: '#475569',
+                                minWidth: '55px',
+                                textAlign: 'center',
+                                display: 'inline-block'
+                              }}>
+                                {acc.plan ? acc.plan.toUpperCase() : 'Free'}
+                              </span>
+                              <select 
+                                defaultValue="" 
+                                onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
+                                style={{ padding: '4px 6px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.75rem', fontWeight: 'bold', color: '#4f46e5', cursor: 'pointer' }}
+                              >
+                                <option value="" disabled style={{ fontWeight: 'bold' }}>{isHebrew ? 'שדרג...' : 'Change...'}</option>
+                                <option value="free" style={{ fontWeight: 'bold' }}>Free</option>
+                                <option value="basic" style={{ fontWeight: 'bold' }}>Basic</option>
+                                <option value="pro" style={{ fontWeight: 'bold' }}>Pro</option>
+                              </select>
+                            </div>
+                          </td>
+                          <td style={{ padding: '10px 6px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: '400' }}>
+                            {acc.role}
+                          </td>
+                          <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                            {acc.trial_ends_at ? (
+                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
+                                <span>{new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}</span>
+                                <button 
+                                  onClick={() => handleMakeLifetime(acc.id)} 
+                                  title={isHebrew ? "הפוך למנוי לכל החיים (בטל תאריך תפוגה)" : "Make Lifetime (Remove expiration)"}
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0 }}
+                                >
+                                  ♾️
+                                </button>
+                              </div>
+                            ) : '-'}
+                          </td>
+                          <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                            {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <div className="no-print mobile-bottom-nav" style={{ display: 'flex', position: 'fixed', bottom: 0, left: 0, width: '100%', background: '#1e293b', color: 'white', justifyContent: 'space-around', padding: '12px 0', zIndex: 9998, boxShadow: '0 -4px 15px rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        <button onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'main' && !showQuoteForm ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>📄</span>
+          {isHebrew ? 'הצעות' : 'Quotes'}
+        </button>
+        <button onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'clients' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>👥</span>
+          {isHebrew ? 'לקוחות' : 'Clients'}
+        </button>
+        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
+          {isHebrew ? 'הגדרות' : 'Settings'}
+        </button>
+        <button onClick={() => { setIsCreatingQuote(true); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>➕</span>
+          {isHebrew ? 'חדש' : 'New'}
+        </button>
+      </div>
+
+      <footer className="no-print" style={{ textAlign: 'center', padding: '20px', marginTop: '40px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
+        <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
+          {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
+        </button>
+      </footer>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/quote/:id" element={<PublicQuote />} />
+      </Routes>
+    </Router>
+  );
+}
