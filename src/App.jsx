@@ -581,7 +581,8 @@ function PublicQuote() {
   const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
   const baseAmount = quoteSub - quoteDiscountAmount;
   
-  const quoteTaxRate = (quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : (isHebrew ? 0.18 : 0.00);
+  // רק עסק מקומי ישראלי מחשב מע"מ
+  const quoteTaxRate = (isLocalIsraeliBusiness && quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : 0.00;
   const hasVat = quoteTaxRate > 0;
   
   let quoteTaxAmount = 0;
@@ -711,7 +712,7 @@ function PublicQuote() {
             ) : (
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '300px', marginLeft: isHebrew ? '0' : 'auto', marginRight: isHebrew ? 'auto' : '0', marginBottom: '6px' }}>
-                  <span>{isHebrew ? 'סה"כ ללא מע"מ:' : 'Subtotal:'}</span>
+                  <span>{isHebrew ? 'סה"כ:' : 'Subtotal:'}</span>
                   <span dir="ltr">{quoteSym}{formatNum(baseAmount)}</span>
                 </div>
                 {quoteDiscount > 0 && (
@@ -846,6 +847,7 @@ function Dashboard() {
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
   const [terms, setTerms] = useState('');
+  const [notes, setNotes] = useState(''); // שדה נפרד להערות בהצעה
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
@@ -1432,12 +1434,12 @@ function Dashboard() {
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
   const discountAmount = (subtotal * Number(discount)) / 100;
   const baseAmount = subtotal - discountAmount;
-  let taxRate = isHebrew ? 0.18 : 0.00;
+  let taxRate = isLocalIsraeliBusiness ? 0.18 : 0.00;
   
   let taxAmount = 0;
   let totalAmount = 0;
 
-  if (isHebrew && clientType === 'private') {
+  if (isLocalIsraeliBusiness && isHebrew && clientType === 'private') {
     totalAmount = baseAmount;
     taxAmount = totalAmount - (totalAmount / (1 + taxRate));
   } else {
@@ -1596,7 +1598,8 @@ function Dashboard() {
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0); 
-    setTerms(quote.terms || quote.clients?.terms || defaultTerms);
+    setTerms(defaultTerms); // תקנון קבוע
+    setNotes(quote.terms || quote.clients?.terms || ''); // הערות ספציפיות להצעה
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1618,7 +1621,8 @@ function Dashboard() {
     setClientAddress('');
     setValidUntil('');
     setDiscount(0);
-    setTerms(defaultTerms); // טעינת ברירת המחדל של המשתמש
+    setTerms(defaultTerms); // מילוי אוטומטי של תקנון ברירת המחדל
+    setNotes(''); // שדה הערות ריק להתחלה
     setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
   };
@@ -1644,7 +1648,8 @@ function Dashboard() {
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0);
-    setTerms(quote.terms || quote.clients?.terms || defaultTerms);
+    setTerms(defaultTerms);
+    setNotes(quote.terms || quote.clients?.terms || '');
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1667,6 +1672,7 @@ function Dashboard() {
     setValidUntil('');
     setDiscount(0);
     setTerms('');
+    setNotes('');
     setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
     setStatusMsg({ text: isHebrew ? 'הפעולה בוטלה. הנה רשימת ההצעות.' : 'Action cancelled. Here are your quotes.', type: 'success' });
@@ -1708,7 +1714,7 @@ function Dashboard() {
         client_type: clientType,
         tax_id: clientTaxId,
         address: clientAddress,
-        terms: terms,
+        terms: notes, // שומרים את ההערות/תקנון בלקוח
         user_id: session.user.id
       };
 
@@ -1733,7 +1739,7 @@ function Dashboard() {
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
         discount: Number(discount),
-        terms: terms,
+        terms: notes, // שומרים את ההערות בהצעת המחיר
         user_id: session.user.id
       };
 
@@ -1779,6 +1785,7 @@ function Dashboard() {
       setValidUntil('');
       setDiscount(0);
       setTerms('');
+      setNotes('');
       setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
       setItems([{ description: '', quantity: 1, unit_price: 0 }]);
       loadData();
@@ -2412,7 +2419,7 @@ function Dashboard() {
                           if (found.phone) setClientPhone(found.phone);
                           if (found.tax_id) setClientTaxId(found.tax_id);
                           if (found.address) setClientAddress(found.address);
-                          if (found.terms) setTerms(found.terms);
+                          if (found.terms) setNotes(found.terms);
                         }
                       }} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
@@ -2488,16 +2495,26 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* טאב / שדה הערות ותקנון בהצעת המחיר */}
-                  <div style={{ marginBottom: '20px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'הערות / תקנון ותנאי תשלום' : 'Notes / Terms & Conditions'}</label>
+                  {/* שדה נפרד לתקנון ותנאים (שנקבע בהגדרות עסק) */}
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים (ברירת מחדל)' : 'Terms & Conditions (Default)'}</label>
                     <textarea 
-                      name="terms" 
                       value={terms} 
                       onChange={(e) => setTerms(e.target.value)} 
-                      rows="5"
-                      placeholder={isHebrew ? "הכנס כאן את תנאי החברה, תשלום, אחריות וכו'..." : "Enter company terms, conditions, and notes here..."}
-                      style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', fontFamily: 'inherit', lineHeight: '1.5' }} 
+                      rows="4"
+                      style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
+                    />
+                  </div>
+
+                  {/* שדה נפרד להערות אישיות להצעה */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'הערות נוספות להצעה זו' : 'Additional Notes for this Quote'}</label>
+                    <textarea 
+                      value={notes} 
+                      onChange={(e) => setNotes(e.target.value)} 
+                      rows="3"
+                      placeholder={isHebrew ? "הערות מיוחדות ללקוח זה..." : "Special notes for this client..."}
+                      style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
                     />
                   </div>
 
@@ -2540,7 +2557,7 @@ function Dashboard() {
 
                   <div style={{ borderTop: '2px solid #f1f5f9', marginTop: '15px', paddingTop: '10px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row', fontSize: '0.85rem' }}>
-                      <span>{isHebrew && clientType === 'private' ? (isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):') : t.subtotal}</span>
+                      <span>{isLocalIsraeliBusiness && isHebrew && clientType === 'private' ? (isHebrew ? 'סכום ביניים (כולל מע"מ):' : 'Subtotal (Inc. VAT):') : t.subtotal}</span>
                       <span>{sym}{formatNum(subtotal)}</span>
                     </div>
                     {discount > 0 && (
@@ -2549,7 +2566,7 @@ function Dashboard() {
                         <span>-{sym}{formatNum(discountAmount)}</span>
                       </div>
                     )}
-                    {isHebrew && clientType === 'business' && (
+                    {isLocalIsraeliBusiness && isHebrew && clientType === 'business' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row', fontSize: '0.85rem' }}>
                         <span>{t.vat}</span>
                         <span>{sym}{formatNum(taxAmount)}</span>
@@ -2559,7 +2576,7 @@ function Dashboard() {
                       <span>{t.totalAmount}</span>
                       <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isLocalIsraeliBusiness ? '' : (currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : currency === 'USD' ? 'USD' : '')}</span>
                     </div>
-                    {isHebrew && clientType === 'private' && (
+                    {isLocalIsraeliBusiness && isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
                         <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
@@ -2689,7 +2706,7 @@ function Dashboard() {
 
                 {/* עריכת תקנון ברירת המחדל בהגדרות עסק */}
                 <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים כלליים (ברירת מחדל להצעות חדשות)' : 'Default Terms & Conditions for New Quotes'}</label>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים (ברירת מחדל להצעות חדשות)' : 'Default Terms & Conditions for New Quotes'}</label>
                   <textarea 
                     value={defaultTerms} 
                     onChange={(e) => setDefaultTerms(e.target.value)} 
@@ -3010,7 +3027,7 @@ function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>👥</span>
           {isHebrew ? 'לקוחות' : 'Clients'}
         </button>
-        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
