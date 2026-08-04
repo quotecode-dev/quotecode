@@ -23,10 +23,10 @@ function PricingModal({ isOpen, onClose, isHebrew, isLocalIsraeliBusiness }) {
 
   if (!isOpen) return null;
 
-  const basicMonthly = isLocalIsraeliBusiness ? '₪49' : '$49';
-  const basicYearly = isLocalIsraeliBusiness ? '₪39' : '$39';
-  const proMonthly = isLocalIsraeliBusiness ? '₪99' : '$99';
-  const proYearly = isLocalIsraeliBusiness ? '₪79' : '$79';
+  const basicMonthly = isLocalIsraeliBusiness ? '₪49' : '$39';
+  const basicYearly = isLocalIsraeliBusiness ? '₪39' : '$29';
+  const proMonthly = isLocalIsraeliBusiness ? '₪99' : '$89';
+  const proYearly = isLocalIsraeliBusiness ? '₪79' : '$69';
 
   return (
     <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
@@ -86,6 +86,7 @@ function PricingModal({ isOpen, onClose, isHebrew, isLocalIsraeliBusiness }) {
               <li>{isHebrew ? 'עריכה ושכפול הצעות מחיר' : 'Edit & duplicate quotes'}</li>
               <li>{isHebrew ? 'קטלוג מוצרים אישי' : 'Personal product catalog'}</li>
               <li>{isHebrew ? 'הפקת קובצי PDF רשמיים' : 'Official PDF exports'}</li>
+              <li style={{ color: '#ef4444' }}>{isHebrew ? '✗ ללא שליחה ישירה בווצאפ' : '✗ No WhatsApp sending'}</li>
             </ul>
             <button onClick={() => { alert(isHebrew ? `לשדרוג מיידי למסלול Basic (${billingCycle === 'yearly' ? 'שנתי' : 'חודשי'}), פנה לתמיכה.` : 'Please contact support to upgrade.'); onClose(); }} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
               {isHebrew ? 'בחר מסלול Basic' : 'Select Basic'}
@@ -747,8 +748,8 @@ export default function Dashboard() {
       : `₪${formatNum(proposal.total)}`;
 
     const text = isHebrew 
-      ? `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ${priceStr}. בתוקף עד ${proposal.valid_until || 'N/A'}.\n\nלצפייה בהצעה:\n${window.location.origin}/quote/${proposal.id}`
-      : `Hi ${clientNameVal}, here is your quote #${proposal.id.slice(0, 6)} totaling ${isHebrew ? priceStr : `${sym}${formatNum(proposal.total)} + VAT`}. Valid until ${proposal.valid_until || 'N/A'}.\n\nView quote:\n${window.location.origin}/quote/${proposal.id}`;
+      ? `הי ${clientNameVal}, הנה הצעת המחיר שלך מספר #${proposal.id.slice(0, 6)} על סך ${priceStr}. בתוקף עד ${proposal.valid_until || 'N/A'}.\n\nלצפייה בהצעה:\n${window.location.origin}/public-quote/${proposal.id}`
+      : `Hi ${clientNameVal}, here is your quote #${proposal.id.slice(0, 6)} totaling ${isHebrew ? priceStr : `${sym}${formatNum(proposal.total)} + VAT`}. Valid until ${proposal.valid_until || 'N/A'}.\n\nView quote:\n${window.location.origin}/public-quote/${proposal.id}`;
     
     const url = clientPhoneVal 
       ? `https://wa.me/${clientPhoneVal}?text=${encodeURIComponent(text)}`
@@ -762,7 +763,7 @@ export default function Dashboard() {
 
     try {
       const quoteSym = getCurrencySymbol(quote.currency);
-      const quoteLink = `${window.location.origin}/quote/${quote.id}`;
+      const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
       
       const { error } = await supabase.functions.invoke('send-quote-email', {
         body: {
@@ -781,7 +782,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Email send error:", err);
       const quoteSym = getCurrencySymbol(quote.currency);
-      const quoteLink = `${window.location.origin}/quote/${quote.id}`;
+      const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
       const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
       const body = isHebrew
         ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
@@ -1172,7 +1173,7 @@ export default function Dashboard() {
       setStatusMsg({ 
         text: editingQuoteId 
           ? (isHebrew ? `הצעה #${editingQuoteId.slice(0, 6)} עודכנה בהצלחה!` : `Quote #${editingQuoteId.slice(0, 6)} successfully updated!`) 
-          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}{formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}{formatNum(totalAmount)}`), 
+          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}${formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`), 
         type: 'success' 
       });
       
@@ -1612,7 +1613,7 @@ export default function Dashboard() {
                                   
                                   <button 
                                     title={isHebrew ? "צפה במסמך המקורי" : "View"}
-                                    onClick={() => window.open(`/quote/${quote.id}`, '_blank')}
+                                    onClick={() => window.open(`/public-quote/${quote.id}`, '_blank')}
                                     style={{ background: '#e0e7ff', color: '#3730a3', border: 'none', padding: '0 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.75rem', height: '26px', boxSizing: 'border-box', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                                   >
                                     {isHebrew ? 'צפה' : 'View'}
@@ -2133,58 +2134,58 @@ export default function Dashboard() {
 
           {isSuperAdmin && activeTab === 'finances' && (
              <div style={{ background: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)', border: '1px solid #f1f5f9' }}>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
-                    <h2 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#475569' }}>{isHebrew ? 'סוג דוח:' : 'Report Type:'}</span>
-                      <select 
-                        value={financeReportType} 
-                        onChange={(e) => setFinanceReportType(e.target.value)}
-                        style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.85rem', fontWeight: 'bold', color: '#4f46e5' }}
-                      >
-                        <option value="monthly">{isHebrew ? 'חודשי (מתחיל מאפס כל חודש)' : 'Monthly'}</option>
-                        <option value="quarterly">{isHebrew ? 'רבעוני (3 חודשים)' : 'Quarterly'}</option>
-                        <option value="half-yearly">{isHebrew ? 'חצי שנתי (6 חודשים)' : 'Half-Yearly'}</option>
-                        <option value="yearly">{isHebrew ? 'שנתי (12 חודשים)' : 'Yearly'}</option>
-                        <option value="custom">{isHebrew ? 'בחירת טווח תאריכים אישי' : 'Custom Date Range'}</option>
-                      </select>
-                    </div>
-                 </div>
-
-                 {financeReportType === 'custom' && (
-                   <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', border: '1px solid #e2e8f0' }}>
-                     <div>
-                       <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'מתאריך:' : 'Start Date:'}</label>
-                       <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontSize: '0.85rem' }} />
-                     </div>
-                     <div>
-                       <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'עד תאריך:' : 'End Date:'}</label>
-                       <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontSize: '0.85rem' }} />
-                     </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '15px' }}>
+                   <h2 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
+                   
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                     <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#475569' }}>{isHebrew ? 'סוג דוח:' : 'Report Type:'}</span>
+                     <select 
+                       value={financeReportType} 
+                       onChange={(e) => setFinanceReportType(e.target.value)}
+                       style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.85rem', fontWeight: 'bold', color: '#4f46e5' }}
+                     >
+                       <option value="monthly">{isHebrew ? 'חודשי (מתחיל מאפס כל חודש)' : 'Monthly'}</option>
+                       <option value="quarterly">{isHebrew ? 'רבעוני (3 חודשים)' : 'Quarterly'}</option>
+                       <option value="half-yearly">{isHebrew ? 'חצי שנתי (6 חודשים)' : 'Half-Yearly'}</option>
+                       <option value="yearly">{isHebrew ? 'שנתי (12 חודשים)' : 'Yearly'}</option>
+                       <option value="custom">{isHebrew ? 'בחירת טווח תאריכים אישי' : 'Custom Date Range'}</option>
+                     </select>
                    </div>
-                 )}
+                </div>
 
-                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalQuotes}</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#1e293b' }}>{adminTotalQuotesCount}</div>
+                {financeReportType === 'custom' && (
+                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '10px', marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', border: '1px solid #e2e8f0' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'מתאריך:' : 'Start Date:'}</label>
+                      <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontSize: '0.85rem' }} />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{isHebrew ? 'עד תאריך:' : 'End Date:'}</label>
+                      <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontSize: '0.85rem' }} />
+                    </div>
                   </div>
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalRevenue}</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#22c55e' }}>{sym}{formatNum(adminTotalRevenue)}</div>
-                  </div>
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalExpenses}</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ef4444' }}>{sym}{formatNum(adminTotalExpenses)}</div>
-                  </div>
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.netProfit}</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: adminNetProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(adminNetProfit)}</div>
-                  </div>
+                )}
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
+                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalQuotes}</div>
+                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#1e293b' }}>{adminTotalQuotesCount}</div>
                  </div>
+                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
+                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalRevenue}</div>
+                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#22c55e' }}>{sym}{formatNum(adminTotalRevenue)}</div>
+                 </div>
+                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
+                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalExpenses}</div>
+                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ef4444' }}>{sym}{formatNum(adminTotalExpenses)}</div>
+                 </div>
+                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
+                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.netProfit}</div>
+                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: adminNetProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(adminNetProfit)}</div>
+                 </div>
+                </div>
 
-                 <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '25px', height: '300px' }} dir="ltr">
+                <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '25px', height: '300px' }} dir="ltr">
                    <h2 style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '800', margin: 0, marginBottom: '15px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'סקירה שנתית - הכנסות מול הוצאות' : 'Yearly Overview - Income vs Expenses'}</h2>
                    <ResponsiveContainer width="100%" height="100%">
                      <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 25 }}>
@@ -2197,9 +2198,9 @@ export default function Dashboard() {
                        <Bar dataKey={isHebrew ? 'הוצאות' : 'Expenses'} fill="#ef4444" radius={[4, 4, 0, 0]} />
                      </BarChart>
                    </ResponsiveContainer>
-                 </div>
+                </div>
 
-                 <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+                <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px', flexWrap: 'wrap', gap: '10px' }}>
                       <h2 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>{t.expensesManagement}</h2>
                       <button 
@@ -2292,7 +2293,7 @@ export default function Dashboard() {
                         </tbody>
                       </table>
                     </div>
-                 </div>
+                </div>
              </div>
           )}
 
