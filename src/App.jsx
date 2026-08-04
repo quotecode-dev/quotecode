@@ -6,12 +6,6 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
-// ==========================================
-// TODO / FUTURE ARCHITECTURE NOTE (מנויים ושינוי מסלולים):
-// לקראת חיבור מערכת הסליקה (Stripe/Tranzilla), יש להוסיף כאן מנגנון לשינוי מסלולים 
-// אמצע תקופה (Upgrade/Downgrade עם חישוב יחסי - Proration).
-// ==========================================
-
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const DEFAULT_TERMS_HEB = `תנאים כלליים:
@@ -588,7 +582,6 @@ function PublicQuote() {
   const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
   const baseAmount = quoteSub - quoteDiscountAmount;
   
-  // רק עסק מקומי ישראלי מחשב מע"מ
   const quoteTaxRate = (isLocalIsraeliBusiness && quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : 0.00;
   const hasVat = isLocalIsraeliBusiness && quoteTaxRate > 0;
   
@@ -603,8 +596,8 @@ function PublicQuote() {
       quoteTotal = baseAmount + quoteTaxAmount;
   }
 
-  // תקנון והערות בנפרד (תקנון רק לעסקי)
-  const quoteTerms = quote.terms ?? (isBusinessClient ? (settings?.default_terms || '') : '');
+  const fallbackTerms = isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG;
+  const quoteTerms = (quote.terms && quote.terms.trim() !== '') ? quote.terms : (isBusinessClient ? (settings?.default_terms || fallbackTerms) : '');
   const quoteNotes = quote.notes || '';
 
   return (
@@ -746,7 +739,29 @@ function PublicQuote() {
 
           <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', gap: '20px' }}>
             
-            <div style={{ flex: 1, minWidth: '250px', textAlign: isHebrew ? 'right' : 'left' }}>
+            <div style={{ order: isHebrew ? 1 : 2, display: 'flex', flexDirection: 'column', alignItems: isHebrew ? 'flex-start' : 'flex-end', minWidth: '200px' }}>
+              {!approvedSuccess && !quote.signature && (
+                <div data-html2canvas-ignore="true" className="no-print" style={{ marginBottom: '15px' }}>
+                  <button 
+                    onClick={handleClientApproveClick}
+                    style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                  >
+                    {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
+                  </button>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '6px', textAlign: 'center' }}>
+                    {isHebrew ? 'חתימה דיגיטלית מהירה' : 'Quick Digital Signature'}
+                  </div>
+                </div>
+              )}
+              {quote.signature && (
+                <div style={{ textAlign: isHebrew ? 'right' : 'left', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'חתימת לקוח מאושרת:' : 'Approved Client Signature:'}</p>
+                  <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '80px', display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
+                </div>
+              )}
+            </div>
+
+            <div style={{ order: isHebrew ? 2 : 1, flex: 1, minWidth: '250px', maxWidth: '600px', textAlign: isHebrew ? 'right' : 'left' }}>
               {quoteTerms && isBusinessClient && (
                 <div style={{ marginBottom: '20px' }}>
                   <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '6px' }}>{isHebrew ? 'תקנון ותנאים (עסקי)' : 'Terms & Conditions'}</p>
@@ -761,29 +776,6 @@ function PublicQuote() {
                   <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '6px' }}>{isHebrew ? 'הערות נוספות להצעה זו' : 'Quote Notes'}</p>
                   <div style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
                     {quoteNotes}
-                  </div>
-                </div>
-              )}
-
-              {quote.signature && (
-                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
-                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'חתימת לקוח מאושרת:' : 'Approved Client Signature:'}</p>
-                  <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '80px', display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
-                </div>
-              )}
-            </div>
-
-            <div className="no-print" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: '200px' }}>
-              {!approvedSuccess && !quote.signature && (
-                <div data-html2canvas-ignore="true" style={{ marginBottom: '15px' }}>
-                  <button 
-                    onClick={handleClientApproveClick}
-                    style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                  >
-                    {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
-                  </button>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '6px', textAlign: 'center' }}>
-                    {isHebrew ? 'חתימה דיגיטלית מהירה' : 'Quick Digital Signature'}
                   </div>
                 </div>
               )}
@@ -1628,7 +1620,7 @@ function Dashboard() {
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0); 
-    setTerms(quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms);
+    setTerms(quote.terms !== null && quote.terms !== undefined && quote.terms.trim() !== '' ? quote.terms : defaultTerms);
     setNotes(quote.notes || '');
     
     if (quote.quote_items && quote.quote_items.length > 0) {
@@ -1678,7 +1670,7 @@ function Dashboard() {
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0);
-    setTerms(quote.terms ?? defaultTerms);
+    setTerms(quote.terms !== null && quote.terms !== undefined && quote.terms.trim() !== '' ? quote.terms : defaultTerms);
     setNotes(quote.notes || '');
     
     if (quote.quote_items && quote.quote_items.length > 0) {
@@ -2542,7 +2534,7 @@ function Dashboard() {
                     </div>
                   )}
 
-                  {/* שדה נפרד להערות אישיות להצעה */}
+                  {/* שדה נפרד להערות אישיות להצעה (מופיע תמיד) */}
                   <div style={{ marginBottom: '20px' }}>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'הערות נוספות להצעה זו' : 'Additional Notes for this Quote'}</label>
                     <textarea 
