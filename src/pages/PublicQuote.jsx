@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import ProFlowLogo from '../components/ProFlowLogo';
@@ -10,6 +10,11 @@ export default function PublicQuote() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [approved, setApproved] = useState(false);
+
+  // Signature canvas state
+  const canvasRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [hasSigned, setHasSigned] = useState(false);
 
   useEffect(() => {
     fetchQuote();
@@ -26,7 +31,7 @@ export default function PublicQuote() {
 
       if (error) throw error;
       setQuote(data);
-      if (data?.status === 'approved') {
+      if (data?.status === 'approved' || data?.signature) {
         setApproved(true);
       }
     } catch (err) {
@@ -37,11 +42,62 @@ export default function PublicQuote() {
     }
   };
 
+  // Canvas drawing handlers
+  const startDrawing = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    setHasSigned(true);
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setHasSigned(false);
+  };
+
   const handleApprove = async () => {
+    if (!hasSigned) {
+      alert(isHebrew ? 'נא לחתום על גבי המסמך לפני האישור' : 'Please sign the quote before approval');
+      return;
+    }
+
     try {
+      const canvas = canvasRef.current;
+      const signatureDataUrl = canvas ? canvas.toDataURL() : null;
+
       const { error } = await supabase
         .from('quotes')
-        .update({ status: 'approved' })
+        .update({ 
+          status: 'approved',
+          signature: signatureDataUrl 
+        })
         .eq('id', id);
 
       if (error) throw error;
@@ -70,9 +126,8 @@ export default function PublicQuote() {
 
   const isHebrew = quote.currency === 'ILS' || quote.isHebrew !== false;
   const currencySymbol = quote.currency === 'USD' ? '$' : quote.currency === 'EUR' ? '€' : '₪';
-  const vatRate = quote.currency === 'ILS' ? 0.18 : 0; // 18% for local, 0% for global
+  const vatRate = quote.currency === 'ILS' ? 0.18 : 0;
 
-  // Parse items safely whether stored as array, JSON string, or empty
   let parsedItems = [];
   try {
     if (typeof quote.items === 'string') {
@@ -84,7 +139,6 @@ export default function PublicQuote() {
     parsedItems = [];
   }
 
-  // Absolute robust fallback logic for totals
   const dbTotal = Number(quote.total || 0);
   const calculatedSubtotalFromItems = parsedItems.reduce((acc, item) => acc + (Number(item.price || item.unit_price || 0) * Number(item.quantity || 1)), 0);
   
@@ -161,7 +215,7 @@ export default function PublicQuote() {
             <span style={{ fontWeight: 'bold' }}>{subtotal.toLocaleString()} {currencySymbol}</span>
           </div>
           {vatRate > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', width: '250px', fontSize: '1rem', color: '#475569' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '250px', fontSize: '1.0rem', color: '#475569' }}>
               <span>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'}</span>
               <span style={{ fontWeight: 'bold' }}>{vatAmount.toLocaleString()} {currencySymbol}</span>
             </div>
@@ -172,19 +226,48 @@ export default function PublicQuote() {
           </div>
         </div>
 
-        {/* Approval Section */}
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+        {/* Signature & Approval Section */}
+        <div style={{ marginBottom: '40px' }}>
           {approved ? (
-            <div style={{ background: '#d1fae5', color: '#065f46', padding: '16px', borderRadius: '12px', fontWeight: 'bold', fontSize: '1.1rem' }}>
-              {isHebrew ? '✓ הצעת מחיר זו אושרה בהצלחה!' : '✓ This quote has been successfully approved!'}
+            <div style={{ background: '#d1fae5', color: '#065f46', padding: '16px', borderRadius: '12px', fontWeight: 'bold', fontSize: '1.1rem', textAlign: 'center' }}>
+              {isHebrew ? '✓ הצעת מחיר זו אושרה ונחתמה בהצלחה!' : '✓ This quote has been successfully approved and signed!'}
             </div>
           ) : (
-            <button
-              onClick={handleApprove}
-              style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}
-            >
-              {isHebrew ? 'אשר הצעת מחיר זו ✓' : 'Approve Quote ✓'}
-            </button>
+            <div style={{ border: '1px solid #cbd5e1', padding: '20px', borderRadius: '12px', background: '#f8fafc', textAlign: 'center' }}>
+              <h4 style={{ margin: '0 0 10px 0', color: '#1e293b' }}>{isHebrew ? 'חתימת לקוח לאישור ההצעה:' : 'Client Signature:'}</h4>
+              <div style={{ display: 'inline-block', border: '1px dashed #94a3b8', background: 'white', borderRadius: '8px', cursor: 'crosshair', marginBottom: '10px' }}>
+                <canvas
+                  ref={canvasRef}
+                  width={350}
+                  height={150}
+                  onMouseDown={startDrawing}
+                  onMouseMove={draw}
+                  onMouseUp={stopDrawing}
+                  onMouseLeave={stopDrawing}
+                  onTouchStart={startDrawing}
+                  onTouchMove={draw}
+                  onTouchEnd={stopDrawing}
+                  style={{ display: 'block', touchAction: 'none' }}
+                />
+              </div>
+              <div style={{ marginBottom: '15px' }}>
+                <button
+                  type="button"
+                  onClick={clearSignature}
+                  style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '4px 12px', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer' }}
+                >
+                  {isHebrew ? 'נקה חתימה' : 'Clear Signature'}
+                </button>
+              </div>
+              <div>
+                <button
+                  onClick={handleApprove}
+                  style={{ background: hasSigned ? '#10b981' : '#94a3b8', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: hasSigned ? 'pointer' : 'not-allowed', boxShadow: hasSigned ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none' }}
+                >
+                  {isHebrew ? 'אשר וחתום על הצעת המחיר ✓' : 'Approve & Sign Quote ✓'}
+                </button>
+              </div>
+            </div>
           )}
         </div>
 
