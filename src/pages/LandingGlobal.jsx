@@ -5,6 +5,26 @@ import ProFlowLogo from '../components/ProFlowLogo';
 export default function LandingGlobal() {
   const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState('monthly');
+  const [openFaq, setOpenFaq] = useState(null);
+
+  const faqs = [
+    {
+      q: 'Do prices include international tax?',
+      a: 'No! Global clients enjoy 0% international tax as configured for cross-border SaaS operations.'
+    },
+    {
+      q: 'What is the difference between Basic and Pro plans?',
+      a: 'Basic plan includes up to 20 quotes per month with all core features (excluding direct WhatsApp sending). Pro plan gives you unlimited quotes and direct WhatsApp sending.'
+    },
+    {
+      q: 'Can I cancel my subscription anytime?',
+      a: 'Yes, absolutely. There are no long-term contracts, and you can cancel anytime directly from your dashboard settings.'
+    },
+    {
+      q: 'Is the platform mobile-friendly?',
+      a: 'Yes, ProFlow is built as a fully responsive SaaS platform, allowing you to generate quotes and manage your business from any smartphone, tablet, or desktop.'
+    }
+  ];
 
   return (
     <div dir="ltr" style={{ fontFamily: 'Inter, Segoe UI, Tahoma, sans-serif', background: '#090d16', minHeight: '100vh', color: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
@@ -25,6 +45,17 @@ export default function LandingGlobal() {
           box-shadow: 0 25px 60px -15px rgba(99, 102, 241, 0.3);
           border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        .faq-item {
+          background: #111827;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 12px;
+          margin-bottom: 12px;
+          overflow: hidden;
+          transition: border-color 0.2s;
+        }
+        .faq-item:hover {
+          border-color: rgba(99, 102, 241, 0.4);
+        }
       `}</style>
 
       {/* Header */}
@@ -34,6 +65,9 @@ export default function LandingGlobal() {
             <ProFlowLogo size={36} />
           </div>
           <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+            <button onClick={() => navigate('/he')} style={{ background: 'transparent', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.15)', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
+              🇮🇱 עברית
+            </button>
             <button onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)' }}>
               Sign In / Dashboard
             </button>
@@ -184,6 +218,26 @@ export default function LandingGlobal() {
               </div>
 
             </div>
+          </div>
+
+          {/* FAQ Section */}
+          <div style={{ marginBottom: '80px', textAlign: 'left', maxWidth: '800px', margin: '0 auto 80px auto' }}>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px', textAlign: 'center' }}>Frequently Asked Questions</h2>
+            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.05rem', textAlign: 'center' }}>Everything you need to know about the platform.</p>
+            
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="faq-item" style={{ padding: '20px', cursor: 'pointer' }} onClick={() => setOpenFaq(openFaq === idx ? null : idx)}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', fontSize: '1.05rem', color: '#ffffff' }}>
+                  <span>{faq.q}</span>
+                  <span style={{ color: '#818cf8', fontSize: '1.2rem' }}>{openFaq === idx ? '−' : '+'}</span>
+                </div>
+                {openFaq === idx && (
+                  <div style={{ marginTop: '12px', color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
         </div>
