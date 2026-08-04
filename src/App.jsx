@@ -69,7 +69,7 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
 }
 
 function PricingModal({ isOpen, onClose, isHebrew }) {
-  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'yearly'
+  const [billingCycle, setBillingCycle] = useState('monthly');
 
   if (!isOpen) return null;
 
@@ -86,7 +86,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
           {isHebrew ? 'בחר את המסלול המתאים ביותר לצרכים שלך והתחל לעבוד ללא הגבלות' : 'Choose the best plan for your needs and work without limits'}
         </p>
 
-        {/* מתג בחירה בין חודשי לשנתי */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '25px' }}>
           <div style={{ background: '#f1f5f9', padding: '4px', borderRadius: '30px', display: 'flex', gap: '4px', border: '1px solid #cbd5e1' }}>
             <button
@@ -114,7 +113,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '25px' }}>
           
-          {/* מנוי Basic */}
           <div style={{ border: '2px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי בסיסי (Basic)' : 'Basic Plan'}</h3>
             <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '5px' }}>
@@ -139,7 +137,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
             </button>
           </div>
 
-          {/* מנוי PRO */}
           <div style={{ border: '2px solid #4f46e5', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: 'white', boxShadow: '0 10px 15px -3px rgba(79, 70, 229, 0.1)' }}>
             <div style={{ background: '#4f46e5', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', alignSelf: 'flex-start', marginBottom: '8px' }}>POPULAR</div>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי PRO (מומלץ)' : 'PRO Plan (Recommended)'}</h3>
@@ -636,7 +633,7 @@ function PublicQuote() {
 
           <div style={{ marginBottom: '40px', textAlign: isHebrew ? 'right' : 'left' }}>
             <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'הוכן עבור:' : 'Prepared For:'}</p>
-            <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>{quote.clients?.company_name || 'N/A'}</p>
+            <p style={{ margin: '0', fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>{quote.clients?.company_name || 'N/A'}</p>
             {quote.clients?.tax_id && (
                <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '14px' }}>{isHebrew ? 'ח.פ / ת.ז:' : 'Tax ID:'} <span dir="ltr">{quote.clients.tax_id}</span></p>
             )}
@@ -3005,6 +3002,9 @@ function Dashboard() {
       </div>
 
       <footer className="no-print" style={{ textAlign: 'center', padding: '20px', marginTop: '40px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
+        <p style={{ margin: '0 0 10px 0' }}>
+          © 2026 <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business & Quoting Platform'}
+        </p>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
           {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
         </button>
