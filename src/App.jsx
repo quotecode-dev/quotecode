@@ -69,7 +69,7 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
 }
 
 function PricingModal({ isOpen, onClose, isHebrew }) {
-  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'yearly'
+  const [billingCycle, setBillingCycle] = useState('monthly');
 
   if (!isOpen) return null;
 
@@ -86,7 +86,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
           {isHebrew ? 'בחר את המסלול המתאים ביותר לצרכים שלך והתחל לעבוד ללא הגבלות' : 'Choose the best plan for your needs and work without limits'}
         </p>
 
-        {/* מתג בחירה בין חודשי לשנתי */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '25px' }}>
           <div style={{ background: '#f1f5f9', padding: '4px', borderRadius: '30px', display: 'flex', gap: '4px', border: '1px solid #cbd5e1' }}>
             <button
@@ -114,7 +113,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '25px' }}>
           
-          {/* מנוי Basic */}
           <div style={{ border: '2px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי בסיסי (Basic)' : 'Basic Plan'}</h3>
             <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '5px' }}>
@@ -139,7 +137,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
             </button>
           </div>
 
-          {/* מנוי PRO */}
           <div style={{ border: '2px solid #4f46e5', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: 'white', boxShadow: '0 10px 15px -3px rgba(79, 70, 229, 0.1)' }}>
             <div style={{ background: '#4f46e5', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', alignSelf: 'flex-start', marginBottom: '8px' }}>POPULAR</div>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי PRO (מומלץ)' : 'PRO Plan (Recommended)'}</h3>
@@ -758,7 +755,7 @@ function PublicQuote() {
             )}
           </div>
 
-          {/* כיתוב מיתוג ProFlow כקישור דינמי שמוביל לאתר הנחיתה */}
+          {/* כיתוב מיתוג ProFlow דינמי עם קישור לאתר הנחיתה */}
           <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
             מסמך זה נערך ע"י <a href="https://proflow.co.il" target="_blank" rel="noopener noreferrer" style={{ color: '#4f46e5', fontWeight: 'bold', textDecoration: 'none' }}>ProFlow</a> - התוכנה שעושה לעסקים את החיים קלים.
           </div>
@@ -776,84 +773,17 @@ function PublicQuote() {
   );
 }
 
-function LandingPage({ onLoginClick, isHebrew }) {
-  return (
-    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column', color: '#1e293b' }}>
-      
-      {/* Header / Nav */}
-      <header style={{ background: 'white', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-        <ProFlowLogo size={35} />
-        <div>
-          <button 
-            onClick={onLoginClick}
-            style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.2)' }}
-          >
-            {isHebrew ? 'התחברות / הרשמה' : 'Sign In / Register'}
-          </button>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section style={{ padding: '80px 20px', textAlign: 'center', background: 'linear-gradient(135deg, #4f46e5 0%, #10b981 100%)', color: 'white' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '2.8rem', fontWeight: '900', marginBottom: '20px', lineHeight: '1.2' }}>
-            {isHebrew ? 'הפקת הצעות מחיר וניהול עסק מעולם לא היו קלות יותר' : 'Quoting and Business Management Made Simple'}
-          </h1>
-          <p style={{ fontSize: '1.2rem', opacity: '0.9', marginBottom: '35px', lineHeight: '1.5' }}>
-            {isHebrew ? 'ProFlow היא המערכת המובילה לעסקים, קבלנים וחברות לשליחת הצעות מחיר מקצועיות, חתימה דיגיטלית וניהול לקוחות חכם.' : 'ProFlow is the leading platform for businesses to send professional quotes, collect digital signatures, and manage clients.'}
-          </p>
-          <button 
-            onClick={onLoginClick}
-            style={{ background: 'white', color: '#4f46e5', border: 'none', padding: '15px 35px', borderRadius: '10px', fontWeight: '900', fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}
-          >
-            {isHebrew ? 'התחל בחינם עכשיו 🚀' : 'Get Started Free 🚀'}
-          </button>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section style={{ padding: '60px 20px', maxWidth: '1000px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
-        <h2 style={{ textAlign: 'center', fontSize: '2rem', fontWeight: '800', marginBottom: '40px', color: '#1e293b' }}>
-          {isHebrew ? 'למה לעבוד עם ProFlow?' : 'Why Choose ProFlow?'}
-        </h2>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '25px' }}>
-          
-          <div style={{ background: 'white', padding: '30px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '15px' }}>📄</div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>{isHebrew ? 'הצעות מחיר רשמיות' : 'Official Quotes'}</h3>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.5' }}>{isHebrew ? 'הפק הצעות מחיר מעוצבות הכוללות חישובי מע"מ אוטומטיים, הנחות והורדה מיידית לקובץ PDF.' : 'Generate beautifully designed quotes with automated VAT calculations and PDF export.'}</p>
-          </div>
-
-          <div style={{ background: 'white', padding: '30px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '15px' }}>✍️</div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>{isHebrew ? 'חתימה דיגיטלית' : 'Digital Signatures'}</h3>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.5' }}>{isHebrew ? 'לקוחות הקצה חותמים ישירות מהנייד או מהמחשב, והמסמך ננעל משפטית כחוזה מחייב.' : 'Clients sign directly from mobile or desktop, locking the quote legally.'}</p>
-          </div>
-
-          <div style={{ background: 'white', padding: '30px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-            <div style={{ fontSize: '2rem', marginBottom: '15px' }}>📊</div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>{isHebrew ? 'ניהול הכנסות והוצאות' : 'Financial Reports'}</h3>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.5' }}>{isHebrew ? 'עקוב אחר ההכנסות, ניהול ההוצאות העסקיות וקבל דוחות רווח והפסד בזמן אמת.' : 'Track revenues, business expenses, and view real-time P&L reports.'}</p>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer style={{ textAlign: 'center', padding: '25px', marginTop: 'auto', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem', background: 'white' }}>
-        <p style={{ margin: '0 0 5px 0' }}>
-          © 2026 <strong>ProFlow</strong> - {isHebrew ? 'כל הזכויות שמורות' : 'All rights reserved'}.
-        </p>
-      </footer>
-    </div>
-  );
-}
-
-function DashboardContent({ session }) {
+function Dashboard() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
   const isHebrew = (browserLang.startsWith('he') || tz === 'Asia/Jerusalem') && !window.location.search.includes('lang=en');
+
+  const [session, setSession] = useState(null);
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [authSuccess, setAuthSuccess] = useState('');
 
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
@@ -976,6 +906,18 @@ function DashboardContent({ session }) {
     delete: isHebrew ? 'מחק' : 'Delete',
     clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management'
   };
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (session) {
@@ -1268,6 +1210,58 @@ function DashboardContent({ session }) {
       Recurring: e.is_recurring ? 'Yes' : 'No'
     }));
     exportToCSV(exportData, 'expenses_report.csv');
+  };
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthSuccess('');
+
+    if (isSignUp) {
+      const { data: existingBiz, error: checkErr } = await supabase
+        .from('business_settings')
+        .select('email')
+        .eq('email', emailInput)
+        .maybeSingle();
+
+      if (existingBiz) {
+        setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({ email: emailInput, password: passwordInput });
+      if (error) {
+        setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר או השתמש בשחזור סיסמה.' : 'Email already registered! Please sign in or use password reset.');
+      } else {
+        if (data?.user && data.user.identities && data.user.identities.length === 0) {
+          setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר.' : 'Email already exists! Please sign in.');
+        } else {
+          setAuthSuccess(isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש...' : 'Sign up successful! Initializing user profile...');
+        }
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email: emailInput, password: passwordInput });
+      if (error) {
+        setAuthError(isHebrew ? 'שגיאה בהתחברות: בדוק את האימייל והסיסמה או השתמש בשחזור סיסמה.' : 'Login error: check your credentials or reset password.');
+      } else {
+        setStatusMsg({ text: isHebrew ? 'התחברת בהצלחה' : 'Logged in successfully', type: 'success' });
+      }
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!emailInput) {
+      setAuthError(isHebrew ? 'נא להזין כתובת אימייל בתיבת האימייל למעלה לשחזור סיסמה.' : 'Please enter your email above to reset password.');
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(emailInput, {
+      redirectTo: window.location.origin,
+    });
+    if (error) {
+      setAuthError(error.message);
+    } else {
+      setAuthSuccess(isHebrew ? 'קישור לשחזור סיסמה נשלח לאימייל שלך בהצלחה.' : 'Password reset link sent to your email.');
+    }
   };
 
   const handleSignOut = async () => await supabase.auth.signOut();
