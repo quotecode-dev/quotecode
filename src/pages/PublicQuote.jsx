@@ -72,9 +72,21 @@ export default function PublicQuote() {
   const currencySymbol = quote.currency === 'USD' ? '$' : quote.currency === 'EUR' ? '€' : '₪';
   const vatRate = quote.currency === 'ILS' ? 0.18 : 0; // 18% for local, 0% for global
 
-  const subtotal = quote.items ? quote.items.reduce((acc, item) => acc + (Number(item.price || 0) * Number(item.quantity || 1)), 0) : 0;
-  const vatAmount = subtotal * vatRate;
-  const total = subtotal + vatAmount;
+  // Parse items safely whether stored as array or JSON string
+  let parsedItems = [];
+  try {
+    if (typeof quote.items === 'string') {
+      parsedItems = JSON.parse(quote.items);
+    } else if (Array.isArray(quote.items)) {
+      parsedItems = quote.items;
+    }
+  } catch (e) {
+    parsedItems = [];
+  }
+
+  const subtotal = quote.subtotal || (parsedItems.length > 0 ? parsedItems.reduce((acc, item) => acc + (Number(item.price || item.unit_price || 0) * Number(item.quantity || 1)), 0) : Number(quote.total || 0) / (1 + vatRate));
+  const vatAmount = quote.vat !== undefined ? Number(quote.vat) : subtotal * vatRate;
+  const total = quote.total !== undefined ? Number(quote.total) : subtotal + vatAmount;
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '40px 20px', color: '#1e293b' }}>
@@ -115,19 +127,23 @@ export default function PublicQuote() {
             </tr>
           </thead>
           <tbody>
-            {quote.items && quote.items.length > 0 ? (
-              quote.items.map((item, index) => (
-                <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '12px' }}>{item.description}</td>
-                  <td style={{ padding: '12px' }}>{item.quantity}</td>
-                  <td style={{ padding: '12px' }}>{Number(item.price).toLocaleString()} {currencySymbol}</td>
-                  <td style={{ padding: '12px', fontWeight: 'bold' }}>{(Number(item.price) * Number(item.quantity)).toLocaleString()} {currencySymbol}</td>
-                </tr>
-              ))
+            {parsedItems && parsedItems.length > 0 ? (
+              parsedItems.map((item, index) => {
+                const itemPrice = Number(item.price || item.unit_price || 0);
+                const itemQty = Number(item.quantity || 1);
+                return (
+                  <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '12px' }}>{item.description || item.name || 'פריט'}</td>
+                    <td style={{ padding: '12px' }}>{itemQty}</td>
+                    <td style={{ padding: '12px' }}>{itemPrice.toLocaleString()} {currencySymbol}</td>
+                    <td style={{ padding: '12px', fontWeight: 'bold' }}>{(itemPrice * itemQty).toLocaleString()} {currencySymbol}</td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
-                  {isHebrew ? 'אין פריטים להצגה' : 'No items to display'}
+                  {isHebrew ? `הצעת מחיר כללית בסך ${total.toLocaleString()} ${currencySymbol}` : `General Quote total ${total.toLocaleString()} ${currencySymbol}`}
                 </td>
               </tr>
             )}
