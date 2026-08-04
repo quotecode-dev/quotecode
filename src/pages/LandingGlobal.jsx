@@ -84,7 +84,7 @@ export default function LandingGlobal() {
       <main className="hero-glow" style={{ flex: 1, padding: '80px 20px', width: '100%', boxSizing: 'border-box' }}>
         <div style={{ maxWidth: '1050px', margin: '0 auto', textAlign: 'center' }}>
           
-          {/* Prominent Top Badge */}
+          {/* Prominent Top Badge - First thing users see */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(99, 102, 241, 0.15))', color: '#34d399', padding: '10px 24px', borderRadius: '30px', fontSize: '1rem', fontWeight: '800', marginBottom: '24px', border: '1px solid rgba(16, 185, 129, 0.4)', boxShadow: '0 0 25px rgba(16, 185, 129, 0.25)' }}>
             🔥 Launch Special: 14-Day Free Trial with Full PRO Access!
           </div>
