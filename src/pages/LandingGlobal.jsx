@@ -69,6 +69,68 @@ export default function LandingGlobal() {
           </div>
         </div>
 
+        {/* Pricing Section - Global */}
+        <div style={{ marginBottom: '80px' }}>
+          <h2 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#0f172a', marginBottom: '10px' }}>Pricing Plans</h2>
+          <p style={{ color: '#64748b', marginBottom: '40px' }}>Choose the perfect plan for your business (Global pricing with 0% VAT).</p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', textAlign: 'left' }}>
+            
+            {/* Free Tier */}
+            <div style={{ background: 'white', padding: '30px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+              <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '10px' }}>Free Tier</h3>
+              <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>For starters and small projects.</p>
+              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>$0 <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ mo</span></div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#475569', fontSize: '0.95rem', lineHeight: '2' }}>
+                <li>✓ Up to 5 quotes / month</li>
+                <li>✓ Basic client management</li>
+                <li>✓ Email support</li>
+              </ul>
+              <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#f1f5f9', color: '#1e293b', border: '1px solid #cbd5e1', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                Get Started Free
+              </button>
+            </div>
+
+            {/* Pro Tier (Highlighted) */}
+            <div style={{ background: 'white', padding: '30px', borderRadius: '16px', border: '2px solid #4f46e5', boxShadow: '0 10px 25px rgba(79, 70, 229, 0.1)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '-14px', left: '20px', background: '#4f46e5', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                Most Popular ⭐
+              </div>
+              <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '10px' }}>Pro Plan</h3>
+              <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>For growing businesses & agencies.</p>
+              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#4f46e5', marginBottom: '20px' }}>$39 <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ mo</span></div>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>* 0% international tax</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#475569', fontSize: '0.95rem', lineHeight: '2' }}>
+                <li>✓ Unlimited quotes</li>
+                <li>✓ Advanced digital signatures</li>
+                <li>✓ Full expense & revenue tracking</li>
+                <li>✓ Priority support</li>
+              </ul>
+              <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 6px rgba(79,70,229,0.2)' }}>
+                Choose Pro
+              </button>
+            </div>
+
+            {/* Enterprise Tier */}
+            <div style={{ background: 'white', padding: '30px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
+              <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '10px' }}>Enterprise</h3>
+              <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>Advanced features for large teams.</p>
+              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>$89 <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ mo</span></div>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>* 0% international tax</p>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#475569', fontSize: '0.95rem', lineHeight: '2' }}>
+                <li>✓ Everything in Pro</li>
+                <li>✓ Multiple team members</li>
+                <li>✓ Advanced financial reports</li>
+                <li>✓ Dedicated account manager</li>
+              </ul>
+              <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#f1f5f9', color: '#1e293b', border: '1px solid #cbd5e1', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                Contact Us
+              </button>
+            </div>
+
+          </div>
+        </div>
+
       </main>
 
       {/* Footer */}
