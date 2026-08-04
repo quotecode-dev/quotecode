@@ -69,7 +69,7 @@ function AccessibilityModal({ isOpen, onClose, isHebrew }) {
 }
 
 function PricingModal({ isOpen, onClose, isHebrew }) {
-  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'yearly'
+  const [billingCycle, setBillingCycle] = useState('monthly');
 
   if (!isOpen) return null;
 
@@ -86,7 +86,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
           {isHebrew ? 'בחר את המסלול המתאים ביותר לצרכים שלך והתחל לעבוד ללא הגבלות' : 'Choose the best plan for your needs and work without limits'}
         </p>
 
-        {/* מתג בחירה בין חודשי לשנתי */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '25px' }}>
           <div style={{ background: '#f1f5f9', padding: '4px', borderRadius: '30px', display: 'flex', gap: '4px', border: '1px solid #cbd5e1' }}>
             <button
@@ -114,7 +113,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '25px' }}>
           
-          {/* מנוי Basic */}
           <div style={{ border: '2px solid #e2e8f0', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי בסיסי (Basic)' : 'Basic Plan'}</h3>
             <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#4f46e5', marginBottom: '5px' }}>
@@ -139,7 +137,6 @@ function PricingModal({ isOpen, onClose, isHebrew }) {
             </button>
           </div>
 
-          {/* מנוי PRO */}
           <div style={{ border: '2px solid #4f46e5', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', background: 'white', boxShadow: '0 10px 15px -3px rgba(79, 70, 229, 0.1)' }}>
             <div style={{ background: '#4f46e5', color: 'white', fontSize: '0.7rem', fontWeight: 'bold', padding: '2px 8px', borderRadius: '4px', alignSelf: 'flex-start', marginBottom: '8px' }}>POPULAR</div>
             <h3 style={{ margin: '0 0 10px 0', color: '#1e293b', fontSize: '1.2rem' }}>{isHebrew ? 'מנוי PRO (מומלץ)' : 'PRO Plan (Recommended)'}</h3>
@@ -396,7 +393,6 @@ function SignaturePadModal({ isOpen, onClose, onSave, isHebrew }) {
           {isHebrew ? 'אנא חתום בתוך המסגרת כדי לאשר את הצעת המחיר.' : 'Please sign within the box below to approve this quote.'}
         </p>
 
-        {/* הודעת אזהרה משפטית ללקוח הקצה */}
         <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '10px 12px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.8rem', fontWeight: 'bold', lineHeight: '1.4' }}>
           {isHebrew ? '⚠️ בלחיצה על "אשר וחתום" הינך מאשר את הפרטים בהצעה.' : 'By clicking approve and sign, you confirm the details in the quote.'}
         </div>
@@ -759,7 +755,7 @@ function PublicQuote() {
             )}
           </div>
 
-          {/* כיתוב מיתוג ProFlow דינמי עם קישור לאתר הנחיתה */}
+          {/* כיתוב מיתוג ProFlow כקישור דינמי שמוביל לאתר הנחיתה */}
           <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
             מסמך זה נערך ע"י <a href="https://proflow.co.il" target="_blank" rel="noopener noreferrer" style={{ color: '#4f46e5', fontWeight: 'bold', textDecoration: 'none' }}>ProFlow</a> - התוכנה שעושה לעסקים את החיים קלים.
           </div>
@@ -777,17 +773,84 @@ function PublicQuote() {
   );
 }
 
-function Dashboard() {
+function LandingPage({ onLoginClick, isHebrew }) {
+  return (
+    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column', color: '#1e293b' }}>
+      
+      {/* Header / Nav */}
+      <header style={{ background: 'white', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
+        <ProFlowLogo size={35} />
+        <div>
+          <button 
+            onClick={onLoginClick}
+            style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.2)' }}
+          >
+            {isHebrew ? 'התחברות / הרשמה' : 'Sign In / Register'}
+          </button>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section style={{ padding: '80px 20px', textAlign: 'center', background: 'linear-gradient(135deg, #4f46e5 0%, #10b981 100%)', color: 'white' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: '2.8rem', fontWeight: '900', marginBottom: '20px', lineHeight: '1.2' }}>
+            {isHebrew ? 'הפקת הצעות מחיר וניהול עסק מעולם לא היו קלות יותר' : 'Quoting and Business Management Made Simple'}
+          </h1>
+          <p style={{ fontSize: '1.2rem', opacity: '0.9', marginBottom: '35px', lineHeight: '1.5' }}>
+            {isHebrew ? 'ProFlow היא המערכת המובילה לעסקים, קבלנים וחברות לשליחת הצעות מחיר מקצועיות, חתימה דיגיטלית וניהול לקוחות חכם.' : 'ProFlow is the leading platform for businesses to send professional quotes, collect digital signatures, and manage clients.'}
+          </p>
+          <button 
+            onClick={onLoginClick}
+            style={{ background: 'white', color: '#4f46e5', border: 'none', padding: '15px 35px', borderRadius: '10px', fontWeight: '900', fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}
+          >
+            {isHebrew ? 'התחל בחינם עכשיו 🚀' : 'Get Started Free 🚀'}
+          </button>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section style={{ padding: '60px 20px', maxWidth: '1000px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+        <h2 style={{ textAlign: 'center', fontSize: '2rem', fontWeight: '800', marginBottom: '40px', color: '#1e293b' }}>
+          {isHebrew ? 'למה לעבוד עם ProFlow?' : 'Why Choose ProFlow?'}
+        </h2>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '25px' }}>
+          
+          <div style={{ background: 'white', padding: '30px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '15px' }}>📄</div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>{isHebrew ? 'הצעות מחיר רשמיות' : 'Official Quotes'}</h3>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.5' }}>{isHebrew ? 'הפק הצעות מחיר מעוצבות הכוללות חישובי מע"מ אוטומטיים, הנחות והורדה מיידית לקובץ PDF.' : 'Generate beautifully designed quotes with automated VAT calculations and PDF export.'}</p>
+          </div>
+
+          <div style={{ background: 'white', padding: '30px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '15px' }}>✍️</div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>{isHebrew ? 'חתימה דיגיטלית' : 'Digital Signatures'}</h3>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.5' }}>{isHebrew ? 'לקוחות הקצה חותמים ישירות מהנייד או מהמחשב, והמסמך ננעל משפטית כחוזה מחייב.' : 'Clients sign directly from mobile or desktop, locking the quote legally.'}</p>
+          </div>
+
+          <div style={{ background: 'white', padding: '30px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '15px' }}>📊</div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '10px', color: '#1e293b' }}>{isHebrew ? 'ניהול הכנסות והוצאות' : 'Financial Reports'}</h3>
+            <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.5' }}>{isHebrew ? 'עקוב אחר ההכנסות, ניהול ההוצאות העסקיות וקבל דוחות רווח והפסד בזמן אמת.' : 'Track revenues, business expenses, and view real-time P&L reports.'}</p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ textAlign: 'center', padding: '25px', marginTop: 'auto', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem', background: 'white' }}>
+        <p style={{ margin: '0 0 5px 0' }}>
+          © 2026 <strong>ProFlow</strong> - {isHebrew ? 'כל הזכויות שמורות' : 'All rights reserved'}.
+        </p>
+      </footer>
+    </div>
+  );
+}
+
+function DashboardContent({ session }) {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
   const isHebrew = (browserLang.startsWith('he') || tz === 'Asia/Jerusalem') && !window.location.search.includes('lang=en');
-
-  const [session, setSession] = useState(null);
-  const [emailInput, setEmailInput] = useState('');
-  const [passwordInput, setPasswordInput] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [authError, setAuthError] = useState('');
-  const [authSuccess, setAuthSuccess] = useState('');
 
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
@@ -910,18 +973,6 @@ function Dashboard() {
     delete: isHebrew ? 'מחק' : 'Delete',
     clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management'
   };
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     if (session) {
@@ -1770,61 +1821,6 @@ function Dashboard() {
   }
 
   const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 7 && trialDaysLeft > 0 && !isSuperAdmin;
-
-  if (!session) {
-    return (
-      <div>
-        <LandingPage onLoginClick={() => {
-          const el = document.getElementById('auth-box');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }} isHebrew={isHebrew} />
-        
-        <div id="auth-box" style={{ background: '#f1f5f9', padding: '60px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
-            <h3 style={{ textAlign: 'center', marginBottom: '20px', color: '#1e293b' }}>
-              {isSignUp ? (isHebrew ? 'יצירת חשבון חדש' : 'Create Account') : (isHebrew ? 'התחברות למערכת' : 'Sign In')}
-            </h3>
-
-            {authSuccess && <div style={{ padding: '10px', background: '#dcfce7', color: '#166534', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem' }}>{authSuccess}</div>}
-            {authError && <div style={{ padding: '10px', background: '#fee2e2', color: '#991b1b', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem' }}>{authError}</div>}
-
-            <form onSubmit={handleAuth}>
-              <div style={{ marginBottom: '15px' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'אימייל' : 'Email'}</label>
-                <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
-              </div>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'סיסמה' : 'Password'}</label>
-                <input type="password" name="loginPassword" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
-              </div>
-              <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
-                {isSignUp ? (isHebrew ? 'הירשם' : 'Sign Up') : (isHebrew ? 'התחבר' : 'Sign In')}
-              </button>
-            </form>
-
-            <div style={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontWeight: '600', padding: 0 }}
-              >
-                {isSignUp ? (isHebrew ? 'כבר יש לך חשבון? התחבר' : 'Already have an account?') : (isHebrew ? 'אין חשבון? הירשם כאן' : "Don't have an account?")}
-              </button>
-              {!isSignUp && (
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
-                  style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-                >
-                  {isHebrew ? 'שכחת סיסמה?' : 'Forgot password?'}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column', paddingBottom: '70px' }}>
