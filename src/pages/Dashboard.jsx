@@ -168,7 +168,6 @@ export default function Dashboard() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
   
-  // Ironclad local user detection: Israel timezone or Hebrew browser language
   const isLocalIsraeliBusiness = tz === 'Asia/Jerusalem' || browserLang.startsWith('he');
   const isHebrew = isLocalIsraeliBusiness && !window.location.search.includes('lang=en');
 
@@ -224,15 +223,14 @@ export default function Dashboard() {
   const [clientTaxId, setClientTaxId] = useState('');
   const [clientAddress, setClientAddress] = useState('');
   
-  // Ironclad currency default: ILS for local users, USD for international users
   const [currency, setCurrency] = useState(isLocalIsraeliBusiness ? 'ILS' : 'USD');
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
-  const [discount, setDiscount] = useState(0);
+  const [discount, setDiscount] = useState('');
   const [terms, setTerms] = useState(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG); 
   const [notes, setNotes] = useState('');
   
-  const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
+  const [items, setItems] = useState([{ description: '', quantity: '', unit_price: '' }]);
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
 
@@ -675,14 +673,14 @@ export default function Dashboard() {
     setItems(newItems);
   };
 
-  const addItem = () => setItems([...items, { description: '', quantity: 1, unit_price: 0 }]);
+  const addItem = () => setItems([...items, { description: '', quantity: '', unit_price: '' }]);
 
   const handleAddFromCatalog = (e) => {
     const sId = e.target.value;
     if (!sId) return;
     const svc = services.find(s => s.id.toString() === sId);
     if (svc) {
-      if (items.length === 1 && items[0].description === '' && items[0].unit_price === 0) {
+      if (items.length === 1 && items[0].description === '' && items[0].unit_price === '') {
         setItems([{ description: svc.name, quantity: 1, unit_price: svc.price }]);
       } else {
         setItems([...items, { description: svc.name, quantity: 1, unit_price: svc.price }]);
@@ -751,12 +749,17 @@ export default function Dashboard() {
     const clientNameVal = proposal.clients?.company_name || 'לקוח';
     let clientPhoneVal = proposal.clients?.phone ? proposal.clients.phone.replace(/\D/g, '') : '';
     
-    // Automatic country code normalization (adds 972 for Israeli numbers if starting with 0 or 9 digits)
     if (isLocalIsraeliBusiness) {
       if (clientPhoneVal.startsWith('0')) {
         clientPhoneVal = '972' + clientPhoneVal.slice(1);
       } else if (clientPhoneVal.length === 9 && !clientPhoneVal.startsWith('972')) {
         clientPhoneVal = '972' + clientPhoneVal;
+      }
+    } else {
+      if (clientPhoneVal.startsWith('0')) {
+        clientPhoneVal = '1' + clientPhoneVal.slice(1);
+      } else if (clientPhoneVal.length === 10 && !clientPhoneVal.startsWith('1')) {
+        clientPhoneVal = '1' + clientPhoneVal;
       }
     }
 
@@ -780,37 +783,21 @@ export default function Dashboard() {
     window.open(url, '_blank');
   };
 
-  const executeEmailSend = async (quote) => {
-    setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך הענן...' : 'Sending email via cloud...', type: 'success' });
-
-    try {
-      const quoteSym = getCurrencySymbol(quote.currency);
-      const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
-      
-      const { error } = await supabase.functions.invoke('send-quote-email', {
-        body: {
-          to: quote.clients.email,
-          clientName: quote.clients.company_name,
-          quoteId: quote.id,
-          total: formatNum(quote.total),
-          currencySymbol: quoteSym,
-          quoteLink: quoteLink,
-          businessName: bizName
-        }
-      });
-
-      if (error) throw error;
-      setStatusMsg({ text: isHebrew ? '📧 האימייל נשלח בהצלחה ללקוח!' : '📧 Email sent successfully!', type: 'success' });
-    } catch (err) {
-      console.error("Email send error:", err);
-      // Clean error notification without opening local mailto client
+  const executeEmailSend = (quote) => {
+    const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
+    navigator.clipboard.writeText(quoteLink).then(() => {
       setStatusMsg({ 
         text: isHebrew 
-          ? '⚠️ שגיאה בשליחת המייל דרך הענן. אנא ודא שה-Edge Function מוגדר ב-Supabase.' 
-          : '⚠️ Error sending email via cloud. Please check Supabase Edge Function.', 
-        type: 'error' 
+          ? '📋 קישור ההצעה הועתק ללוח בהצלחה! הדבק אותו באימייל ללקוח.' 
+          : '📋 Quote link copied to clipboard successfully!', 
+        type: 'success' 
       });
-    }
+    }).catch(() => {
+      setStatusMsg({ 
+        text: isHebrew ? 'קישור ההצעה: ' + quoteLink : 'Quote Link: ' + quoteLink, 
+        type: 'success' 
+      });
+    });
   };
 
   const handleProtectedAction = (quoteId, actionType, callback) => {
@@ -831,15 +818,17 @@ export default function Dashboard() {
     callback();
   };
 
-  const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
-  const discountAmount = (subtotal * Number(discount)) / 100;
+  const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity || 0) * Number(item.unit_price || 0)), 0);
+  const discountAmount = (subtotal * Number(discount || 0)) / 100;
   const baseAmount = subtotal - discountAmount;
-  let taxRate = (isLocalIsraeliBusiness || currency === 'ILS') ? 0.18 : 0.00;
+  
+  // Ironclad VAT rule: 18% for local Israeli business, 0% for international users
+  let taxRate = isLocalIsraeliBusiness ? 0.18 : 0.00;
   
   let taxAmount = 0;
   let totalAmount = 0;
 
-  if ((isLocalIsraeliBusiness || currency === 'ILS') && isHebrew && clientType === 'private') {
+  if (isLocalIsraeliBusiness && isHebrew && clientType === 'private') {
     totalAmount = baseAmount;
     taxAmount = totalAmount - (totalAmount / (1 + taxRate));
   } else {
@@ -991,7 +980,7 @@ export default function Dashboard() {
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
-    setDiscount(quote.discount || 0); 
+    setDiscount(quote.discount || ''); 
 
     let editTerms = quote.terms;
     let editNotes = quote.notes;
@@ -1000,7 +989,7 @@ export default function Dashboard() {
       editNotes = quote.terms;
       editTerms = quote.client_type === 'business' ? defaultTerms : '';
     } else {
-      editTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : (quote.client_type === 'business' ? defaultTerms : '');
+      editTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms;
       editNotes = quote.notes || '';
     }
 
@@ -1010,7 +999,7 @@ export default function Dashboard() {
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
     } else {
-      setItems([{ description: '', quantity: 1, unit_price: 0 }]);
+      setItems([{ description: '', quantity: '', unit_price: '' }]);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStatusMsg({ text: isHebrew ? `טוען לעריכה הצעה #${quote.id.slice(0, 6)}...` : `Editing Quote #${quote.id.slice(0, 6)}...`, type: 'success' });
@@ -1026,11 +1015,11 @@ export default function Dashboard() {
     setClientTaxId('');
     setClientAddress('');
     setValidUntil('');
-    setDiscount(0);
+    setDiscount('');
     setTerms(defaultTerms);
     setNotes('');
     setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
-    setItems([{ description: '', quantity: 1, unit_price: 0 }]);
+    setItems([{ description: '', quantity: '', unit_price: '' }]);
   };
 
   const handleDuplicateQuote = (quote) => {
@@ -1047,7 +1036,7 @@ export default function Dashboard() {
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
-    setDiscount(quote.discount || 0);
+    setDiscount(quote.discount || '');
 
     let dupTerms = quote.terms;
     let dupNotes = quote.notes;
@@ -1056,7 +1045,7 @@ export default function Dashboard() {
       dupNotes = quote.terms;
       dupTerms = quote.client_type === 'business' ? defaultTerms : '';
     } else {
-      dupTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : (quote.client_type === 'business' ? defaultTerms : '');
+      dupTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms;
       dupNotes = quote.notes || '';
     }
 
@@ -1066,7 +1055,7 @@ export default function Dashboard() {
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
     } else {
-      setItems([{ description: '', quantity: 1, unit_price: 0 }]);
+      setItems([{ description: '', quantity: '', unit_price: '' }]);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStatusMsg({ text: isHebrew ? 'ההצעה נטענה לשכפול בהצלחה.' : 'Quote loaded for duplication.', type: 'success' });
@@ -1082,11 +1071,11 @@ export default function Dashboard() {
     setClientTaxId('');
     setClientAddress('');
     setValidUntil('');
-    setDiscount(0);
+    setDiscount('');
     setTerms('');
     setNotes('');
     setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
-    setItems([{ description: '', quantity: 1, unit_price: 0 }]);
+    setItems([{ description: '', quantity: '', unit_price: '' }]);
     setStatusMsg({ text: isHebrew ? 'הפעולה בוטלה. הנה רשימת ההצעות.' : 'Action cancelled. Here are your quotes.', type: 'success' });
   };
 
@@ -1149,7 +1138,7 @@ export default function Dashboard() {
         total: totalAmount,
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
-        discount: Number(discount),
+        discount: Number(discount || 0),
         terms: terms,
         notes: notes,
         user_id: session.user.id
@@ -1171,9 +1160,9 @@ export default function Dashboard() {
       const quoteItemsToInsert = items.map(item => ({
         quote_id: quoteId,
         description: item.description,
-        quantity: Number(item.quantity),
-        unit_price: Number(item.unit_price),
-        total_price: Number(item.quantity) * Number(item.unit_price)
+        quantity: Number(item.quantity || 1),
+        unit_price: Number(item.unit_price || 0),
+        total_price: Number(item.quantity || 1) * Number(item.unit_price || 0)
       }));
 
       const { error: itemsError } = await supabase.from('quote_items').insert(quoteItemsToInsert);
@@ -1195,11 +1184,11 @@ export default function Dashboard() {
       setClientTaxId('');
       setClientAddress('');
       setValidUntil('');
-      setDiscount(0);
+      setDiscount('');
       setTerms('');
       setNotes('');
       setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
-      setItems([{ description: '', quantity: 1, unit_price: 0 }]);
+      setItems([{ description: '', quantity: '', unit_price: '' }]);
       loadData();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
@@ -1681,7 +1670,7 @@ export default function Dashboard() {
 
                                   <button 
                                     title="שלח אימייל"
-                                    onClick={() => setPendingEmailQuote(quote)}
+                                    onClick={() => executeEmailSend(quote)}
                                     style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '0', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem', height: '26px', width: '28px', boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                                   >
                                     @
@@ -1900,7 +1889,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.discount}</label>
-                      <input type="number" name="discount" value={discount} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
+                      <input type="number" name="discount" value={discount} onFocus={(e) => { if (e.target.value === '0') setDiscount(''); }} onChange={(e) => setDiscount(e.target.value)} min="0" max="100" placeholder="0" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                   </div>
 
@@ -1951,11 +1940,11 @@ export default function Dashboard() {
                   {items.map((item, index) => (
                     <div key={index} style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '8px', marginBottom: '8px', alignItems: 'stretch', background: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                       <input type="text" placeholder={isHebrew ? 'תיאור פריט' : 'Item description'} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
-                      <input type="number" placeholder={isHebrew ? 'כמות' : 'Qty'} min="1" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
-                      <input type="number" placeholder={isHebrew ? 'מחיר' : 'Price'} step="0.01" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
+                      <input type="number" placeholder="1" min="1" value={item.quantity} onFocus={(e) => { if (e.target.value === '0') handleItemChange(index, 'quantity', ''); }} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
+                      <input type="number" placeholder="0.00" step="0.01" value={item.unit_price} onFocus={(e) => { if (e.target.value === '0') handleItemChange(index, 'unit_price', ''); }} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '100%', boxSizing: 'border-box', background: 'white', fontSize: '0.85rem', color: '#334155' }} />
                       
                       <div style={{ padding: '8px', border: '1px solid #cbd5e1', borderRadius: '6px', background: 'white', fontWeight: '400', color: '#334155', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.85rem', boxSizing: 'border-box', width: '100%', display: 'flex', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end', height: '100%' }}>
-                        {sym}{formatNum(Number(item.quantity) * Number(item.unit_price))}
+                        {sym}{formatNum(Number(item.quantity || 0) * Number(item.unit_price || 0))}
                       </div>
 
                       {items.length > 1 && (
