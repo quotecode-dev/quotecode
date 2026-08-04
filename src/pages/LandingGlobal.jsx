@@ -13,12 +13,12 @@ export default function LandingGlobal() {
       a: 'No! Global clients enjoy 0% international tax as configured for cross-border SaaS operations.'
     },
     {
-      q: 'What is the difference between Basic and Pro plans?',
-      a: 'Basic plan includes up to 20 quotes per month with all core features (excluding direct WhatsApp sending). Pro plan gives you unlimited quotes and direct WhatsApp sending.'
+      q: 'What is included in the 14-day trial?',
+      a: 'The trial gives you full, unrestricted access to all PRO features (unlimited quotes, direct WhatsApp sending, and more) for 14 days with no commitment.'
     },
     {
-      q: 'Can I cancel my subscription anytime?',
-      a: 'Yes, absolutely. There are no long-term contracts, and you can cancel anytime directly from your dashboard settings.'
+      q: 'What happens after the 14-day trial ends?',
+      a: 'If you do not purchase a subscription, your account automatically reverts to the FREE tier with its standard limits.'
     },
     {
       q: 'Is the platform mobile-friendly?',
@@ -60,7 +60,7 @@ export default function LandingGlobal() {
 
       {/* Top Banner Launch Special */}
       <div style={{ background: 'linear-gradient(90deg, #4f46e5, #10b981)', color: 'white', padding: '10px 20px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
-        🎉 Special Offer: 14-day free trial for all PRO features with no commitment!
+        🎉 Special Offer: 14-day free trial with full access to all PRO features!
       </div>
 
       {/* Header */}
@@ -99,7 +99,7 @@ export default function LandingGlobal() {
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '25px' }}>
             <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
-              Start 14-Day Free Trial 🚀
+              Start 14-Day Free PRO Trial 🚀
             </button>
           </div>
 
@@ -145,7 +145,7 @@ export default function LandingGlobal() {
           {/* Pricing Section */}
           <div style={{ marginBottom: '80px' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px' }}>Pricing Plans</h2>
-            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>Choose the perfect plan for your business. <strong style={{ color: '#10b981' }}>Special Offer: 14-day free trial for all PRO features!</strong></p>
+            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>Choose the perfect plan for your business. <strong style={{ color: '#10b981' }}>14-day free trial with full PRO access!</strong></p>
             
             <div style={{ display: 'inline-flex', background: '#111827', padding: '4px', borderRadius: '12px', marginBottom: '40px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <button 

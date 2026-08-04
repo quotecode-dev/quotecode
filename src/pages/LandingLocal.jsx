@@ -13,12 +13,12 @@ export default function LandingLocal() {
       a: 'כן! כל המחירים במסלולים מותאמים לשוק הישראלי וכוללים מע"מ 18% כחוק (עם פירוט הסכום לפני מע"מ).'
     },
     {
-      q: 'מה ההבדל המרכזי בין מסלול Basic למסלול Pro?',
-      a: 'מסלול Basic מיועד לעסקים קטנים וכולל עד 20 הצעות מחיר בחודש וכל פיצ\'רי הניהול (ללא שליחת וואטסאפ ישירה). מסלול Pro מעניק הצעות מחיר ללא הגבלה כלל יחד עם שליחה ישירה בווצאפ (WhatsApp).'
+      q: 'מה כוללת תקופת הניסיון של 14 יום?',
+      a: 'תקופת הניסיון מעניקה לך גישה מלאה וחופשית לכל פיצ\'רי ה-PRO של המערכת (הצעות מחיר ללא הגבלה, שליחת וואטסאפ ועוד) למשך 14 יום ללא שום התחייבות.'
     },
     {
-      q: 'האם אפשר לבטל את המנוי בכל שלב?',
-      a: 'בהחלט. אין שום התחייבות ארוכת טווח, וניתן לבטל את המנוי החודשי או השנתי בלחיצת כפתור היישר מפאנל הניהול.'
+      q: 'מה קורה בתום 14 ימי הניסיון אם איני רוכש מנוי?',
+      a: 'החשבון שלך יעבור אוטומטית למסלול החינמי (FREE) עם המגבלות שלו, כך שתוכל להמשיך להשתמש במערכת בראש שקט.'
     },
     {
       q: 'האם המערכת מותאמת לסמארטפון ולמחשב?',
@@ -60,7 +60,7 @@ export default function LandingLocal() {
 
       {/* Top Banner Launch Special */}
       <div style={{ background: 'linear-gradient(90deg, #4f46e5, #10b981)', color: 'white', padding: '10px 20px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
-        🎉 מבצע! 14 יום חינם לכל הפיצ'רים של מסלול ה-PRO - ללא שום התחייבות!
+        🎉 מבצע! 14 יום חינם לגמרי - עם גישה מלאה לכל הפיצ'רים של מסלול ה-PRO!
       </div>
 
       {/* Header */}
@@ -99,7 +99,7 @@ export default function LandingLocal() {
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '25px' }}>
             <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
-              התחל 14 יום ניסיון חינם עכשיו 🚀
+              התחל 14 יום ניסיון חינם ב-PRO עכשיו 🚀
             </button>
           </div>
 
@@ -160,7 +160,7 @@ export default function LandingLocal() {
           {/* Pricing Section - Israel */}
           <div style={{ marginBottom: '80px' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px' }}>מסלולים ומחירים</h2>
-            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>בחר את המסלול המתאים ביותר לעסק שלך. <strong style={{ color: '#10b981' }}>מבצע! 14 יום חינם לכל הפיצ'רים של מסלול ה-PRO!</strong></p>
+            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>בחר את המסלול המתאים ביותר לעסק שלך. <strong style={{ color: '#10b981' }}>14 יום חינם לגמרי לכל פיצ'רי ה-PRO!</strong></p>
             
             <div style={{ display: 'inline-flex', background: '#111827', padding: '4px', borderRadius: '12px', marginBottom: '40px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <button 
@@ -227,7 +227,7 @@ export default function LandingLocal() {
                   {billingCycle === 'monthly' ? '* כולל מע"מ 18% (83.90 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (66.95 ₪ לפני מע"מ)'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ <strong>14 יום חינם לכל הפיצ'רים של PRO!</strong></li>
+                  <li>✓ <strong>14 יום חינם לכל פיצ'רי ה-PRO!</strong></li>
                   <li>✓ הצעות מחיר ללא הגבלה כלל</li>
                   <li>✓ שליחה ישירה בווצאפ (WhatsApp)</li>
                   <li>✓ ניהול הכנסות והוצאות מלא</li>
