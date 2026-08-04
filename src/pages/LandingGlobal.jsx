@@ -33,9 +33,6 @@ export default function LandingGlobal() {
           <ProFlowLogo size={38} />
         </div>
         <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-          <button onClick={() => navigate('/he')} style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#cbd5e1', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem' }}>
-            עברית (ישראל) 🇮🇱
-          </button>
           <button onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)' }}>
             Sign In / Dashboard
           </button>
