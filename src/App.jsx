@@ -1,20 +1,36 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import LandingGlobal from './pages/LandingGlobal';
 import LandingLocal from './pages/LandingLocal';
 import Dashboard from './pages/Dashboard';
 import PublicQuote from './pages/PublicQuote';
-import './App.css';
+
+function RootHandler() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const browserLang = navigator.language || navigator.userLanguage || '';
+    
+    // זיהוי משתמש מישראל לפי אזור זמן או שפת דפדפן עברית והפניה אוטומטית לגרסה המקומית
+    if (timeZone === 'Asia/Jerusalem' || browserLang.toLowerCase().startsWith('he')) {
+      navigate('/he', { replace: true });
+    }
+  }, [navigate]);
+
+  return <LandingGlobal />;
+}
 
 export default function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingGlobal />} />
+        <Route path="/" element={<RootHandler />} />
         <Route path="/he" element={<LandingLocal />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/quote/:id" element={<PublicQuote />} />
+        <Route path="/public-quote/:id" element={<PublicQuote />} />
+        <Route path="*" element={<LandingGlobal />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
