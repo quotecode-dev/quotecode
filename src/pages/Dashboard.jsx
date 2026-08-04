@@ -749,7 +749,17 @@ export default function Dashboard() {
 
   const sendWhatsApp = (proposal) => {
     const clientNameVal = proposal.clients?.company_name || 'לקוח';
-    const clientPhoneVal = proposal.clients?.phone ? proposal.clients.phone.replace(/\D/g, '') : '';
+    let clientPhoneVal = proposal.clients?.phone ? proposal.clients.phone.replace(/\D/g, '') : '';
+    
+    // Automatic country code normalization (adds 972 for Israeli numbers if starting with 0 or 9 digits)
+    if (isLocalIsraeliBusiness) {
+      if (clientPhoneVal.startsWith('0')) {
+        clientPhoneVal = '972' + clientPhoneVal.slice(1);
+      } else if (clientPhoneVal.length === 9 && !clientPhoneVal.startsWith('972')) {
+        clientPhoneVal = '972' + clientPhoneVal;
+      }
+    }
+
     const isBiz = (proposal.client_type || proposal.clients?.client_type) === 'business';
     const quoteSub = proposal.subtotal || 0;
     const quoteDiscount = proposal.discount || 0;
@@ -793,14 +803,13 @@ export default function Dashboard() {
       setStatusMsg({ text: isHebrew ? '📧 האימייל נשלח בהצלחה ללקוח!' : '📧 Email sent successfully!', type: 'success' });
     } catch (err) {
       console.error("Email send error:", err);
-      const quoteSym = getCurrencySymbol(quote.currency);
-      const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
-      const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
-      const body = isHebrew
-        ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
-        : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
-
-      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      // Clean error notification without opening local mailto client
+      setStatusMsg({ 
+        text: isHebrew 
+          ? '⚠️ שגיאה בשליחת המייל דרך הענן. אנא ודא שה-Edge Function מוגדר ב-Supabase.' 
+          : '⚠️ Error sending email via cloud. Please check Supabase Edge Function.', 
+        type: 'error' 
+      });
     }
   };
 
