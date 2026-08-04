@@ -249,7 +249,6 @@ export default function Dashboard() {
     isTrialExpired = trialDaysLeft <= 0;
   }
 
-  // Automatic downgrade to free if trial expired
   const effectivePlan = isTrialExpired ? 'free' : bizPlan.toLowerCase();
 
   const isLocalIsraeliBusiness = bizCountry === 'Local' || bizCountry === 'Israel (Local)';
@@ -416,7 +415,6 @@ export default function Dashboard() {
         fetchAllAccounts();
       }
     } else {
-      // Automatic 14-day free Pro trial for new signups
       const trialEndDate = new Date();
       trialEndDate.setDate(trialEndDate.getDate() + 14);
 
@@ -1406,7 +1404,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* תפריט ניווט עליון */}
           <div style={{ display: 'flex', gap: '8px', marginBottom: '15px', flexWrap: 'wrap' }}>
             <button
               onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
@@ -1998,7 +1995,7 @@ export default function Dashboard() {
                     {isLocalIsraeliBusiness && isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
-                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
+                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}${formatNum(taxAmount)})` : `(Includes VAT: ${sym}${formatNum(taxAmount)})`}</span>
                       </div>
                     )}
                   </div>
@@ -2175,22 +2172,22 @@ export default function Dashboard() {
                 )}
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '25px' }}>
-                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
-                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalQuotes}</div>
-                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#1e293b' }}>{adminTotalQuotesCount}</div>
-                 </div>
-                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
-                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalRevenue}</div>
-                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#22c55e' }}>{sym}{formatNum(adminTotalRevenue)}</div>
-                 </div>
-                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
-                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalExpenses}</div>
-                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ef4444' }}>{sym}{formatNum(adminTotalExpenses)}</div>
-                 </div>
-                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
-                   <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.netProfit}</div>
-                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: adminNetProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(adminNetProfit)}</div>
-                 </div>
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #4f46e5' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #4f46e5' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalQuotes}</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#1e293b' }}>{adminTotalQuotesCount}</div>
+                  </div>
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #22c55e' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #22c55e' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalRevenue}</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#22c55e' }}>{sym}{formatNum(adminTotalRevenue)}</div>
+                  </div>
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #ef4444' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #ef4444' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.totalExpenses}</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ef4444' }}>{sym}{formatNum(adminTotalExpenses)}</div>
+                  </div>
+                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', borderRight: isHebrew ? '4px solid #3b82f6' : 'none', borderLeft: isHebrew ? 'none' : '4px solid #3b82f6' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>{t.netProfit}</div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: '900', color: adminNetProfit >= 0 ? '#3b82f6' : '#ef4444' }}>{sym}{formatNum(adminNetProfit)}</div>
+                  </div>
                 </div>
 
                 <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '25px', height: '300px' }} dir="ltr">
