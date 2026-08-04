@@ -6,6 +6,12 @@ import { jsPDF } from 'jspdf';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
+// ==========================================
+// TODO / FUTURE ARCHITECTURE NOTE (מנויים ושינוי מסלולים):
+// לקראת חיבור מערכת הסליקה (Stripe/Tranzilla), יש להוסיף כאן מנגנון לשינוי מסלולים 
+// אמצע תקופה (Upgrade/Downgrade עם חישוב יחסי - Proration).
+// ==========================================
+
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const DEFAULT_TERMS_HEB = `תנאים כלליים:
@@ -582,6 +588,7 @@ function PublicQuote() {
   const quoteDiscountAmount = (quoteSub * quoteDiscount) / 100;
   const baseAmount = quoteSub - quoteDiscountAmount;
   
+  // רק עסק מקומי ישראלי מחשב מע"מ
   const quoteTaxRate = (isLocalIsraeliBusiness && quote.tax_rate !== undefined && quote.tax_rate !== null) ? Number(quote.tax_rate) : 0.00;
   const hasVat = isLocalIsraeliBusiness && quoteTaxRate > 0;
   
@@ -597,8 +604,18 @@ function PublicQuote() {
   }
 
   const fallbackTerms = isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG;
-  const quoteTerms = (quote.terms && quote.terms.trim() !== '') ? quote.terms : (isBusinessClient ? (settings?.default_terms || fallbackTerms) : '');
-  const quoteNotes = quote.notes || '';
+  
+  // תיקון הגירה - זיהוי הצעות ישנות לפי זה ש-notes הוא null
+  let displayTerms = quote.terms;
+  let displayNotes = quote.notes;
+
+  if (quote.notes === null && quote.terms) {
+      displayNotes = quote.terms;
+      displayTerms = isBusinessClient ? (settings?.default_terms || fallbackTerms) : '';
+  } else {
+      displayTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : (isBusinessClient ? (settings?.default_terms || fallbackTerms) : '');
+      displayNotes = quote.notes || '';
+  }
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333', display: 'flex', flexDirection: 'column' }}>
@@ -737,50 +754,50 @@ function PublicQuote() {
             )}
           </div>
 
-          <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', gap: '20px' }}>
+          <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', gap: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
             
-            <div style={{ order: isHebrew ? 1 : 2, display: 'flex', flexDirection: 'column', alignItems: isHebrew ? 'flex-start' : 'flex-end', minWidth: '200px' }}>
-              {!approvedSuccess && !quote.signature && (
-                <div data-html2canvas-ignore="true" className="no-print" style={{ marginBottom: '15px' }}>
-                  <button 
-                    onClick={handleClientApproveClick}
-                    style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                  >
-                    {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
-                  </button>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '6px', textAlign: 'center' }}>
-                    {isHebrew ? 'חתימה דיגיטלית מהירה' : 'Quick Digital Signature'}
+            {/* צד ימין (טקסטים) */}
+            <div style={{ flex: 1, minWidth: '250px', maxWidth: '500px', textAlign: isHebrew ? 'right' : 'left' }}>
+              {displayTerms && isBusinessClient && (
+                <div style={{ marginBottom: '20px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '6px' }}>{isHebrew ? 'תקנון ותנאים (עסקי)' : 'Terms & Conditions'}</p>
+                  <div style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', whiteSpace: 'pre-wrap', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    {displayTerms}
                   </div>
                 </div>
               )}
+
+              {displayNotes && (
+                <div style={{ marginBottom: '15px' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '6px' }}>{isHebrew ? 'הערות נוספות להצעה זו' : 'Quote Notes'}</p>
+                  <div style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', whiteSpace: 'pre-wrap', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    {displayNotes}
+                  </div>
+                </div>
+              )}
+
               {quote.signature && (
-                <div style={{ textAlign: isHebrew ? 'right' : 'left', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
                   <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'חתימת לקוח מאושרת:' : 'Approved Client Signature:'}</p>
                   <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '80px', display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
                 </div>
               )}
             </div>
 
-            <div style={{ order: isHebrew ? 2 : 1, flex: 1, minWidth: '250px', maxWidth: '600px', textAlign: isHebrew ? 'right' : 'left' }}>
-              {quoteTerms && isBusinessClient && (
-                <div style={{ marginBottom: '20px' }}>
-                  <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '6px' }}>{isHebrew ? 'תקנון ותנאים (עסקי)' : 'Terms & Conditions'}</p>
-                  <div style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', whiteSpace: 'pre-wrap', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    {quoteTerms}
-                  </div>
+            {/* צד שמאל (כפתור) */}
+            {!approvedSuccess && !quote.signature && (
+              <div data-html2canvas-ignore="true" className="no-print" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '200px' }}>
+                <button 
+                  onClick={handleClientApproveClick}
+                  style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', width: '100%' }}
+                >
+                  {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
+                </button>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '8px', textAlign: 'center' }}>
+                  {isHebrew ? 'חתימה דיגיטלית מהירה' : 'Quick Digital Signature'}
                 </div>
-              )}
-
-              {quoteNotes && (
-                <div style={{ marginBottom: '15px' }}>
-                  <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '6px' }}>{isHebrew ? 'הערות נוספות להצעה זו' : 'Quote Notes'}</p>
-                  <div style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
-                    {quoteNotes}
-                  </div>
-                </div>
-              )}
-            </div>
-
+              </div>
+            )}
           </div>
 
           <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
@@ -1620,8 +1637,20 @@ function Dashboard() {
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0); 
-    setTerms(quote.terms !== null && quote.terms !== undefined && quote.terms.trim() !== '' ? quote.terms : defaultTerms);
-    setNotes(quote.notes || '');
+
+    let editTerms = quote.terms;
+    let editNotes = quote.notes;
+
+    if (quote.notes === null && quote.terms) {
+      editNotes = quote.terms;
+      editTerms = quote.client_type === 'business' ? defaultTerms : '';
+    } else {
+      editTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : (quote.client_type === 'business' ? defaultTerms : '');
+      editNotes = quote.notes || '';
+    }
+
+    setTerms(editTerms);
+    setNotes(editNotes);
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1670,8 +1699,20 @@ function Dashboard() {
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0);
-    setTerms(quote.terms !== null && quote.terms !== undefined && quote.terms.trim() !== '' ? quote.terms : defaultTerms);
-    setNotes(quote.notes || '');
+
+    let dupTerms = quote.terms;
+    let dupNotes = quote.notes;
+
+    if (quote.notes === null && quote.terms) {
+      dupNotes = quote.terms;
+      dupTerms = quote.client_type === 'business' ? defaultTerms : '';
+    } else {
+      dupTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : (quote.client_type === 'business' ? defaultTerms : '');
+      dupNotes = quote.notes || '';
+    }
+
+    setTerms(dupTerms);
+    setNotes(dupNotes);
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1736,8 +1777,6 @@ function Dashboard() {
         client_type: clientType,
         tax_id: clientTaxId,
         address: clientAddress,
-        terms: terms,
-        notes: notes,
         user_id: session.user.id
       };
 
@@ -2439,13 +2478,15 @@ function Dashboard() {
                         setClientName(val);
                         const found = clients.find(c => c.company_name?.toLowerCase() === val.toLowerCase());
                         if (found) {
-                          if (found.client_type) setClientType(found.client_type);
+                          if (found.client_type) {
+                             setClientType(found.client_type);
+                             if (found.client_type === 'business' && (!terms || terms.trim() === '')) setTerms(defaultTerms);
+                             if (found.client_type === 'private') setTerms('');
+                          }
                           if (found.email) setClientEmail(found.email);
                           if (found.phone) setClientPhone(found.phone);
                           if (found.tax_id) setClientTaxId(found.tax_id);
                           if (found.address) setClientAddress(found.address);
-                          if (found.terms) setTerms(found.terms);
-                          if (found.notes) setNotes(found.notes);
                         }
                       }} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
@@ -2458,6 +2499,11 @@ function Dashboard() {
                           const val = e.target.value;
                           setClientType(val);
                           e.target.setCustomValidity('');
+                          if (val === 'business' && (!terms || terms.trim() === '')) {
+                            setTerms(defaultTerms);
+                          } else if (val === 'private') {
+                            setTerms('');
+                          }
                         }} 
                         onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר סוג לקוח' : 'Select client type')}
                         onInput={(e) => e.target.setCustomValidity('')}
@@ -2650,14 +2696,13 @@ function Dashboard() {
                       <th style={{ padding: '8px 6px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
                       <th style={{ padding: '8px 6px' }}>{isHebrew ? 'כתובת' : 'Address'}</th>
                       <th style={{ padding: '8px 6px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
-                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'תנאי תשלום' : 'Payment Terms'}</th>
                       <th style={{ padding: '8px 6px' }}>{t.actions}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredClients.length === 0 ? (
                       <tr>
-                        <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                        <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                           {isHebrew ? 'לא נמצאו לקוחות התואמים את החיפוש.' : 'No clients found.'}
                         </td>
                       </tr>
@@ -2677,13 +2722,6 @@ function Dashboard() {
                             }}>
                               {client.client_type === 'business' ? (isHebrew ? 'עסקי' : 'Business') : (isHebrew ? 'פרטי' : 'Private')}
                             </span>
-                          </td>
-                          <td style={{ padding: '10px 6px', color: '#4f46e5', fontWeight: '400' }}>
-                            {client.terms ? (
-                              <span style={{ background: '#e0e7ff', padding: '3px 6px', borderRadius: '6px', fontSize: '0.75rem' }}>
-                                {client.terms}
-                              </span>
-                            ) : '-'}
                           </td>
                           <td style={{ padding: '10px 6px' }}>
                             <button 
