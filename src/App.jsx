@@ -464,7 +464,7 @@ function PublicQuote() {
     async function fetchData() {
       const { data: quoteData } = await supabase
         .from('quotes')
-        .select(`*, clients ( company_name, email, phone, client_type, tax_id, address, terms ), quote_items ( * )`)
+        .select(`*, clients ( company_name, email, phone, client_type, tax_id, address, terms, notes ), quote_items ( * )`)
         .eq('id', id)
         .single();
       
@@ -604,7 +604,7 @@ function PublicQuote() {
   }
 
   // תקנון והערות בנפרד (תקנון רק לעסקי)
-  const quoteTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : (isBusinessClient ? (settings?.default_terms || '') : '');
+  const quoteTerms = quote.terms ?? (isBusinessClient ? (settings?.default_terms || '') : '');
   const quoteNotes = quote.notes || '';
 
   return (
@@ -746,31 +746,7 @@ function PublicQuote() {
 
           <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap', gap: '20px' }}>
             
-            {/* כפתור אישור מימין (ב-RTL) או משמאל (ב-LTR) */}
-            <div style={{ order: isHebrew ? 1 : 2, display: 'flex', flexDirection: 'column', alignItems: isHebrew ? 'flex-start' : 'flex-end', minWidth: '200px' }}>
-              {!approvedSuccess && !quote.signature && (
-                <div data-html2canvas-ignore="true" className="no-print" style={{ marginBottom: '15px' }}>
-                  <button 
-                    onClick={handleClientApproveClick}
-                    style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                  >
-                    {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
-                  </button>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '6px', textAlign: 'center' }}>
-                    {isHebrew ? 'חתימה דיגיטלית מהירה' : 'Quick Digital Signature'}
-                  </div>
-                </div>
-              )}
-              {quote.signature && (
-                <div style={{ textAlign: isHebrew ? 'right' : 'left', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
-                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'חתימת לקוח מאושרת:' : 'Approved Client Signature:'}</p>
-                  <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '80px', display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
-                </div>
-              )}
-            </div>
-
-            {/* תקנון והערות בשמאל (ב-RTL) למטה כפי שהתבקש */}
-            <div style={{ order: isHebrew ? 2 : 1, flex: 1, minWidth: '250px', maxWidth: '600px', textAlign: isHebrew ? 'right' : 'left' }}>
+            <div style={{ flex: 1, minWidth: '250px', textAlign: isHebrew ? 'right' : 'left' }}>
               {quoteTerms && isBusinessClient && (
                 <div style={{ marginBottom: '20px' }}>
                   <p style={{ fontSize: '13px', fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase', marginBottom: '6px' }}>{isHebrew ? 'תקנון ותנאים (עסקי)' : 'Terms & Conditions'}</p>
@@ -788,12 +764,39 @@ function PublicQuote() {
                   </div>
                 </div>
               )}
+
+              {quote.signature && (
+                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'חתימת לקוח מאושרת:' : 'Approved Client Signature:'}</p>
+                  <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '80px', display: 'block', objectFit: 'contain' }} crossOrigin="anonymous" />
+                </div>
+              )}
+            </div>
+
+            <div className="no-print" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: '200px' }}>
+              {!approvedSuccess && !quote.signature && (
+                <div data-html2canvas-ignore="true" style={{ marginBottom: '15px' }}>
+                  <button 
+                    onClick={handleClientApproveClick}
+                    style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 28px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                  >
+                    {isHebrew ? '✔️ אשר הצעת מחיר זו' : '✔️ Approve Quote'}
+                  </button>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '6px', textAlign: 'center' }}>
+                    {isHebrew ? 'חתימה דיגיטלית מהירה' : 'Quick Digital Signature'}
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>
 
           <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
-            מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.
+            {isHebrew ? (
+              <>מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.</>
+            ) : (
+              <>This document was generated by <strong>ProFlow</strong> - Business management made easy.</>
+            )}
           </div>
 
         </div>
@@ -873,8 +876,8 @@ function Dashboard() {
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [terms, setTerms] = useState(''); // תקנון קבוע להצעה ספציפית
-  const [notes, setNotes] = useState(''); // הערות ספציפיות להצעה
+  const [terms, setTerms] = useState(''); 
+  const [notes, setNotes] = useState('');
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
@@ -1675,7 +1678,7 @@ function Dashboard() {
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0);
-    setTerms(defaultTerms);
+    setTerms(quote.terms ?? defaultTerms);
     setNotes(quote.notes || '');
     
     if (quote.quote_items && quote.quote_items.length > 0) {
@@ -2449,6 +2452,7 @@ function Dashboard() {
                           if (found.phone) setClientPhone(found.phone);
                           if (found.tax_id) setClientTaxId(found.tax_id);
                           if (found.address) setClientAddress(found.address);
+                          if (found.terms) setTerms(found.terms);
                           if (found.notes) setNotes(found.notes);
                         }
                       }} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
@@ -3059,7 +3063,7 @@ function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>👥</span>
           {isHebrew ? 'לקוחות' : 'Clients'}
         </button>
-        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
