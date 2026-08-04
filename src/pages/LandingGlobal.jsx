@@ -58,6 +58,11 @@ export default function LandingGlobal() {
         }
       `}</style>
 
+      {/* Top Banner Launch Special */}
+      <div style={{ background: 'linear-gradient(90deg, #4f46e5, #10b981)', color: 'white', padding: '10px 20px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
+        🎉 Special Offer: 14-day free trial for all PRO features with no commitment!
+      </div>
+
       {/* Header */}
       <header style={{ background: 'rgba(9, 13, 22, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
@@ -94,7 +99,7 @@ export default function LandingGlobal() {
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '25px' }}>
             <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
-              Get Started Free 🚀
+              Start 14-Day Free Trial 🚀
             </button>
           </div>
 
@@ -140,7 +145,7 @@ export default function LandingGlobal() {
           {/* Pricing Section */}
           <div style={{ marginBottom: '80px' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px' }}>Pricing Plans</h2>
-            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>Choose the perfect plan for your business (Global pricing with 0% VAT).</p>
+            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>Choose the perfect plan for your business. <strong style={{ color: '#10b981' }}>Special Offer: 14-day free trial for all PRO features!</strong></p>
             
             <div style={{ display: 'inline-flex', background: '#111827', padding: '4px', borderRadius: '12px', marginBottom: '40px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <button 
@@ -183,13 +188,13 @@ export default function LandingGlobal() {
                   {billingCycle === 'monthly' ? '* 0% international tax' : '* Billed annually, 0% international tax'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
+                  <li>✓ <strong>14-Day Free Trial!</strong></li>
                   <li>✓ Up to 20 quotes / month</li>
-                  <li>✓ All features unlocked</li>
                   <li>✓ Digital signatures & clients</li>
                   <li style={{ color: '#ef4444' }}>✗ No WhatsApp direct sending</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  Choose Basic
+                  Start Free Trial
                 </button>
               </div>
 
@@ -207,13 +212,13 @@ export default function LandingGlobal() {
                   {billingCycle === 'monthly' ? '* 0% international tax' : '* Billed annually, 0% international tax'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
+                  <li>✓ <strong>14-Day Free Trial (All PRO Features)!</strong></li>
                   <li>✓ Unlimited quotes</li>
                   <li>✓ Direct WhatsApp sending</li>
-                  <li>✓ Advanced digital signatures</li>
                   <li>✓ Full expense & revenue tracking</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
-                  Choose Pro
+                  Start Pro Free Trial
                 </button>
               </div>
 

@@ -382,7 +382,7 @@ export default function Dashboard() {
       setBizEmail(data.email || '');
       setBizPhone(data.phone || '');
       setBizLogoUrl(data.logo_url || '');
-      setBizPlan(data.plan || 'free');
+      setBizPlan(data.plan || 'pro');
       setBizRole(data.role || 'user');
       setBizCountry(data.country || '');
       setDefaultTerms(data.default_terms || initialDefaultTerms);
@@ -403,14 +403,19 @@ export default function Dashboard() {
         fetchAllAccounts();
       }
     } else {
+      // Automatic 14-day free Pro trial for new signups
+      const trialEndDate = new Date();
+      trialEndDate.setDate(trialEndDate.getDate() + 14);
+
       const defaultPayload = {
         user_id: session.user.id,
         email: session.user.email,
         business_name: 'New Business',
         country: detectedCountry,
-        plan: 'free',
+        plan: 'pro',
         role: 'user',
         default_terms: initialDefaultTerms,
+        trial_ends_at: trialEndDate.toISOString(),
         last_sign_in: nowIso
       };
 
@@ -430,7 +435,7 @@ export default function Dashboard() {
         setBizRole(newData.role);
         setBizCountry(newData.country || '');
         setDefaultTerms(newData.default_terms || initialDefaultTerms);
-        setTrialEndsAt(null);
+        setTrialEndsAt(newData.trial_ends_at);
         if (newData.country === 'Local' || newData.country === 'Israel (Local)') {
           setCurrency('ILS');
         } else {
@@ -438,10 +443,10 @@ export default function Dashboard() {
         }
       } else {
         setSettingId(null);
-        setBizPlan('free');
+        setBizPlan('pro');
         setBizRole('user');
         setDefaultTerms(initialDefaultTerms);
-        setTrialEndsAt(null);
+        setTrialEndsAt(trialEndDate.toISOString());
       }
     }
   }
@@ -459,7 +464,7 @@ export default function Dashboard() {
     
     if (newPlan !== 'free') {
       const trialEndDate = new Date();
-      trialEndDate.setDate(trialEndDate.getDate() + 30);
+      trialEndDate.setDate(trialEndDate.getDate() + 14);
       updatePayload.trial_ends_at = trialEndDate.toISOString();
     } else {
       updatePayload.trial_ends_at = null;
@@ -627,7 +632,7 @@ export default function Dashboard() {
         if (data?.user && data.user.identities && data.user.identities.length === 0) {
           setAuthError(isHebrew ? 'כתובת האימייל כבר קיימת במערכת! אנא התחבר.' : 'Email already exists! Please sign in.');
         } else {
-          setAuthSuccess(isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש...' : 'Sign up successful! Initializing user profile...');
+          setAuthSuccess(isHebrew ? 'ההרשמה הצליחה! המערכת יוצרת כעת פרופיל משתמש עם 14 יום ניסיון מתנה...' : 'Sign up successful! Initializing user profile with free trial...');
         }
       }
     } else {
@@ -1173,7 +1178,7 @@ export default function Dashboard() {
       setStatusMsg({ 
         text: editingQuoteId 
           ? (isHebrew ? `הצעה #${editingQuoteId.slice(0, 6)} עודכנה בהצלחה!` : `Quote #${editingQuoteId.slice(0, 6)} successfully updated!`) 
-          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}${formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`), 
+          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}{formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}{formatNum(totalAmount)}`), 
         type: 'success' 
       });
       
@@ -1248,7 +1253,7 @@ export default function Dashboard() {
     isTrialExpired = trialDaysLeft <= 0;
   }
 
-  const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 7 && trialDaysLeft > 0 && !isSuperAdmin;
+  const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 5 && trialDaysLeft > 0 && !isSuperAdmin;
 
   if (!session) {
     return (
@@ -1259,7 +1264,7 @@ export default function Dashboard() {
             <ProFlowLogo size={50} />
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
               {isSignUp 
-                ? (isHebrew ? 'יצירת חשבון חדש במערכת' : 'Create a new account') 
+                ? (isHebrew ? 'יצירת חשבון חדש (כולל 14 יום ניסיון מתנה!)' : 'Create new account (incl. 14 days free trial!)') 
                 : (isHebrew ? 'התחברות למערכת הניהול' : 'Sign in to your dashboard')}
             </p>
           </div>
@@ -1277,7 +1282,7 @@ export default function Dashboard() {
               <input type="password" name="loginPassword" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
-              {isSignUp ? (isHebrew ? 'הירשם' : 'Sign Up') : (isHebrew ? 'התחבר' : 'Sign In')}
+              {isSignUp ? (isHebrew ? 'הירשם (14 יום מתנה)' : 'Sign Up (14d Free)') : (isHebrew ? 'התחבר' : 'Sign In')}
             </button>
           </form>
 
@@ -1287,7 +1292,7 @@ export default function Dashboard() {
               onClick={() => setIsSignUp(!isSignUp)}
               style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontWeight: '600', padding: 0 }}
             >
-              {isSignUp ? (isHebrew ? 'כבר יש לך חשבון? התחבר' : 'Already have an account?') : (isHebrew ? 'אין חשבון? הירשם כאן' : "Don't have an account?")}
+              {isSignUp ? (isHebrew ? 'כבר יש לך חשבון? התחבר' : 'Already have an account?') : (isHebrew ? 'אין חשבון? הירשם וקבל 14 יום מתנה!' : "Don't have an account?")}
             </button>
             {!isSignUp && (
               <button
@@ -1381,14 +1386,14 @@ export default function Dashboard() {
           {isExpiringSoon && (
             <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#991b1b', padding: '12px 20px', borderRadius: '10px', marginBottom: '15px', fontWeight: 'bold', textAlign: 'center', fontSize: '0.9rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
               <span>⚠️</span>
-              <span>{isHebrew ? `שים לב: המנוי שלך עומד להסתיים בעוד ${trialDaysLeft} ימים! מומלץ לשדרג או לחדש בהקדם.` : `Warning: Your subscription expires in ${trialDaysLeft} days!`}</span>
+              <span>{isHebrew ? `תקופת הניסיון שלך עומדת לפוג בעוד ${trialDaysLeft} ימים!` : `Your trial period expires in ${trialDaysLeft} days!`}</span>
             </div>
           )}
 
           {trialEndsAt && !isTrialExpired && !isSuperAdmin && !isExpiringSoon && (
             <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '10px 16px', borderRadius: '8px', marginBottom: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px', fontSize: '0.85rem' }}>
-              <span>{isHebrew ? '🚀 תקופת ניסיון פעילה' : '🚀 Active Trial Period'}</span>
-              <span>{isHebrew ? `נותרו עוד ${trialDaysLeft} ימים` : `${trialDaysLeft} days remaining`}</span>
+              <span>{isHebrew ? '🚀 תקופת ניסיון פעילה (14 יום חינם)' : '🚀 Active Trial Period (14 Days Free)'}</span>
+              <span>{isHebrew ? `תקופת הניסיון שלך עומדת לפוג בעוד ${trialDaysLeft} ימים` : `Your trial period expires in ${trialDaysLeft} days`}</span>
             </div>
           )}
 
