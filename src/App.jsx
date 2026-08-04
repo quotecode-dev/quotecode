@@ -633,7 +633,7 @@ function PublicQuote() {
 
           <div style={{ marginBottom: '40px', textAlign: isHebrew ? 'right' : 'left' }}>
             <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'הוכן עבור:' : 'Prepared For:'}</p>
-            <p style={{ margin: '0', fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>{quote.clients?.company_name || 'N/A'}</p>
+            <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>{quote.clients?.company_name || 'N/A'}</p>
             {quote.clients?.tax_id && (
                <p style={{ margin: '2px 0 0', color: '#4b5563', fontSize: '14px' }}>{isHebrew ? 'ח.פ / ת.ז:' : 'Tax ID:'} <span dir="ltr">{quote.clients.tax_id}</span></p>
             )}
@@ -755,7 +755,6 @@ function PublicQuote() {
             )}
           </div>
 
-          {/* כיתוב מיתוג ProFlow בתוך המסגרת למטה */}
           <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '15px', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
             מסמך זה נערך ע"י <strong>ProFlow</strong> - התוכנה שעושה לעסקים את החיים קלים.
           </div>
@@ -764,8 +763,11 @@ function PublicQuote() {
       </div>
 
       <footer className="no-print" style={{ textAlign: 'center', padding: '20px', marginTop: '40px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
+        <div style={{ marginBottom: '10px' }}>
+          Powered by <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business Management & Quoting System'}
+        </div>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
-          {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
+          {isHebrew ? '♿ הצהרת נגישות' : '♿ Accessibility Statement'}
         </button>
       </footer>
       
@@ -2189,7 +2191,7 @@ function Dashboard() {
                                       onClick={() => handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote))}
                                       style={{ background: isLocked ? '#f1f5f9' : '#fef3c7', color: isLocked ? '#94a3b8' : '#b45309', border: 'none', padding: '0 10px', borderRadius: '4px', cursor: isLocked ? 'not-allowed' : 'pointer', fontWeight: '400', fontSize: '0.75rem', height: '26px', boxSizing: 'border-box', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                                     >
-                                      {isLocked ? '🔒 נעול' : t.edit}
+                                      {isLocked ? (isHebrew ? '🔒 נעול' : '🔒 Locked') : t.edit}
                                     </button>
                                     {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
                                       <div className="feature-lock-tooltip" style={{
@@ -3002,11 +3004,11 @@ function Dashboard() {
       </div>
 
       <footer className="no-print" style={{ textAlign: 'center', padding: '20px', marginTop: '40px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.85rem' }}>
-        <p style={{ margin: '0 0 10px 0' }}>
-          © 2026 <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business & Quoting Platform'}
-        </p>
+        <div style={{ marginBottom: '10px' }}>
+          Powered by <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business Management & Quoting System'}
+        </div>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
-          {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
+          {isHebrew ? '♿ הצהרת נגישות' : '♿ Accessibility Statement'}
         </button>
       </footer>
     </div>
