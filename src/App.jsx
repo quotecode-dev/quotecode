@@ -559,6 +559,7 @@ function PublicQuote() {
   if (loading) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isHebrew ? 'טוען את הצעת המחיר...' : 'Loading quote...'}</div>;
   if (!quote) return <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Segoe UI, Tahoma, sans-serif' }}>{isHebrew ? 'הצעת המחיר לא נמצאה.' : 'Quote not found.'}</div>;
 
+  const isBusinessClient = quote.client_type === 'business';
   const isPrivate = quote.client_type === 'private';
   const bizTaxId = settings?.tax_id || '';
   const bizEmail = settings?.email || '';
@@ -596,7 +597,9 @@ function PublicQuote() {
       quoteTotal = baseAmount + quoteTaxAmount;
   }
 
-  const quoteTerms = quote.terms || quote.clients?.terms || '';
+  // תקנון יוצג רק ללקוח עסקי ולא ללקוח פרטי
+  const quoteTerms = isBusinessClient ? (settings?.default_terms || '') : '';
+  const quoteNotes = quote.terms || quote.clients?.terms || '';
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px 10px', color: '#333', display: 'flex', flexDirection: 'column' }}>
@@ -738,10 +741,19 @@ function PublicQuote() {
           <div style={{ marginTop: '50px', borderTop: '1px solid #e5e7eb', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '20px' }}>
             
             <div style={{ flex: 1, minWidth: '250px' }}>
-              {quoteTerms && (
-                <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
-                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות / הערות' : 'Terms & Conditions / Notes'}</p>
+              {/* הצגת תקנון רק לעסקי */}
+              {quoteTerms && isBusinessClient && (
+                <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '15px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תקנון ותנאים' : 'Terms & Conditions'}</p>
                   <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
+                </div>
+              )}
+
+              {/* הצגת הערות אישיות להצעה (לכל סוג לקוח אם קיימות) */}
+              {quoteNotes && (
+                <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '15px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'הערות להצעה' : 'Quote Notes'}</p>
+                  <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteNotes}</p>
                 </div>
               )}
 
@@ -846,8 +858,8 @@ function Dashboard() {
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
-  const [terms, setTerms] = useState('');
-  const [notes, setNotes] = useState(''); // שדה נפרד להערות בהצעה
+  const [terms, setTerms] = useState(''); // תקנון קבוע
+  const [notes, setNotes] = useState(''); // הערות ספציפיות להצעה
   
   const [items, setItems] = useState([{ description: '', quantity: 1, unit_price: 0 }]);
   const [newServiceName, setNewServiceName] = useState('');
@@ -1598,8 +1610,8 @@ function Dashboard() {
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0); 
-    setTerms(defaultTerms); // תקנון קבוע
-    setNotes(quote.terms || quote.clients?.terms || ''); // הערות ספציפיות להצעה
+    setTerms(defaultTerms);
+    setNotes(quote.terms || quote.clients?.terms || '');
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1621,8 +1633,8 @@ function Dashboard() {
     setClientAddress('');
     setValidUntil('');
     setDiscount(0);
-    setTerms(defaultTerms); // מילוי אוטומטי של תקנון ברירת המחדל
-    setNotes(''); // שדה הערות ריק להתחלה
+    setTerms(defaultTerms);
+    setNotes('');
     setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
     setItems([{ description: '', quantity: 1, unit_price: 0 }]);
   };
@@ -1714,7 +1726,7 @@ function Dashboard() {
         client_type: clientType,
         tax_id: clientTaxId,
         address: clientAddress,
-        terms: notes, // שומרים את ההערות/תקנון בלקוח
+        terms: notes,
         user_id: session.user.id
       };
 
@@ -1739,7 +1751,7 @@ function Dashboard() {
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
         discount: Number(discount),
-        terms: notes, // שומרים את ההערות בהצעת המחיר
+        terms: notes,
         user_id: session.user.id
       };
 
@@ -2495,16 +2507,18 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* שדה נפרד לתקנון ותנאים (שנקבע בהגדרות עסק) */}
-                  <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים (ברירת מחדל)' : 'Terms & Conditions (Default)'}</label>
-                    <textarea 
-                      value={terms} 
-                      onChange={(e) => setTerms(e.target.value)} 
-                      rows="4"
-                      style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
-                    />
-                  </div>
+                  {/* שדה תקנון ותנאים (יוצג רק אם מדובר בלקוח עסקי) */}
+                  {clientType === 'business' && (
+                    <div style={{ marginBottom: '15px' }}>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים (עסקי)' : 'Terms & Conditions (Business)'}</label>
+                      <textarea 
+                        value={terms} 
+                        onChange={(e) => setTerms(e.target.value)} 
+                        rows="4"
+                        style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
+                      />
+                    </div>
+                  )}
 
                   {/* שדה נפרד להערות אישיות להצעה */}
                   <div style={{ marginBottom: '20px' }}>
@@ -3027,7 +3041,7 @@ function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>👥</span>
           {isHebrew ? 'לקוחות' : 'Clients'}
         </button>
-        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
