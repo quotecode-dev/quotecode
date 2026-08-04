@@ -167,7 +167,10 @@ function EmailConfirmModal({ isOpen, onClose, onConfirm, clientEmail, isHebrew }
 export default function Dashboard() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
-  const isHebrew = (browserLang.startsWith('he') || tz === 'Asia/Jerusalem') && !window.location.search.includes('lang=en');
+  
+  // Ironclad local user detection: Israel timezone or Hebrew browser language
+  const isLocalIsraeliBusiness = tz === 'Asia/Jerusalem' || browserLang.startsWith('he');
+  const isHebrew = isLocalIsraeliBusiness && !window.location.search.includes('lang=en');
 
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
@@ -221,7 +224,8 @@ export default function Dashboard() {
   const [clientTaxId, setClientTaxId] = useState('');
   const [clientAddress, setClientAddress] = useState('');
   
-  const [currency, setCurrency] = useState('USD');
+  // Ironclad currency default: ILS for local users, USD for international users
+  const [currency, setCurrency] = useState(isLocalIsraeliBusiness ? 'ILS' : 'USD');
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -251,7 +255,6 @@ export default function Dashboard() {
 
   const effectivePlan = isTrialExpired ? 'free' : bizPlan.toLowerCase();
 
-  const isLocalIsraeliBusiness = bizCountry === 'Local' || bizCountry === 'Israel (Local)';
   const isSuperAdmin = bizRole === 'super_admin';
   const isPro = isSuperAdmin || effectivePlan === 'pro';
   const isBasicOrAbove = isPro || effectivePlan === 'basic';
@@ -374,9 +377,7 @@ export default function Dashboard() {
   async function fetchSettings() {
     if (!session?.user?.id) return;
     
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const isIL = tz === 'Asia/Jerusalem';
-    const detectedCountry = isIL ? 'Local' : (tz ? tz.split('/')[1]?.replace('_', ' ') : 'International');
+    const detectedCountry = isLocalIsraeliBusiness ? 'Local' : 'International';
     const nowIso = new Date().toISOString();
 
     const { data, error } = await supabase
@@ -396,14 +397,14 @@ export default function Dashboard() {
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'pro');
       setBizRole(data.role || 'user');
-      setBizCountry(data.country || '');
+      setBizCountry(data.country || detectedCountry);
       setDefaultTerms(data.default_terms || initialDefaultTerms);
       setTrialEndsAt(data.trial_ends_at || null);
       
-      if (data.country === 'Local' || data.country === 'Israel (Local)') {
+      if (isLocalIsraeliBusiness) {
         setCurrency('ILS');
       } else {
-        setCurrency('USD');
+        if (!currency || currency === 'ILS') setCurrency('USD');
       }
 
       await supabase
@@ -444,20 +445,17 @@ export default function Dashboard() {
         setBizEmail(newData.email);
         setBizPlan(newData.plan);
         setBizRole(newData.role);
-        setBizCountry(newData.country || '');
+        setBizCountry(newData.country || detectedCountry);
         setDefaultTerms(newData.default_terms || initialDefaultTerms);
         setTrialEndsAt(newData.trial_ends_at);
-        if (newData.country === 'Local' || newData.country === 'Israel (Local)') {
-          setCurrency('ILS');
-        } else {
-          setCurrency('USD');
-        }
+        setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
       } else {
         setSettingId(null);
         setBizPlan('pro');
         setBizRole('user');
         setDefaultTerms(initialDefaultTerms);
         setTrialEndsAt(trialEndDate.toISOString());
+        setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
       }
     }
   }
@@ -513,9 +511,7 @@ export default function Dashboard() {
     e.preventDefault();
     if (!session?.user?.id) return;
 
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const isIL = tz === 'Asia/Jerusalem';
-    const detectedCountry = isIL ? 'Local' : (tz ? tz.split('/')[1]?.replace('_', ' ') : 'International');
+    const detectedCountry = isLocalIsraeliBusiness ? 'Local' : 'International';
 
     const payload = {
       business_name: bizName,
@@ -829,12 +825,12 @@ export default function Dashboard() {
   const subtotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price)), 0);
   const discountAmount = (subtotal * Number(discount)) / 100;
   const baseAmount = subtotal - discountAmount;
-  let taxRate = isLocalIsraeliBusiness ? 0.18 : 0.00;
+  let taxRate = (isLocalIsraeliBusiness || currency === 'ILS') ? 0.18 : 0.00;
   
   let taxAmount = 0;
   let totalAmount = 0;
 
-  if (isLocalIsraeliBusiness && isHebrew && clientType === 'private') {
+  if ((isLocalIsraeliBusiness || currency === 'ILS') && isHebrew && clientType === 'private') {
     totalAmount = baseAmount;
     taxAmount = totalAmount - (totalAmount / (1 + taxRate));
   } else {
@@ -982,13 +978,7 @@ export default function Dashboard() {
     setClientTaxId(quote.clients?.tax_id || '');
     setClientAddress(quote.clients?.address || '');
     
-    if (isLocalIsraeliBusiness) {
-      setCurrency('ILS');
-    } else {
-      let c = quote.currency || 'USD';
-      if (c === 'ILS') c = 'USD';
-      setCurrency(c);
-    }
+    setCurrency(isLocalIsraeliBusiness ? 'ILS' : (quote.currency || 'USD'));
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
@@ -1044,13 +1034,7 @@ export default function Dashboard() {
     setClientTaxId(quote.clients?.tax_id || '');
     setClientAddress(quote.clients?.address || '');
     
-    if (isLocalIsraeliBusiness) {
-      setCurrency('ILS');
-    } else {
-      let c = quote.currency || 'USD';
-      if (c === 'ILS') c = 'USD';
-      setCurrency(c);
-    }
+    setCurrency(isLocalIsraeliBusiness ? 'ILS' : (quote.currency || 'USD'));
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
@@ -1570,7 +1554,7 @@ export default function Dashboard() {
                         </tr>
                       ) : (
                         filteredQuotes.map((quote) => {
-                          const quoteSym = isLocalIsraeliBusiness ? '₪' : getCurrencySymbol(quote.currency);
+                          const quoteSym = getCurrencySymbol(quote.currency);
                           const currentStatus = quote.status ? quote.status.toLowerCase() : 'draft';
                           const isLocked = currentStatus === 'approved' || currentStatus === 'paid' || quote.signature;
                           return (
