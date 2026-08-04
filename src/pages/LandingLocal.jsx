@@ -33,9 +33,6 @@ export default function LandingLocal() {
           <ProFlowLogo size={38} />
         </div>
         <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-          <button onClick={() => navigate('/')} style={{ background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#cbd5e1', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem' }}>
-            English (Global) 🌐
-          </button>
           <button onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)' }}>
             כניסה למערכת / התחברות
           </button>
@@ -69,7 +66,7 @@ export default function LandingLocal() {
             <span style={{ color: '#fbbf24', fontSize: '1.2rem' }}>⭐⭐⭐⭐⭐</span> מעל 500 עסקים כבר מפיקים הצעות מחיר בקלות
           </div>
 
-          {/* High-end Dashboard Preview Mockup (Ready for Hebrew Video or Elite Preview) */}
+          {/* Dashboard Preview Box */}
           <div className="preview-box" style={{ borderRadius: '16px', overflow: 'hidden', background: '#111827', maxWidth: '850px', margin: '0 auto 80px auto', padding: '30px', textAlign: 'right' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '15px' }}>
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -82,7 +79,7 @@ export default function LandingLocal() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', marginBottom: '20px' }}>
               <div style={{ background: '#1f2937', padding: '20px', borderRadius: '10px' }}>
                 <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>הצעות מחיר החודש</div>
-                <div style={{ color: '#ffffff', fontSize: '1.8rem', fontWeight: 'bold', marginTop: '5px' }}>24<u></u></div>
+                <div style={{ color: '#ffffff', fontSize: '1.8rem', fontWeight: 'bold', marginTop: '5px' }}>24</div>
               </div>
               <div style={{ background: '#1f2937', padding: '20px', borderRadius: '10px' }}>
                 <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>הכנסות (כולל מע"מ 18%)</div>
@@ -154,7 +151,7 @@ export default function LandingLocal() {
                 </button>
               </div>
 
-              {/* Pro */}
+              {/* Pro / Basic */}
               <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '2px solid #6366f1', boxShadow: '0 15px 30px rgba(99, 102, 241, 0.15)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '-14px', right: '20px', background: '#6366f1', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold' }}>
                   הפופולרי ביותר ⭐
@@ -162,10 +159,10 @@ export default function LandingLocal() {
                 <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול עסקי (Pro)</h3>
                 <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>לסוכנויות ועסקים צומחים.</p>
                 <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#818cf8', marginBottom: '20px' }}>
-                  {billingCycle === 'monthly' ? '149 ₪' : '119 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span>
+                  {billingCycle === 'monthly' ? '49 ₪' : '39 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span>
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
-                  {billingCycle === 'monthly' ? '* כולל מע"מ 18% (126.27 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (100.85 ₪ לפני מע"מ)'}
+                  {billingCycle === 'monthly' ? '* כולל מע"מ 18% (41.53 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (33.05 ₪ לפני מע"מ)'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
                   <li>✓ הצעות מחיר ללא הגבלה</li>
@@ -183,10 +180,10 @@ export default function LandingLocal() {
                 <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול פרימיום (Enterprise)</h3>
                 <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>פתרונות מתקדמים לחברות גדולות.</p>
                 <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#ffffff', marginBottom: '20px' }}>
-                  {billingCycle === 'monthly' ? '299 ₪' : '239 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span>
+                  {billingCycle === 'monthly' ? '99 ₪' : '79 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span>
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
-                  {billingCycle === 'monthly' ? '* כולל מע"מ 18% (253.39 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (202.54 ₪ לפני מע"מ)'}
+                  {billingCycle === 'monthly' ? '* כולל מע"מ 18% (83.90 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (66.95 ₪ לפני מע"מ)'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
                   <li>✓ הכל כלול במסלול Pro</li>
