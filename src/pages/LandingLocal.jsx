@@ -84,7 +84,6 @@ export default function LandingLocal() {
       <main className="hero-glow" style={{ flex: 1, padding: '80px 20px', width: '100%', boxSizing: 'border-box' }}>
         <div style={{ maxWidth: '1050px', margin: '0 auto', textAlign: 'center' }}>
           
-          {/* Prominent Top Badge - First thing users see */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(99, 102, 241, 0.15))', color: '#34d399', padding: '10px 24px', borderRadius: '30px', fontSize: '1rem', fontWeight: '800', marginBottom: '24px', border: '1px solid rgba(16, 185, 129, 0.4)', boxShadow: '0 0 25px rgba(16, 185, 129, 0.25)' }}>
             🔥 מבצע השקה: 14 יום ניסיון חינם לכל פיצ'רי ה-PRO!
           </div>
@@ -94,14 +93,17 @@ export default function LandingLocal() {
             <span style={{ background: 'linear-gradient(to right, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>בקלות, במהירות ובחכמה</span>
           </h1>
           
-          <p style={{ fontSize: '1.25rem', color: '#94a3b8', maxWidth: '750px', margin: '0 auto 35px auto', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '1.25rem', color: '#94a3b8', maxWidth: '750px', margin: '0 auto 30px auto', lineHeight: '1.6' }}>
             פלטפורמת SaaS מתקדמת המותאמת במיוחד לשוק הישראלי (כולל ניהול מע"מ 18% כחוק, מטבע שקלי, חתימות דיגיטליות וניהול לקוחות).
           </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '25px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
             <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
               התחל 14 יום ניסיון חינם ב-PRO עכשיו 🚀
             </button>
+            <span style={{ color: '#34d399', fontSize: '1rem', fontWeight: '800' }}>
+              14 יום חינם לגמרי לכל פיצ'רי ה-PRO!
+            </span>
           </div>
 
           <div style={{ marginBottom: '60px', color: '#94a3b8', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
