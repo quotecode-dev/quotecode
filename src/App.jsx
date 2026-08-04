@@ -14,6 +14,18 @@ import './App.css';
 
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+const DEFAULT_TERMS_HEB = `תנאים כלליים:
+1. תוקף ההצעה: ההצעה בתוקף ל-30 ימים מיום הצעת המחיר.
+2. מחירים: המחירים כוללים מע"מ, אלא אם צוין אחרת.
+3. תשלום: התשלום יתבצע במזומן או באמצעות העברה בנקאית, בתנאים שיוסכמו מראש.
+4. אספקה: אספקת המוצרים תתבצע תוך 30 ימי עבודה ממועד אישור ההזמנה והתשלום, אלא אם כן צוין אחרת.`;
+
+const DEFAULT_TERMS_ENG = `General Terms:
+1. Validity: This quote is valid for 30 days from issuance.
+2. Prices: Prices include VAT unless stated otherwise.
+3. Payment: Payment shall be made in cash or via bank transfer as agreed in advance.
+4. Delivery: Product delivery within 30 business days from order confirmation and payment.`;
+
 function ProFlowLogo({ size = 45 }) {
   return (
     <div dir="ltr" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', flexDirection: 'row' }}>
@@ -609,10 +621,8 @@ function PublicQuote() {
             </div>
           )}
 
-          {/* ראש המסמך מותאם לסטנדרט ישראלי: לוגו ופרטי עסק בימין, כותרת ותאריכים בשמאל */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '30px', flexDirection: 'row', flexWrap: 'wrap', gap: '15px' }}>
             
-            {/* צד ימין: לוגו ופרטי העסק */}
             <div style={{ textAlign: 'right' }}>
               <img src={bizLogo} alt="Business Logo" style={{ maxHeight: '60px', maxWidth: '180px', objectFit: 'contain', marginBottom: '8px', display: 'block', marginLeft: 'auto', marginRight: '0' }} crossOrigin="anonymous" />
               <p style={{ margin: '5px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
@@ -622,7 +632,6 @@ function PublicQuote() {
               </p>
             </div>
 
-            {/* צד שמאל: כותרת הצעת מחיר ותאריכים */}
             <div style={{ textAlign: 'left' }}>
               <h2 style={{ margin: 0, color: '#111827', fontSize: '22px', textTransform: 'uppercase' }}>{isHebrew ? 'הצעת מחיר' : 'QUOTE'}</h2>
               <p style={{ margin: '4px 0 0', color: '#6b7280', fontSize: '14px' }} dir="ltr">#{quote.id.slice(0, 8).toUpperCase()}</p>
@@ -730,7 +739,7 @@ function PublicQuote() {
             <div style={{ flex: 1, minWidth: '250px' }}>
               {quoteTerms && (
                 <div style={{ textAlign: isHebrew ? 'right' : 'left', marginBottom: '20px' }}>
-                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות' : 'Terms & Conditions'}</p>
+                  <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'תנאים והגבלות / הערות' : 'Terms & Conditions / Notes'}</p>
                   <p style={{ margin: '0', color: '#6b7280', fontSize: '13px', whiteSpace: 'pre-wrap' }}>{quoteTerms}</p>
                 </div>
               )}
@@ -767,7 +776,7 @@ function PublicQuote() {
           Powered by <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business Management & Quoting System'}
         </div>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
-          {isHebrew ? '♿ הצהרת נגישות' : '♿ Accessibility Statement'}
+          ♿ {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
         </button>
       </footer>
       
@@ -808,6 +817,7 @@ function Dashboard() {
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
   const [bizCountry, setBizCountry] = useState('');
+  const [defaultTerms, setDefaultTerms] = useState(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
   const [trialEndsAt, setTrialEndsAt] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
@@ -982,6 +992,8 @@ function Dashboard() {
       .eq('user_id', session.user.id)
       .maybeSingle();
     
+    const initialDefaultTerms = isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG;
+
     if (data) {
       setSettingId(data.id);
       setBizName(data.business_name || 'ProFlow');
@@ -992,6 +1004,7 @@ function Dashboard() {
       setBizPlan(data.plan || 'free');
       setBizRole(data.role || 'user');
       setBizCountry(data.country || '');
+      setDefaultTerms(data.default_terms || initialDefaultTerms);
       setTrialEndsAt(data.trial_ends_at || null);
       
       if (data.country === 'Local' || data.country === 'Israel (Local)') {
@@ -1016,6 +1029,7 @@ function Dashboard() {
         country: detectedCountry,
         plan: 'free',
         role: 'user',
+        default_terms: initialDefaultTerms,
         last_sign_in: nowIso
       };
 
@@ -1034,6 +1048,7 @@ function Dashboard() {
         setBizPlan(newData.plan);
         setBizRole(newData.role);
         setBizCountry(newData.country || '');
+        setDefaultTerms(newData.default_terms || initialDefaultTerms);
         setTrialEndsAt(null);
         if (newData.country === 'Local' || newData.country === 'Israel (Local)') {
           setCurrency('ILS');
@@ -1044,6 +1059,7 @@ function Dashboard() {
         setSettingId(null);
         setBizPlan('free');
         setBizRole('user');
+        setDefaultTerms(initialDefaultTerms);
         setTrialEndsAt(null);
       }
     }
@@ -1110,6 +1126,7 @@ function Dashboard() {
       email: bizEmail,
       phone: bizPhone,
       logo_url: bizLogoUrl,
+      default_terms: defaultTerms,
       country: detectedCountry,
       user_id: session.user.id
     };
@@ -1579,7 +1596,7 @@ function Dashboard() {
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0); 
-    setTerms(quote.terms || quote.clients?.terms || '');
+    setTerms(quote.terms || quote.clients?.terms || defaultTerms);
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1588,6 +1605,22 @@ function Dashboard() {
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStatusMsg({ text: isHebrew ? `טוען לעריכה הצעה #${quote.id.slice(0, 6)}...` : `Editing Quote #${quote.id.slice(0, 6)}...`, type: 'success' });
+  };
+
+  const handleCreateNewQuoteClick = () => {
+    setIsCreatingQuote(true);
+    setEditingQuoteId(null);
+    setClientName('');
+    setClientEmail('');
+    setClientPhone('');
+    setClientType('');
+    setClientTaxId('');
+    setClientAddress('');
+    setValidUntil('');
+    setDiscount(0);
+    setTerms(defaultTerms); // טעינת ברירת המחדל של המשתמש
+    setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
+    setItems([{ description: '', quantity: 1, unit_price: 0 }]);
   };
 
   const handleDuplicateQuote = (quote) => {
@@ -1611,7 +1644,7 @@ function Dashboard() {
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || 0);
-    setTerms(quote.terms || quote.clients?.terms || '');
+    setTerms(quote.terms || quote.clients?.terms || defaultTerms);
     
     if (quote.quote_items && quote.quote_items.length > 0) {
       setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
@@ -1642,11 +1675,6 @@ function Dashboard() {
   async function handleSaveQuote(e) {
     e.preventDefault();
     if (!session?.user?.id) return;
-
-    if (clientType === 'business' && (!terms || terms.trim() === '')) {
-      setStatusMsg({ text: isHebrew ? 'שגיאה: חובה לבחור תנאי תשלום ללקוח עסקי.' : 'Error: Payment terms are required for business clients.', type: 'error' });
-      return;
-    }
 
     try {
       if (editingQuoteId) {
@@ -1680,7 +1708,7 @@ function Dashboard() {
         client_type: clientType,
         tax_id: clientTaxId,
         address: clientAddress,
-        terms: clientType === 'business' ? terms : null,
+        terms: terms,
         user_id: session.user.id
       };
 
@@ -1705,7 +1733,7 @@ function Dashboard() {
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
         discount: Number(discount),
-        terms: clientType === 'business' ? terms : null,
+        terms: terms,
         user_id: session.user.id
       };
 
@@ -2071,7 +2099,7 @@ function Dashboard() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <h2 style={{ fontSize: '1.1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>{t.recentHistory}</h2>
                     <button 
-                      onClick={() => setIsCreatingQuote(true)}
+                      onClick={handleCreateNewQuoteClick}
                       style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)' }}
                     >
                       ➕ {isHebrew ? 'צור הצעת מחיר חדשה' : 'Create New Quote'}
@@ -2175,7 +2203,6 @@ function Dashboard() {
                               <td style={{ padding: '10px 6px', verticalAlign: 'middle' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row', justifyContent: isHebrew ? 'flex-start' : 'flex-end', flexWrap: 'nowrap' }}>
                                   
-                                  {/* VIEW (All plans) */}
                                   <button 
                                     title={isHebrew ? "צפה במסמך המקורי" : "View"}
                                     onClick={() => window.open(`/quote/${quote.id}`, '_blank')}
@@ -2184,7 +2211,6 @@ function Dashboard() {
                                     {isHebrew ? 'צפה' : 'View'}
                                   </button>
 
-                                  {/* EDIT (Basic+) - נעול אם חתום/מאושר */}
                                   <div style={{ position: 'relative', display: 'inline-block' }}>
                                     <button 
                                       title={isLocked ? (isHebrew ? 'לא ניתן לערוך הצעה חתומה/מאושרת' : 'Cannot edit signed quote') : t.edit}
@@ -2205,7 +2231,6 @@ function Dashboard() {
                                     )}
                                   </div>
 
-                                  {/* DUPLICATE (Basic+) */}
                                   <div style={{ position: 'relative', display: 'inline-block' }}>
                                     <button 
                                       title={t.duplicate}
@@ -2226,7 +2251,6 @@ function Dashboard() {
                                     )}
                                   </div>
 
-                                  {/* WHATSAPP (Pro only) */}
                                   <div style={{ position: 'relative', display: 'inline-block' }}>
                                     <button 
                                       title="שלח בוואטסאפ"
@@ -2249,7 +2273,6 @@ function Dashboard() {
                                     )}
                                   </div>
 
-                                  {/* EMAIL (All plans) */}
                                   <button 
                                     title="שלח אימייל"
                                     onClick={() => setPendingEmailQuote(quote)}
@@ -2258,7 +2281,6 @@ function Dashboard() {
                                     @
                                   </button>
 
-                                  {/* DELETE (Pro only) */}
                                   <div style={{ position: 'relative', display: 'inline-block' }}>
                                     <button 
                                       title={t.delete}
@@ -2356,7 +2378,6 @@ function Dashboard() {
             </>
           )}
 
-          {/* מראה את טופס היצירה / עריכה רק כאשר המשתמש לוחץ על יצירה או עריכה */}
           {activeTab === 'main' && showQuoteForm && (
               <div style={{ background: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)', marginBottom: '30px', border: editingQuoteId ? '2px solid #4f46e5' : '1px solid #f1f5f9' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
@@ -2404,7 +2425,6 @@ function Dashboard() {
                           const val = e.target.value;
                           setClientType(val);
                           e.target.setCustomValidity('');
-                          if (val === 'private') setTerms('');
                         }} 
                         onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר סוג לקוח' : 'Select client type')}
                         onInput={(e) => e.target.setCustomValidity('')}
@@ -2468,31 +2488,18 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {clientType === 'business' && (
-                    <div style={{ marginBottom: '20px' }}>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תנאי תשלום (חובה לעסקי)' : 'Payment Terms'}</label>
-                      <select 
-                        name="terms" 
-                        value={terms} 
-                        onChange={(e) => {
-                          setTerms(e.target.value);
-                          e.target.setCustomValidity('');
-                        }} 
-                        onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר תנאי תשלום' : 'Select payment terms')}
-                        onInput={(e) => e.target.setCustomValidity('')}
-                        required 
-                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', fontWeight: '400' }}
-                      >
-                        <option value="" disabled>{isHebrew ? 'בחר תנאי תשלום...' : 'Select terms...'}</option>
-                        <option value={isHebrew ? "תשלום בגמר העבודה" : "Payment on completion"}>{isHebrew ? "תשלום בגמר העבודה" : "Payment on completion"}</option>
-                        <option value={isHebrew ? "30 יום מגמר העבודה" : "Net 30 days"}>{isHebrew ? "30 יום מגמר העבודה" : "Net 30 days"}</option>
-                        <option value={isHebrew ? "שוטף 30" : "EOM + 30 days"}>{isHebrew ? "שוטף 30" : "EOM + 30 days"}</option>
-                        {terms && !["תשלום בגמר העבודה", "30 יום מגמר העבודה", "שוטף 30", "Payment on completion", "Net 30 days", "EOM + 30 days"].includes(terms) && (
-                          <option value={terms}>{terms}</option>
-                        )}
-                      </select>
-                    </div>
-                  )}
+                  {/* טאב / שדה הערות ותקנון בהצעת המחיר */}
+                  <div style={{ marginBottom: '20px' }}>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'הערות / תקנון ותנאי תשלום' : 'Notes / Terms & Conditions'}</label>
+                    <textarea 
+                      name="terms" 
+                      value={terms} 
+                      onChange={(e) => setTerms(e.target.value)} 
+                      rows="5"
+                      placeholder={isHebrew ? "הכנס כאן את תנאי החברה, תשלום, אחריות וכו'..." : "Enter company terms, conditions, and notes here..."}
+                      style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', fontFamily: 'inherit', lineHeight: '1.5' }} 
+                    />
+                  </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                     <h3 style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>{t.quoteItems}</h3>
@@ -2507,7 +2514,6 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* כותרות עמודות פריטי ההצעה מתוקנות */}
                   <div style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 40px' : '2fr 1fr 1fr 1fr', gap: '8px', marginBottom: '4px', padding: '0 8px', fontSize: '0.75rem', color: '#64748b', fontWeight: 'bold' }}>
                     <div>{isHebrew ? 'תיאור פריט' : 'Description'}</div>
                     <div>{isHebrew ? 'כמות' : 'Qty'}</div>
@@ -2679,6 +2685,17 @@ function Dashboard() {
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.logoUrlLabel} {bizPlan !== 'pro' && <span style={{ color: '#f59e0b', fontSize: '0.75rem' }}>{isHebrew ? '(דורש חבילת Pro)' : '(Requires Pro plan)'}</span>}</label>
                   <input type="url" value={bizLogoUrl} onChange={(e) => setBizLogoUrl(e.target.value)} placeholder="https://example.com/logo.png" disabled={bizPlan !== 'pro'} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: bizPlan !== 'pro' ? '#f1f5f9' : '#f8fafc', fontSize: '0.9rem' }} />
+                </div>
+
+                {/* עריכת תקנון ברירת המחדל בהגדרות עסק */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים כלליים (ברירת מחדל להצעות חדשות)' : 'Default Terms & Conditions for New Quotes'}</label>
+                  <textarea 
+                    value={defaultTerms} 
+                    onChange={(e) => setDefaultTerms(e.target.value)} 
+                    rows="6"
+                    style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.9rem', fontFamily: 'inherit', lineHeight: '1.5' }} 
+                  />
                 </div>
 
                 <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
@@ -2993,11 +3010,11 @@ function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>👥</span>
           {isHebrew ? 'לקוחות' : 'Clients'}
         </button>
-        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
-        <button onClick={() => { setIsCreatingQuote(true); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>➕</span>
           {isHebrew ? 'חדש' : 'New'}
         </button>
@@ -3008,7 +3025,7 @@ function Dashboard() {
           Powered by <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business Management & Quoting System'}
         </div>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.85rem' }}>
-          {isHebrew ? '♿ הצהרת נגישות' : '♿ Accessibility Statement'}
+          ♿ {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
         </button>
       </footer>
     </div>
