@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProFlowLogo from '../components/ProFlowLogo';
 
 export default function LandingLocal() {
   const navigate = useNavigate();
+  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'annual'
 
   return (
     <div dir="rtl" style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', color: '#1e293b', display: 'flex', flexDirection: 'column' }}>
@@ -68,8 +69,22 @@ export default function LandingLocal() {
         {/* Pricing Section - Israel */}
         <div style={{ marginBottom: '80px' }}>
           <h2 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#0f172a', marginBottom: '10px' }}>מסלולים ומחירים</h2>
-          <p style={{ color: '#64748b', marginBottom: '40px' }}>בחר את המסלול המתאים ביותר לעסק שלך (המחירים כוללים מע"מ 18% כחוק).</p>
+          <p style={{ color: '#64748b', marginBottom: '20px' }}>בחר את המסלול המתאים ביותר לעסק שלך (המחירים כוללים מע"מ 18% כחוק).</p>
           
+          {/* Billing Cycle Toggle */}
+          <div style={{ display: 'inline-flex', background: '#e2e8f0', padding: '4px', borderRadius: '12px', marginBottom: '40px' }}>
+            <button 
+              onClick={() => setBillingCycle('monthly')}
+              style={{ background: billingCycle === 'monthly' ? 'white' : 'transparent', color: billingCycle === 'monthly' ? '#4f46e5' : '#64748b', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', boxShadow: billingCycle === 'monthly' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}>
+              תשלום חודשי
+            </button>
+            <button 
+              onClick={() => setBillingCycle('annual')}
+              style={{ background: billingCycle === 'annual' ? '#4f46e5' : 'transparent', color: billingCycle === 'annual' ? 'white' : '#64748b', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', boxShadow: billingCycle === 'annual' ? '0 2px 4px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s' }}>
+              תשלום שנתי <span style={{ background: billingCycle === 'annual' ? '#10b981' : '#e0e7ff', color: billingCycle === 'annual' ? 'white' : '#4f46e5', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', marginRight: '6px' }}>חסוך 20%!</span>
+            </button>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', textAlign: 'right' }}>
             
             {/* Free Tier */}
@@ -94,8 +109,12 @@ export default function LandingLocal() {
               </div>
               <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '10px' }}>מסלול עסקי (Pro)</h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>לסוכנויות ועסקים צומחים.</p>
-              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#4f46e5', marginBottom: '20px' }}>149 ₪ <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ חודש</span></div>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>* כולל מע"מ 18% (126.27 ₪ לפני מע"מ)</p>
+              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#4f46e5', marginBottom: '20px' }}>
+                {billingCycle === 'monthly' ? '149 ₪' : '119 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ חודש</span>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>
+                {billingCycle === 'monthly' ? '* כולל מע"מ 18% (126.27 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (100.85 ₪ לפני מע"מ)'}
+              </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#475569', fontSize: '0.95rem', lineHeight: '2' }}>
                 <li>✓ הצעות מחיר ללא הגבלה</li>
                 <li>✓ חתימה דיגיטלית מתקדמת</li>
@@ -111,8 +130,12 @@ export default function LandingLocal() {
             <div style={{ background: 'white', padding: '30px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
               <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '10px' }}>מסלול פרימיום (Enterprise)</h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>פתרונות מתקדמים לחברות גדולות.</p>
-              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>299 ₪ <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ חודש</span></div>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>* כולל מע"מ 18% (253.39 ₪ לפני מע"מ)</p>
+              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>
+                {billingCycle === 'monthly' ? '299 ₪' : '239 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ חודש</span>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>
+                {billingCycle === 'monthly' ? '* כולל מע"מ 18% (253.39 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (202.54 ₪ לפני מע"מ)'}
+              </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#475569', fontSize: '0.95rem', lineHeight: '2' }}>
                 <li>✓ הכל כלול במסלול Pro</li>
                 <li>✓ משתמשים מרובים בצוות</li>

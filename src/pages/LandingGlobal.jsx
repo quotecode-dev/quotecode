@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProFlowLogo from '../components/ProFlowLogo';
 
 export default function LandingGlobal() {
   const navigate = useNavigate();
+  const [billingCycle, setBillingCycle] = useState('monthly'); // 'monthly' or 'annual'
 
   return (
     <div dir="ltr" style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', color: '#1e293b', display: 'flex', flexDirection: 'column' }}>
@@ -68,8 +69,22 @@ export default function LandingGlobal() {
         {/* Pricing Section - Global */}
         <div style={{ marginBottom: '80px' }}>
           <h2 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#0f172a', marginBottom: '10px' }}>Pricing Plans</h2>
-          <p style={{ color: '#64748b', marginBottom: '40px' }}>Choose the perfect plan for your business (Global pricing with 0% VAT).</p>
+          <p style={{ color: '#64748b', marginBottom: '20px' }}>Choose the perfect plan for your business (Global pricing with 0% VAT).</p>
           
+          {/* Billing Cycle Toggle */}
+          <div style={{ display: 'inline-flex', background: '#e2e8f0', padding: '4px', borderRadius: '12px', marginBottom: '40px' }}>
+            <button 
+              onClick={() => setBillingCycle('monthly')}
+              style={{ background: billingCycle === 'monthly' ? 'white' : 'transparent', color: billingCycle === 'monthly' ? '#4f46e5' : '#64748b', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', boxShadow: billingCycle === 'monthly' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}>
+              Monthly
+            </button>
+            <button 
+              onClick={() => setBillingCycle('annual')}
+              style={{ background: billingCycle === 'annual' ? '#4f46e5' : 'transparent', color: billingCycle === 'annual' ? 'white' : '#64748b', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', boxShadow: billingCycle === 'annual' ? '0 2px 4px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.2s' }}>
+              Annual <span style={{ background: billingCycle === 'annual' ? '#10b981' : '#e0e7ff', color: billingCycle === 'annual' ? 'white' : '#4f46e5', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', marginLeft: '6px' }}>Save 20%!</span>
+            </button>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', textAlign: 'left' }}>
             
             {/* Free Tier */}
@@ -94,8 +109,12 @@ export default function LandingGlobal() {
               </div>
               <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '10px' }}>Pro Plan</h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>For growing businesses & agencies.</p>
-              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#4f46e5', marginBottom: '20px' }}>$39 <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ mo</span></div>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>* 0% international tax</p>
+              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#4f46e5', marginBottom: '20px' }}>
+                {billingCycle === 'monthly' ? '$39' : '$29'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ mo</span>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>
+                {billingCycle === 'monthly' ? '* 0% international tax' : '* Billed annually, 0% international tax'}
+              </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#475569', fontSize: '0.95rem', lineHeight: '2' }}>
                 <li>✓ Unlimited quotes</li>
                 <li>✓ Advanced digital signatures</li>
@@ -111,8 +130,12 @@ export default function LandingGlobal() {
             <div style={{ background: 'white', padding: '30px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column' }}>
               <h3 style={{ fontSize: '1.3rem', color: '#1e293b', marginBottom: '10px' }}>Enterprise</h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>Advanced features for large teams.</p>
-              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>$89 <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ mo</span></div>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>* 0% international tax</p>
+              <div style={{ fontSize: '2.5rem', fontWeight: '900', color: '#0f172a', marginBottom: '20px' }}>
+                {billingCycle === 'monthly' ? '$89' : '$69'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#64748b' }}>/ mo</span>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-15px', marginBottom: '15px' }}>
+                {billingCycle === 'monthly' ? '* 0% international tax' : '* Billed annually, 0% international tax'}
+              </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#475569', fontSize: '0.95rem', lineHeight: '2' }}>
                 <li>✓ Everything in Pro</li>
                 <li>✓ Multiple team members</li>
