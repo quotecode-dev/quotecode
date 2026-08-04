@@ -1,17 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProFlowLogo from '../components/ProFlowLogo';
-import AccessibilityModal from '../components/AccessibilityModal';
 
 export default function LandingGlobal() {
   const navigate = useNavigate();
-  const [showAccessibility, setShowAccessibility] = useState(false);
 
   return (
     <div dir="ltr" style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', color: '#1e293b', display: 'flex', flexDirection: 'column' }}>
       
-      <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={false} />
-
       {/* Header */}
       <header style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} onClick={() => navigate('/')}>
@@ -28,7 +24,7 @@ export default function LandingGlobal() {
       </header>
 
       {/* Hero Section */}
-      <main style={{ flex: 1, padding: '60px 20px', maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
+      <main style={{ flex: 1, padding: '60px 20px', maxWidth: '1000px', margin: '0 auto', textAlign: 'center', width: '100%', boxSizing: 'border-box' }}>
         <div style={{ display: 'inline-block', background: '#e0e7ff', color: '#4f46e5', padding: '6px 16px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '20px' }}>
           ✨ Global Business & Quoting SaaS Platform
         </div>
@@ -135,10 +131,7 @@ export default function LandingGlobal() {
 
       {/* Footer */}
       <footer style={{ background: '#1e293b', color: '#94a3b8', padding: '30px 20px', textAlign: 'center', marginTop: 'auto' }}>
-        <p style={{ margin: '0 0 10px 0' }}>&copy; {new Date().getFullYear()} ProFlow Global. All rights reserved.</p>
-        <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#38bdf8', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.9rem' }}>
-          ♿ Accessibility Statement
-        </button>
+        <p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} ProFlow Global. All rights reserved.</p>
       </footer>
 
     </div>
