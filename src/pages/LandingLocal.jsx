@@ -151,48 +151,48 @@ export default function LandingLocal() {
                 </button>
               </div>
 
-              {/* Pro / Basic */}
-              <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '2px solid #6366f1', boxShadow: '0 15px 30px rgba(99, 102, 241, 0.15)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '-14px', right: '20px', background: '#6366f1', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                  הפופולרי ביותר ⭐
-                </div>
-                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול עסקי (Pro)</h3>
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>לסוכנויות ועסקים צומחים.</p>
-                <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#818cf8', marginBottom: '20px' }}>
+              {/* Basic Plan */}
+              <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול בסיסי (Basic)</h3>
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>לעסקים קטנים שצריכים פתרון מושלם.</p>
+                <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#ffffff', marginBottom: '20px' }}>
                   {billingCycle === 'monthly' ? '49 ₪' : '39 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span>
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
                   {billingCycle === 'monthly' ? '* כולל מע"מ 18% (41.53 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (33.05 ₪ לפני מע"מ)'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ הצעות מחיר ללא הגבלה</li>
-                  <li>✓ חתימה דיגיטלית מתקדמת</li>
-                  <li>✓ ניהול הכנסות והוצאות מלא</li>
-                  <li>✓ תמיכה בוואטסאפ ובמהירות</li>
+                  <li>✓ עד 20 הצעות מחיר בחודש</li>
+                  <li>✓ כל האופציות פתוחות במערכת</li>
+                  <li>✓ חתימה דיגיטלית וניהול לקוחות</li>
+                  <li style={{ color: '#ef4444' }}>✗ ללא שליחה ישירה בווצאפ</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
-                  בחר מסלול עסקי
+                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                  בחר מסלול בסיסי
                 </button>
               </div>
 
-              {/* Enterprise */}
-              <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול פרימיום (Enterprise)</h3>
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>פתרונות מתקדמים לחברות גדולות.</p>
-                <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#ffffff', marginBottom: '20px' }}>
+              {/* Pro / Business Plan (Highlighted) */}
+              <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '2px solid #6366f1', boxShadow: '0 15px 30px rgba(99, 102, 241, 0.15)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '-14px', right: '20px', background: '#6366f1', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                  הפופולרי ביותר ⭐
+                </div>
+                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול עסקי (Pro)</h3>
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>לסוכנויות ועסקים צומחים ללא מגבלות.</p>
+                <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#818cf8', marginBottom: '20px' }}>
                   {billingCycle === 'monthly' ? '99 ₪' : '79 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span>
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
                   {billingCycle === 'monthly' ? '* כולל מע"מ 18% (83.90 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (66.95 ₪ לפני מע"מ)'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ הכל כלול במסלול Pro</li>
-                  <li>✓ משתמשים מרובים בצוות</li>
-                  <li>✓ דוחות פיננסיים מתקדמים</li>
-                  <li>✓ ליווי אישי ומנהל תיק</li>
+                  <li>✓ הצעות מחיר ללא הגבלה כלל</li>
+                  <li>✓ שליחה ישירה בווצאפ (WhatsApp)</li>
+                  <li>✓ חתימה דיגיטלית מתקדמת</li>
+                  <li>✓ ניהול הכנסות והוצאות מלא</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  צור קשר
+                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
+                  בחר מסלול עסקי
                 </button>
               </div>
 

@@ -136,7 +136,28 @@ export default function LandingGlobal() {
                 </button>
               </div>
 
-              {/* Pro */}
+              {/* Basic Plan */}
+              <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Basic Plan</h3>
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>For small businesses and growing needs.</p>
+                <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#ffffff', marginBottom: '20px' }}>
+                  {billingCycle === 'monthly' ? '$39' : '$29'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ mo</span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
+                  {billingCycle === 'monthly' ? '* 0% international tax' : '* Billed annually, 0% international tax'}
+                </p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
+                  <li>✓ Up to 20 quotes / month</li>
+                  <li>✓ All features unlocked</li>
+                  <li>✓ Digital signatures & clients</li>
+                  <li style={{ color: '#ef4444' }}>✗ No WhatsApp direct sending</li>
+                </ul>
+                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                  Choose Basic
+                </button>
+              </div>
+
+              {/* Pro Plan (Highlighted) */}
               <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '2px solid #6366f1', boxShadow: '0 15px 30px rgba(99, 102, 241, 0.15)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '-14px', left: '20px', background: '#6366f1', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold' }}>
                   Most Popular ⭐
@@ -144,40 +165,19 @@ export default function LandingGlobal() {
                 <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Pro Plan</h3>
                 <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>For growing businesses & agencies.</p>
                 <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#818cf8', marginBottom: '20px' }}>
-                  {billingCycle === 'monthly' ? '$39' : '$29'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ mo</span>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
-                  {billingCycle === 'monthly' ? '* 0% international tax' : '* Billed annually, 0% international tax'}
-                </p>
-                <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ Unlimited quotes</li>
-                  <li>✓ Advanced digital signatures</li>
-                  <li>✓ Full expense & revenue tracking</li>
-                  <li>✓ Priority support</li>
-                </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
-                  Choose Pro
-                </button>
-              </div>
-
-              {/* Enterprise */}
-              <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Enterprise</h3>
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>Advanced features for large teams.</p>
-                <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#ffffff', marginBottom: '20px' }}>
                   {billingCycle === 'monthly' ? '$89' : '$69'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ mo</span>
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
                   {billingCycle === 'monthly' ? '* 0% international tax' : '* Billed annually, 0% international tax'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ Everything in Pro</li>
-                  <li>✓ Multiple team members</li>
-                  <li>✓ Advanced financial reports</li>
-                  <li>✓ Dedicated account manager</li>
+                  <li>✓ Unlimited quotes</li>
+                  <li>✓ Direct WhatsApp sending</li>
+                  <li>✓ Advanced digital signatures</li>
+                  <li>✓ Full expense & revenue tracking</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  Contact Us
+                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
+                  Choose Pro
                 </button>
               </div>
 
