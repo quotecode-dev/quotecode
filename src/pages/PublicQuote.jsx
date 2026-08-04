@@ -68,11 +68,11 @@ export default function PublicQuote() {
     );
   }
 
-  const isHebrew = quote.currency === 'ILS' || quote.isHebrew;
+  const isHebrew = quote.currency === 'ILS' || quote.isHebrew !== false;
   const currencySymbol = quote.currency === 'USD' ? '$' : quote.currency === 'EUR' ? '€' : '₪';
   const vatRate = quote.currency === 'ILS' ? 0.18 : 0; // 18% for local, 0% for global
 
-  // Parse items safely whether stored as array or JSON string
+  // Parse items safely whether stored as array, JSON string, or empty
   let parsedItems = [];
   try {
     if (typeof quote.items === 'string') {
@@ -84,9 +84,13 @@ export default function PublicQuote() {
     parsedItems = [];
   }
 
-  const subtotal = quote.subtotal || (parsedItems.length > 0 ? parsedItems.reduce((acc, item) => acc + (Number(item.price || item.unit_price || 0) * Number(item.quantity || 1)), 0) : Number(quote.total || 0) / (1 + vatRate));
-  const vatAmount = quote.vat !== undefined ? Number(quote.vat) : subtotal * vatRate;
-  const total = quote.total !== undefined ? Number(quote.total) : subtotal + vatAmount;
+  // Absolute robust fallback logic for totals
+  const dbTotal = Number(quote.total || 0);
+  const calculatedSubtotalFromItems = parsedItems.reduce((acc, item) => acc + (Number(item.price || item.unit_price || 0) * Number(item.quantity || 1)), 0);
+  
+  const subtotal = quote.subtotal ? Number(quote.subtotal) : (calculatedSubtotalFromItems > 0 ? calculatedSubtotalFromItems : (dbTotal > 0 ? dbTotal / (1 + vatRate) : 0));
+  const vatAmount = quote.vat !== undefined && quote.vat !== null ? Number(quote.vat) : subtotal * vatRate;
+  const total = dbTotal > 0 ? dbTotal : (subtotal + vatAmount);
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '40px 20px', color: '#1e293b' }}>
@@ -95,7 +99,7 @@ export default function PublicQuote() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px', marginBottom: '30px' }}>
           <div style={{ cursor: 'pointer' }} onClick={() => navigate(isHebrew ? '/he' : '/')}>
-            <ProFlowLogo size={45} />
+            <ProFlowLogo size={45} rtl={!isHebrew} />
           </div>
           <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
             <h1 style={{ fontSize: '1.5rem', color: '#0f172a', margin: '0 0 5px 0' }}>{isHebrew ? 'הצעת מחיר' : 'Price Quote'}</h1>
@@ -133,7 +137,7 @@ export default function PublicQuote() {
                 const itemQty = Number(item.quantity || 1);
                 return (
                   <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '12px' }}>{item.description || item.name || 'פריט'}</td>
+                    <td style={{ padding: '12px' }}>{item.description || item.name || (isHebrew ? 'פריט' : 'Item')}</td>
                     <td style={{ padding: '12px' }}>{itemQty}</td>
                     <td style={{ padding: '12px' }}>{itemPrice.toLocaleString()} {currencySymbol}</td>
                     <td style={{ padding: '12px', fontWeight: 'bold' }}>{(itemPrice * itemQty).toLocaleString()} {currencySymbol}</td>
