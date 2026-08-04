@@ -2,13 +2,35 @@ import React from 'react';
 
 export default function ProFlowLogo({ size = 36 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="32" height="32" rx="8" fill="#4f46e5" />
-        <path d="M10 16L15 21L22 11" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <span style={{ fontSize: `${size * 0.65}px`, fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px' }}>
-        Pro<span style={{ color: '#4f46e5' }}>Flow</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      {/* Icon Box */}
+      <div style={{ 
+        width: `${size}px`, 
+        height: `${size}px`, 
+        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', 
+        borderRadius: '10px', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
+        flexShrink: 0
+      }}>
+        <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      {/* Text */}
+      <span style={{ 
+        fontSize: `${size * 0.75}px`, 
+        fontWeight: '900', 
+        letterSpacing: '-0.5px', 
+        display: 'flex', 
+        alignItems: 'center',
+        fontFamily: 'Inter, Segoe UI, sans-serif'
+      }}>
+        <span style={{ color: '#ffffff' }}>Pro</span>
+        <span style={{ color: '#818cf8', marginLeft: '2px' }}>Flow</span>
       </span>
     </div>
   );
