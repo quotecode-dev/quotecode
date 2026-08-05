@@ -10,6 +10,7 @@ export default function PublicQuote() {
   const navigate = useNavigate();
   const [quote, setQuote] = useState(null);
   const [businessSettings, setBusinessSettings] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [approved, setApproved] = useState(false);
@@ -19,6 +20,12 @@ export default function PublicQuote() {
   const [hasSigned, setHasSigned] = useState(false);
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setCurrentUserId(session.user.id);
+      }
+    });
+
     if (id) {
       fetchQuoteAndIncrementView();
     }
@@ -153,7 +160,6 @@ export default function PublicQuote() {
     );
   }
 
-  // חוק ברזל מוחלט: אם העסק מוגדר כבינלאומי או שהמטבע אינו ILS, השפה תהיה אך ורק אנגלית!
   const isInternationalBiz = businessSettings?.country === 'International' || (quote.currency && quote.currency !== 'ILS');
   const isHebrew = !isInternationalBiz && (quote.currency === 'ILS' || quote.isHebrew !== false);
 
@@ -184,6 +190,9 @@ export default function PublicQuote() {
   const bizEmail = businessSettings?.email || quote.businessSettings?.email;
   const bizPhone = businessSettings?.phone || quote.businessSettings?.phone;
   const bizAddress = businessSettings?.address || quote.businessSettings?.address;
+
+  // זיהוי האם הצופה הוא בעל העסק המחובר למערכת
+  const isOwnerViewing = currentUserId && quote.user_id && currentUserId === quote.user_id;
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', display: 'flex', justifyContent: 'center', boxSizing: 'border-box' }}>
@@ -338,6 +347,10 @@ export default function PublicQuote() {
               <div style={{ fontSize: '0.9rem', color: '#15803d' }}>
                 {quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)} {quote.approved_at && ` בתאריך ${new Date(quote.approved_at).toLocaleString('en-GB')}`}
               </div>
+            </div>
+          ) : isOwnerViewing ? (
+            <div style={{ background: '#eff6ff', color: '#1e40af', padding: '15px', borderRadius: '12px', fontSize: '0.9rem', fontWeight: '600', border: '1px solid #bfdbfe' }}>
+              {isHebrew ? 'ℹ️ תצוגת מנהל: אזור החתימה מוצג ללקוח בלבד.' : 'ℹ️ Owner Preview: Client signature box is hidden from your view.'}
             </div>
           ) : (
             <div style={{ border: '1px solid #cbd5e1', padding: '20px', borderRadius: '12px', background: '#f8fafc', textAlign: 'center', boxSizing: 'border-box' }}>
