@@ -378,12 +378,53 @@ export default function Dashboard() {
     
     const detectedCountry = isLocalIsraeliBusiness ? 'Local' : 'International';
     const nowIso = new Date().toISOString();
+    const userEmail = session.user.email;
+    const currentUserId = session.user.id;
 
-    const { data, error } = await supabase
+    // 1. בדיקה לפי user_id נוכחי
+    let { data, error } = await supabase
       .from('business_settings')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', currentUserId)
       .maybeSingle();
+    
+    // 2. אם לא נמצא לפי user_id, חפש לפי אימייל (מנגנון הגנה גלובלי)
+    if (!data && userEmail) {
+      const { data: emailData } = await supabase
+        .from('business_settings')
+        .select('*')
+        .eq('email', userEmail)
+        .maybeSingle();
+
+      if (emailData) {
+        const oldUserId = emailData.user_id;
+
+        // עדכון ה-user_id בטבלת ההגדרות ל-ID הנוכחי
+        const { data: updatedData } = await supabase
+          .from('business_settings')
+          .update({ user_id: currentUserId, last_sign_in: nowIso, country: detectedCountry })
+          .eq('id', emailData.id)
+          .select()
+          .maybeSingle();
+
+        if (updatedData) {
+          data = updatedData;
+
+          // פתרון גורף ואוטומטי לכל הטבלאות: מעבר של כל הנתונים (קטלוג, לקוחות, הצעות, הוצאות) מה-ID הישן לחדש!
+          if (oldUserId && oldUserId !== currentUserId) {
+            await supabase.from('services').update({ user_id: currentUserId }).eq('user_id', oldUserId);
+            await supabase.from('clients').update({ user_id: currentUserId }).eq('user_id', oldUserId);
+            await supabase.from('quotes').update({ user_id: currentUserId }).eq('user_id', oldUserId);
+            await supabase.from('expenses').update({ user_id: currentUserId }).eq('user_id', oldUserId);
+          }
+        }
+      } else if (data) {
+        // אם נמצאה רשומה רגילה, ודא שהאימייל מעודכן
+        if (!data.email && userEmail) {
+          await supabase.from('business_settings').update({ email: userEmail }).eq('id', data.id);
+        }
+      }
+    }
     
     const initialDefaultTerms = isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG;
 
@@ -391,7 +432,7 @@ export default function Dashboard() {
       setSettingId(data.id);
       setBizName(data.business_name || 'ProFlow');
       setBizTaxId(data.tax_id || '');
-      setBizEmail(data.email || '');
+      setBizEmail(data.email || userEmail || '');
       setBizPhone(data.phone || '');
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'pro');
@@ -409,7 +450,7 @@ export default function Dashboard() {
       await supabase
         .from('business_settings')
         .update({ last_sign_in: nowIso, country: detectedCountry })
-        .eq('user_id', session.user.id);
+        .eq('user_id', currentUserId);
 
       if (data.role === 'super_admin') {
         fetchAllAccounts();
@@ -419,8 +460,8 @@ export default function Dashboard() {
       trialEndDate.setDate(trialEndDate.getDate() + 14);
 
       const defaultPayload = {
-        user_id: session.user.id,
-        email: session.user.email,
+        user_id: currentUserId,
+        email: userEmail,
         business_name: 'New Business',
         country: detectedCountry,
         plan: 'pro',
@@ -1172,7 +1213,7 @@ export default function Dashboard() {
       setStatusMsg({ 
         text: editingQuoteId 
           ? (isHebrew ? `הצעה #${editingQuoteId.slice(0, 6)} עודכנה בהצלחה!` : `Quote #${editingQuoteId.slice(0, 6)} successfully updated!`) 
-          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}${formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`), 
+          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}{formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}{formatNum(totalAmount)}`), 
         type: 'success' 
       });
       
@@ -1279,11 +1320,11 @@ export default function Dashboard() {
           <form onSubmit={handleAuth}>
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'אימייל' : 'Email'}</label>
-              <input type="email" name="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required autoComplete="username" placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
+              <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'סיסמה' : 'Password'}</label>
-              <input type="password" name="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required autoComplete="current-password" placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
+              <input type="password" name="loginPassword" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
               {isSignUp ? (isHebrew ? 'הירשם (14 יום PRO מתנה)' : 'Sign Up (14d PRO Trial)') : (isHebrew ? 'התחבר' : 'Sign In')}
