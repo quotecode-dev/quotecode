@@ -1951,9 +1951,6 @@ export default function Dashboard() {
                         if (found) {
                           if (found.client_type) {
                              setClientType(found.client_type);
-                             if (!terms || terms.trim() === '') {
-                                setTerms(found.terms || defaultTerms);
-                             }
                           }
                           if (found.email) setClientEmail(found.email);
                           if (found.phone) setClientPhone(found.phone);
@@ -1972,9 +1969,6 @@ export default function Dashboard() {
                           const val = e.target.value;
                           setClientType(val);
                           e.target.setCustomValidity('');
-                          if ((!terms || terms.trim() === '')) {
-                            setTerms(defaultTerms);
-                          }
                         }} 
                         onInvalid={(e) => e.target.setCustomValidity(isHebrew ? 'בחר סוג לקוח' : 'Select client type')}
                         onInput={(e) => e.target.setCustomValidity('')}
@@ -2553,7 +2547,7 @@ export default function Dashboard() {
                                 </span>
                               </div>
                             </td>
-                            <td style={{ padding: '12px 8px', fontSize: '0.80rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                            <td style={{ padding: '12px 8px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                               {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                             </td>
                           </tr>
