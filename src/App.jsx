@@ -4,15 +4,22 @@ import LandingGlobal from './pages/LandingGlobal';
 import LandingLocal from './pages/LandingLocal';
 import Dashboard from './pages/Dashboard';
 import PublicQuote from './pages/PublicQuote';
+import { supabase } from './supabase';
 
 function RootHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
     const search = window.location.search;
+    const hash = window.location.hash;
     const isEnglishQuery = search.includes('lang=en') || search.includes('en=true');
 
-    // אם המשתמש ביקש במפורש אנגלית, אל תפנה אותו לעברית!
+    // אם מדובר בבקשת איפוס סיסמה מ-Supabase, עבור ישירות לדשבורד או למסך האיפוס
+    if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+      navigate('/dashboard?reset_password=true', { replace: true });
+      return;
+    }
+
     if (isEnglishQuery) {
       return;
     }
@@ -20,7 +27,6 @@ function RootHandler() {
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const browserLang = navigator.language || navigator.userLanguage || '';
     
-    // זיהוי משתמש מישראל לפי אזור זמן או שפת דפדפן עברית והפניה אוטומטית לגרסה המקומית
     if (timeZone === 'Asia/Jerusalem' || browserLang.toLowerCase().startsWith('he')) {
       navigate('/he', { replace: true });
     }
@@ -30,8 +36,37 @@ function RootHandler() {
 }
 
 export default function App() {
+  const [session, setSession] = useState(null);
+  const [recoveryMode, setRecoveryMode] = useState(false);
+
+  useEffect(() => {
+    // זיהאי אירועי איפוס סיסמה בזמן אמת מול Supabase Auth
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryMode(true);
+      }
+    });
+
+    // בדיקת URL לזיהוי טוקן איפוס
+    if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
+      setRecoveryMode(true);
+    }
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <BrowserRouter>
+      {recoveryMode && (
+        <div style={{ background: '#fef2f2', border: '1px solid #ef4444', padding: '15px', textAlign: 'center', direction: 'rtl' }}>
+          <span style={{ color: '#dc2626' }}><b>זוהתה בקשת איפוס סיסמה. אנא עדכן את סיסמתך בהגדרות החשבון או דרך טופס ההתחברות.</b></span>
+        </div>
+      )}
       <Routes>
         <Route path="/" element={<RootHandler />} />
         <Route path="/he" element={<LandingLocal />} />
