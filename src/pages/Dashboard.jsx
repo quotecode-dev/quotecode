@@ -168,8 +168,10 @@ export default function Dashboard() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
   
-  const isLocalIsraeliBusiness = true;
-  const isHebrew = true;
+  // זיהוי שפה חכם: אם הגענו עם פרמטר lang=en או שהדפדפן אינו ישראלי/לונדון ללא עברית
+  const isEnglishQuery = window.location.search.includes('lang=en');
+  const isLocalIsraeliBusiness = tz === 'Asia/Jerusalem' || browserLang.startsWith('he');
+  const isHebrew = isLocalIsraeliBusiness && !isEnglishQuery;
 
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
@@ -1260,7 +1262,7 @@ export default function Dashboard() {
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
           
           <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <ProFlowLogo size={50} />
+            <ProFlowLogo size={40} darkText={true} />
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
               {isSignUp 
                 ? (isHebrew ? 'יצירת חשבון חדש (כולל 14 יום ניסיון מלא ב-PRO!)' : 'Create new account (incl. 14 days full PRO trial!)') 
@@ -1998,7 +2000,7 @@ export default function Dashboard() {
                     )}
                   </div>
 
-                  <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: '900', fontSize: '1rem', cursor: 'pointer', marginTop: '20px', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)' }} disabled={isTrialExpired && !isSuperAdmin}>
+                  <button type="submit" style={{ width: '100%', background: editingQuoteId ? '#10b981' : '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: '900', fontSize: '1.0rem', cursor: 'pointer', marginTop: '20px', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)' }} disabled={isTrialExpired && !isSuperAdmin}>
                     {editingQuoteId ? t.updateQuote : t.generateSave}
                   </button>
                 </form>
@@ -2436,7 +2438,7 @@ export default function Dashboard() {
           {isHebrew ? 'הצעות' : 'Quotes'}
         </button>
         <button onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'clients' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>👥</span>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' %>👥</span>
           {isHebrew ? 'לקוחות' : 'Clients'}
         </button>
         <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>

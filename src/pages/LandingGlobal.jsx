@@ -74,7 +74,7 @@ export default function LandingGlobal() {
             <ProFlowLogo size={32} rtl={false} />
           </div>
           <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-            <button onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)' }}>
+            <button onClick={() => navigate('/dashboard?lang=en')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)' }}>
               Sign In / Dashboard
             </button>
           </div>
@@ -99,7 +99,7 @@ export default function LandingGlobal() {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
-            <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
+            <button onClick={() => navigate('/dashboard?lang=en')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
               Start 14-Day Free PRO Trial 🚀
             </button>
             <span style={{ color: '#34d399', fontSize: '1rem', fontWeight: '800' }}>
@@ -203,7 +203,7 @@ export default function LandingGlobal() {
                   <li>✓ Basic client management</li>
                   <li>✓ Email support</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?lang=en')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   Get Started Free
                 </button>
               </div>
@@ -224,7 +224,7 @@ export default function LandingGlobal() {
                   <li>✓ Digital signatures & clients</li>
                   <li style={{ color: '#ef4444' }}>✗ No WhatsApp direct sending</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?lang=en')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   Start Free Trial
                 </button>
               </div>
@@ -248,7 +248,7 @@ export default function LandingGlobal() {
                   <li>✓ Direct WhatsApp sending</li>
                   <li>✓ Full expense & revenue tracking</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
+                <button onClick={() => navigate('/dashboard?lang=en')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
                   Start Pro Free Trial
                 </button>
               </div>
