@@ -806,7 +806,7 @@ export default function Dashboard() {
       setStatusMsg({ text: isHebrew ? '📧 האימייל נשלח בהצלחה ללקוח דרך info@quotecodepro.com!' : '📧 Email sent successfully!', type: 'success' });
     } catch (err) {
       console.error("Email send error:", err);
-      // Clean fallback: Copy direct link to clipboard with clear confirmation message
+      // Fallback: Copy direct link to clipboard so user can paste it in mail client
       const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
       navigator.clipboard.writeText(quoteLink).then(() => {
         setStatusMsg({ 
