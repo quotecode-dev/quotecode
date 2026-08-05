@@ -1092,7 +1092,7 @@ export default function Dashboard() {
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || ''); 
 
-    let editTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms;
+    let editTerms = defaultTerms;
     let editNotes = quote.notes || '';
 
     setTerms(editTerms);
@@ -1140,7 +1140,7 @@ export default function Dashboard() {
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || '');
 
-    let dupTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms;
+    let dupTerms = defaultTerms;
     let dupNotes = quote.notes || '';
 
     setTerms(dupTerms);
@@ -1166,7 +1166,7 @@ export default function Dashboard() {
     setClientAddress('');
     setValidUntil('');
     setDiscount('');
-    setTerms('');
+    setTerms(defaultTerms);
     setNotes('');
     setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
     setItems([{ description: '', quantity: '', unit_price: '' }]);
@@ -1234,7 +1234,7 @@ export default function Dashboard() {
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
         discount: Number(discount || 0),
-        terms: terms,
+        terms: defaultTerms,
         notes: notes,
         user_id: session.user.id
       };
