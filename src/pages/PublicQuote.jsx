@@ -9,6 +9,7 @@ export default function PublicQuote() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [quote, setQuote] = useState(null);
+  const [businessSettings, setBusinessSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [approved, setApproved] = useState(false);
@@ -26,6 +27,7 @@ export default function PublicQuote() {
   const fetchQuoteAndIncrementView = async () => {
     try {
       setLoading(true);
+      // 1. שליפת הצעת המחיר
       const { data, error } = await supabase
         .from('quotes')
         .select(`*, clients (*), quote_items (*)`)
@@ -34,6 +36,19 @@ export default function PublicQuote() {
 
       if (error) throw error;
       setQuote(data);
+
+      // 2. שליפת הגדרות העסק של יוצר ההצעה לפי user_id (פתרון גורף לכל המשתמשים בארץ ובחו"ל!)
+      if (data?.user_id) {
+        const { data: bizData } = await supabase
+          .from('business_settings')
+          .select('*')
+          .eq('user_id', data.user_id)
+          .maybeSingle();
+
+        if (bizData) {
+          setBusinessSettings(bizData);
+        }
+      }
 
       // Automatic view count increment
       const newViewCount = (data.view_count || 0) + 1;
@@ -110,7 +125,8 @@ export default function PublicQuote() {
         .from('quotes')
         .update({ 
           status: 'approved',
-          signature: signatureDataUrl 
+          signature: signatureDataUrl,
+          approved_at: new Date().toISOString()
         })
         .eq('id', id);
 
@@ -139,7 +155,7 @@ export default function PublicQuote() {
   }
 
   const isHebrew = quote.currency === 'ILS' || quote.isHebrew !== false;
-  const currencySymbol = quote.currency === 'USD' ? '$' : quote.currency === 'EUR' ? '€' : '₪';
+  const currencySymbol = quote.currency === 'USD' ? '$' : quote.currency === 'EUR' ? '€' : quote.currency === 'GBP' ? '£' : '₪';
   const vatRate = quote.currency === 'ILS' ? 0.18 : 0;
 
   let parsedItems = [];
@@ -160,9 +176,12 @@ export default function PublicQuote() {
   const vatAmount = quote.vat !== undefined && quote.vat !== null ? Number(quote.vat) : subtotal * vatRate;
   const total = dbTotal > 0 ? dbTotal : (subtotal + vatAmount);
 
-  const bizName = quote.businessSettings?.business_name || 'ProFlow Business';
-  const bizLogo = quote.businessSettings?.logo_url;
-  const clientName = quote.clients?.company_name || 'לקוח יקר';
+  // חילוץ פרטי העסק והלוגו מתוך businessSettings שנשלפו לפי user_id
+  const bizName = businessSettings?.business_name || quote.businessSettings?.business_name || 'ProFlow Business';
+  const bizLogo = businessSettings?.logo_url || quote.businessSettings?.logo_url;
+  const bizTaxId = businessSettings?.tax_id || quote.businessSettings?.tax_id;
+  const bizEmail = businessSettings?.email || quote.businessSettings?.email;
+  const bizPhone = businessSettings?.phone || quote.businessSettings?.phone;
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', display: 'flex', justifyContent: 'center', boxSizing: 'border-box' }}>
@@ -177,8 +196,9 @@ export default function PublicQuote() {
               <h1 style={{ margin: 0, color: '#1e293b', fontSize: '1.5rem' }}>{bizName}</h1>
             )}
             <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '5px' }}>
-              {quote.businessSettings?.tax_id && <span>ח.פ / עוסק: {quote.businessSettings.tax_id} | </span>}
-              {quote.businessSettings?.email && <span>{quote.businessSettings.email}</span>}
+              {bizTaxId && <span>{isHebrew ? 'ח.פ / עוסק:' : 'Tax ID:'} {bizTaxId} </span>}
+              {bizPhone && <span>| {bizPhone} </span>}
+              {bizEmail && <span>| {bizEmail}</span>}
             </div>
           </div>
           <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
@@ -191,10 +211,10 @@ export default function PublicQuote() {
         <div style={{ background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', marginBottom: '25px', border: '1px solid #e2e8f0' }}>
           <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'לכבוד הלקוח:' : 'Client:'}</div>
           <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1e293b' }}>{quote.clients?.company_name || quote.client_name || (isHebrew ? 'לקוח נכבד' : 'Valued Client')}</div>
-          {quote.clients?.email && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: 'right' }}>{quote.clients.email}</div>}
-          {quote.clients?.phone && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: 'right' }}>{quote.clients.phone}</div>}
+          {quote.clients?.email && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients.email}</div>}
+          {quote.clients?.phone && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients.phone}</div>}
           {quote.clients?.address && <div style={{ color: '#475569', fontSize: '0.9rem' }}>{quote.clients.address}</div>}
-          <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '10px' }}>{isHebrew ? 'תאריך ההצעה:' : 'Date:'} {new Date(quote.created_at || Date.now()).toLocaleDateString()}</div>
+          <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '10px' }}>{isHebrew ? 'תאריך ההצעה:' : 'Date:'} {new Date(quote.created_at || Date.now()).toLocaleDateString('he-IL')}</div>
         </div>
 
         {/* Items Table */}
@@ -279,7 +299,7 @@ export default function PublicQuote() {
           {approved ? (
             <div style={{ background: '#dcfce7', color: '#166534', padding: '20px', borderRadius: '12px', fontWeight: 'bold' }}>
               <div style={{ fontSize: '1.1rem', marginBottom: '5px' }}>{isHebrew ? '✓ הצעת מחיר זו אושרה ונחתמה בהצלחה!' : '✓ This quote has been successfully approved and signed!'}</div>
-              <div style={{ fontSize: '0.9rem', color: '#15803d' }}>{quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)} {quote.signed_at && ` בתאריך ${new Date(quote.signed_at).toLocaleString('en-GB')}`}</div>
+              <div style={{ fontSize: '0.9rem', color: '#15803d' }}>{quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)} {quote.approved_at && ` בתאריך ${new Date(quote.approved_at).toLocaleString('en-GB')}`}</div>
             </div>
           ) : (
             <div style={{ border: '1px solid #cbd5e1', padding: '20px', borderRadius: '12px', background: '#f8fafc', textAlign: 'center', boxSizing: 'border-box' }}>
