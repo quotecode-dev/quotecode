@@ -2169,8 +2169,8 @@ export default function Dashboard() {
                       <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('client_type')}>
                         {isHebrew ? 'סוג לקוח' : 'Type'} {clientSortField === 'client_type' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
-                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('terms')}>
-                        {isHebrew ? 'תקנון / הערות' : 'Terms / Notes'} {clientSortField === 'terms' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('notes')}>
+                        {isHebrew ? 'הערות / הנחיות' : 'Notes'} {clientSortField === 'notes' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th style={{ padding: '8px 6px' }}>{t.actions}</th>
                     </tr>
@@ -2200,9 +2200,9 @@ export default function Dashboard() {
                             </span>
                           </td>
                           <td style={{ padding: '10px 6px', color: '#4f46e5', fontWeight: '400' }}>
-                            {client.terms ? (
+                            {client.notes ? (
                               <span style={{ background: '#e0e7ff', padding: '3px 6px', borderRadius: '6px', fontSize: '0.75rem' }}>
-                                {client.terms}
+                                {client.notes}
                               </span>
                             ) : '-'}
                           </td>
@@ -2576,7 +2576,7 @@ export default function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
-        <button onClick={() => { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() -> { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>➕</span>
           {isHebrew ? 'חדש' : 'New'}
         </button>
