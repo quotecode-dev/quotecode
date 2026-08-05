@@ -14,7 +14,6 @@ function RootHandler() {
     const hash = window.location.hash;
     const isEnglishQuery = search.includes('lang=en') || search.includes('en=true');
 
-    // שמירת ה-Hash וה-Search המלאים (כולל טוקני האיפוס של Supabase) והפניה לדשבורד
     if (hash.includes('type=recovery') || search.includes('type=recovery')) {
       navigate('/dashboard' + hash + search, { replace: true });
       return;
@@ -38,6 +37,9 @@ function RootHandler() {
 export default function App() {
   const [session, setSession] = useState(null);
   const [recoveryMode, setRecoveryMode] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -58,11 +60,55 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setLoading(false);
+
+    if (error) {
+      setMessage('שגיאה בעדכון הסיסמה: ' + error.message);
+    } else {
+      setMessage('הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...');
+      setTimeout(() => {
+        setRecoveryMode(false);
+        window.location.href = '/dashboard';
+      }, 2000);
+    }
+  };
+
   return (
     <BrowserRouter>
       {recoveryMode && (
-        <div style={{ background: '#fef2f2', border: '1px solid #ef4444', padding: '15px', textAlign: 'center', direction: 'rtl' }}>
-          <span style={{ color: '#dc2626' }}><b>זוהתה בקשת איפוס סיסמה. אנא עדכן את סיסמתך בהגדרות החשבון או דרך טופס ההתחברות.</b></span>
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center',
+          alignItems: 'center', zIndex: 9999, direction: 'rtl', fontFamily: 'Arial, sans-serif'
+        }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', textAlign: 'center' }}>
+            <h2 style={{ color: '#0f172a', marginBottom: '15px' }}>איפוס סיסמה חדשה</h2>
+            <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>הזן את הסיסמה החדשה שלך לחשבון</p>
+            <form onSubmit={handleUpdatePassword}>
+              <input
+                type="password"
+                placeholder="סיסמה חדשה"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '16px', boxSizing: 'border-box' }}
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                style={{ width: '100%', padding: '12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                {loading ? 'מעדכן...' : 'עדכן סיסמה ושמור'}
+              </button>
+            </form>
+            {message && <p style={{ marginTop: '15px', color: message.includes('שגיאה') ? '#dc2626' : '#16a34a', fontWeight: 'bold' }}>{message}</p>}
+          </div>
         </div>
       )}
       <Routes>
