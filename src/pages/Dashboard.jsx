@@ -238,12 +238,24 @@ export default function Dashboard() {
   const [sortField, setSortField] = useState('email');
   const [sortDirection, setSortDirection] = useState('asc');
 
+  const [clientSortField, setClientSortField] = useState('company_name');
+  const [clientSortDirection, setClientSortDirection] = useState('asc');
+
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
       setSortDirection('asc');
+    }
+  };
+
+  const handleClientSort = (field) => {
+    if (clientSortField === field) {
+      setClientSortDirection(clientSortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setClientSortField(field);
+      setClientSortDirection('asc');
     }
   };
 
@@ -1291,6 +1303,19 @@ export default function Dashboard() {
     return (client.company_name && client.company_name.toLowerCase().includes(term)) ||
            (client.email && client.email.toLowerCase().includes(term)) ||
            (client.tax_id && client.tax_id.toLowerCase().includes(term));
+  }).sort((a, b) => {
+    let aVal = a[clientSortField];
+    let bVal = b[clientSortField];
+
+    if (aVal === null || aVal === undefined) aVal = '';
+    if (bVal === null || bVal === undefined) bVal = '';
+
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+    if (aVal < bVal) return clientSortDirection === 'asc' ? -1 : 1;
+    if (aVal > bVal) return clientSortDirection === 'asc' ? 1 : -1;
+    return 0;
   });
 
   const filteredAdminAccounts = allAccounts.filter(acc => {
@@ -2093,7 +2118,7 @@ export default function Dashboard() {
                       <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isLocalIsraeliBusiness ? '' : (currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : currency === 'USD' ? 'USD' : '')}</span>
                     </div>
                     {isLocalIsraeliBusiness && isHebrew && clientType === 'private' && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                      <div style={{ display: 'flex',jsdelivr: 'space-between', fontSize: '0.75rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
                         <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
                       </div>
@@ -2132,13 +2157,27 @@ export default function Dashboard() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '450px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'שם חברה / לקוח' : 'Company / Name'}</th>
-                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'ח.פ / ת.ז' : 'Tax ID'}</th>
-                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'אימייל' : 'Email'}</th>
-                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'טלפון' : 'Phone'}</th>
-                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'כתובת' : 'Address'}</th>
-                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'סוג לקוח' : 'Type'}</th>
-                      <th style={{ padding: '8px 6px' }}>{isHebrew ? 'תנאי תשלום' : 'Payment Terms'}</th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('company_name')}>
+                        {isHebrew ? 'שם חברה / לקוח' : 'Company / Name'} {clientSortField === 'company_name' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('tax_id')}>
+                        {isHebrew ? 'ח.פ / ת.ז' : 'Tax ID'} {clientSortField === 'tax_id' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('email')}>
+                        {isHebrew ? 'אימייל' : 'Email'} {clientSortField === 'email' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('phone')}>
+                        {isHebrew ? 'טלפון' : 'Phone'} {clientSortField === 'phone' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('address')}>
+                        {isHebrew ? 'כתובת' : 'Address'} {clientSortField === 'address' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('client_type')}>
+                        {isHebrew ? 'סוג לקוח' : 'Type'} {clientSortField === 'client_type' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('terms')}>
+                        {isHebrew ? 'תנאי תשלום' : 'Payment Terms'} {clientSortField === 'terms' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
                       <th style={{ padding: '8px 6px' }}>{t.actions}</th>
                     </tr>
                   </thead>
@@ -2509,7 +2548,7 @@ export default function Dashboard() {
                                   <span>♾️</span>
                                   <span>{isLifetime ? (isHebrew ? 'יש מנוי לכל החיים' : 'Lifetime Active') : (isHebrew ? 'אין מנוי לכל החיים' : 'Trial Active')}</span>
                                 </button>
-                                <span style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                <span style={{ fontSize: '0.80rem', color: '#64748b', whiteSpace: 'nowrap' }}>
                                   {isLifetime ? (isHebrew ? '(ללא הגבלת זמן)' : '(No expiry)') : (isHebrew ? `עד: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}` : `Ends: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}`)}
                                 </span>
                               </div>
