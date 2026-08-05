@@ -168,7 +168,6 @@ export default function Dashboard() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
   
-  // זיהוי שפה חכם: אם הגענו עם פרמטר lang=en או שהדפדפן אינו ישראלי/לונדון ללא עברית
   const isEnglishQuery = window.location.search.includes('lang=en');
   const isLocalIsraeliBusiness = tz === 'Asia/Jerusalem' || browserLang.startsWith('he');
   const isHebrew = isLocalIsraeliBusiness && !isEnglishQuery;
@@ -1262,7 +1261,27 @@ export default function Dashboard() {
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
           
           <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <ProFlowLogo size={40} darkText={true} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ 
+                width: '40px', 
+                height: '40px', 
+                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', 
+                borderRadius: '10px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
+                flexShrink: 0
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <span style={{ fontSize: '28px', fontWeight: '900', letterSpacing: '-0.5px', fontFamily: 'Inter, Segoe UI, sans-serif' }}>
+                <span style={{ color: '#0f172a' }}>Pro</span>
+                <span style={{ color: '#4f46e5', marginLeft: '2px' }}>Flow</span>
+              </span>
+            </div>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
               {isSignUp 
                 ? (isHebrew ? 'יצירת חשבון חדש (כולל 14 יום ניסיון מלא ב-PRO!)' : 'Create new account (incl. 14 days full PRO trial!)') 
@@ -2438,7 +2457,7 @@ export default function Dashboard() {
           {isHebrew ? 'הצעות' : 'Quotes'}
         </button>
         <button onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'clients' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.3rem', marginBottom: '2px' %>👥</span>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>👥</span>
           {isHebrew ? 'לקוחות' : 'Clients'}
         </button>
         <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
