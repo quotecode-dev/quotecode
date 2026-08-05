@@ -784,7 +784,7 @@ export default function Dashboard() {
   };
 
   const executeEmailSend = async (quote) => {
-    setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך הענן...' : 'Sending email via cloud...', type: 'success' });
+    setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך info@quotecodepro.com...' : 'Sending email via cloud...', type: 'success' });
 
     try {
       const quoteSym = getCurrencySymbol(quote.currency);
@@ -814,7 +814,8 @@ export default function Dashboard() {
         ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
         : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
 
-      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const mailtoUrl = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
     }
   };
 
