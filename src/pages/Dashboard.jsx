@@ -2409,7 +2409,7 @@ export default function Dashboard() {
 
       <div className="no-print mobile-bottom-nav" style={{ display: 'flex', position: 'fixed', bottom: 0, left: 0, width: '100%', background: '#1e293b', color: 'white', justifyContent: 'space-around', padding: '12px 0', zIndex: 9998, boxShadow: '0 -4px 15px rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'main' && !showQuoteForm ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.3rem', marginBottom: '2px' >>קישור ההצעה 📄</span>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>📄</span>
           {isHebrew ? 'הצעות' : 'Quotes'}
         </button>
         <button onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'clients' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
