@@ -38,6 +38,7 @@ export default function App() {
         <Route path="/en" element={<LandingGlobal />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/public-quote/:id" element={<PublicQuote />} />
+        <Route path="/quote/:id" element={<PublicQuote />} />
         <Route path="*" element={<LandingGlobal />} />
       </Routes>
     </BrowserRouter>
