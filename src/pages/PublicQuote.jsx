@@ -187,25 +187,10 @@ export default function PublicQuote() {
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', display: 'flex', justifyContent: 'center', boxSizing: 'border-box' }}>
       <div style={{ background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', width: '100%', maxWidth: '800px', boxSizing: 'border-box' }}>
         
-        {/* Header - עיצוב מקצועי, יוקרתי ומאוזן */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
+        {/* Header - מרכוז אנכי מושלם בין כרטיס המספרים ללוגו */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
           
-          {/* צד ימין: לוגו ופרטי העסק */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {bizLogo ? (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
-            ) : null}
-            <div>
-              <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
-              <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
-                {bizTaxId && <div>ח.פ / עוסק: {bizTaxId}</div>}
-                {bizPhone && <div>טלפון: {bizPhone}</div>}
-                {bizEmail && <div>אימייל: {bizEmail}</div>}
-              </div>
-            </div>
-          </div>
-
-          {/* צד שמאל: כותרת המסמך ומספר ההצעה בעיצוב כרטיס נקי */}
+          {/* צד ימין: כרטיס המספרים והתאריך (מיושר במרכז אנכי מול הלוגו) */}
           <div style={{ textAlign: isHebrew ? 'left' : 'right', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
             <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>
               {isHebrew ? 'הצעת מחיר' : 'Price Quote'}
@@ -215,6 +200,21 @@ export default function PublicQuote() {
             </div>
             <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '6px', fontWeight: '500' }}>
               {isHebrew ? 'תאריך: ' : 'Date: '}{new Date(quote.created_at || Date.now()).toLocaleDateString('he-IL')}
+            </div>
+          </div>
+
+          {/* צד שמאל: לוגו ופרטי העסק */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: 'row-reverse' }}>
+            {bizLogo ? (
+              <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+            ) : null}
+            <div style={{ textAlign: 'right' }}>
+              <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
+              <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
+                {bizTaxId && <div>ח.פ / עוסק: {bizTaxId}</div>}
+                {bizPhone && <div>טלפון: {bizPhone}</div>}
+                {bizEmail && <div>אימייל: {bizEmail}</div>}
+              </div>
             </div>
           </div>
 
