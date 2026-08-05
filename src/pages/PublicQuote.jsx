@@ -187,23 +187,30 @@ export default function PublicQuote() {
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', display: 'flex', justifyContent: 'center', boxSizing: 'border-box' }}>
       <div style={{ background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', width: '100%', maxWidth: '800px', boxSizing: 'border-box' }}>
         
-        {/* Header */}
+        {/* Header - מעוצב ומסודר מחדש לנראות מושלמת */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px', marginBottom: '30px', flexWrap: 'wrap', gap: '15px' }}>
-          <div>
-            {bizLogo ? (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '50px', objectFit: 'contain' }} />
-            ) : (
-              <h1 style={{ margin: 0, color: '#1e293b', fontSize: '1.5rem' }}>{bizName}</h1>
-            )}
-            <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '5px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+              <h1 style={{ fontSize: '1.7rem', color: '#0f172a', fontWeight: '900', margin: 0, letterSpacing: '-0.5px' }}>
+                {isHebrew ? 'הצעת מחיר' : 'Price Quote'}
+              </h1>
+              <span style={{ background: '#f1f5f9', color: '#475569', fontSize: '0.85rem', fontWeight: '600', padding: '3px 8px', borderRadius: '6px', direction: 'ltr', display: 'inline-block' }}>
+                #{quote.id?.slice(0, 8)}
+              </span>
+            </div>
+            <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '4px' }}>
               {bizTaxId && <span>{isHebrew ? 'ח.פ / עוסק:' : 'Tax ID:'} {bizTaxId} </span>}
               {bizPhone && <span>| {bizPhone} </span>}
               {bizEmail && <span>| {bizEmail}</span>}
             </div>
           </div>
+          
           <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
-            <h1 style={{ fontSize: '1.5rem', color: '#0f172a', margin: '0 0 5px 0' }}>{isHebrew ? 'הצעת מחיר' : 'Price Quote'}</h1>
-            <span style={{ color: '#64748b', fontSize: '0.9rem' }}>#{quote.id?.slice(0, 8)}</span>
+            {bizLogo ? (
+              <img src={bizLogo} alt={bizName} style={{ maxHeight: '55px', maxWidth: '160px', objectFit: 'contain' }} />
+            ) : (
+              <h2 style={{ margin: 0, color: '#1e293b', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
+            )}
           </div>
         </div>
 
