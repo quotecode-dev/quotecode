@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function ProFlowLogo({ size = 36, rtl = false }) {
+export default function ProFlowLogo({ size = 36, rtl = false, darkText = false }) {
   return (
     <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-      {/* Icon Box (Left in RTL layout so it matches the natural flow) */}
+      {/* Icon Box */}
       {!rtl && (
         <div style={{ 
           width: `${size}px`, 
@@ -31,8 +31,8 @@ export default function ProFlowLogo({ size = 36, rtl = false }) {
         alignItems: 'center',
         fontFamily: 'Inter, Segoe UI, sans-serif'
       }}>
-        <span style={{ color: '#ffffff' }}>Pro</span>
-        <span style={{ color: '#818cf8', marginLeft: '2px' }}>Flow</span>
+        <span style={{ color: darkText ? '#0f172a' : '#ffffff' }}>Pro</span>
+        <span style={{ color: '#4f46e5', marginLeft: '2px' }}>Flow</span>
       </span>
 
       {/* Icon Box for RTL */}
