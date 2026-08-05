@@ -236,7 +236,6 @@ export default function Dashboard() {
 
   const [pendingEmailQuote, setPendingEmailQuote] = useState(null);
 
-  // חוק ברזל מוחלט: קביעת השפה מתבססת אך ורק על המדינה הרשומה במסד הנתונים (bizCountry), ללא תלות באזור הזמן של הדפדפן המקומי!
   const isInternationalAccount = bizCountry === 'International';
   const isHebrew = !isInternationalAccount;
 
@@ -2447,18 +2446,16 @@ export default function Dashboard() {
                             {acc.role}
                           </td>
                           <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
-                            {acc.trial_ends_at ? (
-                              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
-                                <span>{new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}</span>
-                                <button 
-                                  onClick={() => handleMakeLifetime(acc.id)} 
-                                  title={isHebrew ? "הפוך למנוי לכל החיים (בטל תאריך תפוגה)" : "Make Lifetime (Remove expiration)"}
-                                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0 }}
-                                >
-                                  ♾️
-                                </button>
-                              </div>
-                            ) : '-'}
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
+                              <span>{acc.trial_ends_at ? new Date(acc.trial_ends_at).toLocaleDateString('en-GB') : '-'}</span>
+                              <button 
+                                onClick={() => handleMakeLifetime(acc.id)} 
+                                title={isHebrew ? "הפוך למנוי לכל החיים (בטל תאריך תפוגה)" : "Make Lifetime (Remove expiration)"}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0 }}
+                              >
+                                ♾️
+                              </button>
+                            </div>
                           </td>
                           <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                             {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
