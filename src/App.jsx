@@ -45,7 +45,6 @@ export default function App() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateMessage, setUpdateMessage] = useState('');
 
-  // זיהוי שפה דינמי (עברית / אנגלית)
   const isEnglish = window.location.pathname.startsWith('/en');
 
   useEffect(() => {
@@ -64,7 +63,24 @@ export default function App() {
       setRecoveryMode(true);
     }
 
-    return () => subscription.unsubscribe();
+    // מאזין גלובלי לתפיסת לחיצה על "שכחת סיסמה" מכל מקום במסך
+    const handleGlobalClick = (e) => {
+      const target = e.target.closest('a, button, span, div, p');
+      if (target) {
+        const text = target.innerText || '';
+        if (text.includes('שכחת סיסמה') || text.toLowerCase().includes('forgot password')) {
+          e.preventDefault();
+          e.stopPropagation();
+          setForgotPasswordOpen(true);
+        }
+      }
+    };
+    document.addEventListener('click', handleGlobalClick, true);
+
+    return () => {
+      subscription.unsubscribe();
+      document.removeEventListener('click', handleGlobalClick, true);
+    };
   }, []);
 
   const handleSendRecovery = async (e) => {
@@ -111,7 +127,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      {/* חלון שחזור סיסמה (תומך עברית ואנגלית) */}
+      {/* חלון שחזור סיסמה */}
       {forgotPasswordOpen && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -178,7 +194,7 @@ export default function App() {
                 {updateLoading ? (isEnglish ? 'Updating...' : 'מעדכן...') : (isEnglish ? 'Update Password & Save' : 'עדכן סיסמה ושמור')}
               </button>
             </form>
-            {updateMessage && <p style={{ marginTop: '15px', color: updateMessage.includes('שגיאה') || updateMessage.includes('Error') ? '#dc2626' : '#16a34a', fontWeight: 'bold' }}>{updateMessage}</p>}
+            {updateMessage && <p style={{ marginTop: '15px', color: updateMessage.includes('שגיאה') || updateMessage.includes('Error') ? '#dc2626' : '#16a34a', fontWeight: 'bold', fontSize: '14px' }}>{updateMessage}</p>}
           </div>
         </div>
       )}
@@ -187,7 +203,7 @@ export default function App() {
         <Route path="/" element={<RootHandler />} />
         <Route path="/he" element={<LandingLocal />} />
         <Route path="/en" element={<LandingGlobal />} />
-        <Route path="/dashboard" element={<Dashboard onOpenForgotPassword={() => setForgotPasswordOpen(true)} />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/public-quote/:id" element={<PublicQuote />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
         <Route path="*" element={<LandingGlobal />} />
