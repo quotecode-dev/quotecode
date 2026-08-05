@@ -238,6 +238,15 @@ export default function Dashboard() {
   const [sortField, setSortField] = useState('email');
   const [sortDirection, setSortDirection] = useState('asc');
 
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [pendingLifetimeUser, setPendingLifetimeUser] = useState(null);
@@ -1299,6 +1308,12 @@ export default function Dashboard() {
       const timeA = aVal ? new Date(aVal).getTime() : 0;
       const timeB = bVal ? new Date(bVal).getTime() : 0;
       return sortDirection === 'asc' ? timeA - timeB : timeB - timeA;
+    }
+
+    if (sortField === 'trial_ends_at_status') {
+      const statusA = (a.trial_ends_at === null || a.trial_ends_at === undefined) ? '1' : '0';
+      const statusB = (b.trial_ends_at === null || b.trial_ends_at === undefined) ? '1' : '0';
+      return sortDirection === 'asc' ? statusA.localeCompare(statusB) : statusB.localeCompare(statusA);
     }
 
     if (typeof aVal === 'string') aVal = aVal.toLowerCase();
@@ -2416,12 +2431,24 @@ export default function Dashboard() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '700px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      <th style={{ padding: '10px 8px' }}>Email</th>
-                      <th style={{ padding: '10px 8px' }}>Business Name</th>
-                      <th style={{ padding: '10px 8px' }}>Plan</th>
-                      <th style={{ padding: '10px 8px' }}>Role</th>
-                      <th style={{ padding: '10px 8px' }}>Trial / Lifetime Status</th>
-                      <th style={{ padding: '10px 8px' }}>Last Sign In</th>
+                      <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('email')}>
+                        Email {sortField === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('business_name')}>
+                        Business Name {sortField === 'business_name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('plan')}>
+                        Plan {sortField === 'plan' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('role')}>
+                        Role {sortField === 'role' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('trial_ends_at_status')}>
+                        Trial / Lifetime Status {sortField === 'trial_ends_at_status' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('last_sign_in')}>
+                        Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
