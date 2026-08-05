@@ -2118,7 +2118,7 @@ export default function Dashboard() {
                       <span style={{ color: '#4f46e5' }}>{sym}{formatNum(totalAmount)} {isLocalIsraeliBusiness ? '' : (currency === 'EUR' ? 'EUR' : currency === 'GBP' ? 'GBP' : currency === 'USD' ? 'USD' : '')}</span>
                     </div>
                     {isLocalIsraeliBusiness && isHebrew && clientType === 'private' && (
-                      <div style={{ display: 'flex',jsdelivr: 'space-between', fontSize: '0.75rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
                         <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
                       </div>
@@ -2176,7 +2176,7 @@ export default function Dashboard() {
                         {isHebrew ? 'סוג לקוח' : 'Type'} {clientSortField === 'client_type' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleClientSort('terms')}>
-                        {isHebrew ? 'תנאי תשלום' : 'Payment Terms'} {clientSortField === 'terms' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
+                        {isHebrew ? 'תקנון / הערות' : 'Terms / Notes'} {clientSortField === 'terms' ? (clientSortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th style={{ padding: '8px 6px' }}>{t.actions}</th>
                     </tr>
@@ -2548,12 +2548,12 @@ export default function Dashboard() {
                                   <span>♾️</span>
                                   <span>{isLifetime ? (isHebrew ? 'יש מנוי לכל החיים' : 'Lifetime Active') : (isHebrew ? 'אין מנוי לכל החיים' : 'Trial Active')}</span>
                                 </button>
-                                <span style={{ fontSize: '0.80rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                <span style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
                                   {isLifetime ? (isHebrew ? '(ללא הגבלת זמן)' : '(No expiry)') : (isHebrew ? `עד: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}` : `Ends: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}`)}
                                 </span>
                               </div>
                             </td>
-                            <td style={{ padding: '12px 8px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                            <td style={{ padding: '12px 8px', fontSize: '0.80rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                               {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                             </td>
                           </tr>
