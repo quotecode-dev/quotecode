@@ -31,8 +31,8 @@ export default function ProFlowLogo({ size = 36, rtl = false }) {
         alignItems: 'center',
         fontFamily: 'Inter, Segoe UI, sans-serif'
       }}>
-        <span style={{ color: '#0f172a' }}>Pro</span>
-        <span style={{ color: '#4f46e5', marginLeft: '2px' }}>Flow</span>
+        <span style={{ color: '#ffffff' }}>Pro</span>
+        <span style={{ color: '#818cf8', marginLeft: '2px' }}>Flow</span>
       </span>
 
       {/* Icon Box for RTL */}
