@@ -17,7 +17,6 @@ const formatDisplayPhone = (phone, isInternational) => {
       clean = '0' + clean;
     }
     
-    // הוספת מקף אחרי שלוש הספרות הראשונות (לדוגמה: 054-4341514 או 03-1234567)
     const digits = clean.replace(/\D/g, '');
     if (digits.length >= 9) {
       const prefix = digits.startsWith('03') || digits.startsWith('02') || digits.startsWith('04') || digits.startsWith('08') || digits.startsWith('09') ? digits.slice(0, 2) : digits.slice(0, 3);
@@ -214,6 +213,8 @@ export default function PublicQuote() {
   const bizPhone = formatDisplayPhone(businessSettings?.phone || quote.businessSettings?.phone, isInternationalBiz);
   const bizAddress = businessSettings?.address || quote.businessSettings?.address;
 
+  const clientPhoneFormatted = formatDisplayPhone(quote.clients?.phone, isInternationalBiz);
+
   const isOwnerViewing = currentUserId && quote.user_id && currentUserId === quote.user_id;
 
   return (
@@ -283,7 +284,7 @@ export default function PublicQuote() {
           <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'לכבוד הלקוח:' : 'Client:'}</div>
           <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1e293b' }}>{quote.clients?.company_name || quote.client_name || (isHebrew ? 'לקוח נכבד' : 'Valued Client')}</div>
           {quote.clients?.email && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients.email}</div>}
-          {quote.clients?.phone && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients.phone}</div>}
+          {clientPhoneFormatted && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{clientPhoneFormatted}</div>}
           {quote.clients?.address && <div style={{ color: '#475569', fontSize: '0.9rem' }}>{quote.clients.address}</div>}
         </div>
 
