@@ -14,9 +14,9 @@ function RootHandler() {
     const hash = window.location.hash;
     const isEnglishQuery = search.includes('lang=en') || search.includes('en=true');
 
-    // אם מדובר בבקשת איפוס סיסמה מ-Supabase, עבור ישירות לדשבורד או למסך האיפוס
+    // שמירת ה-Hash וה-Search המלאים (כולל טוקני האיפוס של Supabase) והפניה לדשבורד
     if (hash.includes('type=recovery') || search.includes('type=recovery')) {
-      navigate('/dashboard?reset_password=true', { replace: true });
+      navigate('/dashboard' + hash + search, { replace: true });
       return;
     }
 
@@ -40,7 +40,6 @@ export default function App() {
   const [recoveryMode, setRecoveryMode] = useState(false);
 
   useEffect(() => {
-    // זיהאי אירועי איפוס סיסמה בזמן אמת מול Supabase Auth
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
@@ -52,7 +51,6 @@ export default function App() {
       }
     });
 
-    // בדיקת URL לזיהוי טוקן איפוס
     if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
       setRecoveryMode(true);
     }
