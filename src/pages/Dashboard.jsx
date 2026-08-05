@@ -791,7 +791,8 @@ export default function Dashboard() {
       ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
       : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
 
-    window.location.href = `mailto:${quote.clients?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoUrl = `mailto:${quote.clients?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
   };
 
   const handleProtectedAction = (quoteId, actionType, callback) => {
@@ -1663,7 +1664,7 @@ export default function Dashboard() {
 
                                   <button 
                                     title="שלח אימייל"
-                                    onClick={() => executeEmailSend(quote)}
+                                    onClick={() => setPendingEmailQuote(quote)}
                                     style={{ background: '#dbeafe', color: '#1e40af', border: 'none', padding: '0', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem', height: '26px', width: '28px', boxSizing: 'border-box', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                                   >
                                     @
@@ -2392,7 +2393,7 @@ export default function Dashboard() {
                               </div>
                             ) : '-'}
                           </td>
-                          <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                          <td style={{ padding: '10px 6px', fontSize: '0.80rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                             {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                           </td>
                         </tr>

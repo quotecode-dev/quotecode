@@ -38,7 +38,7 @@ export default function AIChatWidget({ isHebrew }) {
         } else if (lower.includes('וואטסאפ') || lower.includes('whatsapp'))  {
           reply = 'ניתן לשלוח הצעות מחיר ישירות בוואטסאפ ללקוח דרך כפתור הוואטסאפ בשורת ההצעה (זמין למנויי PRO).';
         } else if (lower.includes('מייל') || lower.includes('אימייל')) {
-          reply = 'ניתן לשלוח הצעת מחיר במייל בלחיצה על כפתור השטרודל (@) בשורת ההצעה. הפעולה תפתח מיד את תוכנת המייל שלך עם קישור ההצעה מוכן לשליחה.';
+          reply = 'ניתן לשלוח הצעת מחיר במייל בלחיצה על כפתור השטרודל (@) בשורת ההצעה. האימייל יישלח אוטומטית דרך כתובת העסק שלך ב-Namecheap.';
         } else if (lower.includes('מע"מ') || lower.includes('vat')) {
           reply = 'המערכת מחשבת מע"מ אוטומטית לפי 18% ללקוחות בארץ ו-0% ללקוחות מחו"ל בהתאם להגדרות העסק.';
         } else {
@@ -85,14 +85,14 @@ export default function AIChatWidget({ isHebrew }) {
 
       {isOpen && (
         <div style={{
-          position: 'absolute',
-          top: '45px',
-          [isHebrew ? 'left' : 'right']: 0,
-          width: '340px',
-          height: '450px',
+          position: 'fixed',
+          bottom: '20px',
+          [isHebrew ? 'right' : 'left']: '20px',
+          width: '360px',
+          height: '480px',
           background: 'white',
           borderRadius: '16px',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           display: 'flex',
           flexDirection: 'column',
           zIndex: 99999,
