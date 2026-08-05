@@ -202,6 +202,7 @@ export default function PublicQuote() {
           
           {isHebrew ? (
             <>
+              {/* צד ימין: לוגו ופרטי עסק */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'right' }}>
                 {bizLogo ? (
                   <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
@@ -209,7 +210,6 @@ export default function PublicQuote() {
                   <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  {bizLogo && <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800', display: 'none' }}>{bizName}</h2>}
                   <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
                     {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
                     {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
@@ -219,7 +219,8 @@ export default function PublicQuote() {
                 </div>
               </div>
 
-              <div style={{ textAlign: 'left', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              {/* צד שמאל: תיבת הצעת מחיר ממורכזת */}
+              <div style={{ textAlign: 'center', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                 <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>הצעת מחיר</div>
                 <div style={{ color: '#4f46e5', fontSize: '0.95rem', fontWeight: '700', fontFamily: 'monospace', direction: 'ltr', display: 'inline-block' }}>#{quote.id?.slice(0, 8)}</div>
                 <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '6px', fontWeight: '500' }}>תאריך: {new Date(quote.created_at || Date.now()).toLocaleDateString('he-IL')}</div>
@@ -227,6 +228,7 @@ export default function PublicQuote() {
             </>
           ) : (
             <>
+              {/* International LTR layout */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'left' }}>
                 {bizLogo ? (
                   <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
@@ -243,7 +245,7 @@ export default function PublicQuote() {
                 </div>
               </div>
 
-              <div style={{ textAlign: 'right', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+              <div style={{ textAlign: 'center', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                 <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>Price Quote</div>
                 <div style={{ color: '#4f46e5', fontSize: '0.95rem', fontWeight: '700', fontFamily: 'monospace', direction: 'ltr', display: 'inline-block' }}>#{quote.id?.slice(0, 8)}</div>
                 <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '6px', fontWeight: '500' }}>Date: {new Date(quote.created_at || Date.now()).toLocaleDateString('en-GB')}</div>
