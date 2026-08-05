@@ -783,16 +783,39 @@ export default function Dashboard() {
     window.open(url, '_blank');
   };
 
-  const executeEmailSend = (quote) => {
-    const quoteSym = getCurrencySymbol(quote.currency);
-    const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
-    const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
-    const body = isHebrew
-      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
-      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
+  const executeEmailSend = async (quote) => {
+    setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך הענן...' : 'Sending email via cloud...', type: 'success' });
 
-    const mailtoUrl = `mailto:${quote.clients?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoUrl;
+    try {
+      const quoteSym = getCurrencySymbol(quote.currency);
+      const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
+      
+      const { error } = await supabase.functions.invoke('send-quote-email', {
+        body: {
+          to: quote.clients.email,
+          clientName: quote.clients.company_name,
+          quoteId: quote.id,
+          total: formatNum(quote.total),
+          currencySymbol: quoteSym,
+          quoteLink: quoteLink,
+          businessName: bizName
+        }
+      });
+
+      if (error) throw error;
+      setStatusMsg({ text: isHebrew ? '📧 האימייל נשלח בהצלחה ללקוח דרך info@quotecodepro.com!' : '📧 Email sent successfully!', type: 'success' });
+    } catch (err) {
+      console.error("Email send error:", err);
+      // Fallback to direct cloud sending simulation / mailto if function is missing
+      const quoteSym = getCurrencySymbol(quote.currency);
+      const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
+      const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
+      const body = isHebrew
+        ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
+        : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
+
+      window.location.href = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
   };
 
   const handleProtectedAction = (quoteId, actionType, callback) => {
@@ -2393,7 +2416,7 @@ export default function Dashboard() {
                               </div>
                             ) : '-'}
                           </td>
-                          <td style={{ padding: '10px 6px', fontSize: '0.80rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                          <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                             {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                           </td>
                         </tr>
