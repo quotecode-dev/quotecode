@@ -5,6 +5,21 @@ import ProFlowLogo from '../components/ProFlowLogo';
 
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+const formatDisplayPhone = (phone, isInternational) => {
+  if (!phone) return '';
+  let clean = phone.trim();
+  if (!isInternational) {
+    if (clean.startsWith('+972')) {
+      clean = '0' + clean.slice(4).replace(/\D/g, '');
+    } else if (clean.startsWith('972')) {
+      clean = '0' + clean.slice(3).replace(/\D/g, '');
+    } else if (!clean.startsWith('0') && clean.length === 9) {
+      clean = '0' + clean;
+    }
+  }
+  return clean;
+};
+
 export default function PublicQuote() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -188,7 +203,7 @@ export default function PublicQuote() {
   const bizLogo = businessSettings?.logo_url || quote.businessSettings?.logo_url;
   const bizTaxId = businessSettings?.tax_id || quote.businessSettings?.tax_id;
   const bizEmail = businessSettings?.email || quote.businessSettings?.email;
-  const bizPhone = businessSettings?.phone || quote.businessSettings?.phone;
+  const bizPhone = formatDisplayPhone(businessSettings?.phone || quote.businessSettings?.phone, isInternationalBiz);
   const bizAddress = businessSettings?.address || quote.businessSettings?.address;
 
   const isOwnerViewing = currentUserId && quote.user_id && currentUserId === quote.user_id;
