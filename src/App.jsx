@@ -20,6 +20,7 @@ function RootHandler() {
     }
 
     if (isEnglishQuery) {
+      localStorage.setItem('proflow_lang', 'en');
       return;
     }
 
@@ -27,7 +28,10 @@ function RootHandler() {
     const browserLang = navigator.language || navigator.userLanguage || '';
     
     if (timeZone === 'Asia/Jerusalem' || browserLang.toLowerCase().startsWith('he')) {
+      localStorage.setItem('proflow_lang', 'he');
       navigate('/he', { replace: true });
+    } else {
+      localStorage.setItem('proflow_lang', 'en');
     }
   }, [navigate]);
 
@@ -45,7 +49,8 @@ export default function App() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateMessage, setUpdateMessage] = useState('');
 
-  const isEnglish = window.location.pathname.startsWith('/en');
+  // בדיקת שפה לפי זיכרון הדפדפן או נתיב ה-URL
+  const isEnglish = localStorage.getItem('proflow_lang') === 'en' || window.location.pathname.startsWith('/en');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -63,7 +68,7 @@ export default function App() {
       setRecoveryMode(true);
     }
 
-    // מאזין גלובלי לתפיסת לחיצה על "שכחת סיסמה" מכל מקום במסך
+    // מאזין גלובלי לתפיסת לחיצה על "שכחת סיסמה" או "Forgot Password" מכל מקום במסך
     const handleGlobalClick = (e) => {
       const target = e.target.closest('a, button, span, div, p');
       if (target) {
