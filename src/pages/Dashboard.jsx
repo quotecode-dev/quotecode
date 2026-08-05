@@ -784,20 +784,14 @@ export default function Dashboard() {
   };
 
   const executeEmailSend = (quote) => {
+    const quoteSym = getCurrencySymbol(quote.currency);
     const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
-    navigator.clipboard.writeText(quoteLink).then(() => {
-      setStatusMsg({ 
-        text: isHebrew 
-          ? '📋 קישור ההצעה הועתק ללוח בהצלחה! הדבק אותו באימייל ללקוח.' 
-          : '📋 Quote link copied to clipboard successfully!', 
-        type: 'success' 
-      });
-    }).catch(() => {
-      setStatusMsg({ 
-        text: isHebrew ? 'קישור ההצעה: ' + quoteLink : 'Quote Link: ' + quoteLink, 
-        type: 'success' 
-      });
-    });
+    const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
+    const body = isHebrew
+      ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
+      : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
+
+    window.location.href = `mailto:${quote.clients?.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const handleProtectedAction = (quoteId, actionType, callback) => {
@@ -822,7 +816,6 @@ export default function Dashboard() {
   const discountAmount = (subtotal * Number(discount || 0)) / 100;
   const baseAmount = subtotal - discountAmount;
   
-  // Ironclad VAT rule: 18% for local Israeli business, 0% for international users
   let taxRate = isLocalIsraeliBusiness ? 0.18 : 0.00;
   
   let taxAmount = 0;
@@ -1889,7 +1882,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.discount}</label>
-                      <input type="text" name="discount" value={discount} onFocus={(e) => { if (e.target.value === '0' || e.target.value === '0') setDiscount(''); }} onChange={(e) => setDiscount(e.target.value)} placeholder="0" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
+                      <input type="text" name="discount" value={discount} onFocus={(e) => { if (e.target.value === '0') setDiscount(''); }} onChange={(e) => setDiscount(e.target.value)} placeholder="0" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                   </div>
 
@@ -2416,7 +2409,7 @@ export default function Dashboard() {
 
       <div className="no-print mobile-bottom-nav" style={{ display: 'flex', position: 'fixed', bottom: 0, left: 0, width: '100%', background: '#1e293b', color: 'white', justifyContent: 'space-around', padding: '12px 0', zIndex: 9998, boxShadow: '0 -4px 15px rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'main' && !showQuoteForm ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>📄</span>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' >>קישור ההצעה 📄</span>
           {isHebrew ? 'הצעות' : 'Quotes'}
         </button>
         <button onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'clients' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>

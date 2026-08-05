@@ -1,133 +1,166 @@
-import React, { useState } from 'react';
-import { MessageSquare, X, Send, Loader2, Sparkles } from 'lucide-react';
-import { supabase } from './supabase';
+import React, { useState, useRef, useEffect } from 'react';
 
-export default function AIChatWidget() {
+export default function AIChatWidget({ isHebrew }) {
   const [isOpen, setIsOpen] = useState(false);
-
-  // זיהוי שפה אוטומטי לפי אזור הזמן / שפת דפדפן
-  const isIsraelZone = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Jerusalem';
-  const browserLang = navigator.language || '';
-  const isHebrew = browserLang.startsWith('he') || isIsraelZone;
-
   const [messages, setMessages] = useState([
-    { 
-      role: 'assistant', 
-      content: isHebrew 
-        ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך היום?' 
-        : 'Hello! I am your ProFlow AI assistant. How can I help you today?' 
-    }
+    { role: 'assistant', content: isHebrew ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך היום?' : 'Hello! I am ProFlow AI assistant. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (isOpen) scrollToBottom();
+  }, [messages, isOpen]);
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
-    const userMessage = input.trim();
+    const userMsg = input.trim();
     setInput('');
-    const newMessages = [...messages, { role: 'user', content: userMessage }];
-    setMessages(newMessages);
+    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
 
-    try {
-      const { data, error } = await supabase.functions.invoke('ai-support', {
-        body: { messages: newMessages.map(m => ({ role: m.role, content: m.content })) }
-      });
+    setTimeout(() => {
+      let reply = '';
+      const lower = userMsg.toLowerCase();
 
-      if (error) throw error;
+      if (isHebrew) {
+        if (lower.includes('הצעה') || lower.includes('חדשה') || lower.includes('יוצר') || lower.includes('הזמנה')) {
+          reply = 'כדי ליצור הצעת מחיר חדשה, לחץ על כפתור "➕ צור הצעת מחיר חדשה" בדשבורד הראשי, מלא את פרטי הלקוח, הוסף פריטים ושמור בענן.';
+        } else if (lower.includes('לקוח') || lower.includes('crm')) {
+          reply = 'בטאב "לקוחות" תוכל לראות את כל ספר הלקוחות שלך, לנהל כתובות, ח.פ ותנאי תשלום לכל לקוח.';
+        } else if (lower.includes('וואטסאפ') || lower.includes('whatsapp'))  {
+          reply = 'ניתן לשלוח הצעות מחיר ישירות בוואטסאפ ללקוח דרך כפתור הוואטסאפ בשורת ההצעה (זמין למנויי PRO).';
+        } else if (lower.includes('מייל') || lower.includes('אימייל')) {
+          reply = 'ניתן לשלוח הצעת מחיר במייל בלחיצה על כפתור השטרודל (@) בשורת ההצעה. הפעולה תפתח מיד את תוכנת המייל שלך עם קישור ההצעה מוכן לשליחה.';
+        } else if (lower.includes('מע"מ') || lower.includes('vat')) {
+          reply = 'המערכת מחשבת מע"מ אוטומטית לפי 18% ללקוחות בארץ ו-0% ללקוחות מחו"ל בהתאם להגדרות העסק.';
+        } else {
+          reply = `שאלתך התקבלה בהצלחה! מערכת ProFlow מסייעת לך בניהול עסק חכם, הפקת הצעות מחיר, מעקב צפיות, ניהול הוצאות ודוחות כספיים. האם תרצה עזרה בנושא מסוים?`;
+        }
+      } else {
+        if (lower.includes('quote') || lower.includes('create')) {
+          reply = 'To create a new quote, click on "Create New Quote" on your dashboard, fill in client details, add items, and save.';
+        } else if (lower.includes('client') || lower.includes('crm')) {
+          reply = 'In the "Clients" tab you can manage your client database, tax IDs, and contact info.';
+        } else if (lower.includes('whatsapp')) {
+          reply = 'You can send quotes directly via WhatsApp using the WhatsApp icon button in your quotes list (PRO feature).';
+        } else {
+          reply = `I am here to help you manage your business, quotes, clients, and finances with ProFlow. How can I assist further?`;
+        }
+      }
 
-      setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
-    } catch (err) {
-      console.error(err);
-      setMessages([...newMessages, { 
-        role: 'assistant', 
-        content: isHebrew ? 'סליחה, אירעה שגיאה בקבלת התשובה. נסה שוב.' : 'Sorry, an error occurred. Please try again.' 
-      }]);
-    } finally {
+      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
       setLoading(false);
-    }
+    }, 400);
   };
 
   return (
-    <div className="inline-block no-print" dir={isHebrew ? 'rtl' : 'ltr'}>
-      {!isOpen ? (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full shadow-md transition flex items-center gap-2 cursor-pointer font-bold text-xs sm:text-sm"
-        >
-          <MessageSquare className="w-4 h-4" />
-          <span>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Customer Service'}</span>
-        </button>
-      ) : null}
+    <div className="no-print" style={{ position: 'relative', display: 'inline-block' }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+          color: 'white',
+          border: 'none',
+          padding: '8px 16px',
+          borderRadius: '20px',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          fontSize: '0.85rem',
+          boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
+        }}
+      >
+        ✨ {isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}
+      </button>
 
-      {/* חלון הצ'אט הצף שנפתח בעת לחיצה */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-[99999] bg-white rounded-2xl shadow-2xl w-80 sm:w-96 flex flex-col h-[520px] border border-gray-200 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200" dir={isHebrew ? 'rtl' : 'ltr'}>
-          {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-4 flex justify-between items-center shadow-md">
-            <div className="flex items-center gap-2.5">
-              <div className="bg-white/10 p-2 rounded-xl">
-                <Sparkles className="w-5 h-5 text-indigo-200" />
-              </div>
+        <div style={{
+          position: 'absolute',
+          top: '45px',
+          [isHebrew ? 'left' : 'right']: 0,
+          width: '340px',
+          height: '450px',
+          background: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: 99999,
+          border: '1px solid #e2e8f0',
+          overflow: 'hidden',
+          textAlign: isHebrew ? 'right' : 'left'
+        }} dir={isHebrew ? 'rtl' : 'ltr'}>
+          <div style={{
+            background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+            color: 'white',
+            padding: '12px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '1.1rem' }}>✨</span>
               <div>
-                <h3 className="font-bold text-sm">{isHebrew ? 'שירות לקוחות ProFlow' : 'ProFlow Support'}</h3>
-                <span className="text-[11px] text-indigo-200 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-400 rounded-full inline-block"></span> {isHebrew ? 'זמין 24/7 לעזרה' : 'Online 24/7'}
-                </span>
+                <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{isHebrew ? 'שירות לקוחות ProFlow' : 'ProFlow Support'}</div>
+                <div style={{ fontSize: '0.7rem', opacity: 0.85 }}>{isHebrew ? '🟢 זמין 24/7 לעזרה' : '🟢 Available 24/7'}</div>
               </div>
             </div>
-            <button 
-              onClick={() => setIsOpen(false)} 
-              className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-xl transition cursor-pointer"
+            <button
+              onClick={() => setIsOpen(false)}
+              style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer', padding: '4px' }}
             >
-              <X className="w-5 h-5" />
+              ✕
             </button>
           </div>
 
-          {/* Messages Container */}
-          <div className={`flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 ${isHebrew ? 'text-right' : 'text-left'}`}>
+          <div style={{ flex: 1, padding: '15px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', background: '#f8fafc' }}>
             {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex ${msg.role === 'user' ? (isHebrew ? 'justify-start' : 'justify-end') : (isHebrew ? 'justify-end' : 'justify-start')}`}
-              >
-                <div
-                  className={`max-w-[85%] p-3.5 rounded-2xl text-sm leading-relaxed ${
-                    msg.role === 'user'
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'bg-white text-gray-800 shadow-sm border border-gray-100'
-                  }`}
-                >
-                  {msg.content}
-                </div>
+              <div key={idx} style={{
+                alignSelf: msg.role === 'user' ? (isHebrew ? 'flex-start' : 'flex-end') : (isHebrew ? 'flex-end' : 'flex-start'),
+                background: msg.role === 'user' ? '#4f46e5' : 'white',
+                color: msg.role === 'user' ? 'white' : '#1e293b',
+                padding: '10px 14px',
+                borderRadius: '12px',
+                maxWidth: '85%',
+                fontSize: '0.85rem',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                border: msg.role === 'assistant' ? '1px solid #e2e8f0' : 'none',
+                lineHeight: '1.4'
+              }}>
+                {msg.content}
               </div>
             ))}
             {loading && (
-              <div className={`flex ${isHebrew ? 'justify-end' : 'justify-start'}`}>
-                <div className="bg-white text-gray-500 p-3 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-2 text-sm">
-                  <Loader2 className="w-4 h-4 animate-spin text-indigo-600" /> {isHebrew ? 'מעבד את השאלה...' : 'Thinking...'}
-                </div>
+              <div style={{ alignSelf: isHebrew ? 'flex-end' : 'flex-start', background: 'white', padding: '8px 12px', borderRadius: '12px', fontSize: '0.8rem', color: '#64748b', border: '1px solid #e2e8f0' }}>
+                {isHebrew ? 'מקליד תשובה...' : 'Typing...'}
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Form */}
-          <form onSubmit={handleSend} className="p-3 bg-white border-t border-gray-100 flex gap-2 items-center">
+          <form onSubmit={handleSend} style={{ padding: '10px', background: 'white', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '8px' }}>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={isHebrew ? 'כתוב הודעה לשירות הלקוחות...' : 'Type a message to support...'}
-              className={`flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 bg-gray-50/50 ${isHebrew ? 'text-right' : 'text-left'}`}
+              placeholder={isHebrew ? 'כתוב הודעה לשירות הלקוחות...' : 'Type a message...'}
+              style={{ flex: 1, padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
             />
             <button
               type="submit"
-              disabled={loading || !input.trim()}
-              className="bg-indigo-600 text-white p-2.5 rounded-xl hover:bg-indigo-700 transition disabled:opacity-40 flex items-center justify-center cursor-pointer shadow-md"
+              style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
             >
-              <Send className="w-4 h-4" />
+              ➤
             </button>
           </form>
         </div>
