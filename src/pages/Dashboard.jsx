@@ -806,16 +806,18 @@ export default function Dashboard() {
       setStatusMsg({ text: isHebrew ? '📧 האימייל נשלח בהצלחה ללקוח דרך info@quotecodepro.com!' : '📧 Email sent successfully!', type: 'success' });
     } catch (err) {
       console.error("Email send error:", err);
-      // Fallback to direct cloud sending simulation / mailto if function is missing
-      const quoteSym = getCurrencySymbol(quote.currency);
+      // Clean fallback: Copy direct link to clipboard with clear confirmation message
       const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
-      const subject = isHebrew ? `הצעת מחיר #${quote.id.slice(0, 6).toUpperCase()} מ-${bizName}` : `Quote #${quote.id.slice(0, 6).toUpperCase()} from ${bizName}`;
-      const body = isHebrew
-        ? `שלום ${quote.clients?.company_name || ''},\n\nמצורפת הצעת המחיר שלך.\nסך הכל לתשלום: ${quoteSym}${formatNum(quote.total)}\n\nלצפייה בהצעה המלאה לחץ כאן:\n${quoteLink}\n\nבברכה,\nצוות ${bizName}`
-        : `Hello ${quote.clients?.company_name || ''},\n\nPlease find your quote details below.\nTotal Amount: ${quoteSym}${formatNum(quote.total)}\n\nView your full quote here:\n${quoteLink}\n\nBest regards,\n${bizName} Team`;
-
-      const mailtoUrl = `mailto:${quote.clients.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailtoUrl;
+      navigator.clipboard.writeText(quoteLink).then(() => {
+        setStatusMsg({ 
+          text: isHebrew 
+            ? '📋 קישור ההצעה הועתק ללוח בהצלחה! הדבק אותו באימייל שתישלח מ-info@quotecodepro.com.' 
+            : '📋 Quote link copied to clipboard successfully!', 
+          type: 'success' 
+        });
+      }).catch(() => {
+        setStatusMsg({ text: isHebrew ? 'קישור ההצעה: ' + quoteLink : 'Quote Link: ' + quoteLink, type: 'success' });
+      });
     }
   };
 
