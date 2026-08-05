@@ -49,8 +49,9 @@ export default function App() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateMessage, setUpdateMessage] = useState('');
 
-  // בדיקת שפה לפי זיכרון הדפדפן או נתיב ה-URL
-  const isEnglish = localStorage.getItem('proflow_lang') === 'en' || window.location.pathname.startsWith('/en');
+  // בדיקת שפה מקיפה: כולל פרמטר URL כמו ?lang=en, נתיב /en, או זיכרון מקומי
+  const queryParams = new URLSearchParams(window.location.search);
+  const isEnglish = queryParams.get('lang=en') === 'true' || queryParams.get('lang') === 'en' || window.location.pathname.startsWith('/en') || localStorage.getItem('proflow_lang') === 'en';
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -68,7 +69,6 @@ export default function App() {
       setRecoveryMode(true);
     }
 
-    // מאזין גלובלי לתפיסת לחיצה על "שכחת סיסמה" או "Forgot Password" מכל מקום במסך
     const handleGlobalClick = (e) => {
       const target = e.target.closest('a, button, span, div, p');
       if (target) {
@@ -94,7 +94,7 @@ export default function App() {
     setForgotMessage('');
 
     const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-      redirectTo: window.location.origin + (isEnglish ? '/en' : '/dashboard'),
+      redirectTo: window.location.origin + (isEnglish ? '/dashboard?lang=en' : '/dashboard'),
     });
 
     setForgotLoading(false);
@@ -125,7 +125,7 @@ export default function App() {
       setUpdateMessage(isEnglish ? 'Password updated successfully! Redirecting...' : 'הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...');
       setTimeout(() => {
         setRecoveryMode(false);
-        window.location.href = isEnglish ? '/en' : '/dashboard';
+        window.location.href = isEnglish ? '/dashboard?lang=en' : '/dashboard';
       }, 2000);
     }
   };
