@@ -41,10 +41,6 @@ export default function LandingGlobal() {
         .hero-glow {
           background: radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.15) 0%, rgba(15, 23, 42, 0) 60%);
         }
-        .video-container {
-          box-shadow: 0 25px 60px -15px rgba(99, 102, 241, 0.3);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
         .pain-box {
           box-shadow: 0 20px 40px -15px rgba(239, 68, 68, 0.2);
           border: 1px solid rgba(239, 68, 68, 0.3);
@@ -112,7 +108,7 @@ export default function LandingGlobal() {
           </div>
 
           {/* Pain-Point Section with AI Image */}
-          <div className="pain-box" style={{ background: '#111827', borderRadius: '16px', overflow: 'hidden', maxWidth: '850px', margin: '0 auto 50px auto', padding: '30px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="pain-box" style={{ background: '#111827', borderRadius: '16px', overflow: 'hidden', maxWidth: '850px', margin: '0 auto 60px auto', padding: '30px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ textAlign: 'center' }}>
               <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '6px 16px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                 🛑 Sound Familiar?
@@ -136,20 +132,6 @@ export default function LandingGlobal() {
             <div style={{ textAlign: 'center', color: '#34d399', fontWeight: 'bold', fontSize: '1.1rem' }}>
               ✨ There is a much easier, smarter, and faster way to run your business with ProFlow!
             </div>
-          </div>
-
-          {/* Embedded YouTube Video Showcase */}
-          <div className="video-container" style={{ borderRadius: '16px', overflow: 'hidden', background: '#1e293b', maxWidth: '850px', margin: '0 auto 80px auto', aspectRatio: '16/9' }}>
-            <iframe 
-              width="100%" 
-              height="100%" 
-              src="https://www.youtube.com/embed/uQuhb52P22k" 
-              title="QuoteCode React SaaS Launch 2026" 
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-              style={{ display: 'block' }}>
-            </iframe>
           </div>
 
           {/* Features Grid */}
