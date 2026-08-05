@@ -1,6 +1,10 @@
 import React from 'react';
 
 export default function ProFlowLogo({ size = 36, rtl = false, darkText = false }) {
+  // אם לא צוין במפורש darkText, נבדוק האם אנחנו בדשבורד לפי נתיב ה-URL (אם כתוב /dashboard נרצה טקסט כהה, אחרת לבן)
+  const isDashboard = typeof window !== 'undefined' && window.location.pathname.includes('/dashboard');
+  const shouldUseDarkText = darkText || isDashboard;
+
   return (
     <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
       {/* Icon Box */}
@@ -31,7 +35,7 @@ export default function ProFlowLogo({ size = 36, rtl = false, darkText = false }
         alignItems: 'center',
         fontFamily: 'Inter, Segoe UI, sans-serif'
       }}>
-        <span style={{ color: darkText ? '#0f172a' : '#ffffff' }}>Pro</span>
+        <span style={{ color: shouldUseDarkText ? '#0f172a' : '#ffffff' }}>Pro</span>
         <span style={{ color: '#4f46e5', marginLeft: '2px' }}>Flow</span>
       </span>
 
