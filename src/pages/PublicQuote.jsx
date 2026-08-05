@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import ProFlowLogo from '../components/ProFlowLogo';
 
+const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export default function PublicQuote() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ export default function PublicQuote() {
       setLoading(true);
       const { data, error } = await supabase
         .from('quotes')
-        .select('*')
+        .select(`*, clients (*), quote_items (*)`)
         .eq('id', id)
         .single();
 
@@ -56,8 +58,10 @@ export default function PublicQuote() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
-    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
     ctx.beginPath();
     ctx.moveTo(x, y);
     setIsDrawing(true);
@@ -69,8 +73,10 @@ export default function PublicQuote() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
-    const y = (e.clientY || e.touches?.[0]?.clientY) - rect.top;
+    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
     ctx.lineTo(x, y);
     ctx.strokeStyle = '#0f172a';
     ctx.lineWidth = 2;
@@ -154,14 +160,26 @@ export default function PublicQuote() {
   const vatAmount = quote.vat !== undefined && quote.vat !== null ? Number(quote.vat) : subtotal * vatRate;
   const total = dbTotal > 0 ? dbTotal : (subtotal + vatAmount);
 
+  const bizName = quote.businessSettings?.business_name || 'ProFlow Business';
+  const bizLogo = quote.businessSettings?.logo_url;
+  const clientName = quote.clients?.company_name || 'לקוח יקר';
+
   return (
-    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '40px 20px', color: '#1e293b' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', display: 'flex', justifyContent: 'center', boxSizing: 'border-box' }}>
+      <div style={{ background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', width: '100%', maxWidth: '800px', boxSizing: 'border-box' }}>
         
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px', marginBottom: '30px' }}>
-          <div style={{ cursor: 'pointer' }} onClick={() => navigate(isHebrew ? '/he' : '/')}>
-            <ProFlowLogo size={45} rtl={!isHebrew} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '20px', marginBottom: '30px', flexWrap: 'wrap', gap: '15px' }}>
+          <div>
+            {bizLogo ? (
+              <img src={bizLogo} alt={bizName} style={{ maxHeight: '50px', objectFit: 'contain' }} />
+            ) : (
+              <h1 style={{ margin: 0, color: '#1e293b', fontSize: '1.5rem' }}>{bizName}</h1>
+            )}
+            <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '5px' }}>
+              {quote.businessSettings?.tax_id && <span>ח.פ / עוסק: {quote.businessSettings.tax_id} | </span>}
+              {quote.businessSettings?.email && <span>{quote.businessSettings.email}</span>}
+            </div>
           </div>
           <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
             <h1 style={{ fontSize: '1.5rem', color: '#0f172a', margin: '0 0 5px 0' }}>{isHebrew ? 'הצעת מחיר' : 'Price Quote'}</h1>
@@ -170,95 +188,104 @@ export default function PublicQuote() {
         </div>
 
         {/* Client & Business Info */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px', background: '#f8fafc', padding: '20px', borderRadius: '12px' }}>
-          <div>
-            <h4 style={{ margin: '0 0 8px 0', color: '#475569' }}>{isHebrew ? 'לכבוד הלקוח:' : 'Client:'}</h4>
-            <p style={{ margin: 0, fontWeight: 'bold', fontSize: '1.1rem' }}>{quote.client_name || (isHebrew ? 'לקוח נכבד' : 'Valued Client')}</p>
-            <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>{quote.client_email}</p>
-          </div>
-          <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
-            <h4 style={{ margin: '0 0 8px 0', color: '#475569' }}>{isHebrew ? 'תאריך ההצעה:' : 'Date:'}</h4>
-            <p style={{ margin: 0, fontWeight: 'bold' }}>{new Date(quote.created_at || Date.now()).toLocaleDateString()}</p>
-          </div>
+        <div style={{ background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', marginBottom: '25px', border: '1px solid #e2e8f0' }}>
+          <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'לכבוד הלקוח:' : 'Client:'}</div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1e293b' }}>{quote.clients?.company_name || quote.client_name || (isHebrew ? 'לקוח נכבד' : 'Valued Client')}</div>
+          {quote.clients?.email && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: 'right' }}>{quote.clients.email}</div>}
+          {quote.clients?.phone && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: 'right' }}>{quote.clients.phone}</div>}
+          {quote.clients?.address && <div style={{ color: '#475569', fontSize: '0.9rem' }}>{quote.clients.address}</div>}
+          <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '10px' }}>{isHebrew ? 'תאריך ההצעה:' : 'Date:'} {new Date(quote.created_at || Date.now()).toLocaleDateString()}</div>
         </div>
 
         {/* Items Table */}
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
-          <thead>
-            <tr style={{ background: '#f1f5f9', textAlign: isHebrew ? 'right' : 'left' }}>
-              <th style={{ padding: '12px', borderRadius: isHebrew ? '0 8px 8px 0' : '8px 0 0 8px' }}>{isHebrew ? 'תיאור פריט' : 'Description'}</th>
-              <th style={{ padding: '12px' }}>{isHebrew ? 'כמות' : 'Qty'}</th>
-              <th style={{ padding: '12px' }}>{isHebrew ? 'מחיר יחידה' : 'Unit Price'}</th>
-              <th style={{ padding: '12px', borderRadius: isHebrew ? '8px 0 0 8px' : '0 8px 8px 0' }}>{isHebrew ? 'סה"כ' : 'Total'}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {parsedItems && parsedItems.length > 0 ? (
-              parsedItems.map((item, index) => {
-                const itemPrice = Number(item.price || item.unit_price || 0);
-                const itemQty = Number(item.quantity || 1);
-                return (
-                  <tr key={index} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '12px' }}>{item.description || item.name || (isHebrew ? 'פריט' : 'Item')}</td>
-                    <td style={{ padding: '12px' }}>{itemQty}</td>
-                    <td style={{ padding: '12px' }}>{itemPrice.toLocaleString()} {currencySymbol}</td>
-                    <td style={{ padding: '12px', fontWeight: 'bold' }}>{(itemPrice * itemQty).toLocaleString()} {currencySymbol}</td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
-                  {isHebrew ? `הצעת מחיר כללית בסך ${total.toLocaleString()} ${currencySymbol}` : `General Quote total ${total.toLocaleString()} ${currencySymbol}`}
-                </td>
+        <div style={{ overflowX: 'auto', marginBottom: '25px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left' }}>
+            <thead>
+              <tr style={{ background: '#f1f5f9', color: '#475569', fontSize: '0.85rem' }}>
+                <th style={{ padding: '10px', borderRadius: isHebrew ? '0 8px 8px 0' : '8px 0 0 8px' }}>{isHebrew ? 'תיאור פריט' : 'Description'}</th>
+                <th style={{ padding: '10px', textAlign: 'center' }}>{isHebrew ? 'כמות' : 'Qty'}</th>
+                <th style={{ padding: '10px', textAlign: 'left' }}>{isHebrew ? 'מחיר יחידה' : 'Unit Price'}</th>
+                <th style={{ padding: '10px', textAlign: 'left', borderRadius: isHebrew ? '8px 0 0 8px' : '0 8px 8px 0' }}>{isHebrew ? 'סה"כ' : 'Total'}</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {quote.quote_items && quote.quote_items.length > 0 ? (
+                quote.quote_items.map((item, index) => {
+                  const itemPrice = Number(item.price || item.unit_price || 0);
+                  const itemQty = Number(item.quantity || 1);
+                  return (
+                    <tr key={index} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
+                      <td style={{ padding: '12px 10px', color: '#1e293b' }}>{item.description || item.name || (isHebrew ? 'פריט' : 'Item')}</td>
+                      <td style={{ padding: '12px 10px', textAlign: 'center', color: '#475569' }}>{itemQty}</td>
+                      <td style={{ padding: '12px 10px', textAlign: 'left', color: '#475569' }}>{currencySymbol}{formatNum(itemPrice)}</td>
+                      <td style={{ padding: '12px 10px', textAlign: 'left', fontWeight: 'bold', color: '#1e293b' }}>{currencySymbol}{formatNum(item.total_price || (itemQty * itemPrice))}</td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
+                    {isHebrew ? `הצעת מחיר כללית בסך ${formatNum(total)} ${currencySymbol}` : `General Quote total ${formatNum(total)} ${currencySymbol}`}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         {/* Totals */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isHebrew ? 'flex-end' : 'flex-start', gap: '8px', marginBottom: '30px', background: '#f8fafc', padding: '20px', borderRadius: '12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: '250px', fontSize: '1rem', color: '#475569' }}>
-            <span>{isHebrew ? 'סיכום ביניים:' : 'Subtotal:'}</span>
-            <span style={{ fontWeight: 'bold' }}>{subtotal.toLocaleString()} {currencySymbol}</span>
-          </div>
-          {vatRate > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', width: '250px', fontSize: '1.0rem', color: '#475569' }}>
-              <span>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'}</span>
-              <span style={{ fontWeight: 'bold' }}>{vatAmount.toLocaleString()} {currencySymbol}</span>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '30px' }}>
+          <div style={{ width: '300px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0', boxSizing: 'border-box' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', fontSize: '0.9rem' }}>
+              <span>{isHebrew ? 'סיכום ביניים:' : 'Subtotal:'}</span>
+              <span>{currencySymbol}{formatNum(subtotal)}</span>
             </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', width: '250px', fontSize: '1.2rem', fontWeight: '900', color: '#0f172a', borderTop: '2px solid #cbd5e1', paddingTop: '8px', marginTop: '4px' }}>
-            <span>{isHebrew ? 'סה"כ לתשלום:' : 'Total:'}</span>
-            <span style={{ color: '#4f46e5' }}>{total.toLocaleString()} {currencySymbol}</span>
+            {quote.discount > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444', fontSize: '0.9rem' }}>
+                <span>{isHebrew ? `הנחה (${quote.discount}%):` : `Discount (${quote.discount}%):`}</span>
+                <span>-{currencySymbol}{formatNum((subtotal * quote.discount) / 100)}</span>
+              </div>
+            )}
+            {vatRate > 0 && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', fontSize: '0.9rem' }}>
+                <span>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'}</span>
+                <span>{currencySymbol}{formatNum(vatAmount)}</span>
+              </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: '900', color: '#1e293b', borderTop: '2px solid #cbd5e1', paddingTop: '10px', marginTop: '5px' }}>
+              <span>{isHebrew ? 'סה"כ לתשלום:' : 'Total:'}</span>
+              <span style={{ color: '#4f46e5' }}>{currencySymbol}{formatNum(total)}</span>
+            </div>
           </div>
         </div>
 
         {/* Terms & Notes Display */}
         {quote.terms && (
-          <div style={{ marginBottom: '20px', background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.85rem', lineHeight: '1.5', color: '#475569' }}>
-            <strong style={{ display: 'block', marginBottom: '5px', color: '#1e293b' }}>{isHebrew ? 'תקנון ותנאים:' : 'Terms & Conditions:'}</strong>
-            <div style={{ whiteSpace: 'pre-wrap' }}>{quote.terms}</div>
+          <div style={{ marginBottom: '25px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px' }}>{isHebrew ? 'תקנון ותנאים:' : 'Terms & Conditions:'}</div>
+            <div style={{ fontSize: '0.85rem', color: '#475569', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>{quote.terms}</div>
           </div>
         )}
 
         {quote.notes && (
-          <div style={{ marginBottom: '30px', background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.85rem', lineHeight: '1.5', color: '#475569' }}>
-            <strong style={{ display: 'block', marginBottom: '5px', color: '#1e293b' }}>{isHebrew ? 'הערות נוספות:' : 'Additional Notes:'}</strong>
-            <div style={{ whiteSpace: 'pre-wrap' }}>{quote.notes}</div>
+          <div style={{ marginBottom: '25px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px' }}>{isHebrew ? 'הערות נוספות:' : 'Additional Notes:'}</div>
+            <div style={{ fontSize: '0.85rem', color: '#475569', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>{quote.notes}</div>
           </div>
         )}
 
         {/* Signature & Approval Section */}
-        <div style={{ marginBottom: '40px' }}>
+        <div style={{ borderTop: '2px solid #f1f5f9', paddingTop: '25px', textAlign: 'center' }}>
           {approved ? (
-            <div style={{ background: '#d1fae5', color: '#065f46', padding: '16px', borderRadius: '12px', fontWeight: 'bold', fontSize: '1.1rem', textAlign: 'center' }}>
-              {isHebrew ? '✓ הצעת מחיר זו אושרה ונחתמה בהצלחה!' : '✓ This quote has been successfully approved and signed!'}
+            <div style={{ background: '#dcfce7', color: '#166534', padding: '20px', borderRadius: '12px', fontWeight: 'bold' }}>
+              <div style={{ fontSize: '1.1rem', marginBottom: '5px' }}>{isHebrew ? '✓ הצעת מחיר זו אושרה ונחתמה בהצלחה!' : '✓ This quote has been successfully approved and signed!'}</div>
+              <div style={{ fontSize: '0.9rem', color: '#15803d' }}>{quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)} {quote.signed_at && ` בתאריך ${new Date(quote.signed_at).toLocaleString('en-GB')}`}</div>
             </div>
           ) : (
-            <div style={{ border: '1px solid #cbd5e1', padding: '20px', borderRadius: '12px', background: '#f8fafc', textAlign: 'center' }}>
+            <div style={{ border: '1px solid #cbd5e1', padding: '20px', borderRadius: '12px', background: '#f8fafc', textAlign: 'center', boxSizing: 'border-box' }}>
               <h4 style={{ margin: '0 0 10px 0', color: '#1e293b' }}>{isHebrew ? 'חתימת לקוח לאישור ההצעה:' : 'Client Signature:'}</h4>
-              <div style={{ display: 'inline-block', border: '1px dashed #94a3b8', background: 'white', borderRadius: '8px', cursor: 'crosshair', marginBottom: '10px' }}>
+              
+              <div style={{ display: 'inline-block', border: '1px dashed #94a3b8', background: 'white', borderRadius: '8px', cursor: 'crosshair', marginBottom: '10px', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
                 <canvas
                   ref={canvasRef}
                   width={350}
@@ -270,9 +297,10 @@ export default function PublicQuote() {
                   onTouchStart={startDrawing}
                   onTouchMove={draw}
                   onTouchEnd={stopDrawing}
-                  style={{ display: 'block', touchAction: 'none' }}
+                  style={{ display: 'block', touchAction: 'none', maxWidth: '100%', height: 'auto' }}
                 />
               </div>
+
               <div style={{ marginBottom: '15px' }}>
                 <button
                   type="button"
@@ -285,7 +313,7 @@ export default function PublicQuote() {
               <div>
                 <button
                   onClick={handleApprove}
-                  style={{ background: hasSigned ? '#10b981' : '#94a3b8', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: hasSigned ? 'pointer' : 'not-allowed', boxShadow: hasSigned ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none' }}
+                  style={{ background: hasSigned ? '#10b981' : '#94a3b8', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: hasSigned ? 'pointer' : 'not-allowed', boxShadow: hasSigned ? '0 4px 12px rgba(16, 185, 129, 0.3)' : 'none', maxWidth: '100%', boxSizing: 'border-box' }}
                 >
                   {isHebrew ? 'אשר וחתום על הצעת המחיר ✓' : 'Approve & Sign Quote ✓'}
                 </button>
@@ -295,7 +323,7 @@ export default function PublicQuote() {
         </div>
 
         {/* Footer with dynamic ProFlow link */}
-        <div style={{ textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '20px', color: '#64748b', fontSize: '0.9rem' }}>
+        <div style={{ textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '20px', marginTop: '25px', color: '#64748b', fontSize: '0.9rem' }}>
           {isHebrew ? (
             <span>
               מסמך זה נערך ע"י{' '}
