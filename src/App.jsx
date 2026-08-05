@@ -41,6 +41,7 @@ function RootHandler() {
 export default function App() {
   const [session, setSession] = useState(null);
   const [recoveryMode, setRecoveryMode] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotMessage, setForgotMessage] = useState('');
@@ -55,10 +56,16 @@ export default function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session?.user?.email) {
+        setRecoveryEmail(session.user.email);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
+      if (session?.user?.email) {
+        setRecoveryEmail(session.user.email);
+      }
       if (event === 'PASSWORD_RECOVERY') {
         setRecoveryMode(true);
       }
@@ -66,6 +73,9 @@ export default function App() {
 
     if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
       setRecoveryMode(true);
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user?.email) setRecoveryEmail(user.email);
+      });
     }
 
     const handleGlobalClick = (e) => {
@@ -172,7 +182,7 @@ export default function App() {
         </div>
       )}
 
-      {/* חלון עדכון סיסמה חדשה (עם תמיכה בזיכרון הסיסמאות של הדפדפן) */}
+      {/* חלון עדכון סיסמה חדשה (עם שדה אימייל נסתר/גלוי לזיהוי אוטומטי של מנהל הסיסמאות בדפדפן) */}
       {recoveryMode && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -183,6 +193,15 @@ export default function App() {
             <h2 style={{ color: '#0f172a', marginBottom: '15px' }}>{isEnglish ? 'Set New Password' : 'איפוס סיסמה חדשה'}</h2>
             <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>{isEnglish ? 'Enter your new account password' : 'הזן את הסיסמה החדשה שלך לחשבון'}</p>
             <form onSubmit={handleUpdatePassword}>
+              {/* שדה אימייל נסתר המקושר אוטומטית לדפדפן כדי לאפשר שמירה אוטומטית של הסיסמה החדשה */}
+              <input
+                type="text"
+                name="username"
+                value={recoveryEmail}
+                readOnly
+                autoComplete="username"
+                style={{ display: 'none' }}
+              />
               <input
                 type="password"
                 placeholder={isEnglish ? 'New password' : 'סיסמה חדשה'}
