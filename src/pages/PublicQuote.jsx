@@ -16,6 +16,14 @@ const formatDisplayPhone = (phone, isInternational) => {
     } else if (!clean.startsWith('0') && clean.length === 9) {
       clean = '0' + clean;
     }
+    
+    // הוספת מקף אחרי שלוש הספרות הראשונות (לדוגמה: 054-4341514 או 03-1234567)
+    const digits = clean.replace(/\D/g, '');
+    if (digits.length >= 9) {
+      const prefix = digits.startsWith('03') || digits.startsWith('02') || digits.startsWith('04') || digits.startsWith('08') || digits.startsWith('09') ? digits.slice(0, 2) : digits.slice(0, 3);
+      const rest = digits.slice(prefix.length);
+      return `${prefix}-${rest}`;
+    }
   }
   return clean;
 };
