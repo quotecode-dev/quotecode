@@ -16,10 +16,12 @@ export default function PublicQuote() {
   const [hasSigned, setHasSigned] = useState(false);
 
   useEffect(() => {
-    fetchQuote();
+    if (id) {
+      fetchQuoteAndIncrementView();
+    }
   }, [id]);
 
-  const fetchQuote = async () => {
+  const fetchQuoteAndIncrementView = async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
@@ -30,6 +32,14 @@ export default function PublicQuote() {
 
       if (error) throw error;
       setQuote(data);
+
+      // Automatic view count increment
+      const newViewCount = (data.view_count || 0) + 1;
+      await supabase
+        .from('quotes')
+        .update({ view_count: newViewCount })
+        .eq('id', id);
+
       if (data?.status === 'approved' || data?.signature) {
         setApproved(true);
       }
