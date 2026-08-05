@@ -999,16 +999,8 @@ export default function Dashboard() {
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || ''); 
 
-    let editTerms = quote.terms;
-    let editNotes = quote.notes;
-
-    if (quote.notes === null && quote.terms) {
-      editNotes = quote.terms;
-      editTerms = quote.client_type === 'business' ? defaultTerms : '';
-    } else {
-      editTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms;
-      editNotes = quote.notes || '';
-    }
+    let editTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms;
+    let editNotes = quote.notes || '';
 
     setTerms(editTerms);
     setNotes(editNotes);
@@ -1055,16 +1047,8 @@ export default function Dashboard() {
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || '');
 
-    let dupTerms = quote.terms;
-    let dupNotes = quote.notes;
-
-    if (quote.notes === null && quote.terms) {
-      dupNotes = quote.terms;
-      dupTerms = quote.client_type === 'business' ? defaultTerms : '';
-    } else {
-      dupTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms;
-      dupNotes = quote.notes || '';
-    }
+    let dupTerms = quote.terms !== null && quote.terms !== undefined ? quote.terms : defaultTerms;
+    let dupNotes = quote.notes || '';
 
     setTerms(dupTerms);
     setNotes(dupNotes);
@@ -1156,7 +1140,7 @@ export default function Dashboard() {
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
         discount: Number(discount || 0),
-        terms: clientType === 'business' ? terms : null,
+        terms: terms,
         notes: notes,
         user_id: session.user.id
       };
@@ -1841,10 +1825,8 @@ export default function Dashboard() {
                         if (found) {
                           if (found.client_type) {
                              setClientType(found.client_type);
-                             if (found.client_type === 'business') {
-                               if (!terms || terms.trim() === '') {
-                                  setTerms(defaultTerms);
-                               }
+                             if (!terms || terms.trim() === '') {
+                                setTerms(found.terms || defaultTerms);
                              }
                           }
                           if (found.email) setClientEmail(found.email);
@@ -1864,7 +1846,7 @@ export default function Dashboard() {
                           const val = e.target.value;
                           setClientType(val);
                           e.target.setCustomValidity('');
-                          if (val === 'business' && (!terms || terms.trim() === '')) {
+                          if ((!terms || terms.trim() === '')) {
                             setTerms(defaultTerms);
                           }
                         }} 
@@ -1930,17 +1912,16 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {clientType === 'business' && (
-                    <div style={{ marginBottom: '15px' }}>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים (עסקי)' : 'Terms & Conditions (Business)'}</label>
-                      <textarea 
-                        value={terms} 
-                        onChange={(e) => setTerms(e.target.value)} 
-                        rows="4"
-                        style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
-                      />
-                    </div>
-                  )}
+                  {/* תקנון ותנאים מופיע כעת תמיד לכל הלקוחות (גם פרטי וגם עסקי) */}
+                  <div style={{ marginBottom: '15px' }}>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים' : 'Terms & Conditions'}</label>
+                    <textarea 
+                      value={terms} 
+                      onChange={(e) => setTerms(e.target.value)} 
+                      rows="4"
+                      style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
+                    />
+                  </div>
 
                   <div style={{ marginBottom: '20px' }}>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'הערות נוספות להצעה זו' : 'Additional Notes for this Quote'}</label>
@@ -2001,7 +1982,7 @@ export default function Dashboard() {
                         <span>-{sym}{formatNum(discountAmount)}</span>
                       </div>
                     )}
-                    {isLocalIsraeliBusiness && isHebrew && clientType === 'business' && (
+                    {isLocalIsraeliBusiness && isHebrew && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: '#64748b', flexDirection: isHebrew ? 'row-reverse' : 'row', fontSize: '0.85rem' }}>
                         <span>{t.vat}</span>
                         <span>{sym}{formatNum(taxAmount)}</span>
