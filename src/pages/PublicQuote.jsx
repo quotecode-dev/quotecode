@@ -213,7 +213,7 @@ export default function PublicQuote() {
                   <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
                     {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
                     {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
-                    {bizEmail && <div dir="ltr" style={{ textAlign: 'right' }}><span>{bizEmail}</span> :אימייל</div>}
+                    {bizEmail && <div dir="ltr" style={{ textAlign: 'right' }}><span>{bizEmail}</span></div>}
                     {bizAddress && <div>כתובת: {bizAddress}</div>}
                   </div>
                 </div>
@@ -239,7 +239,7 @@ export default function PublicQuote() {
                   <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
                     {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
                     {bizPhone && <div>Phone: {bizPhone}</div>}
-                    {bizEmail && <div>Email: {bizEmail}</div>}
+                    {bizEmail && <div>{bizEmail}</div>}
                     {bizAddress && <div>Address: {bizAddress}</div>}
                   </div>
                 </div>
