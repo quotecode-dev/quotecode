@@ -1209,6 +1209,7 @@ export default function Dashboard() {
         client_type: clientType,
         tax_id: clientTaxId,
         address: clientAddress,
+        notes: notes,
         user_id: session.user.id
       };
 
@@ -1279,7 +1280,7 @@ export default function Dashboard() {
       setClientAddress('');
       setValidUntil('');
       setDiscount('');
-      setTerms('');
+      setTerms(defaultTerms);
       setNotes('');
       setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
       setItems([{ description: '', quantity: '', unit_price: '' }]);
@@ -2576,7 +2577,7 @@ export default function Dashboard() {
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
-        <button onClick={() -> { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
+        <button onClick={() => { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>➕</span>
           {isHebrew ? 'חדש' : 'New'}
         </button>
