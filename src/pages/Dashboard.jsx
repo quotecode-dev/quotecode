@@ -1889,7 +1889,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.discount}</label>
-                      <input type="text" name="discount" value={discount} onFocus={(e) => { if (e.target.value === '0') setDiscount(''); }} onChange={(e) => setDiscount(e.target.value)} placeholder="0" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
+                      <input type="text" name="discount" value={discount} onFocus={(e) => { if (e.target.value === '0' || e.target.value === '0') setDiscount(''); }} onChange={(e) => setDiscount(e.target.value)} placeholder="0" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                   </div>
 
