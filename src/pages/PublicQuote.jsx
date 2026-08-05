@@ -191,7 +191,6 @@ export default function PublicQuote() {
   const bizPhone = businessSettings?.phone || quote.businessSettings?.phone;
   const bizAddress = businessSettings?.address || quote.businessSettings?.address;
 
-  // זיהוי האם הצופה הוא בעל העסק המחובר למערכת
   const isOwnerViewing = currentUserId && quote.user_id && currentUserId === quote.user_id;
 
   return (
@@ -206,9 +205,11 @@ export default function PublicQuote() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'right' }}>
                 {bizLogo ? (
                   <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
-                ) : null}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                ) : (
                   <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  {bizLogo && <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800', display: 'none' }}>{bizName}</h2>}
                   <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
                     {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
                     {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
@@ -229,9 +230,10 @@ export default function PublicQuote() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'left' }}>
                 {bizLogo ? (
                   <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
-                ) : null}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                ) : (
                   <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                   <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
                     {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
                     {bizPhone && <div>Phone: {bizPhone}</div>}
