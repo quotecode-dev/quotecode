@@ -125,12 +125,27 @@ export default function App() {
     setUpdateLoading(true);
     setUpdateMessage('');
 
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
     setUpdateLoading(false);
 
     if (error) {
       setUpdateMessage(isEnglish ? 'Error updating password: ' + error.message : 'שגיאה בעדכון הסיסמה: ' + error.message);
     } else {
+      // הפעלת מנהל הסיסמאות של הדפדפן לשמירת הסיסמה החדשה אוטומטית
+      if (window.PasswordCredential) {
+        try {
+          const userEmail = recoveryEmail || data?.user?.email;
+          if (userEmail) {
+            navigator.credentials.store(new PasswordCredential({
+              id: userEmail,
+              password: newPassword
+            }));
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
       setUpdateMessage(isEnglish ? 'Password updated successfully! Redirecting...' : 'הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...');
       setTimeout(() => {
         setRecoveryMode(false);
@@ -182,7 +197,7 @@ export default function App() {
         </div>
       )}
 
-      {/* חלון עדכון סיסמה חדשה (עם שדה אימייל נסתר/גלוי לזיהוי אוטומטי של מנהל הסיסמאות בדפדפן) */}
+      {/* חלון עדכון סיסמה חדשה */}
       {recoveryMode && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -193,7 +208,6 @@ export default function App() {
             <h2 style={{ color: '#0f172a', marginBottom: '15px' }}>{isEnglish ? 'Set New Password' : 'איפוס סיסמה חדשה'}</h2>
             <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>{isEnglish ? 'Enter your new account password' : 'הזן את הסיסמה החדשה שלך לחשבון'}</p>
             <form onSubmit={handleUpdatePassword}>
-              {/* שדה אימייל נסתר המקושר אוטומטית לדפדפן כדי לאפשר שמירה אוטומטית של הסיסמה החדשה */}
               <input
                 type="text"
                 name="username"
