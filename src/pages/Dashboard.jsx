@@ -164,6 +164,40 @@ function EmailConfirmModal({ isOpen, onClose, onConfirm, clientEmail, isHebrew }
   );
 }
 
+function LifetimeConfirmModal({ isOpen, onClose, onConfirm, userEmail, isHebrew }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div style={{ background: 'white', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '450px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', textAlign: 'center', animation: 'popupBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards' }}>
+        
+        <div style={{ width: '55px', height: '55px', borderRadius: '50%', background: '#ede9fe', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px auto', fontSize: '1.6rem' }}>
+          ♾️
+        </div>
+
+        <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.3rem', marginBottom: '10px', fontWeight: '800' }}>
+          {isHebrew ? 'הענקת מנוי לכל החיים (Lifetime)' : 'Grant Lifetime Subscription'}
+        </h3>
+        
+        <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.5' }}>
+          {isHebrew ? 'האם אתה בטוח שברצונך להעניק למשתמש זה גישת לכל החיים ולבטל לחלוטין את תקופת הניסיון?' : 'Are you sure you want to grant lifetime access to this user?'}
+          <br />
+          <strong style={{ color: '#4f46e5', direction: 'ltr', display: 'inline-block', marginTop: '6px' }}>{userEmail}</strong>
+        </p>
+
+        <div style={{ display: 'flex', gap: '10px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+          <button onClick={onClose} style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem' }}>
+            {isHebrew ? 'ביטול' : 'Cancel'}
+          </button>
+          <button onClick={onConfirm} style={{ flex: 1, background: '#7c3aed', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)' }}>
+            {isHebrew ? 'אישור והענקת Lifetime' : 'Confirm Lifetime'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
@@ -206,6 +240,7 @@ export default function Dashboard() {
 
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [pendingLifetimeUser, setPendingLifetimeUser] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -430,7 +465,7 @@ export default function Dashboard() {
       setBizRole(data.role || 'user');
       setBizCountry(data.country || 'Local');
       setDefaultTerms(data.default_terms || (data.country === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB));
-      setTrialEndsAt(data.trial_ends_at || null);
+      setTrialEndsAt(data.trial_ends_at !== undefined ? data.trial_ends_at : null);
       
       if (data.country === 'International') {
         setCurrency('USD');
@@ -533,14 +568,13 @@ export default function Dashboard() {
     }
   }
 
-  async function handleMakeLifetime(accountId) {
-    if (!window.confirm(isHebrew ? 'האם אתה בטוח שברצונך להעניק למשתמש זה מנוי לכל החיים ולבטל את תקופת הניסיון?' : 'Are you sure you want to grant this user a lifetime subscription?')) return;
-    
-    const { error } = await supabase.from('business_settings').update({ trial_ends_at: null }).eq('id', accountId);
+  async function handleToggleLifetime(accountId, currentTrialEnds) {
+    const newTrialEnds = currentTrialEnds === null ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() : null;
+    const { error } = await supabase.from('business_settings').update({ trial_ends_at: newTrialEnds }).eq('id', accountId);
     if (error) {
-      setStatusMsg({ text: 'Error updating user: ' + error.message, type: 'error' });
+      setStatusMsg({ text: 'Error updating user access: ' + error.message, type: 'error' });
     } else {
-      setStatusMsg({ text: isHebrew ? 'מנוי לכל החיים עודכן בהצלחה!' : 'Lifetime access granted successfully!', type: 'success' });
+      setStatusMsg({ text: isHebrew ? 'סטטוס הגישה עודכן בהצלחה!' : 'Access status updated successfully!', type: 'success' });
       fetchAllAccounts();
     }
   }
@@ -1377,6 +1411,19 @@ export default function Dashboard() {
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
       <PricingModal isOpen={showPricingModal} onClose={() => setShowPricingModal(false)} isHebrew={isHebrew} isLocalIsraeliBusiness={isLocalIsraeliBusiness} />
       
+      <LifetimeConfirmModal 
+        isOpen={pendingLifetimeUser !== null}
+        onClose={() => setPendingLifetimeUser(null)}
+        onConfirm={async () => {
+          if (!pendingLifetimeUser) return;
+          const u = pendingLifetimeUser;
+          setPendingLifetimeUser(null);
+          await handleToggleLifetime(u.id, u.trial_ends_at);
+        }}
+        userEmail={pendingLifetimeUser?.email || ''}
+        isHebrew={isHebrew}
+      />
+
       <EmailConfirmModal 
         isOpen={pendingEmailQuote !== null} 
         onClose={() => setPendingEmailQuote(null)} 
@@ -2366,102 +2413,86 @@ export default function Dashboard() {
               </div>
               
               <div style={{ overflowX: 'auto', background: 'white', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '600px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '700px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      <th style={{ padding: '8px 6px' }}>ID</th>
-                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => setSortField('email')}>
-                        Email {sortField === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => setSortField('business_name')}>
-                        Business Name {sortField === 'business_name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => setSortField('country')}>
-                        Region {sortField === 'country' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => setSortField('plan')}>
-                        Current Plan {sortField === 'plan' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => setSortField('role')}>
-                        Role {sortField === 'role' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => setSortField('trial_ends_at')}>
-                        Trial Ends {sortField === 'trial_ends_at' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
-                      <th style={{ padding: '8px 6px', cursor: 'pointer' }} onClick={() => setSortField('last_sign_in')}>
-                        Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
-                      </th>
+                      <th style={{ padding: '10px 8px' }}>Email</th>
+                      <th style={{ padding: '10px 8px' }}>Business Name</th>
+                      <th style={{ padding: '10px 8px' }}>Plan</th>
+                      <th style={{ padding: '10px 8px' }}>Role</th>
+                      <th style={{ padding: '10px 8px' }}>Trial / Lifetime Status</th>
+                      <th style={{ padding: '10px 8px' }}>Last Sign In</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredAdminAccounts.length === 0 ? (
                       <tr>
-                        <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                        <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                           {isHebrew ? 'לא נמצאו משתמשים התואמים לחיפוש.' : 'No users found matching your search.'}
                         </td>
                       </tr>
                     ) : (
-                      filteredAdminAccounts.map(acc => (
-                        <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
-                          <td style={{ padding: '10px 6px', color: '#64748b', fontSize: '0.75rem' }}>{acc.user_id?.slice(0,8)}...</td>
-                          <td style={{ padding: '10px 6px', fontWeight: '400', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
-                          <td style={{ padding: '10px 6px', color: '#334155' }}>{acc.business_name}</td>
-                          <td style={{ padding: '10px 6px' }}>
-                            <span style={{
-                              background: '#dbeafe',
-                              color: '#1e40af',
-                              padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem'
-                            }}>
-                              Local
-                            </span>
-                          </td>
-                          <td style={{ padding: '10px 6px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span style={{ 
-                                background: '#f1f5f9', 
-                                padding: '4px 10px', 
-                                borderRadius: '6px', 
-                                fontSize: '0.75rem', 
-                                fontWeight: '400', 
-                                color: '#475569',
-                                minWidth: '55px',
-                                textAlign: 'center',
-                                display: 'inline-block'
-                              }}>
-                                {acc.plan ? acc.plan.toUpperCase() : 'Free'}
-                              </span>
+                      filteredAdminAccounts.map(acc => {
+                        const isLifetime = acc.trial_ends_at === null || acc.trial_ends_at === undefined;
+                        return (
+                          <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
+                            <td style={{ padding: '12px 8px', fontWeight: '500', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
+                            <td style={{ padding: '12px 8px', color: '#334155' }}>{acc.business_name || 'New Business'}</td>
+                            <td style={{ padding: '12px 8px' }}>
                               <select 
-                                defaultValue="" 
+                                value={acc.plan ? acc.plan.toLowerCase() : 'free'} 
                                 onChange={(e) => handleAdminPlanChange(acc.id, e.target.value)}
-                                style={{ padding: '4px 6px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.75rem', fontWeight: 'bold', color: '#4f46e5', cursor: 'pointer' }}
+                                style={{ padding: '4px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.75rem', fontWeight: 'bold', color: '#4f46e5' }}
                               >
-                                <option value="" disabled style={{ fontWeight: 'bold' }}>{isHebrew ? 'שדרג...' : 'Change...'}</option>
-                                <option value="free" style={{ fontWeight: 'bold' }}>Free</option>
-                                <option value="basic" style={{ fontWeight: 'bold' }}>Basic</option>
-                                <option value="pro" style={{ fontWeight: 'bold' }}>Pro</option>
+                                <option value="free">FREE</option>
+                                <option value="basic">BASIC</option>
+                                <option value="pro">PRO</option>
                               </select>
-                            </div>
-                          </td>
-                          <td style={{ padding: '10px 6px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: '400' }}>
-                            {acc.role}
-                          </td>
-                          <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
-                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>
-                              <span>{acc.trial_ends_at ? new Date(acc.trial_ends_at).toLocaleDateString('en-GB') : '-'}</span>
-                              <button 
-                                onClick={() => handleMakeLifetime(acc.id)} 
-                                title={isHebrew ? "הפוך למנוי לכל החיים (בטל תאריך תפוגה)" : "Make Lifetime (Remove expiration)"}
-                                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', padding: 0 }}
-                              >
-                                ♾️
-                              </button>
-                            </div>
-                          </td>
-                          <td style={{ padding: '10px 6px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
-                            {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
-                          </td>
-                        </tr>
-                      ))
+                            </td>
+                            <td style={{ padding: '12px 8px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: '600' }}>
+                              {acc.role || 'user'}
+                            </td>
+                            <td style={{ padding: '12px 8px', verticalAlign: 'middle' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'nowrap' }}>
+                                <button 
+                                  onClick={() => {
+                                    if (!isLifetime) {
+                                      setPendingLifetimeUser(acc);
+                                    } else {
+                                      handleToggleLifetime(acc.id, acc.trial_ends_at);
+                                    }
+                                  }}
+                                  style={{ 
+                                    background: isLifetime ? '#ede9fe' : '#f1f5f9', 
+                                    color: isLifetime ? '#7c3aed' : '#64748b', 
+                                    border: '1px solid',
+                                    borderColor: isLifetime ? '#c4b5fd' : '#cbd5e1',
+                                    padding: '5px 10px', 
+                                    borderRadius: '6px', 
+                                    cursor: 'pointer', 
+                                    display: 'inline-flex', 
+                                    alignItems: 'center', 
+                                    gap: '6px', 
+                                    fontSize: '0.8rem', 
+                                    fontWeight: 'bold',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                  title={isLifetime ? 'לחץ לביטול מנוי לכל החיים' : 'לחץ להענקת מנוי לכל החיים'}
+                                >
+                                  <span>♾️</span>
+                                  <span>{isLifetime ? (isHebrew ? 'יש מנוי לכל החיים' : 'Lifetime Active') : (isHebrew ? 'אין מנוי לכל החיים' : 'Trial Active')}</span>
+                                </button>
+                                <span style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                  {isLifetime ? (isHebrew ? '(ללא הגבלת זמן)' : '(No expiry)') : (isHebrew ? `עד: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}` : `Ends: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}`)}
+                                </span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '12px 8px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                              {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
