@@ -196,6 +196,7 @@ export default function Dashboard() {
   const [bizTaxId, setBizTaxId] = useState('');
   const [bizEmail, setBizEmail] = useState('');
   const [bizPhone, setBizPhone] = useState('');
+  const [bizAddress, setBizAddress] = useState('');
   const [bizLogoUrl, setBizLogoUrl] = useState('');
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
@@ -381,14 +382,12 @@ export default function Dashboard() {
     const userEmail = session.user.email;
     const currentUserId = session.user.id;
 
-    // 1. בדיקה לפי user_id נוכחי
     let { data, error } = await supabase
       .from('business_settings')
       .select('*')
       .eq('user_id', currentUserId)
       .maybeSingle();
     
-    // 2. אם לא נמצא לפי user_id, חפש לפי אימייל (מנגנון הגנה גלובלי)
     if (!data && userEmail) {
       const { data: emailData } = await supabase
         .from('business_settings')
@@ -399,7 +398,6 @@ export default function Dashboard() {
       if (emailData) {
         const oldUserId = emailData.user_id;
 
-        // עדכון ה-user_id בטבלת ההגדרות ל-ID הנוכחי
         const { data: updatedData } = await supabase
           .from('business_settings')
           .update({ user_id: currentUserId, last_sign_in: nowIso, country: detectedCountry })
@@ -410,7 +408,6 @@ export default function Dashboard() {
         if (updatedData) {
           data = updatedData;
 
-          // פתרון גורף ואוטומטי לכל הטבלאות: מעבר של כל הנתונים (קטלוג, לקוחות, הצעות, הוצאות) מה-ID הישן לחדש!
           if (oldUserId && oldUserId !== currentUserId) {
             await supabase.from('services').update({ user_id: currentUserId }).eq('user_id', oldUserId);
             await supabase.from('clients').update({ user_id: currentUserId }).eq('user_id', oldUserId);
@@ -419,7 +416,6 @@ export default function Dashboard() {
           }
         }
       } else if (data) {
-        // אם נמצאה רשומה רגילה, ודא שהאימייל מעודכן
         if (!data.email && userEmail) {
           await supabase.from('business_settings').update({ email: userEmail }).eq('id', data.id);
         }
@@ -434,6 +430,7 @@ export default function Dashboard() {
       setBizTaxId(data.tax_id || '');
       setBizEmail(data.email || userEmail || '');
       setBizPhone(data.phone || '');
+      setBizAddress(data.address || '');
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'pro');
       setBizRole(data.role || 'user');
@@ -483,6 +480,8 @@ export default function Dashboard() {
         setSettingId(newData.id);
         setBizName(newData.business_name);
         setBizEmail(newData.email);
+        setBizPhone(newData.phone || '');
+        setBizAddress(newData.address || '');
         setBizPlan(newData.plan);
         setBizRole(newData.role);
         setBizCountry(newData.country || detectedCountry);
@@ -558,6 +557,7 @@ export default function Dashboard() {
       tax_id: bizTaxId,
       email: bizEmail,
       phone: bizPhone,
+      address: bizAddress,
       logo_url: bizLogoUrl,
       default_terms: defaultTerms,
       country: detectedCountry,
@@ -1306,6 +1306,7 @@ export default function Dashboard() {
                 <span style={{ color: '#0f172a' }}>Pro</span>
                 <span style={{ color: '#4f46e5', marginLeft: '2px' }}>Flow</span>
               </span>
+
             </div>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
               {isSignUp 
@@ -1953,7 +1954,6 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* תקנון ותנאים מופיע כעת תמיד לכל הלקוחות (גם פרטי וגם עסקי) */}
                   <div style={{ marginBottom: '15px' }}>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים' : 'Terms & Conditions'}</label>
                     <textarea 
@@ -2153,6 +2153,10 @@ export default function Dashboard() {
                   <div>
                     <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'טלפון עסק' : 'Business Phone'}</label>
                     <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="050-0000000" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'כתובת העסק' : 'Business Address'}</label>
+                    <input type="text" value={bizAddress} onChange={(e) => setBizAddress(e.target.value)} placeholder={isHebrew ? 'לדוגמה: הסתת 4, רמת גן' : 'e.g. Main St 10, City'} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                   </div>
                 </div>
 
