@@ -45,6 +45,10 @@ export default function LandingGlobal() {
           box-shadow: 0 25px 60px -15px rgba(99, 102, 241, 0.3);
           border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        .pain-box {
+          box-shadow: 0 20px 40px -15px rgba(239, 68, 68, 0.2);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+        }
         .faq-item {
           background: #111827;
           border: 1px solid rgba(255, 255, 255, 0.08);
@@ -108,6 +112,33 @@ export default function LandingGlobal() {
 
           <div style={{ marginBottom: '60px', color: '#94a3b8', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
             <span style={{ color: '#fbbf24', fontSize: '1.2rem' }}>⭐⭐⭐⭐⭐</span> Over 500 businesses trust ProFlow globally
+          </div>
+
+          {/* Pain-Point Section with AI Image */}
+          <div className="pain-box" style={{ background: '#111827', borderRadius: '16px', overflow: 'hidden', maxWidth: '850px', margin: '0 auto 50px auto', padding: '30px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '6px 16px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                🛑 Sound Familiar?
+              </span>
+              <h2 style={{ fontSize: '2.2rem', fontWeight: '900', color: '#ffffff', marginTop: '15px', marginBottom: '10px' }}>
+                Tired of struggling with quotes and endless paperwork?
+              </h2>
+              <p style={{ color: '#94a3b8', fontSize: '1.05rem' }}>
+                Forget wasting hours on clunky Word documents, manual tax calculations, and chasing clients for approvals.
+              </p>
+            </div>
+            
+            <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <img 
+                src="/frustrated-user.png" 
+                alt="Frustrated business owner struggling with paperwork" 
+                style={{ width: '100%', display: 'block', maxHeight: '450px', objectFit: 'cover' }} 
+                onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80'; }} 
+              />
+            </div>
+            <div style={{ textAlign: 'center', color: '#34d399', fontWeight: 'bold', fontSize: '1.1rem' }}>
+              ✨ There is a much easier, smarter, and faster way to run your business with ProFlow!
+            </div>
           </div>
 
           {/* Embedded YouTube Video Showcase */}
