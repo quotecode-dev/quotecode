@@ -49,7 +49,6 @@ export default function App() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateMessage, setUpdateMessage] = useState('');
 
-  // בדיקת שפה מקיפה: כולל פרמטר URL כמו ?lang=en, נתיב /en, או זיכרון מקומי
   const queryParams = new URLSearchParams(window.location.search);
   const isEnglish = queryParams.get('lang=en') === 'true' || queryParams.get('lang') === 'en' || window.location.pathname.startsWith('/en') || localStorage.getItem('proflow_lang') === 'en';
 
@@ -157,6 +156,7 @@ export default function App() {
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
                 required
+                autoComplete="email"
                 style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '16px', boxSizing: 'border-box', textAlign: isEnglish ? 'left' : 'right' }}
               />
               <button
@@ -172,7 +172,7 @@ export default function App() {
         </div>
       )}
 
-      {/* חלון עדכון סיסמה חדשה */}
+      {/* חלון עדכון סיסמה חדשה (עם תמיכה בזיכרון הסיסמאות של הדפדפן) */}
       {recoveryMode && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -189,6 +189,7 @@ export default function App() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
+                autoComplete="new-password"
                 style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '16px', boxSizing: 'border-box', textAlign: isEnglish ? 'left' : 'right' }}
               />
               <button
