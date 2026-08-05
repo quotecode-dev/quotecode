@@ -170,7 +170,6 @@ export default function Dashboard() {
   
   const isEnglishQuery = window.location.search.includes('lang=en');
   const isLocalIsraeliBusiness = tz === 'Asia/Jerusalem' || browserLang.startsWith('he');
-  const isHebrew = isLocalIsraeliBusiness && !isEnglishQuery;
 
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
@@ -243,6 +242,10 @@ export default function Dashboard() {
 
   const [pendingEmailQuote, setPendingEmailQuote] = useState(null);
 
+  // חוק ברזל מוחלט למשתמשים בינלאומיים: אם העסק מוגדר כ-International במסד הנתונים, isHebrew יהיה תמיד false!
+  const isInternationalAccount = bizCountry === 'International';
+  const isHebrew = !isInternationalAccount && (isLocalIsraeliBusiness && !isEnglishQuery);
+
   let trialDaysLeft = null;
   let isTrialExpired = false;
   if (trialEndsAt) {
@@ -296,7 +299,7 @@ export default function Dashboard() {
     logoUrlLabel: isHebrew ? 'כתובת תמונת לוגו (URL)' : 'Logo Image URL',
     addService: isHebrew ? 'הוסף לקטלוג' : 'Add to Catalog',
     serviceName: isHebrew ? 'שם השירות / המוצר' : 'Service Name',
-    defaultPrice: 'מחיר קבוע',
+    defaultPrice: isHebrew ? 'מחיר קבוע' : 'Fixed Price',
     searchQuote: isHebrew ? 'חיפוש שם לקוח או מס׳ הצעה...' : 'Search client or quote #...',
     filterStatus: isHebrew ? 'כל הסטטוסים' : 'All Statuses',
     actions: isHebrew ? 'פעולות' : 'Actions',
