@@ -9,6 +9,14 @@ function RootHandler() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const search = window.location.search;
+    const isEnglishQuery = search.includes('lang=en') || search.includes('en=true');
+
+    // אם המשתמש ביקש במפורש אנגלית, אל תפנה אותו לעברית!
+    if (isEnglishQuery) {
+      return;
+    }
+
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const browserLang = navigator.language || navigator.userLanguage || '';
     
@@ -27,6 +35,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<RootHandler />} />
         <Route path="/he" element={<LandingLocal />} />
+        <Route path="/en" element={<LandingGlobal />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/public-quote/:id" element={<PublicQuote />} />
         <Route path="*" element={<LandingGlobal />} />
