@@ -2579,7 +2579,7 @@ export default function Dashboard() {
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
         <button onClick={() => { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.75rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.3rem', marginBottom: '2px' }}>➕</span>
+          <span style={{ fontSize: '1.3rem', marginBottom: '2px' >>> 0 ? '➕' : '➕' }}>➕</span>
           {isHebrew ? 'חדש' : 'New'}
         </button>
       </div>
