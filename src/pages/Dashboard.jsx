@@ -168,8 +168,8 @@ export default function Dashboard() {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browserLang = navigator.language || '';
   
-  const isLocalIsraeliBusiness = tz === 'Asia/Jerusalem' || browserLang.startsWith('he');
-  const isHebrew = isLocalIsraeliBusiness && !window.location.search.includes('lang=en');
+  const isLocalIsraeliBusiness = true;
+  const isHebrew = true;
 
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
@@ -294,7 +294,7 @@ export default function Dashboard() {
     logoUrlLabel: isHebrew ? 'כתובת תמונת לוגו (URL)' : 'Logo Image URL',
     addService: isHebrew ? 'הוסף לקטלוג' : 'Add to Catalog',
     serviceName: isHebrew ? 'שם השירות / המוצר' : 'Service Name',
-    defaultPrice: isHebrew ? 'מחיר קבוע' : 'Default Price',
+    defaultPrice: 'מחיר קבוע',
     searchQuote: isHebrew ? 'חיפוש שם לקוח או מס׳ הצעה...' : 'Search client or quote #...',
     filterStatus: isHebrew ? 'כל הסטטוסים' : 'All Statuses',
     actions: isHebrew ? 'פעולות' : 'Actions',
@@ -790,34 +790,30 @@ export default function Dashboard() {
       const quoteSym = getCurrencySymbol(quote.currency);
       const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
       
-      const { error } = await supabase.functions.invoke('send-quote-email', {
-        body: {
-          to: quote.clients.email,
-          clientName: quote.clients.company_name,
-          quoteId: quote.id,
-          total: formatNum(quote.total),
-          currencySymbol: quoteSym,
-          quoteLink: quoteLink,
-          businessName: bizName
-        }
+      const clientEmailVal = quote.clients?.email || quote.client_email || '';
+      const clientNameVal = quote.clients?.company_name || quote.client_name || 'לקוח';
+
+      const payload = {
+        to: clientEmailVal,
+        clientName: clientNameVal,
+        quoteId: quote.id,
+        total: formatNum(quote.total),
+        currencySymbol: quoteSym,
+        quoteLink: quoteLink,
+        businessName: bizName,
+        logoUrl: bizLogoUrl,
+        isHebrew: isHebrew
+      };
+
+      const { data, error } = await supabase.functions.invoke('send-quote-email', {
+        body: payload
       });
 
       if (error) throw error;
       setStatusMsg({ text: isHebrew ? '📧 האימייל נשלח בהצלחה ללקוח דרך info@quotecodepro.com!' : '📧 Email sent successfully!', type: 'success' });
     } catch (err) {
       console.error("Email send error:", err);
-      // Fallback: Copy direct link to clipboard so user can paste it in mail client
-      const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
-      navigator.clipboard.writeText(quoteLink).then(() => {
-        setStatusMsg({ 
-          text: isHebrew 
-            ? '📋 קישור ההצעה הועתק ללוח בהצלחה! הדבק אותו באימייל שתישלח מ-info@quotecodepro.com.' 
-            : '📋 Quote link copied to clipboard successfully!', 
-          type: 'success' 
-        });
-      }).catch(() => {
-        setStatusMsg({ text: isHebrew ? 'קישור ההצעה: ' + quoteLink : 'Quote Link: ' + quoteLink, type: 'success' });
-      });
+      setStatusMsg({ text: isHebrew ? '⚠️ שגיאה בשליחת המייל מהשרת: ' + err.message : 'Error sending email: ' + err.message, type: 'error' });
     }
   };
 
@@ -1997,7 +1993,7 @@ export default function Dashboard() {
                     {isLocalIsraeliBusiness && isHebrew && clientType === 'private' && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#9ca3af', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                         <span></span>
-                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}${formatNum(taxAmount)})` : `(Includes VAT: ${sym}${formatNum(taxAmount)})`}</span>
+                        <span>{isHebrew ? `(הסכום כולל מע"מ בסך ${sym}{formatNum(taxAmount)})` : `(Includes VAT: ${sym}{formatNum(taxAmount)})`}</span>
                       </div>
                     )}
                   </div>
