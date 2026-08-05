@@ -485,15 +485,16 @@ export default function Dashboard() {
       setBizPlan(data.plan || 'pro');
       setBizRole(data.role || 'user');
       setBizCountry(data.country || 'Local');
-      setDefaultTerms(data.default_terms || (data.country === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB));
+      const defTerms = data.default_terms || (data.country === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
+      setDefaultTerms(defTerms);
       setTrialEndsAt(data.trial_ends_at !== undefined ? data.trial_ends_at : null);
       
       if (data.country === 'International') {
         setCurrency('USD');
-        setTerms(DEFAULT_TERMS_ENG);
+        setTerms(defTerms);
       } else {
         setCurrency('ILS');
-        setTerms(DEFAULT_TERMS_HEB);
+        setTerms(defTerms);
       }
 
       await supabase
