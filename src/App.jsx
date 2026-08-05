@@ -37,9 +37,16 @@ function RootHandler() {
 export default function App() {
   const [session, setSession] = useState(null);
   const [recoveryMode, setRecoveryMode] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotMessage, setForgotMessage] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
   const [newPassword, setNewPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState('');
+
+  // זיהוי שפה דינמי (עברית / אנגלית)
+  const isEnglish = window.location.pathname.startsWith('/en');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -60,62 +67,127 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleUpdatePassword = async (e) => {
+  const handleSendRecovery = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage('');
+    setForgotLoading(true);
+    setForgotMessage('');
 
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    setLoading(false);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: window.location.origin + (isEnglish ? '/en' : '/dashboard'),
+    });
+
+    setForgotLoading(false);
 
     if (error) {
-      setMessage('שגיאה בעדכון הסיסמה: ' + error.message);
+      setForgotMessage(isEnglish ? 'Error: ' + error.message : 'שגיאה בשליחה: ' + error.message);
     } else {
-      setMessage('הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...');
+      setForgotMessage(isEnglish ? 'Recovery link sent successfully to your email.' : 'קישור לשחזור סיסמה נשלח בהצלחה לכתובת המייל שלך.');
+      setTimeout(() => {
+        setForgotPasswordOpen(false);
+        setForgotMessage('');
+        setForgotEmail('');
+      }, 3000);
+    }
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setUpdateLoading(true);
+    setUpdateMessage('');
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setUpdateLoading(false);
+
+    if (error) {
+      setUpdateMessage(isEnglish ? 'Error updating password: ' + error.message : 'שגיאה בעדכון הסיסמה: ' + error.message);
+    } else {
+      setUpdateMessage(isEnglish ? 'Password updated successfully! Redirecting...' : 'הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...');
       setTimeout(() => {
         setRecoveryMode(false);
-        window.location.href = '/dashboard';
+        window.location.href = isEnglish ? '/en' : '/dashboard';
       }, 2000);
     }
   };
 
   return (
     <BrowserRouter>
+      {/* חלון שחזור סיסמה (תומך עברית ואנגלית) */}
+      {forgotPasswordOpen && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center',
+          alignItems: 'center', zIndex: 9999, direction: isEnglish ? 'ltr' : 'rtl', fontFamily: 'Arial, sans-serif'
+        }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', textAlign: 'center', position: 'relative' }}>
+            <button 
+              onClick={() => setForgotPasswordOpen(false)}
+              style={{ position: 'absolute', top: '15px', [isEnglish ? 'right' : 'left']: '15px', background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b' }}
+            >
+              ✕
+            </button>
+            <h2 style={{ color: '#0f172a', marginBottom: '15px' }}>{isEnglish ? 'Password Recovery' : 'שחזור סיסמה'}</h2>
+            <p style={{ color: '#334155', fontSize: '15px', marginBottom: '20px', fontWeight: '500' }}>
+              {isEnglish ? 'Enter your email address to recover your password' : 'לשחזור סיסמה הקלד את כתובת המייל שלך'}
+            </p>
+            <form onSubmit={handleSendRecovery}>
+              <input
+                type="email"
+                placeholder={isEnglish ? 'Email address' : 'כתובת אימייל'}
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                required
+                style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '16px', boxSizing: 'border-box', textAlign: isEnglish ? 'left' : 'right' }}
+              />
+              <button
+                type="submit"
+                disabled={forgotLoading}
+                style={{ width: '100%', padding: '12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                {forgotLoading ? (isEnglish ? 'Sending...' : 'שולח...') : (isEnglish ? 'Send Recovery Link' : 'שלח לשחזור סיסמה')}
+              </button>
+            </form>
+            {forgotMessage && <p style={{ marginTop: '15px', color: forgotMessage.includes('שגיאה') || forgotMessage.includes('Error') ? '#dc2626' : '#16a34a', fontWeight: 'bold', fontSize: '14px' }}>{forgotMessage}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* חלון עדכון סיסמה חדשה */}
       {recoveryMode && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
           backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center',
-          alignItems: 'center', zIndex: 9999, direction: 'rtl', fontFamily: 'Arial, sans-serif'
+          alignItems: 'center', zIndex: 9999, direction: isEnglish ? 'ltr' : 'rtl', fontFamily: 'Arial, sans-serif'
         }}>
           <div style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', textAlign: 'center' }}>
-            <h2 style={{ color: '#0f172a', marginBottom: '15px' }}>איפוס סיסמה חדשה</h2>
-            <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>הזן את הסיסמה החדשה שלך לחשבון</p>
+            <h2 style={{ color: '#0f172a', marginBottom: '15px' }}>{isEnglish ? 'Set New Password' : 'איפוס סיסמה חדשה'}</h2>
+            <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>{isEnglish ? 'Enter your new account password' : 'הזן את הסיסמה החדשה שלך לחשבון'}</p>
             <form onSubmit={handleUpdatePassword}>
               <input
                 type="password"
-                placeholder="סיסמה חדשה"
+                placeholder={isEnglish ? 'New password' : 'סיסמה חדשה'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '16px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '16px', boxSizing: 'border-box', textAlign: isEnglish ? 'left' : 'right' }}
               />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={updateLoading}
                 style={{ width: '100%', padding: '12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
               >
-                {loading ? 'מעדכן...' : 'עדכן סיסמה ושמור'}
+                {updateLoading ? (isEnglish ? 'Updating...' : 'מעדכן...') : (isEnglish ? 'Update Password & Save' : 'עדכן סיסמה ושמור')}
               </button>
             </form>
-            {message && <p style={{ marginTop: '15px', color: message.includes('שגיאה') ? '#dc2626' : '#16a34a', fontWeight: 'bold' }}>{message}</p>}
+            {updateMessage && <p style={{ marginTop: '15px', color: updateMessage.includes('שגיאה') || updateMessage.includes('Error') ? '#dc2626' : '#16a34a', fontWeight: 'bold' }}>{updateMessage}</p>}
           </div>
         </div>
       )}
+
       <Routes>
         <Route path="/" element={<RootHandler />} />
         <Route path="/he" element={<LandingLocal />} />
         <Route path="/en" element={<LandingGlobal />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard onOpenForgotPassword={() => setForgotPasswordOpen(true)} />} />
         <Route path="/public-quote/:id" element={<PublicQuote />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
         <Route path="*" element={<LandingGlobal />} />
