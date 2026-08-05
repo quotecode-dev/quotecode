@@ -165,12 +165,6 @@ function EmailConfirmModal({ isOpen, onClose, onConfirm, clientEmail, isHebrew }
 }
 
 export default function Dashboard() {
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const browserLang = navigator.language || '';
-  
-  const isEnglishQuery = window.location.search.includes('lang=en');
-  const isLocalIsraeliBusiness = tz === 'Asia/Jerusalem' || browserLang.startsWith('he');
-
   const [session, setSession] = useState(null);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -199,8 +193,8 @@ export default function Dashboard() {
   const [bizLogoUrl, setBizLogoUrl] = useState('');
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
-  const [bizCountry, setBizCountry] = useState('');
-  const [defaultTerms, setDefaultTerms] = useState(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
+  const [bizCountry, setBizCountry] = useState('Local');
+  const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_HEB);
   const [trialEndsAt, setTrialEndsAt] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
@@ -224,11 +218,11 @@ export default function Dashboard() {
   const [clientTaxId, setClientTaxId] = useState('');
   const [clientAddress, setClientAddress] = useState('');
   
-  const [currency, setCurrency] = useState(isLocalIsraeliBusiness ? 'ILS' : 'USD');
+  const [currency, setCurrency] = useState('ILS');
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState('');
-  const [terms, setTerms] = useState(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG); 
+  const [terms, setTerms] = useState(DEFAULT_TERMS_HEB); 
   const [notes, setNotes] = useState('');
   
   const [items, setItems] = useState([{ description: '', quantity: '', unit_price: '' }]);
@@ -242,9 +236,9 @@ export default function Dashboard() {
 
   const [pendingEmailQuote, setPendingEmailQuote] = useState(null);
 
-  // חוק ברזל מוחלט למשתמשים בינלאומיים: אם העסק מוגדר כ-International במסד הנתונים, isHebrew יהיה תמיד false!
+  // חוק ברזל מוחלט: קביעת השפה מתבססת אך ורק על המדינה הרשומה במסד הנתונים (bizCountry), ללא תלות באזור הזמן של הדפדפן המקומי!
   const isInternationalAccount = bizCountry === 'International';
-  const isHebrew = !isInternationalAccount && (isLocalIsraeliBusiness && !isEnglishQuery);
+  const isHebrew = !isInternationalAccount;
 
   let trialDaysLeft = null;
   let isTrialExpired = false;
@@ -261,6 +255,7 @@ export default function Dashboard() {
   const isSuperAdmin = bizRole === 'super_admin';
   const isPro = isSuperAdmin || effectivePlan === 'pro';
   const isBasicOrAbove = isPro || effectivePlan === 'basic';
+  const isLocalIsraeliBusiness = !isInternationalAccount;
 
   const t = {
     appName: bizName || 'ProFlow',
@@ -380,7 +375,6 @@ export default function Dashboard() {
   async function fetchSettings() {
     if (!session?.user?.id) return;
     
-    const detectedCountry = isLocalIsraeliBusiness ? 'Local' : 'International';
     const nowIso = new Date().toISOString();
     const userEmail = session.user.email;
     const currentUserId = session.user.id;
@@ -403,7 +397,7 @@ export default function Dashboard() {
 
         const { data: updatedData } = await supabase
           .from('business_settings')
-          .update({ user_id: currentUserId, last_sign_in: nowIso, country: detectedCountry })
+          .update({ user_id: currentUserId, last_sign_in: nowIso })
           .eq('id', emailData.id)
           .select()
           .maybeSingle();
@@ -424,8 +418,6 @@ export default function Dashboard() {
         }
       }
     }
-    
-    const initialDefaultTerms = isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG;
 
     if (data) {
       setSettingId(data.id);
@@ -437,19 +429,21 @@ export default function Dashboard() {
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'pro');
       setBizRole(data.role || 'user');
-      setBizCountry(data.country || detectedCountry);
-      setDefaultTerms(data.default_terms || initialDefaultTerms);
+      setBizCountry(data.country || 'Local');
+      setDefaultTerms(data.default_terms || (data.country === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB));
       setTrialEndsAt(data.trial_ends_at || null);
       
-      if (isLocalIsraeliBusiness) {
-        setCurrency('ILS');
+      if (data.country === 'International') {
+        setCurrency('USD');
+        setTerms(DEFAULT_TERMS_ENG);
       } else {
-        if (!currency || currency === 'ILS') setCurrency('USD');
+        setCurrency('ILS');
+        setTerms(DEFAULT_TERMS_HEB);
       }
 
       await supabase
         .from('business_settings')
-        .update({ last_sign_in: nowIso, country: detectedCountry })
+        .update({ last_sign_in: nowIso })
         .eq('user_id', currentUserId);
 
       if (data.role === 'super_admin') {
@@ -463,10 +457,10 @@ export default function Dashboard() {
         user_id: currentUserId,
         email: userEmail,
         business_name: 'New Business',
-        country: detectedCountry,
+        country: 'Local',
         plan: 'pro',
         role: 'user',
-        default_terms: initialDefaultTerms,
+        default_terms: DEFAULT_TERMS_HEB,
         trial_ends_at: trialEndDate.toISOString(),
         last_sign_in: nowIso
       };
@@ -487,17 +481,20 @@ export default function Dashboard() {
         setBizAddress(newData.address || '');
         setBizPlan(newData.plan);
         setBizRole(newData.role);
-        setBizCountry(newData.country || detectedCountry);
-        setDefaultTerms(newData.default_terms || initialDefaultTerms);
+        setBizCountry(newData.country || 'Local');
+        setDefaultTerms(newData.default_terms || DEFAULT_TERMS_HEB);
         setTrialEndsAt(newData.trial_ends_at);
-        setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
+        setCurrency('ILS');
+        setTerms(DEFAULT_TERMS_HEB);
       } else {
         setSettingId(null);
         setBizPlan('pro');
         setBizRole('user');
-        setDefaultTerms(initialDefaultTerms);
+        setBizCountry('Local');
+        setDefaultTerms(DEFAULT_TERMS_HEB);
         setTrialEndsAt(trialEndDate.toISOString());
-        setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
+        setCurrency('ILS');
+        setTerms(DEFAULT_TERMS_HEB);
       }
     }
   }
@@ -553,8 +550,6 @@ export default function Dashboard() {
     e.preventDefault();
     if (!session?.user?.id) return;
 
-    const detectedCountry = isLocalIsraeliBusiness ? 'Local' : 'International';
-
     const payload = {
       business_name: bizName,
       tax_id: bizTaxId,
@@ -563,7 +558,7 @@ export default function Dashboard() {
       address: bizAddress,
       logo_url: bizLogoUrl,
       default_terms: defaultTerms,
-      country: detectedCountry,
+      country: bizCountry,
       user_id: session.user.id
     };
 
