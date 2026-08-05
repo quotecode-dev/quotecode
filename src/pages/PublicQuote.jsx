@@ -36,15 +36,17 @@ export default function PublicQuote() {
       if (error) throw error;
       setQuote(data);
 
+      let bizData = null;
       if (data?.user_id) {
-        const { data: bizData } = await supabase
+        const { data: bData } = await supabase
           .from('business_settings')
           .select('*')
           .eq('user_id', data.user_id)
           .maybeSingle();
 
-        if (bizData) {
-          setBusinessSettings(bizData);
+        if (bData) {
+          bizData = bData;
+          setBusinessSettings(bData);
         }
       }
 
@@ -138,7 +140,7 @@ export default function PublicQuote() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'Segoe UI, Tahoma' }}>
-        <h2>טוען הצעת מחיר... / Loading quote...</h2>
+        <h2>Loading quote...</h2>
       </div>
     );
   }
@@ -146,14 +148,17 @@ export default function PublicQuote() {
   if (error || !quote) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'Segoe UI, Tahoma', textAlign: 'center', padding: '20px' }}>
-        <h2>{error || 'הצעת המחיר לא נמצאה'}</h2>
+        <h2>{error || 'Quote not found'}</h2>
       </div>
     );
   }
 
-  const isHebrew = quote.currency === 'ILS' || quote.isHebrew !== false;
+  // בדיקה מוחלטת: אם המדינה של בעל העסק היא בינלאומית או שהמטבע אינו ILS, השפה תהיה אך ורק אנגלית!
+  const isInternationalBiz = businessSettings?.country === 'International' || (quote.currency && quote.currency !== 'ILS');
+  const isHebrew = !isInternationalBiz && (quote.currency === 'ILS' || quote.isHebrew !== false);
+
   const currencySymbol = quote.currency === 'USD' ? '$' : quote.currency === 'EUR' ? '€' : quote.currency === 'GBP' ? '£' : '₪';
-  const vatRate = quote.currency === 'ILS' ? 0.18 : 0;
+  const vatRate = isHebrew ? 0.18 : 0;
 
   let parsedItems = [];
   try {
@@ -184,37 +189,56 @@ export default function PublicQuote() {
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', display: 'flex', justifyContent: 'center', boxSizing: 'border-box' }}>
       <div style={{ background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', width: '100%', maxWidth: '800px', boxSizing: 'border-box' }}>
         
-        {/* Header - פריסה מאוזנת עם מרכוז אנכי מושלם בין כרטיס הכותרת ללוגו */}
+        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
           
-          {/* צד ימין: כרטיס מספר ההצעה והתאריך (ממורכז ומסודר) */}
-          <div style={{ textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-            <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>
-              {isHebrew ? 'הצעת מחיר' : 'Price Quote'}
-            </div>
-            <div style={{ color: '#4f46e5', fontSize: '0.95rem', fontWeight: '700', fontFamily: 'monospace', direction: 'ltr', display: 'inline-block' }}>
-              #{quote.id?.slice(0, 8)}
-            </div>
-            <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '6px', fontWeight: '500' }}>
-              {isHebrew ? 'תאריך: ' : 'Date: '}{new Date(quote.created_at || Date.now()).toLocaleDateString(isHebrew ? 'he-IL' : 'en-GB')}
-            </div>
-          </div>
-
-          {/* צד שמאל: לוגו ופרטי העסק המלאים */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: isHebrew ? 'right' : 'left' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
-              <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
-                {bizTaxId && <div>{isHebrew ? 'ח.פ / עוסק:' : 'Tax ID:'} <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
-                {bizPhone && <div>{isHebrew ? 'טלפון:' : 'Phone:'} <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
-                {bizEmail && <div>{isHebrew ? 'אימייל:' : 'Email:'} <span dir="ltr" style={{ display: 'inline-block' }}>{bizEmail}</span></div>}
-                {bizAddress && <div>{isHebrew ? 'כתובת:' : 'Address:'} {bizAddress}</div>}
+          {isHebrew ? (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'right' }}>
+                {bizLogo ? (
+                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+                ) : null}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
+                  <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
+                    {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
+                    {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
+                    {bizEmail && <div>אימייל: <span dir="ltr" style={{ display: 'inline-block' }}>{bizEmail}</span></div>}
+                    {bizAddress && <div>כתובת: {bizAddress}</div>}
+                  </div>
+                </div>
               </div>
-            </div>
-            {bizLogo ? (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
-            ) : null}
-          </div>
+
+              <div style={{ textAlign: 'left', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>הצעת מחיר</div>
+                <div style={{ color: '#4f46e5', fontSize: '0.95rem', fontWeight: '700', fontFamily: 'monospace', direction: 'ltr', display: 'inline-block' }}>#{quote.id?.slice(0, 8)}</div>
+                <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '6px', fontWeight: '500' }}>תאריך: {new Date(quote.created_at || Date.now()).toLocaleDateString('he-IL')}</div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'left' }}>
+                {bizLogo ? (
+                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+                ) : null}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
+                  <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
+                    {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
+                    {bizPhone && <div>Phone: {bizPhone}</div>}
+                    {bizEmail && <div>Email: {bizEmail}</div>}
+                    {bizAddress && <div>Address: {bizAddress}</div>}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'right', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>Price Quote</div>
+                <div style={{ color: '#4f46e5', fontSize: '0.95rem', fontWeight: '700', fontFamily: 'monospace', direction: 'ltr', display: 'inline-block' }}>#{quote.id?.slice(0, 8)}</div>
+                <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '6px', fontWeight: '500' }}>Date: {new Date(quote.created_at || Date.now()).toLocaleDateString('en-GB')}</div>
+              </div>
+            </>
+          )}
 
         </div>
 
@@ -308,12 +332,18 @@ export default function PublicQuote() {
         <div style={{ borderTop: '2px solid #f1f5f9', paddingTop: '25px', textAlign: 'center' }}>
           {approved ? (
             <div style={{ background: '#dcfce7', color: '#166534', padding: '20px', borderRadius: '12px', fontWeight: 'bold' }}>
-              <div style={{ fontSize: '1.1rem', marginBottom: '5px' }}>{isHebrew ? '✓ הצעת מחיר זו אושרה ונחתמה בהצלחה!' : '✓ This quote has been successfully approved and signed!'}</div>
-              <div style={{ fontSize: '0.9rem', color: '#15803d' }}>{quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)} {quote.approved_at && ` בתאריך ${new Date(quote.approved_at).toLocaleString('en-GB')}`}</div>
+              <div style={{ fontSize: '1.1rem', marginBottom: '5px' }}>
+                {isHebrew ? '✓ הצעת מחיר זו אושרה ונחתמה בהצלחה!' : '✓ This quote has been successfully approved and signed!'}
+              </div>
+              <div style={{ fontSize: '0.9rem', color: '#15803d' }}>
+                {quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)} {quote.approved_at && ` בתאריך ${new Date(quote.approved_at).toLocaleString('en-GB')}`}
+              </div>
             </div>
           ) : (
             <div style={{ border: '1px solid #cbd5e1', padding: '20px', borderRadius: '12px', background: '#f8fafc', textAlign: 'center', boxSizing: 'border-box' }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#1e293b' }}>{isHebrew ? 'חתימת לקוח לאישור ההצעה:' : 'Client Signature:'}</h4>
+              <h4 style={{ margin: '0 0 10px 0', color: '#1e293b' }}>
+                {isHebrew ? 'חתימת לקוח לאישור ההצעה:' : 'Client Signature for Quote Approval:'}
+              </h4>
               
               <div style={{ display: 'inline-block', border: '1px dashed #94a3b8', background: 'white', borderRadius: '8px', cursor: 'crosshair', marginBottom: '10px', maxWidth: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
                 <canvas
