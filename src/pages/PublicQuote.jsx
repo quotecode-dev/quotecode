@@ -281,7 +281,7 @@ export default function PublicQuote() {
 
         {/* Client & Business Info */}
         <div style={{ background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', marginBottom: '25px', border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'לכבוד הלקוח:' : 'Client:'}</div>
+          <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'לכבוד:' : 'Client:'}</div>
           <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1e293b' }}>{quote.clients?.company_name || quote.client_name || (isHebrew ? 'לקוח נכבד' : 'Valued Client')}</div>
           {quote.clients?.email && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients.email}</div>}
           {clientPhoneFormatted && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{clientPhoneFormatted}</div>}
