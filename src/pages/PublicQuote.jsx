@@ -153,7 +153,7 @@ export default function PublicQuote() {
     );
   }
 
-  // בדיקה מוחלטת: אם המדינה של בעל העסק היא בינלאומית או שהמטבע אינו ILS, השפה תהיה אך ורק אנגלית!
+  // חוק ברזל מוחלט: אם העסק מוגדר כבינלאומי או שהמטבע אינו ILS, השפה תהיה אך ורק אנגלית!
   const isInternationalBiz = businessSettings?.country === 'International' || (quote.currency && quote.currency !== 'ILS');
   const isHebrew = !isInternationalBiz && (quote.currency === 'ILS' || quote.isHebrew !== false);
 
