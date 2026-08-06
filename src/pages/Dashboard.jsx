@@ -1752,21 +1752,21 @@ export default function Dashboard() {
                           boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: '4px'
+                          gap: '6px'
                         }}>
-                          {/* Right side data: Order #, Description, Client Name, Amount */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-                            <div style={{ textAlign: isHebrew ? 'right' : 'left' }}>
-                              <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#4f46e5', direction: 'ltr', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          {/* Right side data: Client Name, Order #, Description, Amount */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: 'row' }}>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a' }}>
+                                {quote.clients?.company_name || 'N/A'}
+                              </div>
+                              <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#4f46e5', direction: 'ltr', display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'flex-start', marginTop: '2px' }}>
                                 <span>#{quote.id.slice(0, 6)}</span>
                                 {firstItemDesc && <span style={{ color: '#64748b', fontWeight: 'normal' }}>| {firstItemDesc}</span>}
                               </div>
-                              <div style={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#0f172a', marginTop: '2px' }}>
-                                {quote.clients?.company_name || 'N/A'}
-                              </div>
                             </div>
 
-                            <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
+                            <div style={{ textAlign: 'left' }}>
                               <div style={{ fontSize: '0.95rem', fontWeight: '900', color: '#0f172a' }}>
                                 {quoteSym}{formatNum(quote.total)}
                               </div>
@@ -1778,16 +1778,16 @@ export default function Dashboard() {
                             </div>
                           </div>
 
-                          {/* Left side data: Date, Status, Views count, and Actions */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f8fafc', paddingTop: '6px', marginTop: '2px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.7rem', color: '#64748b' }}>
+                          {/* Left side data: Date, Status on right, and Actions + Views on left */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f8fafc', paddingTop: '6px', marginTop: '2px', flexDirection: 'row' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.7rem', color: '#64748b' }}>
                               <span>{quote.valid_until ? quote.valid_until : quote.created_at?.split('T')[0]}</span>
                               <span style={{ background: badge.bg, color: badge.color, padding: '1px 5px', borderRadius: '4px', fontWeight: 'bold' }}>
                                 {badge.text}
                               </span>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '0.7rem', color: '#64748b' }}>
                                 <span>{quote.view_count || 0}</span>
                                 <span>👁️</span>
