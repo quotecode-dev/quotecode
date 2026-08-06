@@ -1713,13 +1713,15 @@ export default function Dashboard() {
                 </div>
 
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right', minWidth: '700px' }} dir="rtl">
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right', minWidth: '800px' }} dir="rtl">
                     <thead>
                       <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         <th style={{ padding: '10px 8px', textAlign: 'right' }}>{isHebrew ? 'מספר הזמנה' : 'Order #'}</th>
                         <th style={{ padding: '10px 8px', textAlign: 'right' }}>{isHebrew ? 'שם לקוח' : 'Client Name'}</th>
                         <th style={{ padding: '10px 8px', textAlign: 'right', minWidth: '220px' }}>{isHebrew ? 'תיאור' : 'Description'}</th>
                         <th style={{ padding: '10px 8px', textAlign: 'right' }}>{isHebrew ? 'הסכום' : 'Amount'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'right' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>{isHebrew ? 'סטטוס' : 'Status'}</th>
                         <th style={{ padding: '10px 8px', textAlign: 'center' }}>{isHebrew ? 'מספר צפיות' : 'Views'}</th>
                         <th style={{ padding: '10px 8px', textAlign: 'left' }}>{isHebrew ? 'פעולות' : 'Actions'}</th>
                       </tr>
@@ -1727,7 +1729,7 @@ export default function Dashboard() {
                     <tbody>
                       {filteredQuotes.length === 0 ? (
                         <tr>
-                          <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                          <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                             {quotes.length === 0 
                               ? (isHebrew ? 'לא נמצאו הצעות מחיר במסד הנתונים.' : 'No quotes found in the database.') 
                               : (isHebrew ? 'לא נמצאו תוצאות לחיפוש הנוכחי.' : 'No results found for this search.')}
@@ -1761,18 +1763,8 @@ export default function Dashboard() {
                             <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
                               
                               {/* 1. מספר הזמנה */}
-                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right' }}>
-                                <div style={{ fontWeight: '700', color: '#4f46e5', direction: 'ltr', textAlign: 'right' }}>
-                                  #{quote.id.slice(0, 6)}
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px', justifyContent: 'flex-start' }}>
-                                  <span style={{ background: badge.bg, color: badge.color, padding: '1px 5px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>
-                                    {badge.text}
-                                  </span>
-                                  <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
-                                    {quote.valid_until ? quote.valid_until : quote.created_at?.split('T')[0]}
-                                  </span>
-                                </div>
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right', fontWeight: '700', color: '#4f46e5', direction: 'ltr' }}>
+                                #{quote.id.slice(0, 6)}
                               </td>
 
                               {/* 2. שם לקוח */}
@@ -1785,7 +1777,7 @@ export default function Dashboard() {
                                 {firstItemDesc || '-'}
                               </td>
 
-                              {/* 4. הסכום (למעלה כולל מע"מ, למטה לפני מע"מ) */}
+                              {/* 4. הסכום */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right' }}>
                                 <div style={{ fontWeight: '900', color: '#0f172a', fontSize: '0.9rem' }}>
                                   {quoteSym}{formatNum(quote.total)}
@@ -1797,7 +1789,19 @@ export default function Dashboard() {
                                 )}
                               </td>
 
-                              {/* 5. מספר צפיות */}
+                              {/* 5. תאריך */}
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right', color: '#64748b', fontSize: '0.8rem' }}>
+                                {quote.valid_until ? quote.valid_until : quote.created_at?.split('T')[0]}
+                              </td>
+
+                              {/* 6. סטטוס (בין פעולות לצפיות) */}
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'center' }}>
+                                <span style={{ background: badge.bg, color: badge.color, padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', display: 'inline-block' }}>
+                                  {badge.text}
+                                </span>
+                              </td>
+
+                              {/* 7. מספר צפיות */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                   <span>{quote.view_count || 0}</span>
@@ -1805,7 +1809,7 @@ export default function Dashboard() {
                                 </span>
                               </td>
 
-                              {/* 6. פעולות */}
+                              {/* 8. פעולות */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'left', position: 'relative' }}>
                                 <div ref={dropdownRef} style={{ display: 'inline-block', position: 'relative' }}>
                                   <button
