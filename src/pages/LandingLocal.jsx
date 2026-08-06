@@ -197,13 +197,13 @@ export default function LandingLocal() {
               <button 
                 onClick={() => setBillingCycle('annual')}
                 style={{ background: billingCycle === 'annual' ? '#6366f1' : 'transparent', color: billingCycle === 'annual' ? '#ffffff' : '#94a3b8', border: 'none', padding: '10px 18px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span>תשלום שנתי</span>
+                <span>מסלול שנתי</span>
                 <span style={{ background: '#10b981', color: 'white', padding: '2px 6px', borderRadius: '6px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>חסוך 20%!</span>
               </button>
               <button 
                 onClick={() => setBillingCycle('monthly')}
                 style={{ background: billingCycle === 'monthly' ? '#6366f1' : 'transparent', color: billingCycle === 'monthly' ? '#ffffff' : '#94a3b8', border: 'none', padding: '10px 18px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
-                תשלום חודשי
+                מסלול חודשי
               </button>
             </div>
 
