@@ -1712,7 +1712,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {filteredQuotes.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                       {quotes.length === 0 
@@ -1735,9 +1735,9 @@ export default function Dashboard() {
 
                       const getStatusBadge = (st) => {
                         switch(st) {
-                          case 'approved': return { bg: '#dcfce7', color: '#166534', text: isHebrew ? 'אושר (למעקב)' : 'Approved' };
+                          case 'approved': return { bg: '#dcfce7', color: '#166534', text: isHebrew ? 'אושר' : 'Approved' };
                           case 'paid': return { bg: '#dbeafe', color: '#1e40af', text: isHebrew ? 'שולם' : 'Paid' };
-                          case 'sent': return { bg: '#fef9c3', color: '#854d0e', text: isHebrew ? 'נשלח (למעקב)' : 'Sent' };
+                          case 'sent': return { bg: '#fef9c3', color: '#854d0e', text: isHebrew ? 'נשלח' : 'Sent' };
                           default: return { bg: '#f1f5f9', color: '#475569', text: isHebrew ? 'טיוטה' : 'Draft' };
                         }
                       };
@@ -1747,213 +1747,212 @@ export default function Dashboard() {
                         <div key={quote.id} style={{
                           background: 'white',
                           border: '1px solid #e2e8f0',
-                          borderRadius: '12px',
-                          padding: '16px',
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                          borderRadius: '10px',
+                          padding: '12px 16px',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
                           display: 'flex',
                           flexDirection: 'column',
-                          gap: '10px'
+                          gap: '6px'
                         }}>
-                          {/* Top row: Quote ID + Item Description */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-                            <div style={{ fontWeight: '700', color: '#4f46e5', fontSize: '0.9rem', direction: 'ltr' }}>
-                              #{quote.id.slice(0, 6)} {firstItemDesc && <span style={{ color: '#64748b', fontWeight: 'normal', fontSize: '0.85rem' }}>| {firstItemDesc}</span>}
+                          {/* Top Line: #021143 | צביעת חדר שינה ........ 45 👁️ */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                            <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#4f46e5', direction: 'ltr', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                              <span>#{quote.id.slice(0, 6)}</span>
+                              {firstItemDesc && <span style={{ color: '#64748b', fontWeight: 'normal' }}>| {firstItemDesc}</span>}
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', color: '#64748b' }}>
-                                👁️ {quote.view_count || 0}
-                              </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#64748b' }}>
+                              <span>{quote.view_count || 0}</span>
+                              <span>👁️</span>
                             </div>
                           </div>
 
-                          {/* Middle row: Client Name & Final Price */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-                            <div>
-                              <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#0f172a' }}>
-                                {quote.clients?.company_name || 'N/A'}
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
-                                <span style={{ background: badge.bg, color: badge.color, padding: '2px 6px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                                  {badge.text}
-                                </span>
-                                <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                                  {quote.valid_until ? quote.valid_until : quote.created_at?.split('T')[0]}
-                                </span>
-                              </div>
+                          {/* Second Line: ליאור אחוזות ........ ₪472.00 */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                            <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#0f172a' }}>
+                              {quote.clients?.company_name || 'N/A'}
                             </div>
-
                             <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
-                              <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a' }}>
+                              <div style={{ fontSize: '1.05rem', fontWeight: '900', color: '#0f172a' }}>
                                 {quoteSym}{formatNum(quote.total)}
                               </div>
-                              {isLocalIsraeliBusiness && isHebrew && (
-                                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                                  {isHebrew ? `לפני מע"מ: ${quoteSym}${formatNum(beforeVatAmount)}` : `Before VAT: ${quoteSym}${formatNum(beforeVatAmount)}`}
-                                </div>
-                              )}
                             </div>
                           </div>
 
-                          {/* Bottom row: Actions dropdown */}
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #f1f5f9', paddingTop: '10px', marginTop: '4px' }}>
-                            {/* ACTIONS DROPDOWN */}
-                            <div ref={dropdownRef} style={{ display: 'inline-block', position: 'relative' }}>
-                              <button
-                                onClick={(e) => handleToggleDropdown(e, quote.id)}
-                                style={{
-                                  background: '#4f46e5',
-                                  color: 'white',
-                                  border: 'none',
-                                  padding: '6px 14px',
-                                  borderRadius: '6px',
-                                  cursor: 'pointer',
-                                  fontWeight: 'bold',
-                                  fontSize: '0.8rem',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                  boxShadow: '0 2px 4px rgba(79, 70, 229, 0.2)'
-                                }}
-                              >
-                                {isHebrew ? 'פעולות ▼' : 'Actions ▼'}
-                              </button>
+                          {/* Third Line: 2026-08-20 טיוטה (badge) ........ לפני מע"מ: 400.00 + Actions button */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: '#64748b' }}>
+                              <span>{quote.valid_until ? quote.valid_until : quote.created_at?.split('T')[0]}</span>
+                              <span style={{ background: badge.bg, color: badge.color, padding: '1px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                                {badge.text}
+                              </span>
+                            </div>
 
-                              {isDropdownOpen && (
-                                <div style={{
-                                  position: 'fixed',
-                                  top: `${dropdownPos.top}px`,
-                                  left: `${dropdownPos.left}px`,
-                                  background: 'white',
-                                  border: '1px solid #cbd5e1',
-                                  borderRadius: '8px',
-                                  boxShadow: '0 10px 35px rgba(0,0,0,0.25)',
-                                  zIndex: 999999,
-                                  minWidth: '200px',
-                                  padding: '6px 0',
-                                  textAlign: isHebrew ? 'right' : 'left'
-                                }}>
-                                  {/* View */}
-                                  <button
-                                    onClick={() => { setOpenDropdownId(null); window.open(`/public-quote/${quote.id}`, '_blank'); }}
-                                    style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#3730a3', display: 'block', fontWeight: '500' }}
-                                    onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
-                                    onMouseLeave={(e) => e.target.style.background = 'none'}
-                                  >
-                                    👁️ {isHebrew ? 'צפה במסמך' : 'View Quote'}
-                                  </button>
-
-                                  {/* Edit Document */}
-                                  <div style={{ position: 'relative' }}>
-                                    <button
-                                      onClick={() => {
-                                        setOpenDropdownId(null);
-                                        handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote));
-                                      }}
-                                      disabled={isLocked}
-                                      style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: isLocked ? 'not-allowed' : 'pointer', fontSize: '0.85rem', color: isLocked ? '#94a3b8' : '#b45309', display: 'block', fontWeight: '500' }}
-                                      onMouseEnter={(e) => { if(!isLocked) e.target.style.background = '#f1f5f9'; }}
-                                      onMouseLeave={(e) => e.target.style.background = 'none'}
-                                    >
-                                      {isLocked ? (isHebrew ? '🔒 עריכה נעולה' : '🔒 Locked') : `✏️ ${t.edit}`}
-                                    </button>
-                                    {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
-                                      <div className="feature-lock-tooltip" style={{
-                                        position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
-                                        background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                        fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
-                                      }}>
-                                        {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {/* Duplicate Document */}
-                                  <div style={{ position: 'relative' }}>
-                                    <button
-                                      onClick={() => {
-                                        setOpenDropdownId(null);
-                                        handleProtectedAction(quote.id, 'duplicate', () => handleDuplicateQuote(quote));
-                                      }}
-                                      style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#115e59', display: 'block', fontWeight: '500' }}
-                                      onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
-                                      onMouseLeave={(e) => e.target.style.background = 'none'}
-                                    >
-                                      📋 {t.duplicate}
-                                    </button>
-                                    {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
-                                      <div className="feature-lock-tooltip" style={{
-                                        position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
-                                        background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                        fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
-                                      }}>
-                                        {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {/* WhatsApp with Icon */}
-                                  <div style={{ position: 'relative' }}>
-                                    <button
-                                      onClick={() => {
-                                        setOpenDropdownId(null);
-                                        handleProtectedAction(quote.id, 'whatsapp', () => sendWhatsApp(quote));
-                                      }}
-                                      style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#065f46', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
-                                      onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
-                                      onMouseLeave={(e) => e.target.style.background = 'none'}
-                                    >
-                                      <svg style={{ width: '15px', height: '15px', fill: '#065f46', flexShrink: 0 }} viewBox="0 0 24 24">
-                                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                                      </svg>
-                                      <span>{isHebrew ? 'שלח בוואטסאפ' : 'Send WhatsApp'}</span>
-                                    </button>
-                                    {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
-                                      <div className="feature-lock-tooltip" style={{
-                                        position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
-                                        background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                        fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
-                                      }}>
-                                        {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  {/* Email */}
-                                  <button
-                                    onClick={() => { setOpenDropdownId(null); setPendingEmailQuote(quote); }}
-                                    style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#1e40af', display: 'block', fontWeight: '500' }}
-                                    onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
-                                    onMouseLeave={(e) => e.target.style.background = 'none'}
-                                  >
-                                    ✉️ {isHebrew ? 'שלח במייל' : 'Send Email'}
-                                  </button>
-
-                                  {/* Delete */}
-                                  <div style={{ position: 'relative' }}>
-                                    <button
-                                      onClick={() => {
-                                        setOpenDropdownId(null);
-                                        handleProtectedAction(quote.id, 'delete', () => handleDeleteQuote(quote.id));
-                                      }}
-                                      style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#991b1b', display: 'block', fontWeight: '500' }}
-                                      onMouseEnter={(e) => e.target.style.background = '#fee2e2'}
-                                      onMouseLeave={(e) => e.target.style.background = 'none'}
-                                    >
-                                      🗑️ {t.delete}
-                                    </button>
-                                    {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
-                                      <div className="feature-lock-tooltip" style={{
-                                        position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
-                                        background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
-                                        fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
-                                      }}>
-                                        {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
-                                      </div>
-                                    )}
-                                  </div>
-
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              {isLocalIsraeliBusiness && isHebrew && (
+                                <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                                  {isHebrew ? `לפני מע"מ: ${sym}${formatNum(beforeVatAmount)}` : `Before VAT: ${sym}${formatNum(beforeVatAmount)}`}
                                 </div>
                               )}
+
+                              {/* ACTIONS DROPDOWN */}
+                              <div ref={dropdownRef} style={{ display: 'inline-block', position: 'relative' }}>
+                                <button
+                                  onClick={(e) => handleToggleDropdown(e, quote.id)}
+                                  style={{
+                                    background: '#4f46e5',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '5px 12px',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    fontSize: '0.75rem',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    boxShadow: '0 2px 4px rgba(79, 70, 229, 0.2)'
+                                  }}
+                                >
+                                  {isHebrew ? 'פעולות ▼' : 'Actions ▼'}
+                                </button>
+
+                                {isDropdownOpen && (
+                                  <div style={{
+                                    position: 'fixed',
+                                    top: `${dropdownPos.top}px`,
+                                    left: `${dropdownPos.left}px`,
+                                    background: 'white',
+                                    border: '1px solid #cbd5e1',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 10px 35px rgba(0,0,0,0.25)',
+                                    zIndex: 999999,
+                                    minWidth: '200px',
+                                    padding: '6px 0',
+                                    textAlign: isHebrew ? 'right' : 'left'
+                                  }}>
+                                    {/* View */}
+                                    <button
+                                      onClick={() => { setOpenDropdownId(null); window.open(`/public-quote/${quote.id}`, '_blank'); }}
+                                      style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#3730a3', display: 'block', fontWeight: '500' }}
+                                      onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
+                                      onMouseLeave={(e) => e.target.style.background = 'none'}
+                                    >
+                                      👁️ {isHebrew ? 'צפה במסמך' : 'View Quote'}
+                                    </button>
+
+                                    {/* Edit Document */}
+                                    <div style={{ position: 'relative' }}>
+                                      <button
+                                        onClick={() => {
+                                          setOpenDropdownId(null);
+                                          handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote));
+                                        }}
+                                        disabled={isLocked}
+                                        style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: isLocked ? 'not-allowed' : 'pointer', fontSize: '0.85rem', color: isLocked ? '#94a3b8' : '#b45309', display: 'block', fontWeight: '500' }}
+                                        onMouseEnter={(e) => { if(!isLocked) e.target.style.background = '#f1f5f9'; }}
+                                        onMouseLeave={(e) => e.target.style.background = 'none'}
+                                      >
+                                        {isLocked ? (isHebrew ? '🔒 עריכה נעולה' : '🔒 Locked') : `✏️ ${t.edit}`}
+                                      </button>
+                                      {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
+                                        <div className="feature-lock-tooltip" style={{
+                                          position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
+                                          background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                          fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
+                                        }}>
+                                          {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Duplicate Document */}
+                                    <div style={{ position: 'relative' }}>
+                                      <button
+                                        onClick={() => {
+                                          setOpenDropdownId(null);
+                                          handleProtectedAction(quote.id, 'duplicate', () => handleDuplicateQuote(quote));
+                                        }}
+                                        style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#115e59', display: 'block', fontWeight: '500' }}
+                                        onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
+                                        onMouseLeave={(e) => e.target.style.background = 'none'}
+                                      >
+                                        📋 {t.duplicate}
+                                      </button>
+                                      {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
+                                        <div className="feature-lock-tooltip" style={{
+                                          position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
+                                          background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                          fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
+                                        }}>
+                                          {isHebrew ? '🚀 אופציה זו זמינה ממנויי Basic ומעלה' : '🚀 Available on Basic plan+'}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* WhatsApp with Icon */}
+                                    <div style={{ position: 'relative' }}>
+                                      <button
+                                        onClick={() => {
+                                          setOpenDropdownId(null);
+                                          handleProtectedAction(quote.id, 'whatsapp', () => sendWhatsApp(quote));
+                                        }}
+                                        style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#065f46', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
+                                        onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
+                                        onMouseLeave={(e) => e.target.style.background = 'none'}
+                                      >
+                                        <svg style={{ width: '15px', height: '15px', fill: '#065f46', flexShrink: 0 }} viewBox="0 0 24 24">
+                                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                                        </svg>
+                                        <span>{isHebrew ? 'שלח בוואטסאפ' : 'Send WhatsApp'}</span>
+                                      </button>
+                                      {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
+                                        <div className="feature-lock-tooltip" style={{
+                                          position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
+                                          background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                          fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
+                                        }}>
+                                          {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Email */}
+                                    <button
+                                      onClick={() => { setOpenDropdownId(null); setPendingEmailQuote(quote); }}
+                                      style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#1e40af', display: 'block', fontWeight: '500' }}
+                                      onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
+                                      onMouseLeave={(e) => e.target.style.background = 'none'}
+                                    >
+                                      ✉️ {isHebrew ? 'שלח במייל' : 'Send Email'}
+                                    </button>
+
+                                    {/* Delete */}
+                                    <div style={{ position: 'relative' }}>
+                                      <button
+                                        onClick={() => {
+                                          setOpenDropdownId(null);
+                                          handleProtectedAction(quote.id, 'delete', () => handleDeleteQuote(quote.id));
+                                        }}
+                                        style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#991b1b', display: 'block', fontWeight: '500' }}
+                                        onMouseEnter={(e) => e.target.style.background = '#fee2e2'}
+                                        onMouseLeave={(e) => e.target.style.background = 'none'}
+                                      >
+                                        🗑️ {t.delete}
+                                      </button>
+                                      {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
+                                        <div className="feature-lock-tooltip" style={{
+                                          position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
+                                          background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
+                                          fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
+                                        }}>
+                                          {isHebrew ? '⭐ אופציה זו בלעדית למנויי PRO' : '⭐ Exclusive to PRO subscribers'}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
 
