@@ -158,8 +158,7 @@ export default function PublicQuote() {
         .from('quotes')
         .update({
           status: 'approved',
-          signature: signatureDataUrl,
-          approved_at: new Date().toISOString()
+          signature: signatureDataUrl
         })
         .eq('id', id);
 
@@ -379,7 +378,7 @@ export default function PublicQuote() {
                 {isHebrew ? '✓ הצעת מחיר זו אושרה ונחתמה בהצלחה!' : '✓ This quote has been successfully approved and signed!'}
               </div>
               <div style={{ fontSize: '0.9rem', color: '#15803d' }}>
-                {quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)} {quote.approved_at && ` בתאריך ${new Date(quote.approved_at).toLocaleString('en-GB')}`}
+                {quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)}
               </div>
             </div>
           ) : isOwnerViewing ? (
