@@ -103,8 +103,10 @@ export default function PublicQuote() {
     const rect = canvas.getBoundingClientRect();
     const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
     const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
     ctx.beginPath();
     ctx.moveTo(x, y);
     setIsDrawing(true);
@@ -118,11 +120,14 @@ export default function PublicQuote() {
     const rect = canvas.getBoundingClientRect();
     const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
     const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
     ctx.lineTo(x, y);
     ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
     ctx.stroke();
     setHasSigned(true);
   };
@@ -147,7 +152,7 @@ export default function PublicQuote() {
 
     try {
       const canvas = canvasRef.current;
-      const signatureDataUrl = canvas ? canvas.toDataURL() : null;
+      const signatureDataUrl = canvas ? canvas.toDataURL('image/png') : null;
 
       const { error } = await supabase
         .from('quotes')
@@ -162,7 +167,7 @@ export default function PublicQuote() {
       setApproved(true);
     } catch (err) {
       console.error('Error approving quote:', err);
-      alert('שגיאה באישור ההצעה / Error approving quote');
+      alert(isHebrew ? 'שגיאה באישור ההצעה / Error approving quote' : 'Error approving quote');
     }
   };
 
@@ -226,7 +231,6 @@ export default function PublicQuote() {
           
           {isHebrew ? (
             <>
-              {/* צד ימין: לוגו ופרטי עסק */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'right' }}>
                 {bizLogo ? (
                   <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
@@ -243,7 +247,6 @@ export default function PublicQuote() {
                 </div>
               </div>
 
-              {/* צד שמאל: תיבת הצעת מחיר ממורכזת */}
               <div style={{ textAlign: 'center', background: '#f8fafc', padding: '15px 22px', borderRadius: '12px', border: '1px solid #e2e8f0', minWidth: '190px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                 <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>הצעת מחיר</div>
                 <div style={{ color: '#4f46e5', fontSize: '0.95rem', fontWeight: '700', fontFamily: 'monospace', direction: 'ltr', display: 'inline-block' }}>#{quote.id?.slice(0, 8)}</div>
@@ -252,7 +255,6 @@ export default function PublicQuote() {
             </>
           ) : (
             <>
-              {/* International LTR layout */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'left' }}>
                 {bizLogo ? (
                   <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
