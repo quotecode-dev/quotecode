@@ -1498,11 +1498,11 @@ export default function Dashboard() {
 
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isLoginHebrew ? 'אימייל' : 'Email'}</label>
-              <input type="email" name="user_email_field" autoComplete="off" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
+              <input type="email" name="user_email_field" autoComplete="username" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isLoginHebrew ? 'סיסמה' : 'Password'}</label>
-              <input type="password" name="user_password_field" autoComplete="new-password" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
+              <input type="password" name="user_password_field" autoComplete="current-password" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
               {isLoginHebrew ? 'התחבר' : 'Sign In'}
@@ -2680,7 +2680,7 @@ export default function Dashboard() {
                         Email {sortField === 'email' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('business_name')}>
-                        Business Name {sortField === 'business_name' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                        Business Name {sortField === 'business_name' ? (sortDirection === 'asc' ? '▲' : '▼' ) : ''}
                       </th>
                       <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('plan')}>
                         Plan {sortField === 'plan' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
