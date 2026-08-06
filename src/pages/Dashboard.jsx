@@ -1481,18 +1481,18 @@ export default function Dashboard() {
           {authSuccess && <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: '#dcfce7', color: '#166534' }}>{authSuccess}</div>}
           {authError && <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: '#fee2e2', color: '#991b1b' }}>{authError}</div>}
 
-          <form onSubmit={handleAuth} autoComplete="off">
+          <form onSubmit={handleAuth} autoComplete="off" data-lpignore="true">
             {/* Hidden dummy fields to prevent password manager popups */}
-            <input type="text" name="fake_user" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
-            <input type="password" name="fake_pass" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
+            <input type="text" name="fake_user_login" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
+            <input type="password" name="fake_pass_login" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
 
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isLoginHebrew ? 'אימייל' : 'Email'}</label>
-              <input type="email" name="user_email_field" autoComplete="off" data-lpignore="true" data-bwignore="true" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
+              <input type="email" name="user_email_field" autoComplete="off" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
             </div>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isLoginHebrew ? 'סיסמה' : 'Password'}</label>
-              <input type="password" name="user_password_field" autoComplete="new-password" data-lpignore="true" data-bwignore="true" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
+              <input type="password" name="user_password_field" autoComplete="new-password" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
               {isLoginHebrew ? 'התחבר' : 'Sign In'}
