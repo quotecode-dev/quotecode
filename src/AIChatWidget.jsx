@@ -36,11 +36,15 @@ export default function AIChatWidget({ isHebrew }) {
         } else if (lower.includes('לקוח') || lower.includes('crm')) {
           reply = 'בטאב "לקוחות" תוכל לראות את כל ספר הלקוחות שלך, לנהל כתובות, ח.פ ותנאי תשלום לכל לקוח.';
         } else if (lower.includes('וואטסאפ') || lower.includes('whatsapp'))  {
-          reply = 'ניתן לשלוח הצעות מחיר ישירות בוואטסאפ ללקוח דרך כפתור הוואטסאפ בשורת ההצעה (זמין למנויי PRO).';
+          reply = 'ניתן לשלוח הצעות מחיר ישירות בוואטסאפ ללקוח דרך כפתור הוואטסאפ בתפריט הפעולות בשורת ההצעה (זמין למנויי PRO).';
         } else if (lower.includes('מייל') || lower.includes('אימייל')) {
-          reply = 'ניתן לשלוח הצעת מחיר במייל בלחיצה על כפתור השטרודל (@) בשורת ההצעה. האימייל יישלח אוטומטית דרך כתובת העסק שלך ב-Namecheap.';
+          reply = 'ניתן לשלוח הצעת מחיר במייל דרך תפריט הפעולות בשורת ההצעה. האימייל יישלח אוטומטית דרך השרת בענן.';
         } else if (lower.includes('מע"מ') || lower.includes('vat')) {
           reply = 'המערכת מחשבת מע"מ אוטומטית לפי 18% ללקוחות בארץ ו-0% ללקוחות מחו"ל בהתאם להגדרות העסק.';
+        } else if (lower.includes('מיון') || lower.includes('סדר') || lower.includes('למיין')) {
+          reply = 'ניתן למיין את טבלת ההצעות בקלות בלחיצה על כותרות העמודות (מספר הזמנה, שם לקוח, סכום, תאריך יצירה, סטטוס או צפיות).';
+        } else if (lower.includes('טבלה') || lower.includes('עמודות') || lower.includes('תאריך')) {
+          reply = 'טבלת ההצעות מציגה 8 עמודות מסודרות: מספר הזמנה, שם לקוח, תיאור, סכום (כולל ולפני מע"מ), תאריך יצירה (בפורמט DD/MM/YYYY), סטטוס, צפיות (👁️) ותפריט פעולות.';
         } else {
           reply = `שאלתך התקבלה בהצלחה! מערכת ProFlow מסייעת לך בניהול עסק חכם, הפקת הצעות מחיר, מעקב צפיות, ניהול הוצאות ודוחות כספיים. האם תרצה עזרה בנושא מסוים?`;
         }
@@ -50,7 +54,9 @@ export default function AIChatWidget({ isHebrew }) {
         } else if (lower.includes('client') || lower.includes('crm')) {
           reply = 'In the "Clients" tab you can manage your client database, tax IDs, and contact info.';
         } else if (lower.includes('whatsapp')) {
-          reply = 'You can send quotes directly via WhatsApp using the WhatsApp icon button in your quotes list (PRO feature).';
+          reply = 'You can send quotes directly via WhatsApp using the actions menu in your quotes list (PRO feature).';
+        } else if (lower.includes('sort') || lower.includes('column')) {
+          reply = 'You can sort the quotes table by clicking on any column header (Order #, Client Name, Amount, Date, Status, or Views).';
         } else {
           reply = `I am here to help you manage your business, quotes, clients, and finances with ProFlow. How can I assist further?`;
         }
