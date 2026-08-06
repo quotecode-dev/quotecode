@@ -7,6 +7,15 @@ import AIChatWidget from '../AIChatWidget';
 
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-';
+  const parts = dateStr.split('T')[0].split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return dateStr;
+};
+
 const DEFAULT_TERMS_HEB = `תנאים כלליים:
 1. תוקף ההצעה: ההצעה בתוקף ל-30 ימים מיום הצעת המחיר.
 2. מחירים: המחירים כוללים מע"מ, אלא אם צוין אחרת.
@@ -274,6 +283,18 @@ export default function Dashboard() {
 
   const [clientSortField, setClientSortField] = useState('company_name');
   const [clientSortDirection, setClientSortDirection] = useState('asc');
+
+  const [quoteSortField, setQuoteSortField] = useState('created_at');
+  const [quoteSortDirection, setQuoteSortDirection] = useState('desc');
+
+  const handleQuoteSort = (field) => {
+    if (quoteSortField === field) {
+      setQuoteSortDirection(quoteSortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setQuoteSortField(field);
+      setQuoteSortDirection('asc');
+    }
+  };
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -1332,6 +1353,36 @@ export default function Dashboard() {
                           quote.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || (quote.status || 'draft').toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
+  }).sort((a, b) => {
+    let aVal, bVal;
+    if (quoteSortField === 'id') {
+      aVal = a.id;
+      bVal = b.id;
+    } else if (quoteSortField === 'client') {
+      aVal = a.clients?.company_name || '';
+      bVal = b.clients?.company_name || '';
+    } else if (quoteSortField === 'total') {
+      aVal = Number(a.total || 0);
+      bVal = Number(b.total || 0);
+    } else if (quoteSortField === 'status') {
+      aVal = a.status || '';
+      bVal = b.status || '';
+    } else if (quoteSortField === 'views') {
+      aVal = Number(a.view_count || 0);
+      bVal = Number(b.view_count || 0);
+    } else {
+      aVal = a.valid_until || a.created_at || '';
+      bVal = b.valid_until || b.created_at || '';
+    }
+
+    if (typeof aVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+
+    if (aVal < bVal) return quoteSortDirection === 'asc' ? -1 : 1;
+    if (aVal > bVal) return quoteSortDirection === 'asc' ? 1 : -1;
+    return 0;
   });
 
   const filteredClients = clients.filter(client => {
@@ -1716,14 +1767,30 @@ export default function Dashboard() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '800px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'מספר הזמנה' : '# Order'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'שם לקוח' : 'Client Name'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left', minWidth: '220px' }}>{isHebrew ? 'תיאור' : 'Description'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'הסכום' : 'Amount'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>{isHebrew ? 'סטטוס' : 'Status'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>{isHebrew ? 'צפיות' : 'Views'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'left' : 'right' }}>{isHebrew ? 'פעולות' : 'Actions'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleQuoteSort('id')}>
+                          {isHebrew ? 'מספר הזמנה' : '# Order'} {quoteSortField === 'id' ? (quoteSortDirection === 'asc' ? '▲' : '▼') : ''}
+                        </th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleQuoteSort('client')}>
+                          {isHebrew ? 'שם לקוח' : 'Client Name'} {quoteSortField === 'client' ? (quoteSortDirection === 'asc' ? '▲' : '▼') : ''}
+                        </th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left', minWidth: '220px' }}>
+                          {isHebrew ? 'תיאור' : 'Description'}
+                        </th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleQuoteSort('total')}>
+                          {isHebrew ? 'הסכום' : 'Amount'} {quoteSortField === 'total' ? (quoteSortDirection === 'asc' ? '▲' : '▼') : ''}
+                        </th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleQuoteSort('date')}>
+                          {isHebrew ? 'תאריך' : 'Date'} {quoteSortField === 'date' ? (quoteSortDirection === 'asc' ? '▲' : '▼') : ''}
+                        </th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleQuoteSort('status')}>
+                          {isHebrew ? 'סטטוס' : 'Status'} {quoteSortField === 'status' ? (quoteSortDirection === 'asc' ? '▲' : '▼') : ''}
+                        </th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center', cursor: 'pointer', userSelect: 'none', width: '70px' }} onClick={() => handleQuoteSort('views')} title={isHebrew ? 'מיון לפי צפיות' : 'Sort by views'}>
+                          {isHebrew ? 'צפיות' : 'Views'} {quoteSortField === 'views' ? (quoteSortDirection === 'asc' ? '▲' : '▼') : ''}
+                        </th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'left' : 'right' }}>
+                          {isHebrew ? 'פעולות' : 'Actions'}
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1789,9 +1856,9 @@ export default function Dashboard() {
                                 )}
                               </td>
 
-                              {/* 5. תאריך */}
-                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', color: '#64748b', fontSize: '0.8rem' }}>
-                                {quote.valid_until ? quote.valid_until : quote.created_at?.split('T')[0]}
+                              {/* 5. תאריך בפורמט DD/MM/YYYY */}
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', color: '#64748b', fontSize: '0.8rem', direction: 'ltr' }}>
+                                {formatDate(quote.valid_until || quote.created_at)}
                               </td>
 
                               {/* 6. סטטוס */}
@@ -1803,7 +1870,7 @@ export default function Dashboard() {
 
                               {/* 7. צפיות */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                                   <span>{quote.view_count || 0}</span>
                                   <span>👁️</span>
                                 </span>
