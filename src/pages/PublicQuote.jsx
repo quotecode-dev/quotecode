@@ -154,12 +154,26 @@ export default function PublicQuote() {
       const canvas = canvasRef.current;
       const signatureDataUrl = canvas ? canvas.toDataURL('image/png') : null;
 
-      const { error } = await supabase.rpc('approve_quote_public', {
+      // Try RPC first
+      const { error: rpcError } = await supabase.rpc('approve_quote_public', {
         quote_id: id,
         sig: signatureDataUrl
       });
 
-      if (error) throw error;
+      if (rpcError) {
+        // Fallback to direct update if RPC fails
+        const { error: directError } = await supabase
+          .from('quotes')
+          .update({
+            status: 'approved',
+            signature: signatureDataUrl,
+            approved_at: new Date().toISOString()
+          })
+          .eq('id', id);
+
+        if (directError) throw directError;
+      }
+
       setApproved(true);
     } catch (err) {
       console.error('Error approving quote:', err);
