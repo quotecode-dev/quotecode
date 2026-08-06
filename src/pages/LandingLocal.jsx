@@ -73,8 +73,7 @@ export default function LandingLocal() {
           <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '6px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
             <ProFlowLogo size={36} rtl={true} />
           </div>
-          <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-            {/* Updated English Navigation Button Route */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
             <button onClick={() => navigate('/global')} style={{ background: 'transparent', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.15)', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
               🇬🇧 English
             </button>
