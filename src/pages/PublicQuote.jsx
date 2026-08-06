@@ -154,28 +154,24 @@ export default function PublicQuote() {
       const canvas = canvasRef.current;
       const signatureDataUrl = canvas ? canvas.toDataURL('image/png') : null;
 
-      const { error: rpcError } = await supabase.rpc('approve_quote_public', {
-        quote_id: id,
-        sig: signatureDataUrl
-      });
+      const { error } = await supabase
+        .from('quotes')
+        .update({
+          status: 'approved',
+          signature: signatureDataUrl,
+          approved_at: new Date().toISOString()
+        })
+        .eq('id', id);
 
-      if (rpcError) {
-        const { error: directError } = await supabase
-          .from('quotes')
-          .update({
-            status: 'approved',
-            signature: signatureDataUrl,
-            approved_at: new Date().toISOString()
-          })
-          .eq('id', id);
-
-        if (directError) throw directError;
+      if (error) {
+        console.error("Supabase direct update error:", error);
+        throw error;
       }
 
       setApproved(true);
     } catch (err) {
       console.error('Error approving quote:', err);
-      alert(isHebrew ? 'שגיאה באישור ההצעה / Error approving quote' : 'Error approving quote');
+      alert(isHebrew ? `שגיאה באישור ההצעה: ${err.message}` : `Error approving quote: ${err.message}`);
     }
   };
 
