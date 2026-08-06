@@ -2,32 +2,32 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProFlowLogo from '../components/ProFlowLogo';
 
-export default function LandingGlobal() {
+export default function LandingLocal() {
   const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [openFaq, setOpenFaq] = useState(null);
 
   const faqs = [
     {
-      q: 'Do the displayed prices include taxes?',
-      a: 'Yes! All pricing tiers are structured for international standards with clear tax breakdowns where applicable.'
+      q: 'האם המחירים המוצגים כוללים מע"מ?',
+      a: 'כן! כל המחירים במסלולים מותאמים לשוק הישראלי וכוללים מע"מ 18% כחוק (עם פירוט הסכום לפני מע"מ).'
     },
     {
-      q: 'What is included in the 14-day free trial?',
-      a: 'The trial gives you full and unrestricted access to all PRO features (unlimited quotes, digital client approvals, and more) for 14 days with no obligations.'
+      q: 'מה כוללת תקופת הניסיון של 14 יום?',
+      a: 'תקופת הניסיון מעניקה לך גישה מלאה וחופשית לכל פיצ\'רי ה-PRO של המערכת (הצעות מחיר ללא הגבלה, שליחת וואטסאפ ועוד) למשך 14 יום ללא שום התחייבות.'
     },
     {
-      q: 'What happens after the 14-day trial if I do not subscribe?',
-      a: 'Your account will automatically move to the FREE tier with its standard limitations, so you can continue using the platform peacefully.'
+      q: 'מה קורה בתום 14 ימי הניסיון אם איני רוכש מנוי?',
+      a: 'החשבון שלך יעבור אוטומטית למסלול החינמי (FREE) עם המגבלות שלו, כך שתוכל להמשיך להשתמש במערכת בראש שקט.'
     },
     {
-      q: 'Is the platform optimized for mobile and desktop?',
-      a: 'Yes, ProFlow is built as a fully responsive modern SaaS platform, allowing you to generate quotes and manage your business from any computer, tablet, or smartphone.'
+      q: 'האם המערכת מותאמת לסמארטפון ולמחשב?',
+      a: 'כן, ProFlow פותחה כפלטפורמת SaaS מודרנית רספונסיבית לחלוטין, המאפשרת לך להפיק הצעות ולנהל את העסק מכל מחשב, טאבלט או סמארטפון.'
     }
   ];
 
   return (
-    <div dir="ltr" style={{ fontFamily: 'Inter, Segoe UI, Tahoma, sans-serif', background: '#090d16', minHeight: '100vh', color: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
+    <div dir="rtl" style={{ fontFamily: 'Inter, Segoe UI, Tahoma, sans-serif', background: '#090d16', minHeight: '100vh', color: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
       
       <style>{`
         .hover-card {
@@ -64,21 +64,21 @@ export default function LandingGlobal() {
 
       {/* Top Banner Launch Special */}
       <div style={{ background: 'linear-gradient(90deg, #4f46e5, #10b981)', color: 'white', padding: '10px 20px', textAlign: 'center', fontSize: '0.9rem', fontWeight: 'bold' }}>
-        🎉 Special Offer! 14-day free trial - with full access to all PRO features!
+        🎉 מבצע! 14 יום חינם לגמרי - עם גישה מלאה לכל הפיצ'רים של מסלול ה-PRO!
       </div>
 
       {/* Header */}
       <header style={{ background: 'rgba(9, 13, 22, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '6px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/global')}>
-            <ProFlowLogo size={36} rtl={false} />
+          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '6px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
+            <ProFlowLogo size={36} rtl={true} />
           </div>
           <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-            <button onClick={() => navigate('/he')} style={{ background: 'transparent', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.15)', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
-              🇮🇱 עברית
+            <button onClick={() => navigate('/global')} style={{ background: 'transparent', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.15)', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
+              🇬🇧 English
             </button>
             <button onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)' }}>
-              Sign In / Dashboard
+              כניסה למערכת / התחברות
             </button>
           </div>
         </div>
@@ -89,177 +89,185 @@ export default function LandingGlobal() {
         <div style={{ maxWidth: '1050px', margin: '0 auto', textAlign: 'center' }}>
           
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(99, 102, 241, 0.15))', color: '#34d399', padding: '10px 24px', borderRadius: '30px', fontSize: '1rem', fontWeight: '800', marginBottom: '24px', border: '1px solid rgba(16, 185, 129, 0.4)', boxShadow: '0 0 25px rgba(16, 185, 129, 0.25)' }}>
-            🔥 Launch Special: 14-day free trial for all PRO features!
+            🔥 מבצע השקה: 14 יום ניסיון חינם לכל פיצ'רי ה-PRO!
           </div>
           
           <h1 style={{ fontSize: '3.5rem', fontWeight: '900', color: '#ffffff', lineHeight: '1.15', marginBottom: '24px', letterSpacing: '-1px' }}>
-            Business Management, Quotes & Invoicing <br />
-            <span style={{ background: 'linear-gradient(to right, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Easily, Fast & Smart</span>
+            ניהול עסק, הפקת הצעות מחיר וגבייה <br />
+            <span style={{ background: 'linear-gradient(to right, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>בקלות, במהירות ובחכמה</span>
           </h1>
           
           <p style={{ fontSize: '1.25rem', color: '#94a3b8', maxWidth: '750px', margin: '0 auto 30px auto', lineHeight: '1.6' }}>
-            An advanced global SaaS platform tailored for modern businesses (featuring automated tax handling, digital signatures, and streamlined client management).
+            פלטפורמת SaaS מתקדמת המותאמת במיוחד לשוק הישראלי (כולל ניהול מע"מ 18% כחוק, מטבע שקלי, חתימות דיגיטליות וניהול לקוחות).
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
             <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
-              Start 14-Day Free PRO Trial Now 🚀
+              התחל 14 יום ניסיון חינם ב-PRO עכשיו 🚀
             </button>
             <span style={{ color: '#34d399', fontSize: '1rem', fontWeight: '800' }}>
-              14 days completely free for all PRO features!
+              14 יום חינם לגמרי לכל פיצ'רי ה-PRO!
             </span>
           </div>
 
           <div style={{ marginBottom: '60px', color: '#94a3b8', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <span style={{ color: '#fbbf24', fontSize: '1.2rem' }}>⭐⭐⭐⭐⭐</span> Over 500 businesses already generate quotes with ease
+            <span style={{ color: '#fbbf24', fontSize: '1.2rem' }}>⭐⭐⭐⭐⭐</span> מעל 500 עסקים כבר מפיקים הצעות מחיר בקלות
           </div>
 
           {/* Pain-Point Section with AI Image */}
-          <div className="pain-box" style={{ background: '#111827', borderRadius: '16px', overflow: 'hidden', maxWidth: '850px', margin: '0 auto 50px auto', padding: '30px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div>
+          <div className="pain-box" style={{ background: '#111827', borderRadius: '16px', overflow: 'hidden', maxWidth: '850px', margin: '0 auto 50px auto', padding: '30px', textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ textAlign: 'center' }}>
               <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '6px 16px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
-                🛑 Sound Familiar?
+                🛑 מוכר לך היטב?
               </span>
               <h2 style={{ fontSize: '2.2rem', fontWeight: '900', color: '#ffffff', marginTop: '15px', marginBottom: '10px' }}>
-                Tired of struggling with price quotes and endless paperwork?
+                לא נמאס לך להסתבך עם הצעות מחיר וניירת אינסופית?
               </h2>
               <p style={{ color: '#94a3b8', fontSize: '1.05rem' }}>
-                Forget hours spent on clunky Word documents, manual tax calculations, and exhausting follow-ups for client approvals.
+                שכח משעות מול קבצי וורד מסורבלים, חישובי מע"מ ידניים ומרדפים מעייפים אחרי אישורים מלקוחות.
               </p>
             </div>
             
             <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
               <img 
                 src="/frustrated-user.png" 
-                alt="Frustrated business owner dealing with paperwork" 
+                alt="בעל עסק מתוסכל מניירת והצעות מחיר" 
                 style={{ width: '100%', display: 'block', maxHeight: '450px', objectFit: 'cover' }} 
                 onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80'; }} 
               />
             </div>
-            <div style={{ color: '#34d399', fontWeight: 'bold', fontSize: '1.1rem' }}>
-              ✨ There is a much easier, smarter, and professional way to run your business with ProFlow!
+            <div style={{ textAlign: 'center', color: '#34d399', fontWeight: 'bold', fontSize: '1.1rem' }}>
+              ✨ יש דרך הרבה יותר קלה, חכמה ומקצועית לנהל את העסק שלך עם ProFlow!
             </div>
           </div>
 
           {/* Dashboard Preview Box */}
-          <div className="preview-box" style={{ borderRadius: '16px', overflow: 'hidden', background: '#111827', maxWidth: '850px', margin: '0 auto 80px auto', padding: '30px', textAlign: 'left' }}>
+          <div className="preview-box" style={{ borderRadius: '16px', overflow: 'hidden', background: '#111827', maxWidth: '850px', margin: '0 auto 80px auto', padding: '30px', textAlign: 'right' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '15px' }}>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }}></div>
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#eab308' }}></div>
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#22c55e' }}></div>
               </div>
-              <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>ProFlow SaaS Dashboard (Global)</span>
+              <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>ProFlow SaaS Dashboard (IL)</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', marginBottom: '20px' }}>
               <div style={{ background: '#1f2937', padding: '20px', borderRadius: '10px' }}>
-                <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Quotes This Month</div>
+                <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>הצעות מחיר החודש</div>
                 <div style={{ color: '#ffffff', fontSize: '1.8rem', fontWeight: 'bold', marginTop: '5px' }}>24</div>
               </div>
               <div style={{ background: '#1f2937', padding: '20px', borderRadius: '10px' }}>
-                <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Monthly Revenue</div>
-                <div style={{ color: '#10b981', fontSize: '1.8rem', fontWeight: 'bold', marginTop: '5px' }}>$ 12,400</div>
+                <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>הכנסות (כולל מע"מ 18%)</div>
+                <div style={{ color: '#10b981', fontSize: '1.8rem', fontWeight: 'bold', marginTop: '5px' }}>₪ 84,200</div>
               </div>
               <div style={{ background: '#1f2937', padding: '20px', borderRadius: '10px' }}>
-                <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Active Clients</div>
+                <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>לקוחות פעילים</div>
                 <div style={{ color: '#818cf8', fontSize: '1.8rem', fontWeight: 'bold', marginTop: '5px' }}>142</div>
               </div>
             </div>
             <div style={{ background: '#1f2937', padding: '25px', borderRadius: '10px', textAlign: 'center', color: '#94a3b8', border: '1px dashed rgba(255,255,255,0.1)' }}>
-              Live Preview of ProFlow Quotation & Billing System
+              תצוגה מקדימה חיה של מערכת ניהול הצעות המחיר והגבייה
             </div>
           </div>
 
           {/* Features Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '25px', textAlign: 'left', marginBottom: '80px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '25px', textAlign: 'right', marginBottom: '80px' }}>
             <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '15px', background: 'rgba(251, 191, 36, 0.1)', display: 'inline-block', padding: '10px', borderRadius: '12px' }}>⚡</div>
-              <h3 style={{ fontSize: '1.25rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Quotes in Minutes</h3>
-              <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>Create professional, beautiful price quotes including automated tax calculations, discounts, and items from your catalog.</p>
+              <h3 style={{ fontSize: '1.25rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>הפקת הצעות מחיר בדקה</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>צור הצעות מחיר מקצועיות ומהודרות הכוללות חישוב מע"מ אוטומטי, הנחות ומוצרים מהקטלוג שלך.</p>
             </div>
             
             <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '15px', background: 'rgba(99, 102, 241, 0.1)', display: 'inline-block', padding: '10px', borderRadius: '12px' }}>✍️</div>
-              <h3 style={{ fontSize: '1.25rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Digital Signatures & Approvals</h3>
-              <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>Send a direct link to your client to review, digitally sign, and approve orders from any smartphone or computer.</p>
+              <h3 style={{ fontSize: '1.25rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>חתימה דיגיטלית ואישור לקוח</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>שלח לינק ללקוח שיוכל לצפות במסמך, לחתום דיגיטלית ולאשר את ההזמנה מכל סמארטפון או מחשב.</p>
             </div>
 
             <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '15px', background: 'rgba(16, 185, 129, 0.1)', display: 'inline-block', padding: '10px', borderRadius: '12px' }}>📊</div>
-              <h3 style={{ fontSize: '1.25rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Income & Expense Tracking</h3>
-              <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>Track business profits, manage operating expenses, and view accurate financial reports in real time.</p>
+              <h3 style={{ fontSize: '1.25rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>ניהול הכנסות והוצאות</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>עקוב אחר רווחי העסק, נהל הוצאות שוטפות וצפה בדוחות פיננסיים מדויקים בזמן אמת.</p>
             </div>
           </div>
 
-          {/* Pricing Section - Global */}
+          {/* Pricing Section - Israel */}
           <div style={{ marginBottom: '80px' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px' }}>Plans & Pricing</h2>
-            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>Choose the best plan for your business. <strong style={{ color: '#10b981' }}>14 days completely free for all PRO features!</strong></p>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px' }}>מסלולים ומחירים</h2>
+            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>בחר את המסלול המתאים ביותר לעסק שלך. <strong style={{ color: '#10b981' }}>14 יום חינם לגמרי לכל פיצ'רי ה-PRO!</strong></p>
             
             <div style={{ display: 'inline-flex', background: '#111827', padding: '4px', borderRadius: '12px', marginBottom: '40px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <button 
                 onClick={() => setBillingCycle('monthly')}
                 style={{ background: billingCycle === 'monthly' ? '#6366f1' : 'transparent', color: billingCycle === 'monthly' ? '#ffffff' : '#94a3b8', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }}>
-                Monthly Billing
+                תשלום חודשי
               </button>
               <button 
                 onClick={() => setBillingCycle('annual')}
                 style={{ background: billingCycle === 'annual' ? '#6366f1' : 'transparent', color: billingCycle === 'annual' ? '#ffffff' : '#94a3b8', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }}>
-                Annual Billing <span style={{ background: '#10b981', color: 'white', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', marginLeft: '6px' }}>Save 20%!</span>
+                תשלום שנתי <span style={{ background: '#10b981', color: 'white', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', marginRight: '6px' }}>חסוך 20%!</span>
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', textAlign: 'left' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px', textAlign: 'right' }}>
               
               {/* Free */}
               <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Free Plan</h3>
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>Ideal for getting started.</p>
-                <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#ffffff', marginBottom: '20px' }}>$0 <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ month</span></div>
+                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול חינמי</h3>
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>מתאים לעסקים בתחילת הדרך.</p>
+                <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#ffffff', marginBottom: '20px' }}>0 ₪ <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span></div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ Up to 5 quotes per month</li>
-                  <li>✓ Basic client management</li>
-                  <li>✓ Email support</li>
+                  <li>✓ עד 5 הצעות מחיר בחודש</li>
+                  <li>✓ ניהול לקוחות בסיסי</li>
+                  <li>✓ תמיכה במייל</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  Start for Free
+                  התחל בחינם
                 </button>
               </div>
 
               {/* Basic Plan */}
               <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Basic Plan</h3>
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>For small businesses needing robust tools.</p>
+                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול בסיסי (Basic)</h3>
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>לעסקים קטנים שצריכים פתרון מושלם.</p>
                 <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#ffffff', marginBottom: '20px' }}>
-                  {billingCycle === 'monthly' ? '$15' : '$12'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ month</span>
+                  {billingCycle === 'monthly' ? '49 ₪' : '39 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span>
                 </div>
+                <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
+                  {billingCycle === 'monthly' ? '* כולל מע"מ 18% (41.53 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (33.05 ₪ לפני מע"מ)'}
+                </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ <strong>14-day free trial!</strong></li>
-                  <li>✓ Up to 20 quotes per month</li>
-                  <li>✓ Digital signatures & client management</li>
+                  <li>✓ <strong>14 יום ניסיון חינם!</strong></li>
+                  <li>✓ עד 20 הצעות מחיר בחודש</li>
+                  <li>✓ חתימה דיגיטלית וניהול לקוחות</li>
+                  <li style={{ color: '#ef4444' }}>✗ ללא שליחה ישירה בווצאפ</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  Start 14-Day Free Trial
+                  התחל 14 יום חינם
                 </button>
               </div>
 
               {/* Pro / Business Plan (Highlighted) */}
               <div className="hover-card" style={{ background: '#111827', padding: '35px', borderRadius: '16px', border: '2px solid #6366f1', boxShadow: '0 15px 30px rgba(99, 102, 241, 0.15)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
                 <div style={{ position: 'absolute', top: '-14px', right: '20px', background: '#6366f1', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                  Most Popular ⭐
+                  הפופולרי ביותר ⭐
                 </div>
-                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>Pro Business Plan</h3>
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>For growing agencies and businesses with no limits.</p>
+                <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '10px', fontWeight: '700' }}>מסלול עסקי (Pro)</h3>
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '20px' }}>לסוכנויות ועסקים צומחים ללא מגבלות.</p>
                 <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#818cf8', marginBottom: '20px' }}>
-                  {billingCycle === 'monthly' ? '$29' : '$23'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ month</span>
+                  {billingCycle === 'monthly' ? '99 ₪' : '79 ₪'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ חודש</span>
                 </div>
+                <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '-15px', marginBottom: '15px' }}>
+                  {billingCycle === 'monthly' ? '* כולל מע"מ 18% (83.90 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (66.95 ₪ לפני מע"מ)'}
+                </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ <strong>14 days free for all PRO features!</strong></li>
-                  <li>✓ Unlimited quotes</li>
-                  <li>✓ Full income & expense tracking</li>
+                  <li>✓ <strong>14 יום חינם לכל פיצ'רי ה-PRO!</strong></li>
+                  <li>✓ הצעות מחיר ללא הגבלה כלל</li>
+                  <li>✓ שליחה ישירה בווצאפ (WhatsApp)</li>
+                  <li>✓ ניהול הכנסות והוצאות מלא</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
-                  Start 14-Day PRO Trial
+                  התחל 14 יום חינם ב-PRO
                 </button>
               </div>
 
@@ -267,9 +275,9 @@ export default function LandingGlobal() {
           </div>
 
           {/* FAQ Section */}
-          <div style={{ marginBottom: '80px', textAlign: 'left', maxWidth: '800px', margin: '0 auto 80px auto' }}>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px', textAlign: 'center' }}>Frequently Asked Questions</h2>
-            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.05rem', textAlign: 'center' }}>Everything you need to know about the platform.</p>
+          <div style={{ marginBottom: '80px', textAlign: 'right', maxWidth: '800px', margin: '0 auto 80px auto' }}>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px', textAlign: 'center' }}>שאלות נפוצות</h2>
+            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.05rem', textAlign: 'center' }}>כל מה ששאלת על המערכת, במקום אחד.</p>
             
             {faqs.map((faq, idx) => (
               <div key={idx} className="faq-item" style={{ padding: '20px', cursor: 'pointer' }} onClick={() => setOpenFaq(openFaq === idx ? null : idx)}>
@@ -291,7 +299,7 @@ export default function LandingGlobal() {
 
       {/* Footer */}
       <footer style={{ background: '#05070a', color: '#64748b', padding: '40px 20px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} ProFlow Global. All rights reserved.</p>
+        <p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} ProFlow Israel. כל הזכויות שמורות.</p>
       </footer>
 
     </div>
