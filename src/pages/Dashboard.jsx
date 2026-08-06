@@ -1713,17 +1713,17 @@ export default function Dashboard() {
                 </div>
 
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right', minWidth: '800px' }} dir="rtl">
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '800px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        <th style={{ padding: '10px 8px', textAlign: 'right' }}>{isHebrew ? 'מספר הזמנה' : 'Order #'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'right' }}>{isHebrew ? 'שם לקוח' : 'Client Name'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'right', minWidth: '220px' }}>{isHebrew ? 'תיאור' : 'Description'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'right' }}>{isHebrew ? 'הסכום' : 'Amount'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'right' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'מספר הזמנה' : '# Order'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'שם לקוח' : 'Client Name'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left', minWidth: '220px' }}>{isHebrew ? 'תיאור' : 'Description'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'הסכום' : 'Amount'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left' }}>{isHebrew ? 'תאריך' : 'Date'}</th>
                         <th style={{ padding: '10px 8px', textAlign: 'center' }}>{isHebrew ? 'סטטוס' : 'Status'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>{isHebrew ? 'מספר צפיות' : 'Views'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'left' }}>{isHebrew ? 'פעולות' : 'Actions'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>{isHebrew ? 'צפיות' : 'Views'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'left' : 'right' }}>{isHebrew ? 'פעולות' : 'Actions'}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1763,22 +1763,22 @@ export default function Dashboard() {
                             <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
                               
                               {/* 1. מספר הזמנה */}
-                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right', fontWeight: '700', color: '#4f46e5', direction: 'ltr' }}>
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', fontWeight: '700', color: '#4f46e5', direction: 'ltr' }}>
                                 #{quote.id.slice(0, 6)}
                               </td>
 
                               {/* 2. שם לקוח */}
-                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right', fontWeight: '800', color: '#0f172a' }}>
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', fontWeight: '800', color: '#0f172a' }}>
                                 {quote.clients?.company_name || 'N/A'}
                               </td>
 
                               {/* 3. התיאור */}
-                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right', color: '#334155', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', color: '#334155', fontSize: '0.85rem', lineHeight: '1.4' }}>
                                 {firstItemDesc || '-'}
                               </td>
 
                               {/* 4. הסכום */}
-                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right' }}>
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left' }}>
                                 <div style={{ fontWeight: '900', color: '#0f172a', fontSize: '0.9rem' }}>
                                   {quoteSym}{formatNum(quote.total)}
                                 </div>
@@ -1790,18 +1790,18 @@ export default function Dashboard() {
                               </td>
 
                               {/* 5. תאריך */}
-                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right', color: '#64748b', fontSize: '0.8rem' }}>
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', color: '#64748b', fontSize: '0.8rem' }}>
                                 {quote.valid_until ? quote.valid_until : quote.created_at?.split('T')[0]}
                               </td>
 
-                              {/* 6. סטטוס (בין פעולות לצפיות) */}
+                              {/* 6. סטטוס */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'center' }}>
                                 <span style={{ background: badge.bg, color: badge.color, padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', display: 'inline-block' }}>
                                   {badge.text}
                                 </span>
                               </td>
 
-                              {/* 7. מספר צפיות */}
+                              {/* 7. צפיות */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                   <span>{quote.view_count || 0}</span>
@@ -1810,7 +1810,7 @@ export default function Dashboard() {
                               </td>
 
                               {/* 8. פעולות */}
-                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'left', position: 'relative' }}>
+                              <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'left' : 'right', position: 'relative' }}>
                                 <div ref={dropdownRef} style={{ display: 'inline-block', position: 'relative' }}>
                                   <button
                                     onClick={(e) => handleToggleDropdown(e, quote.id)}
