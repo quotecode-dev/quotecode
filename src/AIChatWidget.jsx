@@ -31,14 +31,14 @@ export default function AIChatWidget({ isHebrew }) {
       const lower = userMsg.toLowerCase();
 
       if (isHebrew) {
-        if (lower.includes('הצעה') || lower.includes('חדשה') || lower.includes('יוצר') || lower.includes('הזמנה')) {
+        if ((lower.includes('הזמנה') || lower.includes('הצעה')) && (lower.includes('מייל') || lower.includes('אימייל') || lower.includes('לשלוח') || lower.includes('שולח'))) {
+          reply = 'כדי לשלוח הזמנה או הצעת מחיר במייל: היכנס לטבלת ההצעות בדשבורד הראשי, לחץ על כפתור ה-"פעולות ▼" בשורה של ההצעה שתרצה לשלוח, ובחר באפשרות "שלח במייל".';
+        } else if (lower.includes('הצעה') || lower.includes('חדשה') || lower.includes('יוצר')) {
           reply = 'כדי ליצור הצעת מחיר חדשה, לחץ על כפתור "➕ צור הצעת מחיר חדשה" בדשבורד הראשי, מלא את פרטי הלקוח, הוסף פריטים ושמור בענן.';
         } else if (lower.includes('לקוח') || lower.includes('crm')) {
           reply = 'בטאב "לקוחות" תוכל לראות את כל ספר הלקוחות שלך, לנהל כתובות, ח.פ ותנאי תשלום לכל לקוח.';
         } else if (lower.includes('וואטסאפ') || lower.includes('whatsapp'))  {
           reply = 'ניתן לשלוח הצעות מחיר ישירות בוואטסאפ ללקוח דרך כפתור הוואטסאפ בתפריט הפעולות בשורת ההצעה (זמין למנויי PRO).';
-        } else if (lower.includes('מייל') || lower.includes('אימייל')) {
-          reply = 'ניתן לשלוח הצעת מחיר במייל דרך תפריט הפעולות בשורת ההצעה. האימייל יישלח אוטומטית דרך השרת בענן.';
         } else if (lower.includes('מע"מ') || lower.includes('vat')) {
           reply = 'המערכת מחשבת מע"מ אוטומטית לפי 18% ללקוחות בארץ ו-0% ללקוחות מחו"ל בהתאם להגדרות העסק.';
         } else if (lower.includes('מיון') || lower.includes('סדר') || lower.includes('למיין')) {
@@ -51,6 +51,8 @@ export default function AIChatWidget({ isHebrew }) {
       } else {
         if (lower.includes('quote') || lower.includes('create')) {
           reply = 'To create a new quote, click on "Create New Quote" on your dashboard, fill in client details, add items, and save.';
+        } else if (lower.includes('email') || lower.includes('send')) {
+          reply = 'To send a quote via email: Go to the quotes table, click the "Actions ▼" button on the specific quote row, and select "Send Email".';
         } else if (lower.includes('client') || lower.includes('crm')) {
           reply = 'In the "Clients" tab you can manage your client database, tax IDs, and contact info.';
         } else if (lower.includes('whatsapp')) {
