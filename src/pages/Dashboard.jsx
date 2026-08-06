@@ -270,9 +270,19 @@ export default function Dashboard() {
       const spaceBelow = window.innerHeight - rect.bottom;
       const openUpward = spaceBelow < 250;
 
+      // תיקון מיקום רספונסיבי למובייל כך שהתפריט לא יברח הצידה או ייחתך
+      const menuWidth = 210;
+      let calculatedLeft = isHebrew ? rect.right - menuWidth : rect.left;
+      if (calculatedLeft + menuWidth > window.innerWidth - 10) {
+        calculatedLeft = window.innerWidth - menuWidth - 10;
+      }
+      if (calculatedLeft < 10) {
+        calculatedLeft = 10;
+      }
+
       setDropdownPos({
         top: openUpward ? rect.top - 245 : rect.bottom + 6,
-        left: isHebrew ? Math.max(10, rect.right - 210) : Math.min(window.innerWidth - 220, rect.left)
+        left: calculatedLeft
       });
       setOpenDropdownId(quoteId);
     }
