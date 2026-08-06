@@ -1371,8 +1371,8 @@ export default function Dashboard() {
       aVal = Number(a.view_count || 0);
       bVal = Number(b.view_count || 0);
     } else {
-      aVal = a.valid_until || a.created_at || '';
-      bVal = b.valid_until || b.created_at || '';
+      aVal = a.created_at || '';
+      bVal = b.created_at || '';
     }
 
     if (typeof aVal === 'string') {
@@ -1512,6 +1512,8 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  const tableDir = isHebrew ? 'rtl' : 'ltr';
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column', paddingBottom: '70px' }}>
@@ -1764,7 +1766,7 @@ export default function Dashboard() {
                 </div>
 
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '800px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '800px' }} dir={tableDir}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         <th style={{ padding: '10px 8px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleQuoteSort('id')}>
@@ -1856,9 +1858,9 @@ export default function Dashboard() {
                                 )}
                               </td>
 
-                              {/* 5. תאריך בפורמט DD/MM/YYYY */}
+                              {/* 5. תאריך */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', color: '#64748b', fontSize: '0.8rem', direction: 'ltr' }}>
-                                {formatDate(quote.valid_until || quote.created_at)}
+                                {formatDate(quote.created_at)}
                               </td>
 
                               {/* 6. סטטוס */}
