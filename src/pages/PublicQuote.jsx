@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import ProFlowLogo from '../components/ProFlowLogo';
+import ProFlowLogo from './components/ProFlowLogo';
 
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -154,14 +154,10 @@ export default function PublicQuote() {
       const canvas = canvasRef.current;
       const signatureDataUrl = canvas ? canvas.toDataURL('image/png') : null;
 
-      const { error } = await supabase
-        .from('quotes')
-        .update({ 
-          status: 'approved',
-          signature: signatureDataUrl,
-          approved_at: new Date().toISOString()
-        })
-        .eq('id', id);
+      const { error } = await supabase.rpc('approve_quote_public', {
+        quote_id: id,
+        sig: signatureDataUrl
+      });
 
       if (error) throw error;
       setApproved(true);
