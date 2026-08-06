@@ -74,6 +74,7 @@ export default function LandingLocal() {
             <ProFlowLogo size={36} rtl={true} />
           </div>
           <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+            {/* Updated English Navigation Button Route */}
             <button onClick={() => navigate('/global')} style={{ background: 'transparent', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.15)', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
               🇬🇧 English
             </button>
