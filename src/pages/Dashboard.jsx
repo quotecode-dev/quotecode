@@ -235,6 +235,7 @@ export default function Dashboard() {
   const [clientSearchTerm, setClientSearchTerm] = useState('');
   const [activeTooltip, setActiveTooltip] = useState({ quoteId: null, action: null });
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -244,8 +245,29 @@ export default function Dashboard() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
+
+  const handleToggleDropdown = (e, quoteId) => {
+    e.stopPropagation();
+    if (openDropdownId === quoteId) {
+      setOpenDropdownId(null);
+    } else {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUpward = spaceBelow < 250;
+
+      setDropdownPos({
+        top: openUpward ? rect.top - 245 : rect.bottom + 6,
+        left: isHebrew ? Math.max(10, rect.right - 210) : Math.min(window.innerWidth - 220, rect.left)
+      });
+      setOpenDropdownId(quoteId);
+    }
+  };
   
   const [sortField, setSortField] = useState('email');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -1690,7 +1712,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div style={{ overflowX: 'auto', position: 'relative' }}>
+                <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '550px' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -1759,11 +1781,11 @@ export default function Dashboard() {
                               </td>
                               <td style={{ padding: '10px 6px', color: '#64748b', fontWeight: '400' }}>{quote.valid_until || '-'}</td>
                               
-                              {/* ACTIONS DROPDOWN CELL WITH FIXED HOVER FLOATING MENU */}
+                              {/* ACTIONS DROPDOWN CELL WITH FIXED FLOATING VIEWPORT POSITION */}
                               <td style={{ padding: '10px 6px', verticalAlign: 'middle', position: 'relative' }}>
                                 <div ref={dropdownRef} style={{ display: 'inline-block', position: 'relative' }}>
                                   <button
-                                    onClick={() => setOpenDropdownId(isDropdownOpen ? null : quote.id)}
+                                    onClick={(e) => handleToggleDropdown(e, quote.id)}
                                     style={{
                                       background: '#4f46e5',
                                       color: 'white',
@@ -1785,11 +1807,12 @@ export default function Dashboard() {
                                   {isDropdownOpen && (
                                     <div style={{
                                       position: 'fixed',
-                                      transform: 'translateY(5px)',
+                                      top: `${dropdownPos.top}px`,
+                                      left: `${dropdownPos.left}px`,
                                       background: 'white',
                                       border: '1px solid #cbd5e1',
                                       borderRadius: '8px',
-                                      boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                                      boxShadow: '0 10px 35px rgba(0,0,0,0.25)',
                                       zIndex: 999999,
                                       minWidth: '200px',
                                       padding: '6px 0',
