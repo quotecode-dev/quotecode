@@ -348,7 +348,10 @@ export default function Dashboard() {
   const [pendingEmailQuote, setPendingEmailQuote] = useState(null);
 
   const isInternationalAccount = bizCountry === 'International';
-  const isHebrew = !isInternationalAccount;
+  
+  // Login screen language detection based on browser or account state
+  const isBrowserHebrew = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
+  const isHebrew = session ? !isInternationalAccount : isBrowserHebrew;
 
   let trialDaysLeft = null;
   let isTrialExpired = false;
@@ -1439,8 +1442,9 @@ export default function Dashboard() {
   const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 5 && trialDaysLeft > 0 && !isSuperAdmin;
 
   if (!session) {
+    const loginDir = isHebrew ? 'rtl' : 'ltr';
     return (
-      <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }}>
+      <div dir={loginDir} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }}>
         <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
           
           <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
