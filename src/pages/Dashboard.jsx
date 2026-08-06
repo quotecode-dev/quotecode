@@ -429,10 +429,10 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (session) {
+    if (session?.user?.id) {
       loadData();
     }
-  }, [session]);
+  }, [session?.user?.id]);
 
   async function loadData() {
     await fetchQuotes();
