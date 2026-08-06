@@ -1690,7 +1690,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div style={{ overflowX: 'visible' }}>
+                <div style={{ overflowX: 'auto', position: 'relative' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '550px' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -1759,8 +1759,8 @@ export default function Dashboard() {
                               </td>
                               <td style={{ padding: '10px 6px', color: '#64748b', fontWeight: '400' }}>{quote.valid_until || '-'}</td>
                               
-                              {/* ACTIONS DROPDOWN CELL (OPENS UPWARD AND HOVERS ABOVE ALL CONTENT) */}
-                              <td style={{ padding: '10px 6px', verticalAlign: 'middle', position: 'relative', overflow: 'visible' }}>
+                              {/* ACTIONS DROPDOWN CELL WITH FIXED HOVER FLOATING MENU */}
+                              <td style={{ padding: '10px 6px', verticalAlign: 'middle', position: 'relative' }}>
                                 <div ref={dropdownRef} style={{ display: 'inline-block', position: 'relative' }}>
                                   <button
                                     onClick={() => setOpenDropdownId(isDropdownOpen ? null : quote.id)}
@@ -1779,19 +1779,17 @@ export default function Dashboard() {
                                       boxShadow: '0 2px 4px rgba(79, 70, 229, 0.2)'
                                     }}
                                   >
-                                    {isHebrew ? 'פעולות ▲' : 'Actions ▲'}
+                                    {isHebrew ? 'פעולות ▼' : 'Actions ▼'}
                                   </button>
 
                                   {isDropdownOpen && (
                                     <div style={{
-                                      position: 'absolute',
-                                      [isHebrew ? 'right' : 'left']: 0,
-                                      bottom: '110%',
-                                      marginBottom: '6px',
+                                      position: 'fixed',
+                                      transform: 'translateY(5px)',
                                       background: 'white',
                                       border: '1px solid #cbd5e1',
                                       borderRadius: '8px',
-                                      boxShadow: '0 -15px 35px -5px rgba(0,0,0,0.25)',
+                                      boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
                                       zIndex: 999999,
                                       minWidth: '200px',
                                       padding: '6px 0',
@@ -1823,7 +1821,7 @@ export default function Dashboard() {
                                         </button>
                                         {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
                                           <div className="feature-lock-tooltip" style={{
-                                            position: 'absolute', bottom: 0, [isHebrew ? 'right' : 'left']: '105%',
+                                            position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
                                             background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                             fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
                                           }}>
@@ -1847,7 +1845,7 @@ export default function Dashboard() {
                                         </button>
                                         {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
                                           <div className="feature-lock-tooltip" style={{
-                                            position: 'absolute', bottom: 0, [isHebrew ? 'right' : 'left']: '105%',
+                                            position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
                                             background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                             fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
                                           }}>
@@ -1874,7 +1872,7 @@ export default function Dashboard() {
                                         </button>
                                         {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
                                           <div className="feature-lock-tooltip" style={{
-                                            position: 'absolute', bottom: 0, [isHebrew ? 'right' : 'left']: '105%',
+                                            position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
                                             background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                             fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
                                           }}>
@@ -1908,7 +1906,7 @@ export default function Dashboard() {
                                         </button>
                                         {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
                                           <div className="feature-lock-tooltip" style={{
-                                            position: 'absolute', bottom: 0, [isHebrew ? 'right' : 'left']: '105%',
+                                            position: 'absolute', top: 0, [isHebrew ? 'right' : 'left']: '105%',
                                             background: '#1e293b', color: '#fff', padding: '6px 12px', borderRadius: '6px',
                                             fontSize: '0.75rem', whiteSpace: 'nowrap', zIndex: 999999, boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
                                           }}>
