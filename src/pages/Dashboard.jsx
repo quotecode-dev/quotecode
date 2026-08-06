@@ -1482,6 +1482,10 @@ export default function Dashboard() {
           {authError && <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: '#fee2e2', color: '#991b1b' }}>{authError}</div>}
 
           <form onSubmit={handleAuth} autoComplete="off">
+            {/* Hidden dummy fields to prevent password manager popups */}
+            <input type="text" name="fake_user" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
+            <input type="password" name="fake_pass" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
+
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isLoginHebrew ? 'אימייל' : 'Email'}</label>
               <input type="email" name="user_email_field" autoComplete="off" data-lpignore="true" data-bwignore="true" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
