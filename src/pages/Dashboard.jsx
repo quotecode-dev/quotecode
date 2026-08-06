@@ -1756,7 +1756,7 @@ export default function Dashboard() {
                         }}>
                           {/* Top row: Quote ID + Item Description */}
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-                            <div style={{ fontWeight: '800', color: '#1e293b', fontSize: '0.95rem', direction: 'ltr' }}>
+                            <div style={{ fontWeight: '700', color: '#4f46e5', fontSize: '0.9rem', direction: 'ltr' }}>
                               #{quote.id.slice(0, 6)} {firstItemDesc && <span style={{ color: '#64748b', fontWeight: 'normal', fontSize: '0.85rem' }}>| {firstItemDesc}</span>}
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1769,11 +1769,11 @@ export default function Dashboard() {
                           {/* Middle row: Client Name & Final Price */}
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                             <div>
-                              <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#0f172a' }}>
+                              <div style={{ fontSize: '1.05rem', fontWeight: 'bold', color: '#0f172a' }}>
                                 {quote.clients?.company_name || 'N/A'}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px', flexWrap: 'wrap' }}>
-                                <span style={{ background: badge.bg, color: badge.color, padding: '3px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                <span style={{ background: badge.bg, color: badge.color, padding: '2px 6px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
                                   {badge.text}
                                 </span>
                                 <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
@@ -1783,7 +1783,7 @@ export default function Dashboard() {
                             </div>
 
                             <div style={{ textAlign: isHebrew ? 'left' : 'right' }}>
-                              <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#0f172a' }}>
+                              <div style={{ fontSize: '1.15rem', fontWeight: '900', color: '#0f172a' }}>
                                 {quoteSym}{formatNum(quote.total)}
                               </div>
                               {isLocalIsraeliBusiness && isHebrew && (
@@ -1794,28 +1794,8 @@ export default function Dashboard() {
                             </div>
                           </div>
 
-                          {/* Bottom row: Status selector & Actions dropdown */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '10px', marginTop: '4px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-                            <select
-                              value={currentStatus}
-                              onChange={(e) => handleStatusChange(quote.id, e.target.value)}
-                              style={{
-                                padding: '4px 8px',
-                                borderRadius: '6px',
-                                fontSize: '0.75rem',
-                                fontWeight: 'bold',
-                                background: badge.bg,
-                                color: badge.color,
-                                border: '1px solid #cbd5e1',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              <option value="draft">{isHebrew ? 'טיוטה' : 'Draft'}</option>
-                              <option value="sent">{isHebrew ? 'נשלח' : 'Sent'}</option>
-                              <option value="approved">{isHebrew ? 'אושר' : 'Approved'}</option>
-                              <option value="paid">{isHebrew ? 'שולם' : 'Paid'}</option>
-                            </select>
-
+                          {/* Bottom row: Actions dropdown */}
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #f1f5f9', paddingTop: '10px', marginTop: '4px' }}>
                             {/* ACTIONS DROPDOWN */}
                             <div ref={dropdownRef} style={{ display: 'inline-block', position: 'relative' }}>
                               <button
