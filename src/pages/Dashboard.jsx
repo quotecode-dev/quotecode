@@ -349,7 +349,6 @@ export default function Dashboard() {
 
   const isInternationalAccount = bizCountry === 'International';
   
-  // Login screen language detection based on browser or account state
   const isBrowserHebrew = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
   const isHebrew = session ? !isInternationalAccount : isBrowserHebrew;
 
@@ -1442,10 +1441,12 @@ export default function Dashboard() {
   const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 5 && trialDaysLeft > 0 && !isSuperAdmin;
 
   if (!session) {
-    const loginDir = isHebrew ? 'rtl' : 'ltr';
+    const isLoginHebrew = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
+    const loginDir = isLoginHebrew ? 'rtl' : 'ltr';
+
     return (
       <div dir={loginDir} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }}>
-        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isHebrew ? 'right' : 'left' }}>
+        <div style={{ background: 'white', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '400px', textAlign: isLoginHebrew ? 'right' : 'left' }}>
           
           <div style={{ textAlign: 'center', marginBottom: '25px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1471,9 +1472,9 @@ export default function Dashboard() {
 
             </div>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
-              {isSignUp 
-                ? (isHebrew ? 'יצירת חשבון חדש (כולל 14 יום ניסיון מלא ב-PRO!)' : 'Create new account (incl. 14 days full PRO trial!)') 
-                : (isHebrew ? 'התחברות למערכת הניהול' : 'Sign in to your dashboard')}
+              {isLoginHebrew 
+                ? 'התחברות למערכת הניהול' 
+                : 'Sign in to your dashboard'}
             </p>
           </div>
 
@@ -1482,15 +1483,15 @@ export default function Dashboard() {
 
           <form onSubmit={handleAuth}>
             <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'אימייל' : 'Email'}</label>
-              <input type="email" name="loginEmail" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isLoginHebrew ? 'אימייל' : 'Email'}</label>
+              <input type="email" name="loginEmail" autoComplete="email" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff' }} />
             </div>
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isHebrew ? 'סיסמה' : 'Password'}</label>
-              <input type="password" name="loginPassword" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>{isLoginHebrew ? 'סיסמה' : 'Password'}</label>
+              <input type="password" name="loginPassword" autoComplete="current-password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
-              {isSignUp ? (isHebrew ? 'הירשם (14 יום PRO מתנה)' : 'Sign Up (14d PRO Trial)') : (isHebrew ? 'התחבר' : 'Sign In')}
+              {isLoginHebrew ? 'התחבר' : 'Sign In'}
             </button>
           </form>
 
@@ -1500,17 +1501,15 @@ export default function Dashboard() {
               onClick={() => setIsSignUp(!isSignUp)}
               style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontWeight: '600', padding: 0 }}
             >
-              {isSignUp ? (isHebrew ? 'כבר יש לך חשבון? התחבר' : 'Already have an account?') : (isHebrew ? 'אין חשבון? הירשם וקבל 14 יום PRO מתנה!' : "Don't have an account?")}
+              {isLoginHebrew ? 'אין חשבון? הירשם וקבל 14 יום PRO מתנה!' : "Don't have an account? Sign up!"}
             </button>
-            {!isSignUp && (
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-              >
-                {isHebrew ? 'שכחת סיסמה?' : 'Forgot password?'}
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+            >
+              {isLoginHebrew ? 'שכחת סיסמה?' : 'Forgot password?'}
+            </button>
           </div>
         </div>
       </div>
@@ -2687,7 +2686,7 @@ export default function Dashboard() {
                     {filteredAdminAccounts.length === 0 ? (
                       <tr>
                         <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
-                          {isHebrew ? 'לא נמצאו משתמשים התואמים לחיפוש.' : 'No users found matching your search.'}
+                          {isHebrew ? 'לא נמצאו משתמשים התואמים את החיפוש.' : 'No users found matching your search.'}
                         </td>
                       </tr>
                     ) : (
