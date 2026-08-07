@@ -267,21 +267,36 @@ export default function Dashboard() {
       setIsPasswordRecoveryMode(true);
     }
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    const initAuth = async () => {
+      setIsInitializing(true);
+      const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       if (session?.user?.id) {
-        await loadData();
+        await loadData(session.user.id, session.user.email);
       }
       setIsInitializing(false);
-    });
+    };
+
+    initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      if (session?.user?.id) {
-        await loadData();
-      }
-      setIsInitializing(false);
-      if (event === 'PASSWORD_RECOVERY') {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setIsInitializing(true);
+        setSession(session);
+        if (session?.user?.id) {
+          await loadData(session.user.id, session.user.email);
+        }
+        setIsInitializing(false);
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setQuotes([]);
+        setClients([]);
+        setServices([]);
+        setExpenses([]);
+        setSettingId(null);
+        setBizCountry('Local');
+        setIsInitializing(false);
+      } else if (event === 'PASSWORD_RECOVERY') {
         setIsPasswordRecoveryMode(true);
       }
     });
@@ -385,7 +400,6 @@ export default function Dashboard() {
   const [pendingEmailQuote, setPendingEmailQuote] = useState(null);
 
   const isInternationalAccount = bizCountry === 'International';
-  
   const isHebrew = !isInternationalAccount;
 
   let trialDaysLeft = null;
@@ -452,31 +466,29 @@ export default function Dashboard() {
     clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management'
   };
 
-  async function loadData() {
-    await fetchQuotes();
-    await fetchClients();
-    await fetchServices();
-    await fetchExpenses();
-    await fetchSettings();
+  async function loadData(userId, userEmail) {
+    await fetchQuotes(userId);
+    await fetchClients(userId);
+    await fetchServices(userId);
+    await fetchExpenses(userId);
+    await fetchSettings(userId, userEmail);
   }
 
-  async function fetchQuotes() {
-    if (!session?.user?.id) return;
+  async function fetchQuotes(userId) {
     const { data, error } = await supabase
       .from('quotes')
       .select(`*, clients ( company_name, email, phone, client_type, tax_id, address, terms, notes ), quote_items ( * )`)
-      .eq('user_id', session.user.id)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false });
     if (error) console.error('Error fetching quotes:', error.message);
     else setQuotes(data || []);
   }
 
-  async function fetchClients() {
-    if (!session?.user?.id) return;
+  async function fetchClients(userId) {
     const { data, error } = await supabase
       .from('clients')
       .select('id, company_name, email, phone, client_type, created_at, user_id, tax_id, address, terms, notes')
-      .eq('user_id', session.user.id);
+      .eq('user_id', userId);
     if (error) {
       console.error('Error fetching clients:', error.message);
     } else {
@@ -484,35 +496,29 @@ export default function Dashboard() {
     }
   }
 
-  async function fetchServices() {
-    if (!session?.user?.id) return;
-    const { data, error } = await supabase.from('services').select('*').eq('user_id', session.user.id).order('created_at', { ascending: true });
+  async function fetchServices(userId) {
+    const { data, error } = await supabase.from('services').select('*').eq('user_id', userId).order('created_at', { ascending: true });
     if (error) console.error('Error fetching services:', error.message);
     else setServices(data || []);
   }
 
-  async function fetchExpenses() {
-    if (!session?.user?.id) return;
+  async function fetchExpenses(userId) {
     const { data, error } = await supabase
       .from('expenses')
       .select('*')
-      .eq('user_id', session.user.id)
+      .eq('user_id', userId)
       .order('expense_date', { ascending: false });
     if (error) console.error('Error fetching expenses:', error.message);
     else setExpenses(data || []);
   }
 
-  async function fetchSettings() {
-    if (!session?.user?.id) return;
-    
+  async function fetchSettings(userId, userEmail) {
     const nowIso = new Date().toISOString();
-    const userEmail = session.user.email;
-    const currentUserId = session.user.id;
 
     let { data, error } = await supabase
       .from('business_settings')
       .select('*')
-      .eq('user_id', currentUserId)
+      .eq('user_id', userId)
       .maybeSingle();
     
     if (!data && userEmail) {
@@ -527,7 +533,7 @@ export default function Dashboard() {
 
         const { data: updatedData } = await supabase
           .from('business_settings')
-          .update({ user_id: currentUserId, last_sign_in: nowIso })
+          .update({ user_id: userId, last_sign_in: nowIso })
           .eq('id', emailData.id)
           .select()
           .maybeSingle();
@@ -535,11 +541,11 @@ export default function Dashboard() {
         if (updatedData) {
           data = updatedData;
 
-          if (oldUserId && oldUserId !== currentUserId) {
-            await supabase.from('services').update({ user_id: currentUserId }).eq('user_id', oldUserId);
-            await supabase.from('clients').update({ user_id: currentUserId }).eq('user_id', oldUserId);
-            await supabase.from('quotes').update({ user_id: currentUserId }).eq('user_id', oldUserId);
-            await supabase.from('expenses').update({ user_id: currentUserId }).eq('user_id', oldUserId);
+          if (oldUserId && oldUserId !== userId) {
+            await supabase.from('services').update({ user_id: userId }).eq('user_id', oldUserId);
+            await supabase.from('clients').update({ user_id: userId }).eq('user_id', oldUserId);
+            await supabase.from('quotes').update({ user_id: userId }).eq('user_id', oldUserId);
+            await supabase.from('expenses').update({ user_id: userId }).eq('user_id', oldUserId);
           }
         }
       } else if (data) {
@@ -575,7 +581,7 @@ export default function Dashboard() {
       await supabase
         .from('business_settings')
         .update({ last_sign_in: nowIso })
-        .eq('user_id', currentUserId);
+        .eq('user_id', userId);
 
       if (data.role === 'super_admin') {
         fetchAllAccounts();
@@ -585,7 +591,7 @@ export default function Dashboard() {
       trialEndDate.setDate(trialEndDate.getDate() + 14);
 
       const defaultPayload = {
-        user_id: currentUserId,
+        user_id: userId,
         email: userEmail,
         business_name: 'New Business',
         country: 'Local',
