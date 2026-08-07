@@ -386,7 +386,7 @@ export default function Dashboard() {
 
   const isInternationalAccount = bizCountry === 'International';
   
-  const isHebrew = session ? !isInternationalAccount : (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he'));
+  const isHebrew = !isInternationalAccount;
 
   let trialDaysLeft = null;
   let isTrialExpired = false;
@@ -1480,7 +1480,6 @@ export default function Dashboard() {
 
   const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 5 && trialDaysLeft > 0 && !isSuperAdmin;
 
-  // If initializing session / business settings, show a clean loading indicator to avoid language flicker
   if (isInitializing) {
     return (
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#090d16', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f8fafc' }}>
@@ -1492,7 +1491,6 @@ export default function Dashboard() {
     );
   }
 
-  // If we are in password recovery mode, show the set new password screen
   if (isPasswordRecoveryMode) {
     return (
       <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir="rtl">
@@ -1600,7 +1598,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* מודל שחזור סיסמה נקי במסך ההתחברות */}
         {forgotOpen && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isLoginHebrew ? 'rtl' : 'ltr'}>
             <div style={{ background: 'white', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '400px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', textAlign: 'center', position: 'relative' }}>
