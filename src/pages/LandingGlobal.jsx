@@ -27,7 +27,7 @@ export default function LandingGlobal() {
   ];
 
   return (
-    <div dir="ltr" style={{ fontFamily: 'Inter, Segoe UI, Tahoma, sans-serif', background: '#090d16', minHeight: '100vh', color: '#f8fafc', display: 'flex', flexDirection: 'column' }}>
+    <div dir="ltr" style={{ fontFamily: 'Inter, Segoe UI, Tahoma, sans-serif', background: '#090d16', minHeight: '100vh', color: '#f8fafc', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       
       <style>{`
         .hover-card {
@@ -60,6 +60,35 @@ export default function LandingGlobal() {
         .faq-item:hover {
           border-color: rgba(99, 102, 241, 0.4);
         }
+        .pricing-toggle-container {
+          display: inline-flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 6px;
+          background: #111827;
+          padding: 6px;
+          borderRadius: 14px;
+          marginBottom: 40px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        @media (max-width: 480px) {
+          .nav-btn {
+            padding: 8px 12px !important;
+            font-size: 0.8rem !important;
+          }
+          .hero-title {
+            font-size: 2.2rem !important;
+          }
+          .pricing-toggle-container {
+            display: flex;
+            width: 100%;
+          }
+          .pricing-toggle-container button {
+            flex: 1;
+            text-align: center;
+            justify-content: center;
+          }
+        }
       `}</style>
 
       {/* Top Banner Launch Special */}
@@ -69,12 +98,12 @@ export default function LandingGlobal() {
 
       {/* Header */}
       <header style={{ background: 'rgba(9, 13, 22, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 1000 }}>
-        <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '6px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/global')}>
+        <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: '10px' }}>
+          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '6px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', flexShrink: 0 }} onClick={() => navigate('/global')}>
             <ProFlowLogo size={36} rtl={false} />
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button className="nav-btn" onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)', whiteSpace: 'nowrap' }}>
               Sign In / Dashboard
             </button>
           </div>
@@ -89,7 +118,7 @@ export default function LandingGlobal() {
             🔥 Launch Special: 14-day free trial for all PRO features!
           </div>
           
-          <h1 style={{ fontSize: '3.5rem', fontWeight: '900', color: '#ffffff', lineHeight: '1.15', marginBottom: '24px', letterSpacing: '-1px' }}>
+          <h1 className="hero-title" style={{ fontSize: '3.5rem', fontWeight: '900', color: '#ffffff', lineHeight: '1.15', marginBottom: '24px', letterSpacing: '-1px' }}>
             Business Management, Quotes & Invoicing <br />
             <span style={{ background: 'linear-gradient(to right, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Easily, Fast & Smart</span>
           </h1>
@@ -193,7 +222,7 @@ export default function LandingGlobal() {
             <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px' }}>Plans & Pricing</h2>
             <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>Choose the best plan for your business. <strong style={{ color: '#10b981' }}>14 days completely free for all PRO features!</strong></p>
             
-            <div style={{ display: 'inline-flex', background: '#111827', padding: '4px', borderRadius: '12px', marginBottom: '40px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div className="pricing-toggle-container">
               <button 
                 onClick={() => setBillingCycle('monthly')}
                 style={{ background: billingCycle === 'monthly' ? '#6366f1' : 'transparent', color: billingCycle === 'monthly' ? '#ffffff' : '#94a3b8', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }}>
@@ -201,8 +230,9 @@ export default function LandingGlobal() {
               </button>
               <button 
                 onClick={() => setBillingCycle('annual')}
-                style={{ background: billingCycle === 'annual' ? '#6366f1' : 'transparent', color: billingCycle === 'annual' ? '#ffffff' : '#94a3b8', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }}>
-                Annual Billing <span style={{ background: '#10b981', color: 'white', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', marginLeft: '6px' }}>Save 20%!</span>
+                style={{ background: billingCycle === 'annual' ? '#6366f1' : 'transparent', color: billingCycle === 'annual' ? '#ffffff' : '#94a3b8', border: 'none', padding: '10px 24px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <span>Annual Billing</span>
+                <span style={{ background: '#10b981', color: 'white', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>Save 20%!</span>
               </button>
             </div>
 
