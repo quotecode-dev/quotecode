@@ -386,8 +386,7 @@ export default function Dashboard() {
 
   const isInternationalAccount = bizCountry === 'International';
   
-  const isBrowserHebrew = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
-  const isHebrew = session ? !isInternationalAccount : isBrowserHebrew;
+  const isHebrew = session ? !isInternationalAccount : (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he'));
 
   let trialDaysLeft = null;
   let isTrialExpired = false;
@@ -2017,7 +2016,6 @@ export default function Dashboard() {
 
                                   {isDropdownOpen && (
                                     <>
-                                      {/* Transparent backdrop overlay for mobile & desktop outside clicks */}
                                       <div 
                                         style={{
                                           position: 'fixed',
@@ -2031,7 +2029,6 @@ export default function Dashboard() {
                                         onClick={() => setOpenDropdownId(null)}
                                         onTouchStart={() => setOpenDropdownId(null)}
                                       />
-                                      {/* Actual Dropdown Menu */}
                                       <div 
                                         onClick={(e) => e.stopPropagation()}
                                         onTouchStart={(e) => e.stopPropagation()}
