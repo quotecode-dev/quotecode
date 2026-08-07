@@ -270,7 +270,6 @@ export default function Dashboard() {
       const spaceBelow = window.innerHeight - rect.bottom;
       const openUpward = spaceBelow < 250;
 
-      // תיקון מיקום רספונסיבי למובייל כך שהתפריט לא יברח הצידה או ייחתך
       const menuWidth = 210;
       let calculatedLeft = isHebrew ? rect.right - menuWidth : rect.left;
       if (calculatedLeft + menuWidth > window.innerWidth - 10) {
@@ -1848,22 +1847,18 @@ export default function Dashboard() {
                           return (
                             <tr key={quote.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
                               
-                              {/* 1. מספר הזמנה */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', fontWeight: '700', color: '#4f46e5', direction: 'ltr' }}>
                                 #{quote.id.slice(0, 6)}
                               </td>
 
-                              {/* 2. שם לקוח */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', fontWeight: '800', color: '#0f172a' }}>
                                 {quote.clients?.company_name || 'N/A'}
                               </td>
 
-                              {/* 3. התיאור */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', color: '#334155', fontSize: '0.85rem', lineHeight: '1.4' }}>
                                 {firstItemDesc || '-'}
                               </td>
 
-                              {/* 4. הסכום */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left' }}>
                                 <div style={{ fontWeight: '900', color: '#0f172a', fontSize: '0.9rem' }}>
                                   {quoteSym}{formatNum(quote.total)}
@@ -1875,19 +1870,16 @@ export default function Dashboard() {
                                 )}
                               </td>
 
-                              {/* 5. תאריך */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'right' : 'left', color: '#64748b', fontSize: '0.8rem', direction: 'ltr' }}>
                                 {formatDate(quote.created_at)}
                               </td>
 
-                              {/* 6. סטטוס */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'center' }}>
                                 <span style={{ background: badge.bg, color: badge.color, padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', display: 'inline-block' }}>
                                   {badge.text}
                                 </span>
                               </td>
 
-                              {/* 7. צפיות */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'center', color: '#64748b', fontSize: '0.85rem' }}>
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                                   <span>{quote.view_count || 0}</span>
@@ -1895,7 +1887,6 @@ export default function Dashboard() {
                                 </span>
                               </td>
 
-                              {/* 8. פעולות */}
                               <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: isHebrew ? 'left' : 'right', position: 'relative' }}>
                                 <div ref={dropdownRef} style={{ display: 'inline-block', position: 'relative' }}>
                                   <button
@@ -1919,7 +1910,10 @@ export default function Dashboard() {
                                   </button>
 
                                   {isDropdownOpen && (
-                                    <div style={{
+                                    <div 
+                                      onClick={(e) => e.stopPropagation()}
+                                      onTouchStart={(e) => e.stopPropagation()}
+                                      style={{
                                       position: 'fixed',
                                       top: `${dropdownPos.top}px`,
                                       left: `${dropdownPos.left}px`,
@@ -1932,7 +1926,6 @@ export default function Dashboard() {
                                       padding: '6px 0',
                                       textAlign: isHebrew ? 'right' : 'left'
                                     }}>
-                                      {/* View */}
                                       <button
                                         onClick={() => { setOpenDropdownId(null); window.open(`/public-quote/${quote.id}`, '_blank'); }}
                                         style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#3730a3', display: 'block', fontWeight: '500' }}
@@ -1942,7 +1935,6 @@ export default function Dashboard() {
                                         👁️ {isHebrew ? 'צפה במסמך' : 'View Quote'}
                                       </button>
 
-                                      {/* Edit Document */}
                                       <div style={{ position: 'relative' }}>
                                         <button
                                           onClick={() => {
@@ -1967,7 +1959,6 @@ export default function Dashboard() {
                                         )}
                                       </div>
 
-                                      {/* Duplicate Document */}
                                       <div style={{ position: 'relative' }}>
                                         <button
                                           onClick={() => {
@@ -1991,7 +1982,6 @@ export default function Dashboard() {
                                         )}
                                       </div>
 
-                                      {/* WhatsApp with Icon */}
                                       <div style={{ position: 'relative' }}>
                                         <button
                                           onClick={() => {
@@ -2018,7 +2008,6 @@ export default function Dashboard() {
                                         )}
                                       </div>
 
-                                      {/* Email */}
                                       <button
                                         onClick={() => { setOpenDropdownId(null); setPendingEmailQuote(quote); }}
                                         style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#1e40af', display: 'block', fontWeight: '500' }}
@@ -2028,7 +2017,6 @@ export default function Dashboard() {
                                         ✉️ {isHebrew ? 'שלח במייל' : 'Send Email'}
                                       </button>
 
-                                      {/* Delete */}
                                       <div style={{ position: 'relative' }}>
                                         <button
                                           onClick={() => {
