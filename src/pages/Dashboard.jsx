@@ -2252,21 +2252,35 @@ export default function Dashboard() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '15px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.clientName}</label>
-                      <input type="text" name="clientName" value={clientName} onChange={(e) => {
-                        const val = e.target.value;
-                        setClientName(val);
-                        const found = clients.find(c => c.company_name?.toLowerCase() === val.toLowerCase());
-                        if (found) {
-                          if (found.client_type) {
-                             setClientType(found.client_type);
+                      <input 
+                        type="text" 
+                        name="clientName" 
+                        list="existing-clients-list"
+                        value={clientName} 
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setClientName(val);
+                          const found = clients.find(c => c.company_name?.toLowerCase() === val.toLowerCase());
+                          if (found) {
+                            if (found.client_type) {
+                               setClientType(found.client_type);
+                            }
+                            if (found.email) setClientEmail(found.email);
+                            if (found.phone) setClientPhone(found.phone);
+                            if (found.tax_id) setClientTaxId(found.tax_id);
+                            if (found.address) setClientAddress(found.address);
+                            if (found.notes) setNotes(found.notes);
                           }
-                          if (found.email) setClientEmail(found.email);
-                          if (found.phone) setClientPhone(found.phone);
-                          if (found.tax_id) setClientTaxId(found.tax_id);
-                          if (found.address) setClientAddress(found.address);
-                          if (found.notes) setNotes(found.notes);
-                        }
-                      }} placeholder="e.g. Acme Corp" required style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
+                        }} 
+                        placeholder="e.g. Acme Corp" 
+                        required 
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} 
+                      />
+                      <datalist id="existing-clients-list">
+                        {clients.map(c => (
+                          <option key={c.id} value={c.company_name} />
+                        ))}
+                      </datalist>
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'סוג לקוח (חובה)' : 'Client Type'}</label>
