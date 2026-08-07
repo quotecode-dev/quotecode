@@ -221,6 +221,12 @@ export default function Dashboard() {
   const [resetMsg, setResetMsg] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
 
+  // Recovery mode state for handling password reset from email link
+  const [isPasswordRecoveryMode, setIsPasswordRecoveryMode] = useState(false);
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+  const [recoveryUpdateMsg, setRecoveryUpdateMsg] = useState('');
+  const [recoveryUpdateLoading, setRecoveryUpdateLoading] = useState(false);
+
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
   const [services, setServices] = useState([]);
@@ -265,6 +271,27 @@ export default function Dashboard() {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
     };
+  }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    const search = window.location.search;
+    if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+      setIsPasswordRecoveryMode(true);
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsPasswordRecoveryMode(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleToggleDropdown = (e, quoteId) => {
@@ -430,18 +457,6 @@ export default function Dashboard() {
     delete: isHebrew ? 'מחק' : 'Delete',
     clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management'
   };
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -834,6 +849,24 @@ export default function Dashboard() {
         setResetMsg('');
         setResetEmail('');
       }, 3000);
+    }
+  };
+
+  // Handler for updating password when arrived via recovery link
+  const handleUpdatePasswordFromRecovery = async (e) => {
+    e.preventDefault();
+    setRecoveryUpdateLoading(true);
+    setRecoveryUpdateMsg('');
+    const { error } = await supabase.auth.updateUser({ password: newPasswordInput });
+    setRecoveryUpdateLoading(false);
+    if (error) {
+      setRecoveryUpdateMsg('שגיאה בעדכון הסיסמה: ' + error.message);
+    } else {
+      setRecoveryUpdateMsg('הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...');
+      setTimeout(() => {
+        setIsPasswordRecoveryMode(false);
+        window.location.href = window.location.origin;
+      }, 2000);
     }
   };
 
@@ -1459,6 +1492,38 @@ export default function Dashboard() {
   });
 
   const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 5 && trialDaysLeft > 0 && !isSuperAdmin;
+
+  // If we are in password recovery mode, show the set new password screen
+  if (isPasswordRecoveryMode) {
+    return (
+      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir="rtl">
+        <div style={{ background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+          <h2 style={{ color: '#0f172a', marginBottom: '15px', fontWeight: '800' }}>איפוס סיסמה חדשה</h2>
+          <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>הזן את הסיסמה החדשה שלך לחשבון</p>
+          
+          {recoveryUpdateMsg && (
+            <div style={{ padding: '10px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: recoveryUpdateMsg.includes('שגיאה') ? '#fee2e2' : '#dcfce7', color: recoveryUpdateMsg.includes('שגיאה') ? '#991b1b' : '#166534', fontWeight: 'bold' }}>
+              {recoveryUpdateMsg}
+            </div>
+          )}
+
+          <form onSubmit={handleUpdatePasswordFromRecovery}>
+            <input 
+              type="password" 
+              value={newPasswordInput} 
+              onChange={(e) => setNewPasswordInput(e.target.value)} 
+              placeholder="סיסמה חדשה" 
+              required 
+              style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', marginBottom: '15px', fontSize: '1rem', direction: 'rtl', textAlign: 'right' }} 
+            />
+            <button type="submit" disabled={recoveryUpdateLoading} style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
+              {recoveryUpdateLoading ? 'מעדכן...' : 'עדכן סיסמה ושמור'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   if (!session) {
     const isLoginHebrew = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
