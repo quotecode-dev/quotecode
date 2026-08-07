@@ -215,6 +215,12 @@ export default function Dashboard() {
   const [authError, setAuthError] = useState('');
   const [authSuccess, setAuthSuccess] = useState('');
 
+  // Forgot password modal states for login screen
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetMsg, setResetMsg] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+
   const [quotes, setQuotes] = useState([]);
   const [clients, setClients] = useState([]);
   const [services, setServices] = useState([]);
@@ -811,18 +817,23 @@ export default function Dashboard() {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!emailInput) {
-      setAuthError(isHebrew ? 'נא להזין כתובת אימייל בתיבת האימייל למעלה לשחזור סיסמה.' : 'Please enter your email above to reset password.');
-      return;
-    }
-    const { error } = await supabase.auth.resetPasswordForEmail(emailInput, {
+  const handleResetSubmit = async (e) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setResetMsg('');
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
       redirectTo: window.location.origin,
     });
+    setResetLoading(false);
     if (error) {
-      setAuthError(error.message);
+      setResetMsg('שגיאה: ' + error.message);
     } else {
-      setAuthSuccess(isHebrew ? 'קישור לשחזור סיסמה נשלח לאימייל שלך בהצלחה.' : 'Password reset link sent to your email.');
+      setResetMsg('קישור לשחזור סיסמה נשלח בהצלחה למייל שלך!');
+      setTimeout(() => {
+        setForgotOpen(false);
+        setResetMsg('');
+        setResetEmail('');
+      }, 3000);
     }
   };
 
@@ -1491,7 +1502,6 @@ export default function Dashboard() {
           {authError && <div style={{ padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: '#fee2e2', color: '#991b1b' }}>{authError}</div>}
 
           <form onSubmit={handleAuth} autoComplete="off" data-lpignore="true">
-            {/* Hidden dummy fields to prevent password manager popups */}
             <input type="text" name="fake_user_login" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
             <input type="password" name="fake_pass_login" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
 
@@ -1518,13 +1528,44 @@ export default function Dashboard() {
             </button>
             <button
               type="button"
-              onClick={handleForgotPassword}
+              onClick={() => setForgotOpen(true)}
               style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
             >
               {isLoginHebrew ? 'שכחת סיסמה?' : 'Forgot password?'}
             </button>
           </div>
         </div>
+
+        {/* מודל שחזור סיסמה נקי במסך ההתחברות */}
+        {forgotOpen && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isLoginHebrew ? 'rtl' : 'ltr'}>
+            <div style={{ background: 'white', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '400px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', textAlign: 'center', position: 'relative' }}>
+              <button onClick={() => setForgotOpen(false)} style={{ position: 'absolute', top: '15px', [isLoginHebrew ? 'left' : 'right']: '15px', background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕</button>
+              <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.3rem', marginBottom: '10px', fontWeight: '800' }}>איפוס סיסמה חדשה</h3>
+              <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>הזן את כתובת האימייל שלך לחשבון</p>
+              
+              {resetMsg && (
+                <div style={{ padding: '10px', borderRadius: '6px', marginBottom: '15px', fontSize: '0.85rem', background: resetMsg.includes('שגיאה') ? '#fee2e2' : '#dcfce7', color: resetMsg.includes('שגיאה') ? '#991b1b' : '#166534', fontWeight: 'bold' }}>
+                  {resetMsg}
+                </div>
+              )}
+
+              <form onSubmit={handleResetSubmit}>
+                <input 
+                  type="email" 
+                  value={resetEmail} 
+                  onChange={(e) => setResetEmail(e.target.value)} 
+                  placeholder="user@example.com" 
+                  required 
+                  style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', marginBottom: '15px', direction: 'ltr', textAlign: 'left' }} 
+                />
+                <button type="submit" disabled={resetLoading} style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '0.95rem', cursor: 'pointer' }}>
+                  {resetLoading ? 'שולח...' : 'עדכן סיסמה ושמור'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -1914,18 +1955,18 @@ export default function Dashboard() {
                                       onClick={(e) => e.stopPropagation()}
                                       onTouchStart={(e) => e.stopPropagation()}
                                       style={{
-                                      position: 'fixed',
-                                      top: `${dropdownPos.top}px`,
-                                      left: `${dropdownPos.left}px`,
-                                      background: 'white',
-                                      border: '1px solid #cbd5e1',
-                                      borderRadius: '8px',
-                                      boxShadow: '0 10px 35px rgba(0,0,0,0.25)',
-                                      zIndex: 999999,
-                                      minWidth: '200px',
-                                      padding: '6px 0',
-                                      textAlign: isHebrew ? 'right' : 'left'
-                                    }}>
+                                        position: 'fixed',
+                                        top: `${dropdownPos.top}px`,
+                                        left: `${dropdownPos.left}px`,
+                                        background: 'white',
+                                        border: '1px solid #cbd5e1',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 10px 35px rgba(0,0,0,0.25)',
+                                        zIndex: 999999,
+                                        minWidth: '200px',
+                                        padding: '6px 0',
+                                        textAlign: isHebrew ? 'right' : 'left'
+                                      }}>
                                       <button
                                         onClick={() => { setOpenDropdownId(null); window.open(`/public-quote/${quote.id}`, '_blank'); }}
                                         style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#3730a3', display: 'block', fontWeight: '500' }}
