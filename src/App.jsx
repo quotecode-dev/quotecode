@@ -78,22 +78,8 @@ export default function App() {
       });
     }
 
-    const handleGlobalClick = (e) => {
-      const target = e.target.closest('a, button, span, div, p');
-      if (target) {
-        const text = target.innerText || '';
-        if (text.includes('שכחת סיסמה') || text.toLowerCase().includes('forgot password')) {
-          e.preventDefault();
-          e.stopPropagation();
-          setForgotPasswordOpen(true);
-        }
-      }
-    };
-    document.addEventListener('click', handleGlobalClick, true);
-
     return () => {
       subscription.unsubscribe();
-      document.removeEventListener('click', handleGlobalClick, true);
     };
   }, []);
 
@@ -131,7 +117,6 @@ export default function App() {
     if (error) {
       setUpdateMessage(isEnglish ? 'Error updating password: ' + error.message : 'שגיאה בעדכון הסיסמה: ' + error.message);
     } else {
-      // הפעלת מנהל הסיסמאות של הדפדפן לשמירת הסיסמה החדשה אוטומטית
       if (window.PasswordCredential) {
         try {
           const userEmail = recoveryEmail || data?.user?.email;
