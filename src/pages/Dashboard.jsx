@@ -209,6 +209,7 @@ function LifetimeConfirmModal({ isOpen, onClose, onConfirm, userEmail, isHebrew 
 
 export default function Dashboard() {
   const [session, setSession] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -266,12 +267,20 @@ export default function Dashboard() {
       setIsPasswordRecoveryMode(true);
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
+      if (session?.user?.id) {
+        await loadData();
+      }
+      setIsInitializing(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
+      if (session?.user?.id) {
+        await loadData();
+      }
+      setIsInitializing(false);
       if (event === 'PASSWORD_RECOVERY') {
         setIsPasswordRecoveryMode(true);
       }
@@ -443,12 +452,6 @@ export default function Dashboard() {
     delete: isHebrew ? 'מחק' : 'Delete',
     clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management'
   };
-
-  useEffect(() => {
-    if (session?.user?.id) {
-      loadData();
-    }
-  }, [session?.user?.id]);
 
   async function loadData() {
     await fetchQuotes();
@@ -1477,6 +1480,18 @@ export default function Dashboard() {
   });
 
   const isExpiringSoon = trialDaysLeft !== null && trialDaysLeft <= 5 && trialDaysLeft > 0 && !isSuperAdmin;
+
+  // If initializing session / business settings, show a clean loading indicator to avoid language flicker
+  if (isInitializing) {
+    return (
+      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#090d16', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f8fafc' }}>
+        <div style={{ textAlign: 'center' }}>
+          <ProFlowLogo size={48} rtl={!isHebrew} />
+          <div style={{ marginTop: '20px', fontSize: '1rem', color: '#94a3b8', fontWeight: 'bold' }}>Loading ProFlow...</div>
+        </div>
+      </div>
+    );
+  }
 
   // If we are in password recovery mode, show the set new password screen
   if (isPasswordRecoveryMode) {
