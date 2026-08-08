@@ -128,7 +128,7 @@ export default function LandingGlobal() {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '25px' }}>
-            <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
+            <button onClick={() => navigate('/dashboard?signup=true')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '16px 36px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
               Start 14-Day Free PRO Trial Now 🚀
             </button>
             <span style={{ color: '#34d399', fontSize: '1rem', fontWeight: '800' }}>
@@ -175,7 +175,6 @@ export default function LandingGlobal() {
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#eab308' }}></div>
                 <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#22c55e' }}></div>
               </div>
-              <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>ProFlow SaaS Dashboard (Global)</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', marginBottom: '20px' }}>
               <div style={{ background: '#1f2937', padding: '20px', borderRadius: '10px' }}>
@@ -248,7 +247,7 @@ export default function LandingGlobal() {
                   <li>✓ Basic client management</li>
                   <li>✓ Email support</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   Start for Free
                 </button>
               </div>
@@ -261,11 +260,10 @@ export default function LandingGlobal() {
                   {billingCycle === 'monthly' ? '$15' : '$12'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ month</span>
                 </div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ <strong>14-day free trial!</strong></li>
                   <li>✓ Up to 20 quotes per month</li>
                   <li>✓ Digital signatures & client management</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   Start 14-Day Free Trial
                 </button>
               </div>
@@ -281,11 +279,10 @@ export default function LandingGlobal() {
                   {billingCycle === 'monthly' ? '$29' : '$23'} <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#94a3b8' }}>/ month</span>
                 </div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 30px 0', color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '2.2' }}>
-                  <li>✓ <strong>14 days free for all PRO features!</strong></li>
                   <li>✓ Unlimited quotes</li>
                   <li>✓ Full income & expense tracking</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
+                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
                   Start 14-Day PRO Trial
                 </button>
               </div>

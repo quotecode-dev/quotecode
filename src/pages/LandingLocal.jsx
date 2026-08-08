@@ -108,7 +108,7 @@ export default function LandingLocal() {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <button onClick={() => navigate('/dashboard')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 30px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
+            <button onClick={() => navigate('/dashboard?signup=true')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 30px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
               התחל 14 יום ניסיון חינם ב-PRO עכשיו 🚀
             </button>
             <span style={{ color: '#34d399', fontSize: '0.95rem', fontWeight: '800' }}>
@@ -155,7 +155,6 @@ export default function LandingLocal() {
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#eab308' }}></div>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#22c55e' }}></div>
               </div>
-              <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>ProFlow SaaS Dashboard (IL)</span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '16px' }}>
               <div style={{ background: '#1f2937', padding: '16px', borderRadius: '10px' }}>
@@ -228,7 +227,7 @@ export default function LandingLocal() {
                   <li>✓ ניהול לקוחות בסיסי</li>
                   <li>✓ תמיכה במייל</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   התחל בחינם
                 </button>
               </div>
@@ -244,12 +243,11 @@ export default function LandingLocal() {
                   {billingCycle === 'monthly' ? '* כולל מע"מ 18% (41.53 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (33.05 ₪ לפני מע"מ)'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', color: '#cbd5e1', fontSize: '0.9rem', lineHeight: '2' }}>
-                  <li>✓ <strong>14 יום ניסיון חינם!</strong></li>
                   <li>✓ עד 20 הצעות מחיר בחודש</li>
                   <li>✓ חתימה דיגיטלית וניהול לקוחות</li>
                   <li style={{ color: '#ef4444' }}>✗ ללא שליחה ישירה בווצאפ</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   התחל 14 יום חינם
                 </button>
               </div>
@@ -268,12 +266,11 @@ export default function LandingLocal() {
                   {billingCycle === 'monthly' ? '* כולל מע"מ 18% (83.90 ₪ לפני מע"מ)' : '* חיוב שנתי, כולל מע"מ 18% (66.95 ₪ לפני מע"מ)'}
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0', color: '#cbd5e1', fontSize: '0.9rem', lineHeight: '2' }}>
-                  <li>✓ <strong>14 יום חינם לכל פיצ'רי ה-PRO!</strong></li>
                   <li>✓ הצעות מחיר ללא הגבלה כלל</li>
                   <li>✓ שליחה ישירה בווצאפ (WhatsApp)</li>
                   <li>✓ ניהול הכנסות והוצאות מלא</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
+                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
                   התחל 14 יום חינם ב-PRO
                 </button>
               </div>
