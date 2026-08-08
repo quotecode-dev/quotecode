@@ -1539,7 +1539,7 @@ export default function Dashboard() {
   }
 
   if (!session) {
-    const isLoginHebrew = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
+    const isLoginHebrew = isHebrew;
     const loginDir = isLoginHebrew ? 'rtl' : 'ltr';
 
     return (
@@ -1569,10 +1569,12 @@ export default function Dashboard() {
               </span>
 
             </div>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
+            
+            {/* הודעה ברורה ומזמינה בהתאם למצב הרשמה/התחברות */}
+            <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px', lineHeight: '1.4' }}>
               {isLoginHebrew 
-                ? (isSignUp ? 'הרשמה למערכת הניהול' : 'התחברות למערכת הניהול')
-                : (isSignUp ? 'Sign up for dashboard' : 'Sign in to your dashboard')}
+                ? (isSignUp ? 'לרישום לאתר ולקבלת 14 יום ניסיון ב-PRO מתנה, נא הקלד אימייל וסיסמה.' : 'התחברות למערכת הניהול')
+                : (isSignUp ? 'To register and claim your 14-day free PRO trial, please enter your email and password.' : 'Sign in to your dashboard')}
             </p>
           </div>
 
