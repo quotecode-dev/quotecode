@@ -254,6 +254,9 @@ export default function PublicQuote() {
                 <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>הצעת מחיר</div>
                 <div style={{ color: '#4f46e5', fontSize: '0.95rem', fontWeight: '700', fontFamily: 'monospace', direction: 'ltr', display: 'inline-block' }}>#{quote.id?.slice(0, 8)}</div>
                 <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '6px', fontWeight: '500' }}>תאריך: {new Date(quote.created_at || Date.now()).toLocaleDateString('he-IL')}</div>
+                {quote.valid_until && (
+                  <div style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '2px', fontWeight: '700' }}>בתוקף עד: {new Date(quote.valid_until).toLocaleDateString('he-IL')}</div>
+                )}
               </div>
             </>
           ) : (
@@ -278,6 +281,9 @@ export default function PublicQuote() {
                 <div style={{ fontSize: '1.4rem', color: '#0f172a', fontWeight: '900', margin: '0 0 4px 0', letterSpacing: '-0.5px' }}>Price Quote</div>
                 <div style={{ color: '#4f46e5', fontSize: '0.95rem', fontWeight: '700', fontFamily: 'monospace', direction: 'ltr', display: 'inline-block' }}>#{quote.id?.slice(0, 8)}</div>
                 <div style={{ color: '#64748b', fontSize: '0.78rem', marginTop: '6px', fontWeight: '500' }}>Date: {new Date(quote.created_at || Date.now()).toLocaleDateString('en-GB')}</div>
+                {quote.valid_until && (
+                  <div style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '2px', fontWeight: '700' }}>Valid until: {new Date(quote.valid_until).toLocaleDateString('en-GB')}</div>
+                )}
               </div>
             </>
           )}
@@ -377,8 +383,17 @@ export default function PublicQuote() {
               <div style={{ fontSize: '1.1rem', marginBottom: '5px' }}>
                 {isHebrew ? '✓ הצעת מחיר זו אושרה ונחתמה בהצלחה!' : '✓ This quote has been successfully approved and signed!'}
               </div>
-              <div style={{ fontSize: '0.9rem', color: '#15803d' }}>
-                {quote.signature && (quote.signature.startsWith('data:image') ? (isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received') : `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`)}
+              <div style={{ fontSize: '0.9rem', color: '#15803d', marginTop: '10px' }}>
+                {quote.signature && quote.signature.startsWith('data:image') ? (
+                  <div>
+                    <div style={{ marginBottom: '5px' }}>{isHebrew ? 'חתימה דיגיטלית:' : 'Digital Signature:'}</div>
+                    <img src={quote.signature} alt="Client Signature" style={{ maxHeight: '100px', maxWidth: '100%', border: '1px solid #166534', borderRadius: '8px', background: 'white', padding: '4px' }} />
+                  </div>
+                ) : quote.signature ? (
+                  `${isHebrew ? 'שם החותם' : 'Signed by'}: ${quote.signature}`
+                ) : (
+                  isHebrew ? 'חתימה דיגיטלית התקבלה בהצלחה' : 'Digital signature received'
+                )}
               </div>
             </div>
           ) : isOwnerViewing ? (
