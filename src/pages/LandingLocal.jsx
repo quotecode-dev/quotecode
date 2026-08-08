@@ -199,7 +199,7 @@ export default function LandingLocal() {
           {/* Pricing Section - Israel */}
           <div style={{ marginBottom: '60px' }}>
             <h2 style={{ fontSize: '2.2rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px' }}>מסלולים ומחירים</h2>
-            <p style={{ color: '#94a3b8', marginBottom: '25px', fontSize: '1.05rem' }}>בחר את המסלול המתאים ביותר לעסק שלך. <strong style={{ color: '#10b981' }}>14 יום חינם לגמרי לכל פיצ'רי ה-PRO!</strong></p>
+            <p style={{ color: '#94a3b8', marginBottom: '25px', fontSize: '1.05rem' }}>בחר את המסלול המתאים ביותר לעסק שלך.</p>
             
             <div style={{ display: 'inline-flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center', background: '#111827', padding: '4px', borderRadius: '12px', marginBottom: '30px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
               <button 
@@ -248,7 +248,7 @@ export default function LandingLocal() {
                   <li style={{ color: '#ef4444' }}>✗ ללא שליחה ישירה בווצאפ</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  התחל 14 יום חינם
+                  בחר מסלול Basic
                 </button>
               </div>
 
@@ -271,7 +271,7 @@ export default function LandingLocal() {
                   <li>✓ ניהול הכנסות והוצאות מלא</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
-                  התחל 14 יום חינם ב-PRO
+                  בחר מסלול PRO
                 </button>
               </div>
 

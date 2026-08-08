@@ -219,7 +219,7 @@ export default function LandingGlobal() {
           {/* Pricing Section - Global */}
           <div style={{ marginBottom: '80px' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#ffffff', marginBottom: '10px' }}>Plans & Pricing</h2>
-            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>Choose the best plan for your business. <strong style={{ color: '#10b981' }}>14 days completely free for all PRO features!</strong></p>
+            <p style={{ color: '#94a3b8', marginBottom: '30px', fontSize: '1.1rem' }}>Choose the best plan for your business.</p>
             
             <div className="pricing-toggle-container">
               <button 
@@ -264,7 +264,7 @@ export default function LandingGlobal() {
                   <li>✓ Digital signatures & client management</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                  Start 14-Day Free Trial
+                  Select Basic Plan
                 </button>
               </div>
 
@@ -283,7 +283,7 @@ export default function LandingGlobal() {
                   <li>✓ Full income & expense tracking</li>
                 </ul>
                 <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
-                  Start 14-Day PRO Trial
+                  Select PRO Plan
                 </button>
               </div>
 
