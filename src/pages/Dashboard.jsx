@@ -263,8 +263,15 @@ export default function Dashboard() {
   useEffect(() => {
     const hash = window.location.hash;
     const search = window.location.search;
+    
     if (hash.includes('type=recovery') || search.includes('type=recovery')) {
       setIsPasswordRecoveryMode(true);
+    }
+
+    // בדיקת פרמטר הרשמה
+    const params = new URLSearchParams(search);
+    if (params.get('signup') === 'true') {
+      setIsSignUp(true);
     }
 
     const initAuth = async () => {
@@ -401,7 +408,9 @@ export default function Dashboard() {
 
   const isInternationalAccount = bizCountry === 'International';
   
-  const isHebrew = session ? !isInternationalAccount : (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he'));
+  const isHebrew = session 
+    ? !isInternationalAccount 
+    : (localStorage.getItem('proflow_lang') === 'he' || (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he')));
 
   let trialDaysLeft = null;
   let isTrialExpired = false;
