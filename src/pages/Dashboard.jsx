@@ -400,7 +400,8 @@ export default function Dashboard() {
   const [pendingEmailQuote, setPendingEmailQuote] = useState(null);
 
   const isInternationalAccount = bizCountry === 'International';
-  const isHebrew = !isInternationalAccount;
+  
+  const isHebrew = session ? !isInternationalAccount : (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he'));
 
   let trialDaysLeft = null;
   let isTrialExpired = false;
@@ -1370,7 +1371,7 @@ export default function Dashboard() {
       setStatusMsg({ 
         text: editingQuoteId 
           ? (isHebrew ? `הצעה #${editingQuoteId.slice(0, 6)} עודכנה בהצלחה!` : `Quote #${editingQuoteId.slice(0, 6)} successfully updated!`) 
-          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}{formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}{formatNum(totalAmount)}`), 
+          : (isHebrew ? `ההצעה הופקה ונשמרה בענן בהצלחה! סה"כ: ${sym}${formatNum(totalAmount)}` : `Quote successfully created and saved to cloud! Total: ${sym}${formatNum(totalAmount)}`), 
         type: 'success' 
       });
       
@@ -1388,7 +1389,7 @@ export default function Dashboard() {
       setNotes('');
       setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
       setItems([{ description: '', quantity: '', unit_price: '' }]);
-      loadData();
+      loadData(session.user.id, session.user.email);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error(err);
@@ -1561,8 +1562,8 @@ export default function Dashboard() {
             </div>
             <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
               {isLoginHebrew 
-                ? 'התחברות למערכת הניהול' 
-                : 'Sign in to your dashboard'}
+                ? (isSignUp ? 'הרשמה למערכת הניהול' : 'התחברות למערכת הניהול')
+                : (isSignUp ? 'Sign up for dashboard' : 'Sign in to your dashboard')}
             </p>
           </div>
 
@@ -1582,7 +1583,7 @@ export default function Dashboard() {
               <input type="password" name="user_password_field" autoComplete="off" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" data-form-type="other" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
-              {isLoginHebrew ? 'התחבר' : 'Sign In'}
+              {isLoginHebrew ? (isSignUp ? 'הירשם' : 'התחבר') : (isSignUp ? 'Sign Up' : 'Sign In')}
             </button>
           </form>
 
@@ -1592,15 +1593,19 @@ export default function Dashboard() {
               onClick={() => setIsSignUp(!isSignUp)}
               style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontWeight: '600', padding: 0 }}
             >
-              {isLoginHebrew ? 'אין חשבון? הירשם וקבל 14 יום PRO מתנה!' : "Don't have an account? Sign up!"}
+              {isLoginHebrew 
+                ? (isSignUp ? 'יש לך כבר חשבון? התחבר' : 'אין חשבון? הירשם וקבל 14 יום PRO מתנה!') 
+                : (isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up!")}
             </button>
-            <button
-              type="button"
-              onClick={() => setForgotOpen(true)}
-              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-            >
-              {isLoginHebrew ? 'שכחת סיסמה?' : 'Forgot password?'}
-            </button>
+            {!isSignUp && (
+              <button
+                type="button"
+                onClick={() => setForgotOpen(true)}
+                style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+              >
+                {isLoginHebrew ? 'שכחת סיסמה?' : 'Forgot password?'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -2327,7 +2332,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'ח.פ / עוסק / ת.ז' : 'Tax ID / ID'}</label>
-                      <input type="text" name="clientTaxId" value={clientTaxId} onChange={(e) => setClientTaxId(e.target.value)} placeholder={isHebrew ? "לדוגמה: 512345678" : "e.g. 512345678"} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
+                      <input type="text" name="clientTaxId" value={clientTaxId} onChange={(e) => setClientTaxId(e.target.value)} placeholder={isHebrew ? "לדוגמה: 512345678" : "e.g. 512345678"} required={clientType === 'business'} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', boxSizing: 'border-box', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.9rem' }} />
                     </div>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'כתובת' : 'Address'}</label>
