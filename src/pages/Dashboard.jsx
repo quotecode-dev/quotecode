@@ -242,6 +242,81 @@ function RegionConfirmModal({ isOpen, onClose, onConfirm, userEmail, newCountry,
   );
 }
 
+function UserDetailsModal({ isOpen, onClose, user, isHebrew }) {
+  if (!isOpen || !user) return null;
+
+  const isLifetime = user.trial_ends_at === null || user.trial_ends_at === undefined;
+
+  return (
+    <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div style={{ background: 'white', padding: '30px', borderRadius: '16px', width: '100%', maxWidth: '480px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', textAlign: isHebrew ? 'right' : 'left', position: 'relative', animation: 'popupBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards', maxHeight: '90vh', overflowY: 'auto' }}>
+        
+        <button onClick={onClose} style={{ position: 'absolute', top: '15px', [isHebrew ? 'left' : 'right']: '15px', background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕</button>
+
+        <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#e0e7ff', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '15px', fontSize: '1.3rem' }}>
+          👤
+        </div>
+
+        <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.25rem', marginBottom: '20px', fontWeight: '800' }}>
+          {isHebrew ? 'פרטי משתמש מלאים' : 'User Full Details'}
+        </h3>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.9rem', color: '#334155' }}>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'אימייל:' : 'Email:'}</strong>
+            <span dir="ltr" style={{ fontWeight: '600', color: '#0f172a' }}>{user.email || 'N/A'}</span>
+          </div>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'שם העסק:' : 'Business Name:'}</strong>
+            <span style={{ fontWeight: '600', color: '#0f172a' }}>{user.business_name || 'New Business'}</span>
+          </div>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'ח.פ / עוסק:' : 'Tax ID:'}</strong>
+            <span dir="ltr" style={{ fontWeight: '600', color: '#0f172a' }}>{user.tax_id || 'N/A'}</span>
+          </div>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'טלפון עסק:' : 'Phone:'}</strong>
+            <span dir="ltr" style={{ fontWeight: '600', color: '#0f172a' }}>{user.phone || 'N/A'}</span>
+          </div>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'כתובת עסק:' : 'Address:'}</strong>
+            <span style={{ fontWeight: '600', color: '#0f172a' }}>{user.address || 'N/A'}</span>
+          </div>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'חבילה פעילה:' : 'Plan:'}</strong>
+            <span style={{ fontWeight: 'bold', color: '#4f46e5', textTransform: 'uppercase' }}>{user.plan || 'Free'}</span>
+          </div>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'אזור פעילות:' : 'Region:'}</strong>
+            <span style={{ fontWeight: 'bold', color: (user.country || 'Local') === 'Local' ? '#166534' : '#991b1b' }}>{user.country === 'International' ? 'Intl' : 'LCL'}</span>
+          </div>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'הרשאה (Role):' : 'Role:'}</strong>
+            <span style={{ fontWeight: '600', color: user.role === 'super_admin' ? '#ef4444' : '#0f172a' }}>{user.role || 'user'}</span>
+          </div>
+          <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'סטטוס מנוי:' : 'Subscription:'}</strong>
+            <span style={{ fontWeight: '600', color: '#7c3aed' }}>
+              {isLifetime ? (isHebrew ? '♾️ מנוי לכל החיים (Lifetime)' : 'Lifetime Active') : (isHebrew ? `ניסיון פעיל עד ${new Date(user.trial_ends_at).toLocaleDateString('en-GB')}` : `Trial until ${new Date(user.trial_ends_at).toLocaleDateString('en-GB')}`)}
+            </span>
+          </div>
+          <div>
+            <strong style={{ color: '#64748b', display: 'inline-block', width: '130px' }}>{isHebrew ? 'כניסה אחרונה:' : 'Last Sign In:'}</strong>
+            <span dir="ltr" style={{ fontWeight: '600', color: '#0f172a' }}>{user.last_sign_in ? new Date(user.last_sign_in).toLocaleString('en-GB') : 'N/A'}</span>
+          </div>
+        </div>
+
+        <div style={{ marginTop: '25px', textAlign: 'center' }}>
+          <button onClick={onClose} style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 28px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}>
+            {isHebrew ? 'סגור חלון' : 'Close'}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [session, setSession] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -411,6 +486,7 @@ export default function Dashboard() {
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [pendingLifetimeUser, setPendingLifetimeUser] = useState(null);
   const [pendingRegionChange, setPendingRegionChange] = useState(null);
+  const [selectedUserDetails, setSelectedUserDetails] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -1775,6 +1851,13 @@ export default function Dashboard() {
         isHebrew={isHebrew}
       />
 
+      <UserDetailsModal 
+        isOpen={selectedUserDetails !== null}
+        onClose={() => setSelectedUserDetails(null)}
+        user={selectedUserDetails}
+        isHebrew={isHebrew}
+      />
+
       <EmailConfirmModal 
         isOpen={pendingEmailQuote !== null} 
         onClose={() => setPendingEmailQuote(null)} 
@@ -2896,7 +2979,7 @@ export default function Dashboard() {
               </div>
               
               <div style={{ overflowX: 'auto', background: 'white', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '800px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '850px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('email')}>
@@ -2920,12 +3003,15 @@ export default function Dashboard() {
                       <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('last_sign_in')}>
                         Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
+                      <th style={{ padding: '10px 8px', textAlign: 'center' }}>
+                        {isHebrew ? 'פרטים' : 'Details'}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredAdminAccounts.length === 0 ? (
                       <tr>
-                        <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                           {isHebrew ? 'לא נמצאו משתמשים התואמים את החיפוש.' : 'No users found matching your search.'}
                         </td>
                       </tr>
@@ -3009,6 +3095,15 @@ export default function Dashboard() {
                             </td>
                             <td style={{ padding: '12px 8px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                               {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
+                            </td>
+                            <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                              <button
+                                onClick={() => setSelectedUserDetails(acc)}
+                                style={{ background: '#e0e7ff', color: '#4f46e5', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                title={isHebrew ? 'הצג פרטי משתמש מלאים' : 'View User Details'}
+                              >
+                                ℹ️ {isHebrew ? 'פרטים' : 'Details'}
+                              </button>
                             </td>
                           </tr>
                         );
