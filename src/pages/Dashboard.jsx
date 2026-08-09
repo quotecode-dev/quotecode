@@ -1570,12 +1570,12 @@ export default function Dashboard() {
 
             </div>
             
-            {/* תיבת באנר בולטת ומעוצבת להרשמה / התחברות */}
+            {/* תיבת באנר בולטת עם המלל המפורט שביקשת ומותאמת נכון מבחינת כיוון שפה */}
             {isSignUp ? (
-              <div style={{ background: 'linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%)', border: '1px solid #c7d2fe', padding: '12px 16px', borderRadius: '10px', marginTop: '16px', marginBottom: '4px', color: '#4f46e5', fontSize: '0.88rem', fontWeight: '700', textAlign: isLoginHebrew ? 'right' : 'left', width: '100%', boxSizing: 'border-box', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.1)', lineHeight: '1.4' }}>
+              <div dir={isLoginHebrew ? 'rtl' : 'ltr'} style={{ background: 'linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%)', border: '1px solid #c7d2fe', padding: '12px 16px', borderRadius: '10px', marginTop: '16px', marginBottom: '4px', color: '#4f46e5', fontSize: '0.88rem', fontWeight: '700', textAlign: isLoginHebrew ? 'right' : 'left', width: '100%', boxSizing: 'border-box', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.1)', lineHeight: '1.4' }}>
                 {isLoginHebrew 
-                  ? '🎁 פתח חשבון חדש וקבל 14 יום ניסיון ב-PRO מתנה!' 
-                  : '🎁 Create a new account & get a 14-day PRO trial for free!'}
+                  ? 'לרישום לאתר ולקבלת 14 יום ניסיון ב-PRO מתנה, נא הקלד אימייל וסיסמה.' 
+                  : 'To register and claim your 14-day free PRO trial, please enter your email and password.'}
               </div>
             ) : (
               <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '12px' }}>
@@ -2906,7 +2906,7 @@ export default function Dashboard() {
                                 </span>
                               </div>
                             </td>
-                            <td style={{ padding: '12px 8px', fontSize: '0.80rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
+                            <td style={{ padding: '12px 8px', fontSize: '0.8rem', color: '#475569', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                               {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
                             </td>
                           </tr>
