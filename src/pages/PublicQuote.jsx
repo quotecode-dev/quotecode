@@ -424,7 +424,7 @@ export default function PublicQuote() {
                 />
               </div>
 
-<u>              <div style={{ marginBottom: '15px' }}>
+              <div style={{ marginBottom: '15px' }}>
                 <button
                   type="button"
                   onClick={clearSignature}
