@@ -234,20 +234,16 @@ export default function PublicQuote() {
           
           {isHebrew ? (
             <>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', textAlign: 'right', flex: 1, minWidth: '250px' }}>
-                {bizLogo ? (
-                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', flexShrink: 0 }} />
-                ) : (
-                  <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'right', flex: 1, minWidth: '250px' }}>
+                {bizLogo && (
+                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', alignSelf: 'flex-start' }} />
                 )}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  {bizLogo && <div style={{ fontWeight: '800', color: '#0f172a', fontSize: '1.1rem', marginBottom: '2px' }}>{bizName}</div>}
-                  <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4', textAlign: 'right' }}>
-                    {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
-                    {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
-                    {bizEmail && <div dir="ltr" style={{ textAlign: 'right' }}><span>{bizEmail}</span></div>}
-                    {bizAddress && <div>כתובת: {bizAddress}</div>}
-                  </div>
+                <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
+                <div style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.5', textAlign: 'right' }}>
+                  {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
+                  {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
+                  {bizEmail && <div dir="ltr" style={{ textAlign: 'right' }}><span>{bizEmail}</span></div>}
+                  {bizAddress && <div>כתובת: {bizAddress}</div>}
                 </div>
               </div>
 
@@ -262,20 +258,16 @@ export default function PublicQuote() {
             </>
           ) : (
             <>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', textAlign: 'left', flex: 1, minWidth: '250px' }}>
-                {bizLogo ? (
-                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', flexShrink: 0 }} />
-                ) : (
-                  <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left', flex: 1, minWidth: '250px' }}>
+                {bizLogo && (
+                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', alignSelf: 'flex-start' }} />
                 )}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  {bizLogo && <div style={{ fontWeight: '800', color: '#0f172a', fontSize: '1.1rem', marginBottom: '2px' }}>{bizName}</div>}
-                  <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4', textAlign: 'left' }}>
-                    {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
-                    {bizPhone && <div>Phone: {bizPhone}</div>}
-                    {bizEmail && <div>{bizEmail}</div>}
-                    {bizAddress && <div>Address: {bizAddress}</div>}
-                  </div>
+                <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
+                <div style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.5', textAlign: 'left' }}>
+                  {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
+                  {bizPhone && <div>Phone: {bizPhone}</div>}
+                  {bizEmail && <div>{bizEmail}</div>}
+                  {bizAddress && <div>Address: {bizAddress}</div>}
                 </div>
               </div>
 
