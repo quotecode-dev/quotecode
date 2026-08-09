@@ -241,7 +241,7 @@ export default function PublicQuote() {
                   <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
+                  <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4', textAlign: 'right' }}>
                     {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
                     {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
                     {bizEmail && <div dir="ltr" style={{ textAlign: 'right' }}><span>{bizEmail}</span></div>}
@@ -268,7 +268,7 @@ export default function PublicQuote() {
                   <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4' }}>
+                  <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4', textAlign: 'left' }}>
                     {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
                     {bizPhone && <div>Phone: {bizPhone}</div>}
                     {bizEmail && <div>{bizEmail}</div>}
@@ -291,7 +291,7 @@ export default function PublicQuote() {
         </div>
 
         {/* Client & Business Info */}
-        <div style={{ background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', marginBottom: '25px', border: '1px solid #e2e8f0' }}>
+        <div style={{ background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', marginBottom: '25px', border: '1px solid #e2e8f0', textAlign: isHebrew ? 'right' : 'left' }}>
           <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '5px' }}>{isHebrew ? 'לכבוד:' : 'Client:'}</div>
           <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#1e293b' }}>{quote.clients?.company_name || quote.client_name || (isHebrew ? 'לקוח נכבד' : 'Valued Client')}</div>
           {quote.clients?.email && <div style={{ color: '#475569', fontSize: '0.9rem', direction: 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>{quote.clients.email}</div>}
@@ -304,10 +304,10 @@ export default function PublicQuote() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left' }}>
             <thead>
               <tr style={{ background: '#f1f5f9', color: '#475569', fontSize: '0.85rem' }}>
-                <th style={{ padding: '10px', borderRadius: isHebrew ? '0 8px 8px 0' : '8px 0 0 8px' }}>{isHebrew ? 'תיאור פריט' : 'Description'}</th>
+                <th style={{ padding: '10px', textAlign: isHebrew ? 'right' : 'left', borderRadius: isHebrew ? '0 8px 8px 0' : '8px 0 0 8px' }}>{isHebrew ? 'תיאור פריט' : 'Description'}</th>
                 <th style={{ padding: '10px', textAlign: 'center' }}>{isHebrew ? 'כמות' : 'Qty'}</th>
-                <th style={{ padding: '10px', textAlign: 'left' }}>{isHebrew ? 'מחיר יחידה' : 'Unit Price'}</th>
-                <th style={{ padding: '10px', textAlign: 'left', borderRadius: isHebrew ? '8px 0 0 8px' : '0 8px 8px 0' }}>{isHebrew ? 'סה"כ' : 'Total'}</th>
+                <th style={{ padding: '10px', textAlign: isHebrew ? 'left' : 'right' }}>{isHebrew ? 'מחיר יחידה' : 'Unit Price'}</th>
+                <th style={{ padding: '10px', textAlign: isHebrew ? 'left' : 'right', borderRadius: isHebrew ? '8px 0 0 8px' : '0 8px 8px 0' }}>{isHebrew ? 'סה"כ' : 'Total'}</th>
               </tr>
             </thead>
             <tbody>
@@ -317,10 +317,10 @@ export default function PublicQuote() {
                   const itemQty = Number(item.quantity || 1);
                   return (
                     <tr key={index} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.9rem' }}>
-                      <td style={{ padding: '12px 10px', color: '#1e293b' }}>{item.description || item.name || (isHebrew ? 'פריט' : 'Item')}</td>
+                      <td style={{ padding: '12px 10px', color: '#1e293b', textAlign: isHebrew ? 'right' : 'left' }}>{item.description || item.name || (isHebrew ? 'פריט' : 'Item')}</td>
                       <td style={{ padding: '12px 10px', textAlign: 'center', color: '#475569' }}>{itemQty}</td>
-                      <td style={{ padding: '12px 10px', textAlign: 'left', color: '#475569' }}>{currencySymbol}{formatNum(itemPrice)}</td>
-                      <td style={{ padding: '12px 10px', textAlign: 'left', fontWeight: 'bold', color: '#1e293b' }}>{currencySymbol}{formatNum(item.total_price || (itemQty * itemPrice))}</td>
+                      <td style={{ padding: '12px 10px', textAlign: isHebrew ? 'left' : 'right', color: '#475569' }}>{currencySymbol}{formatNum(itemPrice)}</td>
+                      <td style={{ padding: '12px 10px', textAlign: isHebrew ? 'left' : 'right', fontWeight: 'bold', color: '#1e293b' }}>{currencySymbol}{formatNum(item.total_price || (itemQty * itemPrice))}</td>
                     </tr>
                   );
                 })
@@ -336,25 +336,25 @@ export default function PublicQuote() {
         </div>
 
         {/* Totals */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '30px' }}>
+        <div style={{ display: 'flex', justifyContent: isHebrew ? 'flex-start' : 'flex-end', marginBottom: '30px' }}>
           <div style={{ width: '300px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0', boxSizing: 'border-box' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', fontSize: '0.9rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', fontSize: '0.9rem', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
               <span>{isHebrew ? 'סיכום ביניים:' : 'Subtotal:'}</span>
               <span>{currencySymbol}{formatNum(subtotal)}</span>
             </div>
             {quote.discount > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444', fontSize: '0.9rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#ef4444', fontSize: '0.9rem', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                 <span>{isHebrew ? `הנחה (${quote.discount}%):` : `Discount (${quote.discount}%):`}</span>
                 <span>-{currencySymbol}{formatNum((subtotal * quote.discount) / 100)}</span>
               </div>
             )}
             {vatRate > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', fontSize: '0.9rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#64748b', fontSize: '0.9rem', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
                 <span>{isHebrew ? 'מע"מ (18%):' : 'VAT (18%):'}</span>
                 <span>{currencySymbol}{formatNum(vatAmount)}</span>
               </div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: '900', color: '#1e293b', borderTop: '2px solid #cbd5e1', paddingTop: '10px', marginTop: '5px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: '900', color: '#1e293b', borderTop: '2px solid #cbd5e1', paddingTop: '10px', marginTop: '5px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
               <span>{isHebrew ? 'סה"כ לתשלום:' : 'Total:'}</span>
               <span style={{ color: '#4f46e5' }}>{currencySymbol}{formatNum(total)}</span>
             </div>
@@ -363,14 +363,14 @@ export default function PublicQuote() {
 
         {/* Terms & Notes Display */}
         {quote.terms && (
-          <div style={{ marginBottom: '25px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <div style={{ marginBottom: '25px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: isHebrew ? 'right' : 'left' }}>
             <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px' }}>{isHebrew ? 'תקנון ותנאים:' : 'Terms & Conditions:'}</div>
             <div style={{ fontSize: '0.85rem', color: '#475569', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>{quote.terms}</div>
           </div>
         )}
 
         {quote.notes && (
-          <div style={{ marginBottom: '25px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <div style={{ marginBottom: '25px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: isHebrew ? 'right' : 'left' }}>
             <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px' }}>{isHebrew ? 'הערות נוספות:' : 'Additional Notes:'}</div>
             <div style={{ fontSize: '0.85rem', color: '#475569', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>{quote.notes}</div>
           </div>
