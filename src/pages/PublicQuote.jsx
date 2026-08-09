@@ -227,6 +227,15 @@ export default function PublicQuote() {
 
   const isOwnerViewing = currentUserId && quote.user_id && currentUserId === quote.user_id;
 
+  // Strict International Terms & Conditions Override Fallback
+  let displayTerms = quote.terms;
+  if (!isHebrew && displayTerms && /[א-ת]/.test(displayTerms)) {
+    displayTerms = `General Terms:
+1. Validity: This quote is valid for 30 days from issuance.
+2. Payment: Payment shall be made in cash or via bank transfer as agreed in advance.
+3. Delivery: Product delivery within 30 business days from order confirmation and payment.`;
+  }
+
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', padding: '20px', display: 'flex', justifyContent: 'center', boxSizing: 'border-box' }}>
       <div style={{ background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', width: '100%', maxWidth: '800px', boxSizing: 'border-box' }}>
@@ -315,10 +324,10 @@ export default function PublicQuote() {
         </div>
 
         {/* Terms & Notes Display */}
-        {quote.terms && (
+        {displayTerms && (
           <div style={{ marginBottom: '25px', background: '#f8fafc', padding: '15px 20px', borderRadius: '10px', border: '1px solid #e2e8f0', textAlign: isHebrew ? 'right' : 'left' }}>
             <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px' }}>{isHebrew ? 'תקנון ותנאים:' : 'Terms & Conditions:'}</div>
-            <div style={{ fontSize: '0.85rem', color: '#475569', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>{quote.terms}</div>
+            <div style={{ fontSize: '0.85rem', color: '#475569', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>{displayTerms}</div>
           </div>
         )}
 
