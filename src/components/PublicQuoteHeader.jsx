@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 
 export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId, bizPhone, bizEmail, bizAddress, quote }) {
   const [imgError, setImgError] = useState(false);
-  const hasLogo = bizLogo && typeof bizLogo === 'string' && bizLogo.trim().length > 0 && !imgError;
+  
+  // תנאי ברור: יש לוגו רק אם הכתובת קיימת, לא ריקה, ולא הייתה שגיאת טעינה
+  const shouldShowLogo = bizLogo && typeof bizLogo === 'string' && bizLogo.trim().length > 0 && !imgError;
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
@@ -17,8 +19,8 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            {hasLogo ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: '65px' }}>
+            {shouldShowLogo ? (
               <img 
                 src={bizLogo} 
                 alt={bizName} 
@@ -41,8 +43,8 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
         </>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {hasLogo ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', minHeight: '65px' }}>
+            {shouldShowLogo ? (
               <img 
                 src={bizLogo} 
                 alt={bizName} 
