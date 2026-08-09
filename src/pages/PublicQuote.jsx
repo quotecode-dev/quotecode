@@ -230,17 +230,18 @@ export default function PublicQuote() {
       <div style={{ background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', width: '100%', maxWidth: '800px', boxSizing: 'border-box' }}>
         
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
           
           {isHebrew ? (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'right' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', textAlign: 'right', flex: 1, minWidth: '250px' }}>
                 {bizLogo ? (
-                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', flexShrink: 0 }} />
                 ) : (
                   <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  {bizLogo && <div style={{ fontWeight: '800', color: '#0f172a', fontSize: '1.1rem', marginBottom: '2px' }}>{bizName}</div>}
                   <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4', textAlign: 'right' }}>
                     {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
                     {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
@@ -261,13 +262,14 @@ export default function PublicQuote() {
             </>
           ) : (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px', textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', textAlign: 'left', flex: 1, minWidth: '250px' }}>
                 {bizLogo ? (
-                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+                  <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', flexShrink: 0 }} />
                 ) : (
                   <h2 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.4rem', fontWeight: '800' }}>{bizName}</h2>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  {bizLogo && <div style={{ fontWeight: '800', color: '#0f172a', fontSize: '1.1rem', marginBottom: '2px' }}>{bizName}</div>}
                   <div style={{ color: '#64748b', fontSize: '0.82rem', lineHeight: '1.4', textAlign: 'left' }}>
                     {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
                     {bizPhone && <div>Phone: {bizPhone}</div>}
@@ -422,7 +424,7 @@ export default function PublicQuote() {
                 />
               </div>
 
-              <div style={{ marginBottom: '15px' }}>
+<u>              <div style={{ marginBottom: '15px' }}>
                 <button
                   type="button"
                   onClick={clearSignature}
