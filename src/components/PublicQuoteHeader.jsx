@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId, bizPhone, bizEmail, bizAddress, quote }) {
-  const hasLogo = bizLogo && typeof bizLogo === 'string' && bizLogo.trim().length > 0;
+  const [imgError, setImgError] = useState(false);
+  const hasLogo = bizLogo && typeof bizLogo === 'string' && bizLogo.trim().length > 0 && !imgError;
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
@@ -18,7 +19,12 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             {hasLogo ? (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+              <img 
+                src={bizLogo} 
+                alt={bizName} 
+                onError={() => setImgError(true)}
+                style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} 
+              />
             ) : (
               <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
             )}
@@ -37,7 +43,12 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
         <>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {hasLogo ? (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+              <img 
+                src={bizLogo} 
+                alt={bizName} 
+                onError={() => setImgError(true)}
+                style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} 
+              />
             ) : (
               <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
             )}
