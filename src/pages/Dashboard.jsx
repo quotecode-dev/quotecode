@@ -407,7 +407,6 @@ export default function Dashboard() {
         }
         setIsInitializing(false);
       } else if (event === 'TOKEN_REFRESHED') {
-        // Handle token refresh silently without triggering full initialization reload/flash
         setSession(session);
       } else if (event === 'SIGNED_OUT') {
         setSession(null);
@@ -703,17 +702,19 @@ export default function Dashboard() {
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'pro');
       setBizRole(data.role || 'user');
-      setBizCountry(data.country || 'Local');
-      const defTerms = data.default_terms || (data.country === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
+      const countryVal = data.country || 'Local';
+      setBizCountry(countryVal);
+      
+      const defTerms = data.default_terms || (countryVal === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
       setDefaultTerms(defTerms);
       setTrialEndsAt(data.trial_ends_at !== undefined ? data.trial_ends_at : null);
       
-      if (data.country === 'International') {
+      if (countryVal === 'International') {
         setCurrency('USD');
-        setTerms(defTerms);
+        setTerms(defTerms.includes('General Terms') ? defTerms : DEFAULT_TERMS_ENG);
       } else {
         setCurrency('ILS');
-        setTerms(defTerms);
+        setTerms(defTerms.includes('תנאים כלליים') ? defTerms : DEFAULT_TERMS_HEB);
       }
 
       await supabase
@@ -763,8 +764,8 @@ export default function Dashboard() {
         setBizCountry(newData.country || detectedCountry);
         setDefaultTerms(newData.default_terms || detectedTerms);
         setTrialEndsAt(newData.trial_ends_at);
-        setCurrency(detectedCountry === 'International' ? 'USD' : 'ILS');
-        setTerms(detectedTerms);
+        setCurrency(newData.country === 'International' ? 'USD' : 'ILS');
+        setTerms(newData.country === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
       } else {
         setSettingId(null);
         setBizPlan('pro');
@@ -1350,13 +1351,14 @@ export default function Dashboard() {
     setClientTaxId(quote.clients?.tax_id || '');
     setClientAddress(quote.clients?.address || '');
     
-    setCurrency(isLocalIsraeliBusiness ? 'ILS' : (quote.currency || 'USD'));
+    const quoteCurr = isLocalIsraeliBusiness ? 'ILS' : (quote.currency || 'USD');
+    setCurrency(quoteCurr);
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || ''); 
 
-    let editTerms = defaultTerms;
+    let editTerms = quote.terms || (quoteCurr === 'ILS' ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     let editNotes = quote.notes || '';
 
     setTerms(editTerms);
@@ -1382,9 +1384,11 @@ export default function Dashboard() {
     setClientAddress('');
     setValidUntil('');
     setDiscount('');
-    setTerms(defaultTerms);
+    const isIntl = !isLocalIsraeliBusiness;
+    const initialCurr = isIntl ? 'USD' : 'ILS';
+    setCurrency(initialCurr);
+    setTerms(isIntl ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
     setNotes('');
-    setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
     setItems([{ description: '', quantity: '', unit_price: '' }]);
   };
 
@@ -1398,13 +1402,14 @@ export default function Dashboard() {
     setClientTaxId(quote.clients?.tax_id || '');
     setClientAddress(quote.clients?.address || '');
     
-    setCurrency(isLocalIsraeliBusiness ? 'ILS' : (quote.currency || 'USD'));
+    const quoteCurr = isLocalIsraeliBusiness ? 'ILS' : (quote.currency || 'USD');
+    setCurrency(quoteCurr);
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || '');
 
-    let dupTerms = defaultTerms;
+    let dupTerms = quote.terms || (quoteCurr === 'ILS' ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     let dupNotes = quote.notes || '';
 
     setTerms(dupTerms);
@@ -1430,7 +1435,7 @@ export default function Dashboard() {
     setClientAddress('');
     setValidUntil('');
     setDiscount('');
-    setTerms(defaultTerms);
+    setTerms(isLocalIsraeliBusiness ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     setNotes('');
     setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
     setItems([{ description: '', quantity: '', unit_price: '' }]);
@@ -1498,7 +1503,7 @@ export default function Dashboard() {
         status: quoteStatus.toLowerCase(),
         valid_until: validUntil || null,
         discount: Number(discount || 0),
-        terms: defaultTerms,
+        terms: terms,
         notes: notes,
         user_id: session.user.id
       };
@@ -1544,7 +1549,7 @@ export default function Dashboard() {
       setClientAddress('');
       setValidUntil('');
       setDiscount('');
-      setTerms(defaultTerms);
+      setTerms(isLocalIsraeliBusiness ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
       setNotes('');
       setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
       setItems([{ description: '', quantity: '', unit_price: '' }]);
@@ -2251,7 +2256,8 @@ export default function Dashboard() {
                                           minWidth: '200px',
                                           padding: '6px 0',
                                           textAlign: isHebrew ? 'right' : 'left'
-                                        }}>
+                                        }}
+                                      >
                                         <button
                                           onClick={() => { setOpenDropdownId(null); window.open(`/public-quote/${quote.id}`, '_blank'); }}
                                           style={{ width: '100%', background: 'none', border: 'none', padding: '9px 14px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.85rem', color: '#3730a3', display: 'block', fontWeight: '500' }}
@@ -2542,7 +2548,20 @@ export default function Dashboard() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '15px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{t.currency}</label>
-                      <select name="currency" value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.9rem', fontWeight: '400' }}>
+                      <select 
+                        name="currency" 
+                        value={currency} 
+                        onChange={(e) => {
+                          const newCurr = e.target.value;
+                          setCurrency(newCurr);
+                          if (newCurr === 'ILS') {
+                            setTerms(DEFAULT_TERMS_HEB);
+                          } else {
+                            setTerms(DEFAULT_TERMS_ENG);
+                          }
+                        }} 
+                        style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.9rem', fontWeight: '400' }}
+                      >
                         {isLocalIsraeliBusiness ? (
                           <option value="ILS">ILS (₪)</option>
                         ) : (
@@ -2574,12 +2593,12 @@ export default function Dashboard() {
                   </div>
 
                   <div style={{ marginBottom: '15px' }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isHebrew ? 'תקנון ותנאים' : 'Terms & Conditions'}</label>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{currency === 'ILS' ? 'תקנון ותנאים' : 'Terms & Conditions'}</label>
                     <textarea 
                       value={terms} 
                       onChange={(e) => setTerms(e.target.value)} 
                       rows="4"
-                      style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
+                      style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px', background: '#f8fafc', boxSizing: 'border-box', textAlign: currency === 'ILS' ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
                     />
                   </div>
 
