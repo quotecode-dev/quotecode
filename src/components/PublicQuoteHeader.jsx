@@ -4,7 +4,7 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
   const hasLogo = bizLogo && typeof bizLogo === 'string' && bizLogo.trim().length > 0;
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
       {isHebrew ? (
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'right', flex: 1, minWidth: '220px' }}>
@@ -16,12 +16,11 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
-            </div>
-            {hasLogo && (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '140px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            {hasLogo ? (
+              <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+            ) : (
+              <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
             )}
           </div>
 
@@ -36,11 +35,12 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
         </>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {hasLogo && (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '140px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {hasLogo ? (
+              <img src={bizLogo} alt={bizName} style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} />
+            ) : (
+              <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
             )}
-            <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'left', flex: 1, minWidth: '220px' }}>
