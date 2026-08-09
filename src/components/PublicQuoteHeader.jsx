@@ -1,15 +1,19 @@
 import React from 'react';
 
 export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId, bizPhone, bizEmail, bizAddress, quote }) {
+  // בדיקה פשוטה אם הלוגו הוא URL תקין
+  const hasValidLogo = bizLogo && bizLogo.startsWith('http');
+
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
       {isHebrew ? (
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'right', flex: 1, minWidth: '250px' }}>
-            {bizLogo && (
+            {hasValidLogo ? (
               <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', alignSelf: 'flex-start' }} />
+            ) : (
+              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
             )}
-            <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
             <div style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.5', textAlign: 'right' }}>
               {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
               {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
@@ -30,10 +34,11 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
       ) : (
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left', flex: 1, minWidth: '250px' }}>
-            {bizLogo && (
+            {hasValidLogo ? (
               <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', alignSelf: 'flex-start' }} />
+            ) : (
+              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
             )}
-            <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
             <div style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.5', textAlign: 'left' }}>
               {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
               {bizPhone && <div>Phone: {bizPhone}</div>}
