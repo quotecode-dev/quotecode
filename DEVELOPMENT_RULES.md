@@ -1,24 +1,22 @@
 # ProFlow SaaS - Development Rules & Architecture Protocol
 
-## Project Overview
-* **Project Name**: ProFlow (Business management and smart quoting SaaS system).
-* **Production Domain**: https://www.quotecodepro.com/
-* **Tech Stack**: React (Vite), Supabase (Auth, Database, Edge Functions), Vercel (Hosting), GitHub (Version Control).
-* **Environment**: Cloud-only development (No Localhost).
+אנא זכור ויישם תמיד את כללי הברזל הבאים בפרויקט ProFlow:
 
----
+1. **הפרדה מוחלטת בשפות ובמטבעות:**
+   * **פלטפורמת ישראל (עברית):** ממשק, דף נחיתה ותכנים בעברית מלאה בלבד (ללא שום שפה אחרת), ומטבע ש"ח (ILS) בלבד.
+   * **פלטפורמת חו"ל (אנגלית):** ממשק, דף נחיתה ותכנים באנגלית מלאה בלבד (ללא אף אות בעברית), ומטבעות דולר ($), יורו (€) ופאונד (£) בלבד.
 
-## Iron Rules for Code & Responses
+2. **גיבוי מערכת מתועד (חובה בכל שינוי קריטי):**
+   * תמיד לאחר ביצוע שינוי או עדכון קריטי במערכת, חובה לבצע באופן מיידי גיבוי מלא לענן הכולל את הקוד, כללי הברזל והתיעוד, ויצירת תגית (Tag) ב-GitHub ששמה מתאר במדויק את השינויים שבוצעו מהגרסה הקודמת (לפי הפורמט: `v[גרסה]-[תיאור קצר של השינויים]-full-backup`).
+   * <span style="color:red;"><b>בשום פנים ואופן אין לבצע גיבוי מלא לבד או באופן אוטומטי!</b></span> לאחר עדכון במערכת, חובה אך ורק להציע לבצע גיבוי מלא לענן או להמתין לבקשה מפורשת מהמשתמש. הגיבוי יבוצע אך ורק לאחר קבלת אישור מפורש ממנו.
 
-1. **Complete File Delivery**: When making code changes (React, Tailwind, Supabase, etc.), always provide the **full updated file from start to finish**. Never provide partial code snippets or manual insertion instructions.
-2. **Git Commands**: At the end of every code update, provide the required Git commands in a dedicated code block (`git add . ; git commit -m "..." ; git push`).
-3. **Simple Explanations**: Explanations must be step-by-step, simple, and accessible without assuming advanced developer knowledge.
-4. **Visual Highlights**: Always highlight warnings or critical points in bright red using HTML (`<span style="color:red;"><b>...</b></span>`).
-5. **Copy Instructions Formatting**: Always add an underscore before and after the prompt instruction for copying and pasting code files.
-6. **VAT Rules**: 18% for local Israeli clients (`business_settings.country === 'Local'`), 0% for international clients (`business_settings.country === 'International'`).
-7. **Strict International Language Isolation**: 
-   - Language localization (`isHebrew`) is tied strictly and exclusively to the database field `business_settings.country` (or currency if specified).
-   - International users/businesses (`International`) must **never** under any circumstances be exposed to Hebrew text or labels in public quotes or dashboards.
-8. **Owner View Safety**: 
-   - When a business owner views their own quote from the management dashboard (`PublicQuote.jsx`), the client signature box (`canvas`) must be hidden, showing a clean management preview instead. Client signatures are reserved exclusively for the external public client link.
-9. **Prior History Analysis**: Before giving any answer, project continuation proposal, or future task reference, analyze previous conversation history and decisions in two parallel vectors: Technical (code, features, architecture) and Business/Strategic (marketing, business model, explicitly deferred processes). Never propose development that contradicts past decisions.
+3. **נוהל עדכון קבצים:**
+   * לפני עדכון או החלפה של קובץ קוד כלשהו, חובה לבקש ממני את הקובץ הקיים.
+   * לעולם אין לשלוח או לפרסם קובץ קוד מבלי לקבל ממני אישור מפורש לכך קודם.
+   * בעת מתן קובץ מעודכן, ספק תמיד את הקובץ המלא מתחילתו ועד סופו (ללא חלקי קוד או השמטות).
+
+4. **פקודות Git:**
+   * תמיד לספק את פקודות ה-Git בשורה אחת מרוכזת בתוך בלוק קוד (לדוגמה: `git add . ; git commit -m "..." ; git push origin main ; git tag ... ; git push origin ...`).
+
+5. **בידוד שינויים (Isolation) ברכיבי עיצוב:**
+   * בעת ביצוע שינויים עיצוביים (כמו יישור שפה, CSS או אלמנטים ויזואליים), יש לבצע בדיקה נקודתית אך ורק על האלמנט הספציפי שנוגעים בו, מבלי לשנות או לגעת במבנה הכללי של הקונטיינר או הרכיבים העוטפים מסביב, כדי למנוע פגיעה בתצוגה או בפונקציונליות של חלקים אחרים במערכת.
