@@ -207,6 +207,41 @@ function LifetimeConfirmModal({ isOpen, onClose, onConfirm, userEmail, isHebrew 
   );
 }
 
+function RegionConfirmModal({ isOpen, onClose, onConfirm, userEmail, newCountry, isHebrew }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div style={{ background: 'white', padding: '25px', borderRadius: '14px', width: '100%', maxWidth: '380px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)', textAlign: 'center', animation: 'popupBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards' }}>
+        
+        <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: '#e0e7ff', color: '#4f46e5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px auto', fontSize: '1.2rem' }}>
+          🌐
+        </div>
+
+        <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.15rem', marginBottom: '8px', fontWeight: '800' }}>
+          {isHebrew ? 'אישור שינוי אזור פעילות' : 'Confirm Region Change'}
+        </h3>
+        
+        <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '20px', lineHeight: '1.4' }}>
+          {isHebrew ? 'האם אתה בטוח שברצונך לשנות את אזור הפעילות ל-' : 'Are you sure you want to change region to '}
+          <strong style={{ color: '#4f46e5' }}>{newCountry === 'Local' ? 'LCL (Local)' : 'Intl (International)'}</strong>?
+          <br />
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8', direction: 'ltr', display: 'inline-block', marginTop: '4px' }}>{userEmail}</span>
+        </p>
+
+        <div style={{ display: 'flex', gap: '8px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+          <button onClick={onClose} style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}>
+            {isHebrew ? 'ביטול' : 'Cancel'}
+          </button>
+          <button onClick={onConfirm} style={{ flex: 1, background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem', boxShadow: '0 4px 10px rgba(79, 70, 229, 0.3)' }}>
+            {isHebrew ? 'אישור שינוי' : 'Confirm'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [session, setSession] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -268,7 +303,6 @@ export default function Dashboard() {
       setIsPasswordRecoveryMode(true);
     }
 
-    // בדיקת פרמטר הרשמה
     const params = new URLSearchParams(search);
     if (params.get('signup') === 'true') {
       setIsSignUp(true);
@@ -376,6 +410,7 @@ export default function Dashboard() {
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [pendingLifetimeUser, setPendingLifetimeUser] = useState(null);
+  const [pendingRegionChange, setPendingRegionChange] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -600,14 +635,18 @@ export default function Dashboard() {
       const trialEndDate = new Date();
       trialEndDate.setDate(trialEndDate.getDate() + 14);
 
+      const isHebNav = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
+      const detectedCountry = isHebNav ? 'Local' : 'International';
+      const detectedTerms = detectedCountry === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB;
+
       const defaultPayload = {
         user_id: userId,
         email: userEmail,
         business_name: 'New Business',
-        country: 'Local',
+        country: detectedCountry,
         plan: 'pro',
         role: 'user',
-        default_terms: DEFAULT_TERMS_HEB,
+        default_terms: detectedTerms,
         trial_ends_at: trialEndDate.toISOString(),
         last_sign_in: nowIso
       };
@@ -628,20 +667,20 @@ export default function Dashboard() {
         setBizAddress(newData.address || '');
         setBizPlan(newData.plan);
         setBizRole(newData.role);
-        setBizCountry(newData.country || 'Local');
-        setDefaultTerms(newData.default_terms || DEFAULT_TERMS_HEB);
+        setBizCountry(newData.country || detectedCountry);
+        setDefaultTerms(newData.default_terms || detectedTerms);
         setTrialEndsAt(newData.trial_ends_at);
-        setCurrency('ILS');
-        setTerms(DEFAULT_TERMS_HEB);
+        setCurrency(detectedCountry === 'International' ? 'USD' : 'ILS');
+        setTerms(detectedTerms);
       } else {
         setSettingId(null);
         setBizPlan('pro');
         setBizRole('user');
-        setBizCountry('Local');
-        setDefaultTerms(DEFAULT_TERMS_HEB);
+        setBizCountry(detectedCountry);
+        setDefaultTerms(detectedTerms);
         setTrialEndsAt(trialEndDate.toISOString());
-        setCurrency('ILS');
-        setTerms(DEFAULT_TERMS_HEB);
+        setCurrency(detectedCountry === 'International' ? 'USD' : 'ILS');
+        setTerms(detectedTerms);
       }
     }
   }
@@ -1719,6 +1758,20 @@ export default function Dashboard() {
           await handleToggleLifetime(u.id, u.trial_ends_at);
         }}
         userEmail={pendingLifetimeUser?.email || ''}
+        isHebrew={isHebrew}
+      />
+
+      <RegionConfirmModal 
+        isOpen={pendingRegionChange !== null}
+        onClose={() => setPendingRegionChange(null)}
+        onConfirm={async () => {
+          if (!pendingRegionChange) return;
+          const { accountId, newCountry } = pendingRegionChange;
+          setPendingRegionChange(null);
+          await handleAdminCountryChange(accountId, newCountry);
+        }}
+        userEmail={pendingRegionChange?.userEmail || ''}
+        newCountry={pendingRegionChange?.newCountry || 'Local'}
         isHebrew={isHebrew}
       />
 
@@ -2879,6 +2932,7 @@ export default function Dashboard() {
                     ) : (
                       filteredAdminAccounts.map(acc => {
                         const isLifetime = acc.trial_ends_at === null || acc.trial_ends_at === undefined;
+                        const currentCountry = acc.country || 'Local';
                         return (
                           <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.85rem' }}>
                             <td style={{ padding: '12px 8px', fontWeight: '500', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
@@ -2896,12 +2950,23 @@ export default function Dashboard() {
                             </td>
                             <td style={{ padding: '12px 8px' }}>
                               <select 
-                                value={acc.country || 'Local'} 
-                                onChange={(e) => handleAdminCountryChange(acc.id, e.target.value)}
-                                style={{ padding: '4px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.75rem', fontWeight: 'bold', color: '#0d9488' }}
+                                value={currentCountry} 
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setPendingRegionChange({ accountId: acc.id, newCountry: val, userEmail: acc.email });
+                                }}
+                                style={{ 
+                                  padding: '5px 10px', 
+                                  borderRadius: '6px', 
+                                  border: '1px solid #cbd5e1', 
+                                  background: currentCountry === 'Local' ? '#ecfdf5' : '#fef3c7', 
+                                  fontSize: '0.75rem', 
+                                  fontWeight: 'bold', 
+                                  color: currentCountry === 'Local' ? '#047857' : '#b45309' 
+                                }}
                               >
-                                <option value="Local">Local (Hebrew)</option>
-                                <option value="International">International (English)</option>
+                                <option value="Local">LCL</option>
+                                <option value="International">Intl</option>
                               </select>
                             </td>
                             <td style={{ padding: '12px 8px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: '600' }}>
