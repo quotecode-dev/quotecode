@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId, bizPhone, bizEmail, bizAddress, quote }) {
   const [imgError, setImgError] = useState(false);
-  
-  // תנאי ברור: יש לוגו רק אם הכתובת קיימת, לא ריקה, ולא הייתה שגיאת טעינה
-  const shouldShowLogo = bizLogo && typeof bizLogo === 'string' && bizLogo.trim().length > 0 && !imgError;
+
+  useEffect(() => {
+    // דיבאג: נדפיס לקונסול כדי לראות מה המערכת באמת מקבלת
+    console.log("Current bizLogo URL:", bizLogo);
+  }, [bizLogo]);
+
+  // לוגיקה ברורה: אם יש לוגו תקין (וזו לא תמונה שבורה) - נציג אותו
+  const showLogo = bizLogo && bizLogo.length > 5 && !imgError;
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
@@ -19,13 +24,13 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: '65px' }}>
-            {shouldShowLogo ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: '60px' }}>
+            {showLogo ? (
               <img 
                 src={bizLogo} 
                 alt={bizName} 
                 onError={() => setImgError(true)}
-                style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} 
+                style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} 
               />
             ) : (
               <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
@@ -43,13 +48,13 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
         </>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', minHeight: '65px' }}>
-            {shouldShowLogo ? (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', minHeight: '60px' }}>
+            {showLogo ? (
               <img 
                 src={bizLogo} 
                 alt={bizName} 
                 onError={() => setImgError(true)}
-                style={{ maxHeight: '65px', maxWidth: '170px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} 
+                style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white' }} 
               />
             ) : (
               <div style={{ fontSize: '1.3rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
