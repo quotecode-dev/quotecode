@@ -23,6 +23,14 @@ export default function LandingGlobal() {
     {
       q: 'Is the platform optimized for mobile and desktop?',
       a: 'Yes, ProFlow is built as a fully responsive modern SaaS platform, allowing you to generate quotes and manage your business from any computer, tablet, or smartphone.'
+    },
+    {
+      q: 'Is my business data secure on the cloud?',
+      a: 'Absolutely. We utilize state-of-the-art enterprise-grade cloud databases with strict security, encryption, and automated backups to ensure your data is always safe.'
+    },
+    {
+      q: 'Can I export my financial reports and quotes?',
+      a: 'Yes, you can easily export all your business quotes and expense reports into CSV format compatible with Excel and accounting software.'
     }
   ];
 

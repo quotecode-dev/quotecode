@@ -42,12 +42,6 @@ export default function PublicQuote() {
   const [hasSigned, setHasSigned] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setCurrentUserId(session.user.id);
-      }
-    });
-
     if (id) {
       fetchQuoteAndIncrementView();
     }
@@ -56,6 +50,10 @@ export default function PublicQuote() {
   const fetchQuoteAndIncrementView = async () => {
     try {
       setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      setCurrentUserId(userId);
+
       const { data, error } = await supabase
         .from('quotes')
         .select(`*, clients (*), quote_items (*)`)
@@ -79,11 +77,15 @@ export default function PublicQuote() {
         }
       }
 
-      const newViewCount = (data.view_count || 0) + 1;
-      await supabase
-        .from('quotes')
-        .update({ view_count: newViewCount })
-        .eq('id', id);
+      // Increment view count only if viewer is NOT the quote owner
+      const isOwner = userId && data.user_id && userId === data.user_id;
+      if (!isOwner) {
+        const newViewCount = (data.view_count || 0) + 1;
+        await supabase
+          .from('quotes')
+          .update({ view_count: newViewCount })
+          .eq('id', id);
+      }
 
       if (data?.status === 'approved' || data?.signature) {
         setApproved(true);

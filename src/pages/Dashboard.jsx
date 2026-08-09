@@ -370,6 +370,9 @@ export default function Dashboard() {
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef(null);
 
+  // Hot quotes rotation index for multiple clients
+  const [hotQuoteIndex, setHotQuoteIndex] = useState(0);
+
   useEffect(() => {
     const hash = window.location.hash;
     const search = window.location.search;
@@ -419,6 +422,17 @@ export default function Dashboard() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Interval to rotate hot quotes client names every 4 seconds
+  useEffect(() => {
+    const hotQuotes = quotes.filter(q => (q.view_count || 0) >= 3 && q.status !== 'approved' && q.status !== 'paid');
+    if (hotQuotes.length > 1) {
+      const interval = setInterval(() => {
+        setHotQuoteIndex(prev => (prev + 1) % hotQuotes.length);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [quotes]);
 
   const handleToggleDropdown = (e, quoteId) => {
     e.stopPropagation();
@@ -1799,6 +1813,10 @@ export default function Dashboard() {
 
   const tableDir = isHebrew ? 'rtl' : 'ltr';
 
+  // Hot quotes list for client name rotation banner
+  const hotQuotesList = quotes.filter(q => (q.view_count || 0) >= 3 && q.status !== 'approved' && q.status !== 'paid');
+  const currentHotClientName = hotQuotesList.length > 0 ? (hotQuotesList[hotQuoteIndex % hotQuotesList.length]?.clients?.company_name || 'לקוח') : '';
+
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column', paddingBottom: '70px' }}>
       
@@ -2019,12 +2037,14 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {quotes.some(q => (q.view_count || 0) >= 3 && q.status !== 'approved' && q.status !== 'paid') && (
+              {hotQuotesList.length > 0 && (
                 <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#991b1b', padding: '12px 20px', borderRadius: '12px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
                     <span>🔥</span>
                     <span>
-                      {isHebrew ? 'הצעה חמה! לקוח צפה בהצעה מספר פעמים ועדיין לא חתם. כדאי ליצור קשר!' : 'Hot Quote! A client viewed a quote multiple times without signing.'}
+                      {isHebrew 
+                        ? `הצעה חמה! הלקוח "${currentHotClientName}" צפה בהצעה מספר פעמים ועדיין לא חתם. כדאי ליצור קשר!` 
+                        : `Hot Quote! Client "${currentHotClientName}" viewed the quote multiple times without signing.`}
                     </span>
                   </div>
                 </div>

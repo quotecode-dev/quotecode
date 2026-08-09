@@ -34,7 +34,7 @@ export default function AIChatWidget({ isHebrew }) {
         if (lower.includes('פעולות') || lower.includes('תפריט') || lower.includes('כפתור') || lower.includes('צפה') || lower.includes('עריכה')) {
           reply = 'בכל שורה של הצעת מחיר בטבלה ישנו כפתור "פעולות ▼" מצד שמאל. בלחיצה עליו נפתח תפריט המאפשר לך: לצפות במסמך (👁️), לערוך אותו (✏️), לשכפל (📋), לשלוח בוואטסאפ או במייל, או למחוק את ההצעה.';
         } else if (lower.includes('סיכום') || lower.includes('הזמנות') || lower.includes('רשימה') || lower.includes('היסטוריה') || lower.includes('טבלה')) {
-          reply = 'את סיכום כל ההצעות וההזמנות ניתן לראות בטאב "הצעות מחיר" הראשי. הטבלה מציגה את מספר ההזמנה, שם הלקוח, תיאור הפריט הראשון, הסכום הכולל, תאריך היצירה, סטטוס הע사ק (טיוטה, נשלח, אושר, שולם) ומספר הצפיות (👁️).';
+          reply = 'את סיכום כל ההצעות וההזמנות ניתן לראות בטאב "הצעות מחיר" הראשי. הטבלה מציגה את מספר ההזמנה, שם הלקוח, תיאור הפריט הראשון, הסכום הכולל, תאריך היצירה, סטטוס העסק (טיוטה, נשלח, אושר, שולם) ומספר צפיות אמיתיות של לקוחות (👁️).';
         } else if (lower.includes('מייל') || lower.includes('אימייל') || lower.includes('לשלוח')) {
           reply = 'כדי לשלוח הצעת מחיר במייל: פתח את תפריט "פעולות ▼" בשורת ההצעה המבוקשת ובחר באפשרות "שלח במייל". המערכת תשלח את ההצעה אוטומטית לכתובת המייל של הלקוח דרך השרת.';
         } else if (lower.includes('הצעה') || lower.includes('חדשה') || lower.includes('ליצור') || lower.includes('הפקת')) {
@@ -49,8 +49,10 @@ export default function AIChatWidget({ isHebrew }) {
           reply = 'ניתן למיין את טבלת ההצעות בקלות בלחיצה על כותרות העמודות בטבלה (מספר הזמנה, שם לקוח, סכום, תאריך, סטטוס או צפיות).';
         } else if (lower.includes('הוצאות') || lower.includes('דוחות') || lower.includes('רווח') || lower.includes('הכנסות'))  {
           reply = 'בטאב "הוצאות/הכנסות" (למנהלי מערכת) תוכל לנהל את הוצאות העסק השוטפות, לצפות בגרפים שנתיים של הכנסות מול הוצאות, ולייצא דוחות מרוכזים לאקסל (CSV).';
+        } else if (lower.includes('אזור') || lower.includes('lcl') || lower.includes('intl') || lower.includes('משתמשים') || lower.includes('אדמין')) {
+          reply = 'בפאנל ה-Super Admin תוכל לראות את כל משתמשי המערכת, לנהל את החבילות שלהם (Free, Basic, Pro), להעניק מנוי לכל החיים (Lifetime), ולשנות את אזור הפעילות (LCL לישראל בירוק, או Intl לחו"ל באדום עם התראת אישור).';
         } else {
-          reply = `שאלתך התקבלה! מערכת ProFlow מספקת לך ניהול עסק חכם. האם תרצה הסבר על הפקת הצעות מחיר, תפריט הפעולות, ניהול לקוחות, או הגדרות המערכת?`;
+          reply = `שאלתך התקבלה! מערכת ProFlow מספקת ניהול עסק חכם, הצעות מחיר, חתימות דיגיטליות, ניהול אזורי פעילות LCL/Intl, ודוחות פיננסיים מתקדמים. במה תרצה עזרה נוספת?`;
         }
       } else {
         if (lower.includes('action') || lower.includes('menu') || lower.includes('button') || lower.includes('view')) {
@@ -65,8 +67,10 @@ export default function AIChatWidget({ isHebrew }) {
           reply = 'You can send quotes directly via WhatsApp using the actions menu in your quotes list (PRO feature).';
         } else if (lower.includes('sort') || lower.includes('column')) {
           reply = 'You can sort the quotes table by clicking on any column header (Order #, Client Name, Amount, Date, Status, or Views).';
+        } else if (lower.includes('lcl') || lower.includes('intl') || lower.includes('region') || lower.includes('admin')) {
+          reply = 'In the Super Admin panel, you can manage user subscription plans, grant Lifetime access, and control business regions (LCL in green for Israel or Intl in red for international).';
         } else {
-          reply = `I am here to help you navigate ProFlow interface, quotes, clients, and reports. How can I assist you further?`;
+          reply = `I am here to help you navigate ProFlow interface, quotes, clients, regions, and reports. How can I assist you further?`;
         }
       }
 
