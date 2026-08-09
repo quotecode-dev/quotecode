@@ -224,7 +224,7 @@ function RegionConfirmModal({ isOpen, onClose, onConfirm, userEmail, newCountry,
         
         <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '20px', lineHeight: '1.4' }}>
           {isHebrew ? 'האם אתה בטוח שברצונך לשנות את אזור הפעילות ל-' : 'Are you sure you want to change region to '}
-          <strong style={{ color: '#4f46e5' }}>{newCountry === 'Local' ? 'LCL (Local)' : 'Intl (International)'}</strong>?
+          <strong style={{ color: '#4f46e5' }}>{newCountry === 'Local' ? 'LCL' : 'Intl'}</strong>?
           <br />
           <span style={{ fontSize: '0.75rem', color: '#94a3b8', direction: 'ltr', display: 'inline-block', marginTop: '4px' }}>{userEmail}</span>
         </p>
@@ -2959,10 +2959,10 @@ export default function Dashboard() {
                                   padding: '5px 10px', 
                                   borderRadius: '6px', 
                                   border: '1px solid #cbd5e1', 
-                                  background: currentCountry === 'Local' ? '#ecfdf5' : '#fef3c7', 
+                                  background: currentCountry === 'Local' ? '#dcfce7' : '#fee2e2', 
                                   fontSize: '0.75rem', 
                                   fontWeight: 'bold', 
-                                  color: currentCountry === 'Local' ? '#047857' : '#b45309' 
+                                  color: currentCountry === 'Local' ? '#166534' : '#991b1b' 
                                 }}
                               >
                                 <option value="Local">LCL</option>
