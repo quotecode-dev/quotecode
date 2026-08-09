@@ -1010,6 +1010,8 @@ export default function Dashboard() {
         quoteLink: quoteLink,
         businessName: bizName,
         logoUrl: bizLogoUrl,
+        businessLogo: bizLogoUrl,
+        logo: bizLogoUrl,
         isHebrew: isHebrew
       };
 
@@ -1570,7 +1572,6 @@ export default function Dashboard() {
 
             </div>
             
-            {/* תיבת באנר בולטת עם המלל המפורט שביקשת ומותאמת נכון מבחינת כיוון שפה */}
             {isSignUp ? (
               <div dir={isLoginHebrew ? 'rtl' : 'ltr'} style={{ background: 'linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%)', border: '1px solid #c7d2fe', padding: '12px 16px', borderRadius: '10px', marginTop: '16px', marginBottom: '4px', color: '#4f46e5', fontSize: '0.88rem', fontWeight: '700', textAlign: isLoginHebrew ? 'right' : 'left', width: '100%', boxSizing: 'border-box', boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.1)', lineHeight: '1.4' }}>
                 {isLoginHebrew 
