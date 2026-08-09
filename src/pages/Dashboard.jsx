@@ -681,6 +681,22 @@ export default function Dashboard() {
     }
   }
 
+  async function handleAdminCountryChange(accountId, newCountry) {
+    if (!newCountry) return;
+    const { data, error } = await supabase
+      .from('business_settings')
+      .update({ country: newCountry })
+      .eq('id', accountId)
+      .select();
+    
+    if (error) {
+      setStatusMsg({ text: 'Error updating user country: ' + error.message, type: 'error' });
+    } else {
+      setStatusMsg({ text: isHebrew ? 'אזור העסק עודכן בהצלחה!' : 'Business region updated successfully!', type: 'success' });
+      fetchAllAccounts();
+    }
+  }
+
   async function handleToggleLifetime(accountId, currentTrialEnds) {
     const newTrialEnds = currentTrialEnds === null ? new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() : null;
     const { error } = await supabase.from('business_settings').update({ trial_ends_at: newTrialEnds }).eq('id', accountId);
@@ -1486,6 +1502,12 @@ export default function Dashboard() {
       const statusA = (a.trial_ends_at === null || a.trial_ends_at === undefined) ? '1' : '0';
       const statusB = (b.trial_ends_at === null || b.trial_ends_at === undefined) ? '1' : '0';
       return sortDirection === 'asc' ? statusA.localeCompare(statusB) : statusB.localeCompare(statusA);
+    }
+
+    if (sortField === 'country') {
+      const aValStr = a.country || 'Local';
+      const bValStr = b.country || 'Local';
+      return sortDirection === 'asc' ? aValStr.localeCompare(bValStr) : bValStr.localeCompare(aValStr);
     }
 
     if (typeof aVal === 'string') aVal = aVal.toLowerCase();
@@ -2807,7 +2829,7 @@ export default function Dashboard() {
                 </h2>
               </div>
               <p style={{ color: '#64748b', marginBottom: '15px', fontSize: '0.85rem' }}>
-                {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות שלהם.' : 'View all registered users and manage their subscription plans.'}
+                {isHebrew ? 'כאן תוכל לראות את כל המשתמשים הרשומים במערכת ולנהל את החבילות ואזור הפעילות שלהם.' : 'View all registered users and manage their subscription plans and regions.'}
               </p>
 
               <div style={{ marginBottom: '15px' }}>
@@ -2821,7 +2843,7 @@ export default function Dashboard() {
               </div>
               
               <div style={{ overflowX: 'auto', background: 'white', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '700px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '800px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('email')}>
@@ -2832,6 +2854,9 @@ export default function Dashboard() {
                       </th>
                       <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('plan')}>
                         Plan {sortField === 'plan' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
+                      </th>
+                      <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('country')}>
+                        Region {sortField === 'country' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th style={{ padding: '10px 8px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('role')}>
                         Role {sortField === 'role' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
@@ -2847,7 +2872,7 @@ export default function Dashboard() {
                   <tbody>
                     {filteredAdminAccounts.length === 0 ? (
                       <tr>
-                        <td colSpan="6" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                        <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
                           {isHebrew ? 'לא נמצאו משתמשים התואמים את החיפוש.' : 'No users found matching your search.'}
                         </td>
                       </tr>
@@ -2867,6 +2892,16 @@ export default function Dashboard() {
                                 <option value="free">FREE</option>
                                 <option value="basic">BASIC</option>
                                 <option value="pro">PRO</option>
+                              </select>
+                            </td>
+                            <td style={{ padding: '12px 8px' }}>
+                              <select 
+                                value={acc.country || 'Local'} 
+                                onChange={(e) => handleAdminCountryChange(acc.id, e.target.value)}
+                                style={{ padding: '4px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '0.75rem', fontWeight: 'bold', color: '#0d9488' }}
+                              >
+                                <option value="Local">Local (Hebrew)</option>
+                                <option value="International">International (English)</option>
                               </select>
                             </td>
                             <td style={{ padding: '12px 8px', color: acc.role === 'super_admin' ? '#ef4444' : '#64748b', fontWeight: '600' }}>
