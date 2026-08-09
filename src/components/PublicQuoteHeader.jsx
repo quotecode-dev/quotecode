@@ -1,24 +1,24 @@
 import React from 'react';
 
 export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId, bizPhone, bizEmail, bizAddress, quote }) {
-  // בדיקה פשוטה אם הלוגו הוא URL תקין
-  const hasValidLogo = bizLogo && bizLogo.startsWith('http');
+  const hasLogo = bizLogo && typeof bizLogo === 'string' && bizLogo.trim().length > 0;
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #f1f5f9', paddingBottom: '25px', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
       {isHebrew ? (
         <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'right', flex: 1, minWidth: '250px' }}>
-            {hasValidLogo ? (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', alignSelf: 'flex-start' }} />
-            ) : (
-              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', textAlign: 'right', flex: 1, minWidth: '250px' }}>
+            {hasLogo && (
+              <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', flexShrink: 0 }} />
             )}
-            <div style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.5', textAlign: 'right' }}>
-              {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
-              {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
-              {bizEmail && <div dir="ltr" style={{ textAlign: 'right' }}><span>{bizEmail}</span></div>}
-              {bizAddress && <div>כתובת: {bizAddress}</div>}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a', marginBottom: '2px' }}>{bizName}</div>
+              <div style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.4', textAlign: 'right' }}>
+                {bizTaxId && <div>ח.פ / עוסק: <span dir="ltr" style={{ display: 'inline-block' }}>{bizTaxId}</span></div>}
+                {bizPhone && <div>טלפון: <span dir="ltr" style={{ display: 'inline-block' }}>{bizPhone}</span></div>}
+                {bizEmail && <div dir="ltr" style={{ textAlign: 'right' }}><span>{bizEmail}</span></div>}
+                {bizAddress && <div>כתובת: {bizAddress}</div>}
+              </div>
             </div>
           </div>
 
@@ -33,17 +33,18 @@ export default function PublicQuoteHeader({ isHebrew, bizLogo, bizName, bizTaxId
         </>
       ) : (
         <>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left', flex: 1, minWidth: '250px' }}>
-            {hasValidLogo ? (
-              <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', alignSelf: 'flex-start' }} />
-            ) : (
-              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{bizName}</div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px', textAlign: 'left', flex: 1, minWidth: '250px' }}>
+            {hasLogo && (
+              <img src={bizLogo} alt={bizName} style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #f1f5f9', padding: '4px', background: 'white', flexShrink: 0 }} />
             )}
-            <div style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.5', textAlign: 'left' }}>
-              {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
-              {bizPhone && <div>Phone: {bizPhone}</div>}
-              {bizEmail && <div>{bizEmail}</div>}
-              {bizAddress && <div>Address: {bizAddress}</div>}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a', marginBottom: '2px' }}>{bizName}</div>
+              <div style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.4', textAlign: 'left' }}>
+                {bizTaxId && <div>Tax ID: {bizTaxId}</div>}
+                {bizPhone && <div>Phone: {bizPhone}</div>}
+                {bizEmail && <div>{bizEmail}</div>}
+                {bizAddress && <div>Address: {bizAddress}</div>}
+              </div>
             </div>
           </div>
 
