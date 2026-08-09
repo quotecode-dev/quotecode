@@ -2,9 +2,15 @@ import React, { useState, useRef, useEffect } from 'react';
 
 export default function AIChatWidget({ isHebrew }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: isHebrew ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?' }
-  ]);
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('proflow_ai_chat');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return [
+      { role: 'assistant', content: isHebrew ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?' }
+    ];
+  });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -14,6 +20,9 @@ export default function AIChatWidget({ isHebrew }) {
   };
 
   useEffect(() => {
+    try {
+      sessionStorage.setItem('proflow_ai_chat', JSON.stringify(messages));
+    } catch (e) {}
     if (isOpen) scrollToBottom();
   }, [messages, isOpen]);
 
