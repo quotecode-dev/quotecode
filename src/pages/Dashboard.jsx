@@ -258,10 +258,10 @@ function EditClientModal({ isOpen, onClose, client, onSave, isHebrew }) {
           </div>
 
           <div style={{ display: 'flex', gap: '8px', marginTop: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '10px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '0.9rem' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.9rem' }}>
               {isHebrew ? 'ביטול' : 'Cancel'}
             </button>
-            <button type="submit" style={{ flex: 1, background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '0.9rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
+            <button type="submit" style={{ flex: 1, background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.9rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
               {isHebrew ? 'שמור שינויים' : 'Save Changes'}
             </button>
           </div>
@@ -413,6 +413,11 @@ function UserDetailsModal({ isOpen, onClose, user, isHebrew }) {
       </div>
     </div>
   );
+}
+
+// פונקציית עזר למטבעות שהועלתה למעלה כדי להימנע משגיאת Hoisting
+function getCurrencySymbol(curr) {
+  return getCurrencySym(bizCountry, curr);
 }
 
 export default function Dashboard() {
@@ -1274,7 +1279,7 @@ export default function Dashboard() {
     setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך info@quotecodepro.com...' : 'Sending email via cloud...', type: 'success' });
 
     try {
-      const quoteSym = getCurrencySym(bizCountry, quote.currency);
+      const quoteSym = getCurrencySymbol(quote.currency);
       const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
       
       const clientEmailVal = quote.clients?.email || quote.client_email || '';
@@ -1451,7 +1456,7 @@ export default function Dashboard() {
     return { name, [isHebrew ? 'הכנסות' : 'Income']: income, [isHebrew ? 'הוצאות' : 'Expenses']: expense };
   });
 
-  const sym = getCurrencySym(bizCountry, currency);
+  const sym = getCurrencySymbol(currency);
 
   const showQuoteForm = isCreatingQuote || editingQuoteId !== null;
 
