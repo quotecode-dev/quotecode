@@ -18,11 +18,8 @@ export const isHebrewEnv = (country, session) => {
   if (country === 'International') return false;
   if (country === 'Local') return true;
 
-  if (typeof navigator !== 'undefined' && navigator.language) {
-    return navigator.language.startsWith('he');
-  }
-
-  return true;
+  // ברירת מחדל למסך כניסה ומצב לא מחובר – אנגלית בינלאומית נקייה
+  return localStorage.getItem('proflow_lang') === 'he';
 };
 
 export const getCurrencySym = (country, currency) => {
