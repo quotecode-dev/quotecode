@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ProFlowLogo from './ProFlowLogo';
 
 function PublicTools() {
   const [activeTab, setActiveTab] = useState('currency');
@@ -361,8 +362,11 @@ function PublicTools() {
           </p>
         </section>
 
-        {/* CTA Banner */}
-        <div style={{ marginTop: '30px', background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', color: 'white', padding: '30px', borderRadius: '16px', textAlign: 'center' }}>
+        {/* CTA Banner with ProFlow Logo */}
+        <div style={{ marginTop: '30px', background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', color: 'white', padding: '35px 20px', borderRadius: '16px', textAlign: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}>
+            <ProFlowLogo />
+          </div>
           <h3 style={{ fontSize: '1.4rem', marginBottom: '10px', fontWeight: 'bold' }}>רוצה לנהל את העסק שלך ברמה הבאה?</h3>
           <p style={{ fontSize: '0.95rem', opacity: 0.9, marginBottom: '20px' }}>הפק הצעות מחיר חכמות, נהל לקוחות ופתח את העסק לעולם עם ProFlow.</p>
           <a
