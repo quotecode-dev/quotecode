@@ -534,7 +534,6 @@ export default function Dashboard() {
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
   
-  // הסרת השימוש ב-localStorage כדי למנוע דריסת אזור הפעילות של משתמשים בינלאומיים
   const [bizCountry, setBizCountry] = useState('Local');
 
   const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_HEB);
@@ -589,7 +588,6 @@ export default function Dashboard() {
 
     initAuth();
 
-    // מניעת איפוס וריפרש מיותר במעבר בין טאבים
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN') {
         setSession(session);
