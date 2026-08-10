@@ -125,13 +125,46 @@ function PublicToolsEn() {
 
   const metalResult = calculateMetalValue();
 
+  // Crypto state
+  const [cryptoCoin, setCryptoCoin] = useState('btc');
+  const [cryptoAmount, setCryptoAmount] = useState('1');
+
+  const cryptoBasePricesUSD = {
+    btc: 65000,
+    eth: 3500,
+    sol: 150,
+    xrp: 0.60,
+    trx: 0.12
+  };
+
+  const cryptoLabels = {
+    btc: 'Bitcoin (BTC)',
+    eth: 'Ethereum (ETH)',
+    sol: 'Solana (SOL)',
+    xrp: 'Ripple (XRP)',
+    trx: 'Tron (TRX)'
+  };
+
+  const calculateCryptoValue = () => {
+    const amt = parseFloat(cryptoAmount) || 0;
+    const priceUSD = cryptoBasePricesUSD[cryptoCoin] || 0;
+    const totalUSD = amt * priceUSD;
+    const totalEUR = totalUSD * rates['EUR'];
+    return {
+      usd: totalUSD.toLocaleString('en-US', { maximumFractionDigits: 2 }),
+      eur: totalEUR.toLocaleString('de-DE', { maximumFractionDigits: 2 })
+    };
+  };
+
+  const cryptoResult = calculateCryptoValue();
+
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#1e293b', fontFamily: 'system-ui, sans-serif' }} dir="ltr">
       {/* Header */}
       <header style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', color: 'white', padding: '40px 20px', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2.2rem', marginBottom: '10px', fontWeight: 'bold' }}>Business Tools & Calculators Hub</h1>
         <p style={{ fontSize: '1.05rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto' }}>
-          Smart, fast, and accurate tools for businesses, importers, and freelancers – real-time currency, unit, and precious metals conversions.
+          Smart, fast, and accurate tools for businesses, importers, and freelancers – real-time currency, unit, precious metals, and crypto conversions.
         </p>
       </header>
 
@@ -140,13 +173,13 @@ function PublicToolsEn() {
         <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
           
           {/* Tabs */}
-          <div style={{ display: 'flex', background: '#f1f5f9', borderBottom: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', background: '#f1f5f9', borderBottom: '1px solid #e2e8f0', flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveTab('currency')}
               style={{
-                flex: 1, padding: '16px', border: 'none', background: activeTab === 'currency' ? 'white' : 'transparent',
+                flex: 1, minWidth: '130px', padding: '16px 10px', border: 'none', background: activeTab === 'currency' ? 'white' : 'transparent',
                 color: activeTab === 'currency' ? '#4f46e5' : '#64748b', fontWeight: 'bold', cursor: 'pointer',
-                borderBottom: activeTab === 'currency' ? '3px solid #4f46e5' : 'none', fontSize: '0.95rem'
+                borderBottom: activeTab === 'currency' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem'
               }}
             >
               💱 Currency Converter
@@ -154,9 +187,9 @@ function PublicToolsEn() {
             <button
               onClick={() => setActiveTab('units')}
               style={{
-                flex: 1, padding: '16px', border: 'none', background: activeTab === 'units' ? 'white' : 'transparent',
+                flex: 1, minWidth: '130px', padding: '16px 10px', border: 'none', background: activeTab === 'units' ? 'white' : 'transparent',
                 color: activeTab === 'units' ? '#4f46e5' : '#64748b', fontWeight: 'bold', cursor: 'pointer',
-                borderBottom: activeTab === 'units' ? '3px solid #4f46e5' : 'none', fontSize: '0.95rem'
+                borderBottom: activeTab === 'units' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem'
               }}
             >
               📏 Unit Conversions
@@ -164,12 +197,22 @@ function PublicToolsEn() {
             <button
               onClick={() => setActiveTab('metals')}
               style={{
-                flex: 1, padding: '16px', border: 'none', background: activeTab === 'metals' ? 'white' : 'transparent',
+                flex: 1, minWidth: '130px', padding: '16px 10px', border: 'none', background: activeTab === 'metals' ? 'white' : 'transparent',
                 color: activeTab === 'metals' ? '#4f46e5' : '#64748b', fontWeight: 'bold', cursor: 'pointer',
-                borderBottom: activeTab === 'metals' ? '3px solid #4f46e5' : 'none', fontSize: '0.95rem'
+                borderBottom: activeTab === 'metals' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem'
               }}
             >
               🥇 Precious Metals
+            </button>
+            <button
+              onClick={() => setActiveTab('crypto')}
+              style={{
+                flex: 1, minWidth: '130px', padding: '16px 10px', border: 'none', background: activeTab === 'crypto' ? 'white' : 'transparent',
+                color: activeTab === 'crypto' ? '#4f46e5' : '#64748b', fontWeight: 'bold', cursor: 'pointer',
+                borderBottom: activeTab === 'crypto' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem'
+              }}
+            >
+              🪙 Crypto Converter
             </button>
           </div>
 
@@ -387,6 +430,50 @@ function PublicToolsEn() {
                     <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '5px' }}>Estimated Value (EUR):</div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706' }}>
                       €{metalResult.eur}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'crypto' && (
+              <div>
+                <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#1e293b' }}>Crypto Converter Calculator</h2>
+                
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>Select Cryptocurrency:</label>
+                  <select
+                    value={cryptoCoin}
+                    onChange={(e) => setCryptoCoin(e.target.value)}
+                    style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
+                  >
+                    {Object.entries(cryptoLabels).map(([code, label]) => (
+                      <option key={code} value={code}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>Amount of Coins:</label>
+                  <input
+                    type="number"
+                    value={cryptoAmount}
+                    onChange={(e) => setCryptoAmount(e.target.value)}
+                    style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                  <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '5px' }}>Estimated Value (USD):</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#8b5cf6' }}>
+                      ${cryptoResult.usd}
+                    </div>
+                  </div>
+                  <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '5px' }}>Estimated Value (EUR):</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#8b5cf6' }}>
+                      €{cryptoResult.eur}
                     </div>
                   </div>
                 </div>
