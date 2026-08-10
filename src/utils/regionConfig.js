@@ -1,6 +1,13 @@
 // src/utils/regionConfig.js
 
 export const isHebrewEnv = (country, session) => {
+  // בדיקה מיידית מול ה-LocalStorage למניעת הבזק שפה בריפרש עוד לפני טעינת השרת
+  const cachedCountry = typeof window !== 'undefined' ? localStorage.getItem('proflow_cached_country') : null;
+  if (cachedCountry === 'International') return false;
+  if (cachedCountry === 'Local') return true;
+
+  if (country === 'International') return false;
+
   if (session) {
     return country !== 'International';
   }
@@ -9,13 +16,21 @@ export const isHebrewEnv = (country, session) => {
 };
 
 export const getCurrencySym = (country, currency) => {
-  if (country !== 'International') return '₪';
-  if (currency === 'EUR') return '€';
-  if (currency === 'GBP') return '£';
-  if (currency === 'ILS') return '₪';
-  return '$';
+  const cachedCountry = typeof window !== 'undefined' ? localStorage.getItem('proflow_cached_country') : null;
+  const effectiveCountry = country || cachedCountry;
+
+  if (effectiveCountry === 'International') {
+    if (currency === 'EUR') return '€';
+    if (currency === 'GBP') return '£';
+    if (currency === 'ILS') return '₪';
+    return '$';
+  }
+  return '₪';
 };
 
 export const getRegionTaxRate = (country) => {
-  return country !== 'International' ? 0.18 : 0.00;
+  const cachedCountry = typeof window !== 'undefined' ? localStorage.getItem('proflow_cached_country') : null;
+  const effectiveCountry = country || cachedCountry;
+  
+  return effectiveCountry !== 'International' ? 0.18 : 0.00;
 };
