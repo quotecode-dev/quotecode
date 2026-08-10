@@ -48,15 +48,17 @@ export default function QuotesTab({
           <h2 style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>{t.recentHistory}</h2>
           <button 
             onClick={handleCreateNewQuoteClick}
-            style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '5px', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}
+            style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}
           >
-            ➕ {isHebrew ? 'צור הצעת מחיר חדשה' : 'Create New Quote'}
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>{isHebrew ? 'צור הצעת מחיר חדשה' : 'Create New Quote'}</span>
           </button>
           <button 
             onClick={handleExportQuotes}
-            style={{ background: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem', boxShadow: '0 2px 6px rgba(16, 185, 129, 0.2)' }}
+            style={{ background: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 2px 6px rgba(16, 185, 129, 0.2)' }}
           >
-            📥 {isHebrew ? 'ייצא לאקסל (CSV)' : 'Export CSV'}
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>{isHebrew ? 'ייצא לאקסל (CSV)' : 'Export CSV'}</span>
           </button>
         </div>
         
@@ -165,9 +167,9 @@ export default function QuotesTab({
                       </span>
                     </td>
                     <td style={{ padding: '8px 6px', verticalAlign: 'middle', textAlign: 'center', color: '#64748b', fontSize: '0.8rem' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         <span>{quote.view_count || 0}</span>
-                        <span>👁️</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                       </span>
                     </td>
                     <td style={{ padding: '8px 6px', verticalAlign: 'middle', textAlign: isHebrew ? 'left' : 'right', position: 'relative' }}>
@@ -214,7 +216,6 @@ export default function QuotesTab({
                                 textAlign: isHebrew ? 'right' : 'left'
                               }}
                             >
-                              {/* אייקונים מודרניים, חדים וצבעוניים */}
                               <button
                                 onClick={() => { setOpenDropdownId(null); window.open(`/public-quote/${quote.id}`, '_blank'); }}
                                 style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#3730a3', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
