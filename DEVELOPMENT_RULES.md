@@ -1,22 +1,27 @@
-# ProFlow SaaS - Development Rules & Architecture Protocol
+# ProFlow SaaS - Strict Development Rules & Architecture Protocol
 
-אנא זכור ויישם תמיד את כללי הברזל הבאים בפרויקט ProFlow:
+Please always remember and strictly apply the following ironclad rules in the ProFlow project:
 
-1. **הפרדה מוחלטת בשפות ובמטבעות:**
-   * **פלטפורמת ישראל (עברית):** ממשק, דף נחיתה ותכנים בעברית מלאה בלבד (ללא שום שפה אחרת), ומטבע ש"ח (ILS) בלבד.
-   * **פלטפורמת חו"ל (אנגלית):** ממשק, דף נחיתה ותכנים באנגלית מלאה בלבד (ללא אף אות בעברית), ומטבעות דולר ($), יורו (€) ופאונד (£) בלבד.
+1. **Absolute Separation of Languages and Currencies:**
+   * **Israel Platform (Hebrew):** Interface, landing page, and content must be strictly in complete Hebrew (no other languages), and the currency must be strictly NIS (ILS - ₪).
+   * **International Platform (English):** Interface, landing page, and content must be strictly in complete English (not a single Hebrew letter), and currencies must be strictly Dollar ($), Euro (€), and Pound (£).
 
-2. **גיבוי מערכת מתועד (חובה בכל שינוי קריטי):**
-   * תמיד לאחר ביצוע שינוי או עדכון קריטי במערכת, חובה לבצע באופן מיידי גיבוי מלא לענן הכולל את הקוד, כללי הברזל והתיעוד, ויצירת תגית (Tag) ב-GitHub ששמה מתאר במדויק את השינויים שבוצעו מהגרסה הקודמת (לפי הפורמט: `v[גרסה]-[תיאור קצר של השינויים]-full-backup`).
-   * <span style="color:red;"><b>בשום פנים ואופן אין לבצע גיבוי מלא לבד או באופן אוטומטי!</b></span> לאחר עדכון במערכת, חובה אך ורק להציע לבצע גיבוי מלא לענן או להמתין לבקשה מפורשת מהמשתמש. הגיבוי יבוצע אך ורק לאחר קבלת אישור מפורש ממנו.
+2. **Documented System Backup (Mandatory after critical changes):**
+   * Always after a critical change or update, a full cloud backup must be performed immediately, including code, rules, and documentation. A GitHub Tag must be created describing exactly the changes from the previous version (Format: `v[version]-[short_description]-full-backup`).
+   * <span style="color:red;"><b>UNDER NO CIRCUMSTANCES should a full backup be executed independently or automatically!</b></span> After a system update, you must ONLY suggest a full cloud backup or wait for an explicit request. The backup must be executed ONLY after receiving explicit confirmation from the user.
 
-3. **נוהל עדכון קבצים:**
-   * לפני עדכון או החלפה של קובץ קוד כלשהו, חובה לבקש ממני את הקובץ הקיים.
-   * לעולם אין לשלוח או לפרסם קובץ קוד מבלי לקבל ממני אישור מפורש לכך קודם.
-   * בעת מתן קובץ מעודכן, ספק תמיד את הקובץ המלא מתחילתו ועד סופו (ללא חלקי קוד או השמטות).
+3. **File Update Protocol:**
+   * Before updating or replacing any code file, you MUST ask me for the current existing file.
+   * NEVER send or publish a code file without receiving explicit prior permission from me.
+   * When providing an updated file, ALWAYS provide the complete file from start to finish (no partial code, placeholders, or omissions).
 
-4. **פקודות Git:**
-   * תמיד לספק את פקודות ה-Git בשורה אחת מרוכזת בתוך בלוק קוד (לדוגמה: `git add . ; git commit -m "..." ; git push origin main ; git tag ... ; git push origin ...`).
+4. **Git Commands:**
+   * Always provide Git commands concentrated in a single line within a code block (e.g., `git add . ; git commit -m "..." ; git push origin main ; git tag ... ; git push origin ...`).
 
-5. **בידוד שינויים (Isolation) ברכיבי עיצוב:**
-   * בעת ביצוע שינויים עיצוביים (כמו יישור שפה, CSS או אלמנטים ויזואליים), יש לבצע בדיקה נקודתית אך ורק על האלמנט הספציפי שנוגעים בו, מבלי לשנות או לגעת במבנה הכללי של הקונטיינר או הרכיבים העוטפים מסביב, כדי למנוע פגיעה בתצוגה או בפונקציונליות של חלקים אחרים במערכת.
+5. **Design Component Isolation (CSS/UI):**
+   * When making design changes (like text alignment, CSS, or visual elements), perform pinpoint changes strictly on the specific element being addressed, WITHOUT modifying or touching the overall structure of the container or surrounding wrapper components, to prevent breaking the layout or functionality of other parts of the system.
+
+6. **Strict Preservation of Existing Code & Features (Non-Destructive Updates):**
+   * When updating, upgrading, or replacing any code file, it is MANDATORY to ensure that all existing functions, buttons, logic, and components that currently work in the system remain strictly in place and intact.
+   * <span style="color:red;"><b>It is ABSOLUTELY FORBIDDEN to remove, delete, alter, or overwrite any existing feature, button, or code</b></span> without explicit prior request and approval from me.
+   * In any addition or fix, the new code must integrate harmoniously alongside the existing code, maintaining 100% functionality of everything already developed and working in the system.
