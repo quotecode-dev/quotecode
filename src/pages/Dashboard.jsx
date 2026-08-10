@@ -533,7 +533,12 @@ export default function Dashboard() {
   const [bizLogoUrl, setBizLogoUrl] = useState('');
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
-  const [bizCountry, setBizCountry] = useState('Local');
+  
+  // טעינה ראשונית מ-localStorage למניעת הבזקי שפה/אזור
+  const [bizCountry, setBizCountry] = useState(() => {
+    return localStorage.getItem('proflow_biz_country') || 'Local';
+  });
+
   const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_HEB);
   const [trialEndsAt, setTrialEndsAt] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
@@ -557,7 +562,6 @@ export default function Dashboard() {
   const [editServiceName, setEditServiceName] = useState('');
   const [editServicePrice, setEditServicePrice] = useState('');
 
-  // פונקציית עזר למטבעות שהוגדרה בתוך הקומפוננטה כך שיש לה גישה ל-bizCountry
   function getCurrencySymbol(curr) {
     return getCurrencySym(bizCountry, curr);
   }
@@ -587,14 +591,13 @@ export default function Dashboard() {
 
     initAuth();
 
+    // הגנה מפני איפוס שדות בעת מעבר בין טאבים או רענון סשן ברקע
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN') {
-        setIsInitializing(true);
         setSession(session);
-        if (session?.user?.id) {
+        if (session?.user?.id && !bizCountry) {
           await loadData(session.user.id, session.user.email);
         }
-        setIsInitializing(false);
       } else if (event === 'TOKEN_REFRESHED') {
         setSession(session);
       } else if (event === 'SIGNED_OUT') {
@@ -605,6 +608,7 @@ export default function Dashboard() {
         setExpenses([]);
         setSettingId(null);
         setBizCountry('Local');
+        localStorage.removeItem('proflow_biz_country');
         setIsInitializing(false);
       } else if (event === 'PASSWORD_RECOVERY') {
         setIsPasswordRecoveryMode(true);
@@ -890,6 +894,7 @@ export default function Dashboard() {
       setBizRole(data.role || 'user');
       const countryVal = data.country || 'Local';
       setBizCountry(countryVal);
+      localStorage.setItem('proflow_biz_country', countryVal);
       
       const defTerms = data.default_terms || (countryVal === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
       setDefaultTerms(defTerms);
@@ -948,6 +953,7 @@ export default function Dashboard() {
         setBizPlan(newData.plan);
         setBizRole(newData.role);
         setBizCountry(newData.country || detectedCountry);
+        localStorage.setItem('proflow_biz_country', newData.country || detectedCountry);
         setDefaultTerms(newData.default_terms || detectedTerms);
         setTrialEndsAt(newData.trial_ends_at);
         setCurrency(newData.country === 'International' ? 'USD' : 'ILS');
@@ -957,6 +963,7 @@ export default function Dashboard() {
         setBizPlan('pro');
         setBizRole('user');
         setBizCountry(detectedCountry);
+        localStorage.setItem('proflow_biz_country', detectedCountry);
         setDefaultTerms(detectedTerms);
         setTrialEndsAt(trialEndDate.toISOString());
         setCurrency(detectedCountry === 'International' ? 'USD' : 'ILS');
@@ -1042,6 +1049,8 @@ export default function Dashboard() {
       country: bizCountry,
       user_id: session.user.id
     };
+
+    localStorage.setItem('proflow_biz_country', bizCountry);
 
     if (settingId) {
       const { error } = await supabase.from('business_settings').update(payload).eq('id', settingId);
