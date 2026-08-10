@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 function PublicTools() {
   const [activeTab, setActiveTab] = useState('currency');
 
-  // Currency state
+  // Currency state with Swap support
   const [amount, setAmount] = useState('100');
   const [fromCurrency, setFromCurrency] = useState('USD');
   const [toCurrency, setToCurrency] = useState('ILS');
@@ -22,6 +22,12 @@ function PublicTools() {
     return result.toFixed(2);
   };
 
+  const handleSwapCurrencies = () => {
+    const temp = fromCurrency;
+    setFromCurrency(toCurrency);
+    setToCurrency(temp);
+  };
+
   // Units state
   const [unitValue, setUnitValue] = useState('1');
   const [unitType, setUnitType] = useState('m_to_ft');
@@ -38,10 +44,42 @@ function PublicTools() {
     }
   };
 
-  // Gold/Metals state
-  const [grams, setGrams] = useState('10');
-  const pricePerGramILS = 276; 
-  const pricePerGramUSD = 75.6;
+  // Metals state (Gold & Silver purity tiers)
+  const [metalType, setMetalType] = useState('gold'); // 'gold' or 'silver'
+  const [purity, setPurity] = useState('24k'); // gold: 24k, 22k, 21k, 18k, 14k | silver: 999, 925, 800
+  const [metalGrams, setMetalGrams] = useState('10');
+
+  // Base base price per gram for pure 24K gold and pure 999 silver in ILS
+  const baseGoldPricePerGramILS = 276; 
+  const baseSilverPricePerGramILS = 3.2; 
+  const usdRate = rates['USD'];
+
+  const calculateMetalValue = () => {
+    const g = parseFloat(metalGrams) || 0;
+    let factor = 1;
+
+    if (metalType === 'gold') {
+      if (purity === '24k') factor = 1.0;
+      else if (purity === '22k') factor = 22 / 24;
+      else if (purity === '21k') factor = 21 / 24;
+      else if (purity === '18k') factor = 18 / 24;
+      else if (purity === '14k') factor = 14 / 24;
+
+      const totalILS = g * baseGoldPricePerGramILS * factor;
+      const totalUSD = totalILS / usdRate;
+      return { ils: totalILS.toLocaleString('he-IL', { maximumFractionDigits: 2 }), usd: totalUSD.toLocaleString('en-US', { maximumFractionDigits: 2 }) };
+    } else {
+      if (purity === '999') factor = 1.0;
+      else if (purity === '925') factor = 0.925;
+      else if (purity === '800') factor = 0.800;
+
+      const totalILS = g * baseSilverPricePerGramILS * factor;
+      const totalUSD = totalILS / usdRate;
+      return { ils: totalILS.toLocaleString('he-IL', { maximumFractionDigits: 2 }), usd: totalUSD.toLocaleString('en-US', { maximumFractionDigits: 2 }) };
+    }
+  };
+
+  const metalResult = calculateMetalValue();
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', color: '#1e293b', fontFamily: 'system-ui, sans-serif' }} dir="rtl">
@@ -49,7 +87,7 @@ function PublicTools() {
       <header style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', color: 'white', padding: '40px 20px', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2.2rem', marginBottom: '10px', fontWeight: 'bold' }}>מרכז הכלים והמחשבונים העסקיים</h1>
         <p style={{ fontSize: '1.05rem', opacity: 0.9, maxWidth: '600px', margin: '0 auto' }}>
-          כלים חכמים, מהירים ומדויקים לעסקים, יבואנים ופרילנסרים – המרות מטבעות, מידות ומתכות בזמן אמת.
+          כלים חכמים, מהירים ומדויקים לעסקים, יבואנים ופרילנסרים – המרות מטבעות, מידות ומתכות יקרות בזמן אמת.
         </p>
       </header>
 
@@ -87,7 +125,7 @@ function PublicTools() {
                 borderBottom: activeTab === 'metals' ? '3px solid #4f46e5' : 'none', fontSize: '0.95rem'
               }}
             >
-              🥇 שערי זהב ומתכות
+              🥇 שערי זהב וכסף
             </button>
           </div>
 
@@ -96,16 +134,8 @@ function PublicTools() {
             {activeTab === 'currency' && (
               <div>
                 <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#1e293b' }}>המיר מטבעות זרים ושקלים</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>סכום להמרה:</label>
-                    <input
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none' }}
-                    />
-                  </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '15px', alignItems: 'flex-end', marginBottom: '20px' }}>
                   <div>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>ממטבע:</label>
                     <select
@@ -119,20 +149,44 @@ function PublicTools() {
                       <option value="GBP">ליש"ט (GBP)</option>
                     </select>
                   </div>
+
+                  {/* Swap Button */}
+                  <button
+                    onClick={handleSwapCurrencies}
+                    title="החלף מטבעות (SWAP)"
+                    style={{
+                      background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', width: '46px', height: '46px',
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = '#e2e8f0'}
+                    onMouseLeave={(e) => e.target.style.background = '#f1f5f9'}
+                  >
+                    ⇄
+                  </button>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>למטבע יעד:</label>
+                    <select
+                      value={toCurrency}
+                      onChange={(e) => setToCurrency(e.target.value)}
+                      style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
+                    >
+                      <option value="ILS">שקל חדש (ILS)</option>
+                      <option value="USD">דולר ארה"ב (USD)</option>
+                      <option value="EUR">אירו (EUR)</option>
+                      <option value="GBP">ליש"ט (GBP)</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div style={{ marginBottom: '25px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>למטבע יעד:</label>
-                  <select
-                    value={toCurrency}
-                    onChange={(e) => setToCurrency(e.target.value)}
-                    style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
-                  >
-                    <option value="ILS">שקל חדש (ILS)</option>
-                    <option value="USD">דולר ארה"ב (USD)</option>
-                    <option value="EUR">אירו (EUR)</option>
-                    <option value="GBP">ליש"ט (GBP)</option>
-                  </select>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>סכום להמרה ({fromCurrency}):</label>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', boxSizing: 'border-box' }}
+                  />
                 </div>
 
                 <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
@@ -184,14 +238,58 @@ function PublicTools() {
 
             {activeTab === 'metals' && (
               <div>
-                <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#1e293b' }}>מחשבון שווי זהב לפי משקל</h2>
+                <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#1e293b' }}>מחשבון שווי זהב וכסף לפי משקל ודרגת טוהר</h2>
+                
+                {/* Metal Type Selector */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>סוג מתכת:</label>
+                    <select
+                      value={metalType}
+                      onChange={(e) => {
+                        setMetalType(e.target.value);
+                        setPurity(e.target.value === 'gold' ? '24k' : '999');
+                      }}
+                      style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
+                    >
+                      <option value="gold">🥇 זהב</option>
+                      <option value="silver">🥈 כסף</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>דרגת טוהר / קראט:</label>
+                    <select
+                      value={purity}
+                      onChange={(e) => setPurity(e.target.value)}
+                      style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
+                    >
+                      {metalType === 'gold' ? (
+                        <>
+                          <option value="24k">זהב 24 קראט (99.9%)</option>
+                          <option value="22k">זהב 22 קראט (91.6%)</option>
+                          <option value="21k">זהב 21 קראט (87.5%)</option>
+                          <option value="18k">זהב 18 קראט (75.0%)</option>
+                          <option value="14k">זהב 14 קראט (58.5%)</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="999">כסף טהור 999 (99.9%)</option>
+                          <option value="925">כסף סטרלינג 925 (92.5%)</option>
+                          <option value="800">כסף 800 (80.0%)</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+                </div>
+
                 <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>משקל בגרמים:</label>
                   <input
                     type="number"
-                    value={grams}
-                    onChange={(e) => setGrams(e.target.value)}
-                    style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none' }}
+                    value={metalGrams}
+                    onChange={(e) => setMetalGrams(e.target.value)}
+                    style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
 
@@ -199,13 +297,13 @@ function PublicTools() {
                   <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '5px' }}>שווי משוער בשקלים (ILS):</div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706' }}>
-                      {(parseFloat(grams || 0) * pricePerGramILS).toLocaleString()} ₪
+                      {metalResult.ils} ₪
                     </div>
                   </div>
                   <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
                     <div style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '5px' }}>שווי משוער בדולרים (USD):</div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706' }}>
-                      ${(parseFloat(grams || 0) * pricePerGramUSD).toLocaleString()}
+                      ${metalResult.usd}
                     </div>
                   </div>
                 </div>
