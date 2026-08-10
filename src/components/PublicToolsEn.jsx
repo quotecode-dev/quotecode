@@ -179,40 +179,48 @@ function PublicToolsEn() {
               style={{
                 flex: 1, minWidth: '130px', padding: '16px 10px', border: 'none', background: activeTab === 'currency' ? 'white' : 'transparent',
                 color: activeTab === 'currency' ? '#4f46e5' : '#64748b', fontWeight: 'bold', cursor: 'pointer',
-                borderBottom: activeTab === 'currency' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem'
+                borderBottom: activeTab === 'currency' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              💱 Currency Converter
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+              Currency Converter
             </button>
             <button
               onClick={() => setActiveTab('units')}
               style={{
                 flex: 1, minWidth: '130px', padding: '16px 10px', border: 'none', background: activeTab === 'units' ? 'white' : 'transparent',
                 color: activeTab === 'units' ? '#4f46e5' : '#64748b', fontWeight: 'bold', cursor: 'pointer',
-                borderBottom: activeTab === 'units' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem'
+                borderBottom: activeTab === 'units' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              📏 Unit Conversions
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h20"></path><path d="M6 8v8"></path><path d="M10 10v4"></path><path d="M14 8v8"></path><path d="M18 10v4"></path></svg>
+              Unit Conversions
             </button>
             <button
               onClick={() => setActiveTab('metals')}
               style={{
                 flex: 1, minWidth: '130px', padding: '16px 10px', border: 'none', background: activeTab === 'metals' ? 'white' : 'transparent',
                 color: activeTab === 'metals' ? '#4f46e5' : '#64748b', fontWeight: 'bold', cursor: 'pointer',
-                borderBottom: activeTab === 'metals' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem'
+                borderBottom: activeTab === 'metals' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              🥇 Precious Metals
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="6 3 18 3 22 8 12 22 2 8 6 3"></polygon></svg>
+              Precious Metals
             </button>
             <button
               onClick={() => setActiveTab('crypto')}
               style={{
                 flex: 1, minWidth: '130px', padding: '16px 10px', border: 'none', background: activeTab === 'crypto' ? 'white' : 'transparent',
                 color: activeTab === 'crypto' ? '#4f46e5' : '#64748b', fontWeight: 'bold', cursor: 'pointer',
-                borderBottom: activeTab === 'crypto' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem'
+                borderBottom: activeTab === 'crypto' ? '3px solid #4f46e5' : 'none', fontSize: '0.9rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
               }}
             >
-              🪙 Crypto Converter
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9 8h6a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H9v-4z"></path><path d="M9 12h6a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2H9v-4z"></path><line x1="10" y1="6" x2="10" y2="8"></line><line x1="14" y1="6" x2="14" y2="8"></line><line x1="10" y1="16" x2="10" y2="18"></line><line x1="14" y1="16" x2="14" y2="18"></line></svg>
+              Crypto Converter
             </button>
           </div>
 
