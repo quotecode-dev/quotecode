@@ -405,9 +405,9 @@ function PublicTools() {
           </p>
         </section>
 
-        {/* CTA Banner with ProFlow Logo */}
+        {/* CTA Banner with ProFlow Logo on White Card */}
         <div style={{ marginTop: '30px', background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', color: 'white', padding: '35px 20px', borderRadius: '16px', textAlign: 'center' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}>
+          <div style={{ display: 'inline-block', background: 'white', padding: '10px 20px', borderRadius: '12px', marginBottom: '15px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
             <ProFlowLogo />
           </div>
           <h3 style={{ fontSize: '1.4rem', marginBottom: '10px', fontWeight: 'bold' }}>רוצה לנהל את העסק שלך ברמה הבאה?</h3>
