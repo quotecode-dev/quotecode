@@ -80,7 +80,10 @@ export default function Dashboard() {
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
   
-  const [bizCountry, setBizCountry] = useState('Local');
+  // טעינה מיידית מ-LocalStorage למניעת הבזק שפה בכניסה
+  const [bizCountry, setBizCountry] = useState(() => {
+    return typeof window !== 'undefined' ? (localStorage.getItem('proflow_cached_country') || 'Local') : 'Local';
+  });
 
   const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_HEB);
   const [trialEndsAt, setTrialEndsAt] = useState(null);
@@ -146,6 +149,7 @@ export default function Dashboard() {
         setExpenses([]);
         setSettingId(null);
         setBizCountry('Local');
+        localStorage.removeItem('proflow_cached_country');
         setIsInitializing(false);
       } else if (event === 'PASSWORD_RECOVERY') {
         setIsPasswordRecoveryMode(true);
@@ -431,6 +435,7 @@ export default function Dashboard() {
       setBizRole(data.role || 'user');
       const countryVal = data.country || 'Local';
       setBizCountry(countryVal);
+      localStorage.setItem('proflow_cached_country', countryVal);
       
       const defTerms = data.default_terms || (countryVal === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
       setDefaultTerms(defTerms);
@@ -489,6 +494,7 @@ export default function Dashboard() {
         setBizPlan(newData.plan);
         setBizRole(newData.role);
         setBizCountry(newData.country || detectedCountry);
+        localStorage.setItem('proflow_cached_country', newData.country || detectedCountry);
         setDefaultTerms(newData.default_terms || detectedTerms);
         setTrialEndsAt(newData.trial_ends_at);
         setCurrency(newData.country === 'International' ? 'USD' : 'ILS');
@@ -498,6 +504,7 @@ export default function Dashboard() {
         setBizPlan('pro');
         setBizRole('user');
         setBizCountry(detectedCountry);
+        localStorage.setItem('proflow_cached_country', detectedCountry);
         setDefaultTerms(detectedTerms);
         setTrialEndsAt(trialEndDate.toISOString());
         setCurrency(detectedCountry === 'International' ? 'USD' : 'ILS');
@@ -587,12 +594,16 @@ export default function Dashboard() {
     if (settingId) {
       const { error } = await supabase.from('business_settings').update(payload).eq('id', settingId);
       if (error) setStatusMsg({ text: 'Error updating settings: ' + error.message, type: 'error' });
-      else setStatusMsg({ text: isHebrew ? 'הגדרות העסק עודכנו בהצלחה!' : 'Business settings updated successfully!', type: 'success' });
+      else {
+        localStorage.setItem('proflow_cached_country', bizCountry);
+        setStatusMsg({ text: isHebrew ? 'הגדרות העסק עודכנו בהצלחה!' : 'Business settings updated successfully!', type: 'success' });
+      }
     } else {
       const { data, error } = await supabase.from('business_settings').insert([payload]).select();
       if (error) setStatusMsg({ text: 'Error saving settings: ' + error.message, type: 'error' });
       else if (data && data[0]) {
         setSettingId(data[0].id);
+        localStorage.setItem('proflow_cached_country', bizCountry);
         setStatusMsg({ text: isHebrew ? 'הגדרות העסק נשמרו בהצלחה!' : 'Business settings saved successfully!', type: 'success' });
       }
     }
@@ -2039,13 +2050,15 @@ export default function Dashboard() {
                                           textAlign: isHebrew ? 'right' : 'left'
                                         }}
                                       >
+                                        {/* אייקונים מודרניים, חדים וצבעוניים */}
                                         <button
                                           onClick={() => { setOpenDropdownId(null); window.open(`/public-quote/${quote.id}`, '_blank'); }}
-                                          style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#3730a3', display: 'block', fontWeight: '500' }}
+                                          style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#3730a3', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
                                           onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
                                           onMouseLeave={(e) => e.target.style.background = 'none'}
                                         >
-                                          👁️ {isHebrew ? 'צפה במסמך' : 'View Quote'}
+                                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                          <span>{isHebrew ? 'צפה במסמך' : 'View Quote'}</span>
                                         </button>
 
                                         <div style={{ position: 'relative' }}>
@@ -2055,11 +2068,16 @@ export default function Dashboard() {
                                               handleProtectedAction(quote.id, 'edit', () => handleEditClick(quote));
                                             }}
                                             disabled={isLocked}
-                                            style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: isLocked ? 'not-allowed' : 'pointer', fontSize: '0.8rem', color: isLocked ? '#94a3b8' : '#b45309', display: 'block', fontWeight: '500' }}
+                                            style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: isLocked ? 'not-allowed' : 'pointer', fontSize: '0.8rem', color: isLocked ? '#94a3b8' : '#d97706', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
                                             onMouseEnter={(e) => { if(!isLocked) e.target.style.background = '#f1f5f9'; }}
                                             onMouseLeave={(e) => e.target.style.background = 'none'}
                                           >
-                                            {isLocked ? (isHebrew ? '🔒 עריכה נעולה' : '🔒 Locked') : `✏️ ${t.edit}`}
+                                            {isLocked ? (
+                                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                            ) : (
+                                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            )}
+                                            <span>{isLocked ? (isHebrew ? 'עריכה נעולה' : 'Locked') : t.edit}</span>
                                           </button>
                                           {activeTooltip.quoteId === quote.id && activeTooltip.action === 'edit' && (
                                             <div className="feature-lock-tooltip" style={{
@@ -2078,11 +2096,12 @@ export default function Dashboard() {
                                               setOpenDropdownId(null);
                                               handleProtectedAction(quote.id, 'duplicate', () => handleDuplicateQuote(quote));
                                             }}
-                                            style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#115e59', display: 'block', fontWeight: '500' }}
+                                            style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#0d9488', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
                                             onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
                                             onMouseLeave={(e) => e.target.style.background = 'none'}
                                           >
-                                            📋 {t.duplicate}
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                            <span>{t.duplicate}</span>
                                           </button>
                                           {activeTooltip.quoteId === quote.id && activeTooltip.action === 'duplicate' && (
                                             <div className="feature-lock-tooltip" style={{
@@ -2101,13 +2120,11 @@ export default function Dashboard() {
                                               setOpenDropdownId(null);
                                               handleProtectedAction(quote.id, 'whatsapp', () => sendWhatsApp(quote));
                                             }}
-                                            style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#065f46', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' }}
+                                            style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#16a34a', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
                                             onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
                                             onMouseLeave={(e) => e.target.style.background = 'none'}
                                           >
-                                            <svg style={{ width: '13px', height: '13px', fill: '#065f46', flexShrink: 0 }} viewBox="0 0 24 24">
-                                              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-                                            </svg>
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                                             <span>{isHebrew ? 'שלח בוואטסאפ' : 'Send WhatsApp'}</span>
                                           </button>
                                           {activeTooltip.quoteId === quote.id && activeTooltip.action === 'whatsapp' && (
@@ -2123,11 +2140,12 @@ export default function Dashboard() {
 
                                         <button
                                           onClick={() => { setOpenDropdownId(null); setPendingEmailQuote(quote); }}
-                                          style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#1e40af', display: 'block', fontWeight: '500' }}
+                                          style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#2563eb', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
                                           onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
                                           onMouseLeave={(e) => e.target.style.background = 'none'}
                                         >
-                                          ✉️ {isHebrew ? 'שלח במייל' : 'Send Email'}
+                                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                          <span>{isHebrew ? 'שלח במייל' : 'Send Email'}</span>
                                         </button>
 
                                         <div style={{ position: 'relative' }}>
@@ -2136,11 +2154,12 @@ export default function Dashboard() {
                                               setOpenDropdownId(null);
                                               handleProtectedAction(quote.id, 'delete', () => handleDeleteQuote(quote.id));
                                             }}
-                                            style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#991b1b', display: 'block', fontWeight: '500' }}
+                                            style={{ width: '100%', background: 'none', border: 'none', padding: '7px 12px', textAlign: isHebrew ? 'right' : 'left', cursor: 'pointer', fontSize: '0.8rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}
                                             onMouseEnter={(e) => e.target.style.background = '#fee2e2'}
                                             onMouseLeave={(e) => e.target.style.background = 'none'}
                                           >
-                                            🗑️ {t.delete}
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                            <span>{t.delete}</span>
                                           </button>
                                           {activeTooltip.quoteId === quote.id && activeTooltip.action === 'delete' && (
                                             <div className="feature-lock-tooltip" style={{
