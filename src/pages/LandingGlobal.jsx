@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProFlowLogo from '../components/ProFlowLogo';
 
-export default function LandingGlobal() {
+export default function LandingGlobal({ onForgotPassword }) {
   const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [openFaq, setOpenFaq] = useState(null);
@@ -110,7 +110,12 @@ export default function LandingGlobal() {
           <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '5px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', flexShrink: 0 }} onClick={() => navigate('/global')}>
             <ProFlowLogo size={32} rtl={false} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {onForgotPassword && (
+              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
+                Forgot Password?
+              </button>
+            )}
             <button className="nav-btn" onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '8px 18px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)', whiteSpace: 'nowrap', transition: 'background 0.2s' }}>
               Sign In / Dashboard
             </button>
