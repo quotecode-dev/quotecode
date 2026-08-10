@@ -5,6 +5,7 @@ Please always remember and strictly apply the following ironclad rules in the Pr
 1. **Absolute Separation of Languages and Currencies:**
    * **Israel Platform (Hebrew):** Interface, landing page, and content must be strictly in complete Hebrew (no other languages), and the currency must be strictly NIS (ILS - ₪).
    * **International Platform (English):** Interface, landing page, and content must be strictly in complete English (not a single Hebrew letter), and currencies must be strictly Dollar ($), Euro (€), and Pound (£).
+   * **Modular Enforcement:** Every extracted component (such as `ClientsTab`, `FinancesTab`, `QuoteForm`, and modals) must strictly inherit and respect the `isHebrew` and regional configuration rules.
 
 2. **Documented System Backup (Mandatory after critical changes):**
    * Always after a critical change or update, a full cloud backup must be performed immediately, including code, rules, and documentation. A GitHub Tag must be created describing exactly the changes from the previous version (Format: `v[version]-[short_description]-full-backup`).
@@ -28,7 +29,17 @@ Please always remember and strictly apply the following ironclad rules in the Pr
 
 7. **Project File Map & Technical Glossary:**
    * `src/App.jsx` - Main router, initial language detection, and global modals (recovery/auth state).
-   * `src/pages/Dashboard.jsx` - Central business management dashboard (quotes, CRM, catalog, expenses, reports).
+   * `src/pages/Dashboard.jsx` - Central business management orchestrator (state management, Supabase queries).
+   * `src/components/ClientsTab.jsx` - CRM and clients management tab component.
+   * `src/components/FinancesTab.jsx` - Finances, expenses management, and Recharts reports tab component.
+   * `src/components/QuoteForm.jsx` - Central quote creation and editing form component.
+   * `src/components/PricingModal.jsx` - Subscription pricing and upgrade modal.
+   * `src/components/EditClientModal.jsx` - Client details editing modal.
+   * `src/components/EditExpenseModal.jsx` - Business expense editing modal.
+   * `src/components/LifetimeConfirmModal.jsx` - Super admin lifetime access confirmation modal.
+   * `src/components/RegionConfirmModal.jsx` - Region/country change confirmation modal.
+   * `src/components/UserDetailsModal.jsx` - Full user details review modal for super admins.
+   * `src/components/EmailConfirmModal.jsx` - Quote email dispatch confirmation modal.
    * `src/pages/LandingGlobal.jsx` - International landing page (strictly English, foreign currencies).
    * `src/pages/LandingLocal.jsx` - Local Israeli landing page (strictly Hebrew, ILS currency, 18% VAT).
    * `src/pages/PublicQuote.jsx` - Public quote view, digital client approval, and signature screen.
