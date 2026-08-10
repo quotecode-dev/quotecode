@@ -153,6 +153,20 @@ export default function LandingGlobal({ onForgotPassword }) {
             <span style={{ color: '#fbbf24' }}>⭐⭐⭐⭐⭐</span> Over 500 businesses already generate quotes with ease
           </div>
 
+          {/* AI Video Demo Showcase (English) */}
+          <div style={{ margin: '0 auto 40px auto', maxWidth: '400px' }}>
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              style={{ width: '100%', borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(99, 102, 241, 0.35)', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'block' }}
+            >
+              <source src="/proflow-demoEN.mp4" type="video/mp4" />
+              Your browser does not support video playback.
+            </video>
+          </div>
+
           {/* Pain-Point Section with AI Image */}
           <div className="pain-box" style={{ background: '#111827', borderRadius: '14px', overflow: 'hidden', maxWidth: '800px', margin: '0 auto 40px auto', padding: '24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>

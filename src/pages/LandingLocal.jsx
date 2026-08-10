@@ -133,6 +133,20 @@ export default function LandingLocal({ onForgotPassword }) {
             <span style={{ color: '#fbbf24', fontSize: '1.1rem' }}>⭐⭐⭐⭐⭐</span> מעל 500 עסקים כבר מפיקים הצעות מחיר בקלות
           </div>
 
+          {/* AI Video Demo Showcase */}
+          <div style={{ margin: '0 auto 40px auto', maxWidth: '400px' }}>
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              style={{ width: '100%', borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(99, 102, 241, 0.35)', border: '1px solid rgba(255, 255, 255, 0.15)', display: 'block' }}
+            >
+              <source src="/proflow-demo.mp4" type="video/mp4" />
+              הדפדפן שלך אינו תומך בהצגת סרטונים.
+            </video>
+          </div>
+
           {/* Pain-Point Section with AI Image */}
           <div className="pain-box" style={{ background: '#111827', borderRadius: '16px', overflow: 'hidden', maxWidth: '850px', margin: '0 auto 40px auto', padding: '24px', textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ textAlign: 'center' }}>
