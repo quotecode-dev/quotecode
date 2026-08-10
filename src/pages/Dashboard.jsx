@@ -415,11 +415,6 @@ function UserDetailsModal({ isOpen, onClose, user, isHebrew }) {
   );
 }
 
-// פונקציית עזר למטבעות שהועלתה למעלה כדי להימנע משגיאת Hoisting
-function getCurrencySymbol(curr) {
-  return getCurrencySym(bizCountry, curr);
-}
-
 export default function Dashboard() {
   const [session, setSession] = useState(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -480,6 +475,11 @@ export default function Dashboard() {
   const [editingServiceId, setEditingServiceId] = useState(null);
   const [editServiceName, setEditServiceName] = useState('');
   const [editServicePrice, setEditServicePrice] = useState('');
+
+  // פונקציית עזר למטבעות שהוגדרה בתוך הקומפוננטה כך שיש לה גישה ל-bizCountry
+  function getCurrencySymbol(curr) {
+    return getCurrencySym(bizCountry, curr);
+  }
 
   useEffect(() => {
     const hash = window.location.hash;
