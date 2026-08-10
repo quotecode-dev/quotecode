@@ -13,7 +13,22 @@ function PublicTools() {
     ILS: 1,
     USD: 3.65,
     EUR: 3.95,
-    GBP: 4.65
+    GBP: 4.65,
+    CAD: 2.68,
+    AUD: 2.42,
+    CHF: 4.20,
+    JPY: 0.024
+  };
+
+  const currencyLabels = {
+    ILS: 'שקל חדש (ILS)',
+    USD: 'דולר ארה"ב (USD)',
+    EUR: 'אירו (EUR)',
+    GBP: 'ליש"ט (GBP)',
+    CAD: 'דולר קנדי (CAD)',
+    AUD: 'דולר אוסטרלי (AUD)',
+    CHF: 'פרנק שוויצרי (CHF)',
+    JPY: 'ין יפני (JPY)'
   };
 
   const convertCurrency = () => {
@@ -65,18 +80,25 @@ function PublicTools() {
     setToUnit(temp);
   };
 
-  // Metals state (Gold & Silver purity tiers)
-  const [metalType, setMetalType] = useState('gold'); // 'gold' or 'silver'
+  // Precious Metals state (Gold, Silver, Platinum, Palladium, Rhodium)
+  const [metalType, setMetalType] = useState('gold'); 
   const [purity, setPurity] = useState('24k'); 
   const [metalGrams, setMetalGrams] = useState('10');
 
-  const baseGoldPricePerGramILS = 276; 
-  const baseSilverPricePerGramILS = 3.2; 
+  const baseMetalPrices = {
+    gold: 276,     // per gram 24K in ILS
+    silver: 3.2,   // per gram 999 in ILS
+    platinum: 120, // per gram pure in ILS
+    palladium: 110,// per gram pure in ILS
+    rhodium: 3800  // per gram pure in ILS
+  };
+
   const usdRate = rates['USD'];
 
   const calculateMetalValue = () => {
     const g = parseFloat(metalGrams) || 0;
     let factor = 1;
+    let basePrice = baseMetalPrices[metalType] || 276;
 
     if (metalType === 'gold') {
       if (purity === '24k') factor = 1.0;
@@ -84,19 +106,23 @@ function PublicTools() {
       else if (purity === '21k') factor = 21 / 24;
       else if (purity === '18k') factor = 18 / 24;
       else if (purity === '14k') factor = 14 / 24;
-
-      const totalILS = g * baseGoldPricePerGramILS * factor;
-      const totalUSD = totalILS / usdRate;
-      return { ils: totalILS.toLocaleString('he-IL', { maximumFractionDigits: 2 }), usd: totalUSD.toLocaleString('en-US', { maximumFractionDigits: 2 }) };
-    } else {
+    } else if (metalType === 'silver') {
       if (purity === '999') factor = 1.0;
       else if (purity === '925') factor = 0.925;
       else if (purity === '800') factor = 0.800;
-
-      const totalILS = g * baseSilverPricePerGramILS * factor;
-      const totalUSD = totalILS / usdRate;
-      return { ils: totalILS.toLocaleString('he-IL', { maximumFractionDigits: 2 }), usd: totalUSD.toLocaleString('en-US', { maximumFractionDigits: 2 }) };
+    } else if (metalType === 'platinum') {
+      if (purity === '999') factor = 1.0;
+      else if (purity === '950') factor = 0.950;
+    } else {
+      factor = 1.0;
     }
+
+    const totalILS = g * basePrice * factor;
+    const totalUSD = totalILS / usdRate;
+    return { 
+      ils: totalILS.toLocaleString('he-IL', { maximumFractionDigits: 2 }), 
+      usd: totalUSD.toLocaleString('en-US', { maximumFractionDigits: 2 }) 
+    };
   };
 
   const metalResult = calculateMetalValue();
@@ -145,7 +171,7 @@ function PublicTools() {
                 borderBottom: activeTab === 'metals' ? '3px solid #4f46e5' : 'none', fontSize: '0.95rem'
               }}
             >
-              🥇 שערי זהב וכסף
+              🥇 שערי מתכות יקרות
             </button>
           </div>
 
@@ -163,10 +189,9 @@ function PublicTools() {
                       onChange={(e) => setFromCurrency(e.target.value)}
                       style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
                     >
-                      <option value="ILS">שקל חדש (ILS)</option>
-                      <option value="USD">דולר ארה"ב (USD)</option>
-                      <option value="EUR">אירו (EUR)</option>
-                      <option value="GBP">ליש"ט (GBP)</option>
+                      {Object.entries(currencyLabels).map(([code, label]) => (
+                        <option key={code} value={code}>{label}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -189,10 +214,9 @@ function PublicTools() {
                       onChange={(e) => setToCurrency(e.target.value)}
                       style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
                     >
-                      <option value="ILS">שקל חדש (ILS)</option>
-                      <option value="USD">דולר ארה"ב (USD)</option>
-                      <option value="EUR">אירו (EUR)</option>
-                      <option value="GBP">ליש"ט (GBP)</option>
+                      {Object.entries(currencyLabels).map(([code, label]) => (
+                        <option key={code} value={code}>{label}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -281,7 +305,7 @@ function PublicTools() {
 
             {activeTab === 'metals' && (
               <div>
-                <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#1e293b' }}>מחשבון שווי זהב וכסף לפי משקל ודרגת טוהר</h2>
+                <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#1e293b' }}>מחשבון שווי מתכות יקרות לפי משקל ודרגת טוהר</h2>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
                   <div>
@@ -289,13 +313,19 @@ function PublicTools() {
                     <select
                       value={metalType}
                       onChange={(e) => {
-                        setMetalType(e.target.value);
-                        setPurity(e.target.value === 'gold' ? '24k' : '999');
+                        const val = e.target.value;
+                        setMetalType(val);
+                        if (val === 'gold') setPurity('24k');
+                        else if (val === 'silver') setPurity('999');
+                        else setPurity('999');
                       }}
                       style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
                     >
                       <option value="gold">🥇 זהב</option>
                       <option value="silver">🥈 כסף</option>
+                      <option value="platinum">🪙 פלטינה</option>
+                      <option value="palladium">🪙 פלדיום</option>
+                      <option value="rhodium">🪙 רודיום</option>
                     </select>
                   </div>
 
@@ -306,7 +336,7 @@ function PublicTools() {
                       onChange={(e) => setPurity(e.target.value)}
                       style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
                     >
-                      {metalType === 'gold' ? (
+                      {metalType === 'gold' && (
                         <>
                           <option value="24k">זהב 24 קראט (99.9%)</option>
                           <option value="22k">זהב 22 קראט (91.6%)</option>
@@ -314,12 +344,25 @@ function PublicTools() {
                           <option value="18k">זהב 18 קראט (75.0%)</option>
                           <option value="14k">זהב 14 קראט (58.5%)</option>
                         </>
-                      ) : (
+                      )}
+                      {metalType === 'silver' && (
                         <>
                           <option value="999">כסף טהור 999 (99.9%)</option>
                           <option value="925">כסף סטרלינג 925 (92.5%)</option>
                           <option value="800">כסף 800 (80.0%)</option>
                         </>
+                      )}
+                      {metalType === 'platinum' && (
+                        <>
+                          <option value="999">פלטינה טהורה 999 (99.9%)</option>
+                          <option value="950">פלטינה 950 (95.0%)</option>
+                        </>
+                      )}
+                      {metalType === 'palladium' && (
+                        <option value="999">פלדיום טהור 999 (99.9%)</option>
+                      )}
+                      {metalType === 'rhodium' && (
+                        <option value="999">רודיום טהור 999 (99.9%)</option>
                       )}
                     </select>
                   </div>
