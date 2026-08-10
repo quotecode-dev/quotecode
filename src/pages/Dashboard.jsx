@@ -469,6 +469,11 @@ export default function Dashboard() {
 
   // Edit Client Modal State
   const [editingClient, setEditingClient] = useState(null);
+  
+  // Catalog Item Edit State
+  const [editingServiceId, setEditingServiceId] = useState(null);
+  const [editServiceName, setEditServiceName] = useState('');
+  const [editServicePrice, setEditServicePrice] = useState('');
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -1176,8 +1181,26 @@ export default function Dashboard() {
     else {
       setNewServiceName('');
       setNewServicePrice('');
-      fetchServices();
+      fetchServices(session.user.id);
       setStatusMsg({ text: isHebrew ? 'שירות נוסף לקטלוג בהצלחה' : 'Service added to catalog successfully', type: 'success' });
+    }
+  }
+
+  async function handleSaveEditedService(serviceId) {
+    if (!session?.user?.id) return;
+    const { error } = await supabase
+      .from('services')
+      .update({ name: editServiceName, price: Number(editServicePrice) })
+      .eq('id', serviceId);
+
+    if (error) {
+      setStatusMsg({ text: 'Error updating service: ' + error.message, type: 'error' });
+    } else {
+      setEditingServiceId(null);
+      setEditServiceName('');
+      setEditServicePrice('');
+      fetchServices(session.user.id);
+      setStatusMsg({ text: isHebrew ? 'השירות עודכן בהצלחה!' : 'Service updated successfully!', type: 'success' });
     }
   }
 
@@ -1185,7 +1208,7 @@ export default function Dashboard() {
     if (!window.confirm(isHebrew ? 'למחוק שירות זה מהקטלוג?' : 'Delete this service from catalog?')) return;
     const { error } = await supabase.from('services').delete().eq('id', id);
     if (error) setStatusMsg({ text: 'Error deleting service: ' + error.message, type: 'error' });
-    else fetchServices();
+    else fetchServices(session.user.id);
   }
 
   async function handleDeleteClient(clientId) {
@@ -1206,17 +1229,7 @@ export default function Dashboard() {
       setStatusMsg({ text: 'Error deleting quote: ' + error.message, type: 'error' });
     } else {
       setStatusMsg({ text: isHebrew ? 'ההצעה נמחקה בהצלחה!' : 'Quote deleted successfully!', type: 'success' });
-      fetchQuotes();
-    }
-  }
-
-  async function handleStatusChange(quoteId, newStatus) {
-    const { error } = await supabase.from('quotes').update({ status: newStatus.toLowerCase() }).eq('id', quoteId);
-    if (error) {
-      setStatusMsg({ text: 'Error updating status: ' + error.message, type: 'error' });
-    } else {
-      setStatusMsg({ text: isHebrew ? 'סטטוס ההצעה עודכן בהצלחה!' : 'Quote status updated successfully!', type: 'success' });
-      fetchQuotes();
+      fetchQuotes(session.user.id);
     }
   }
 
@@ -2555,21 +2568,76 @@ export default function Dashboard() {
                           </td>
                         </tr>
                       ) : (
-                        services.map((svc) => (
-                          <tr key={svc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.8rem' }}>
-                            <td style={{ padding: '8px 6px', fontWeight: '400', color: '#1e293b' }}>{svc.name}</td>
-                            <td style={{ padding: '8px 6px', color: '#4f46e5', fontWeight: '400' }}>{formatNum(svc.price)}</td>
-                            <td style={{ padding: '8px 6px' }}>
-                               <button 
-                            title={t.delete}
-                            onClick={() => handleDeleteService(svc.id)}
-                            style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '3px 6px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.65rem' }}
-                            >
-                              {t.delete}
-                            </button>
-                            </td>
-                          </tr>
-                        ))
+                        services.map((svc) => {
+                          const isEditingThisSvc = editingServiceId === svc.id;
+                          return (
+                            <tr key={svc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.8rem' }}>
+                              <td style={{ padding: '8px 6px', fontWeight: '400', color: '#1e293b' }}>
+                                {isEditingThisSvc ? (
+                                  <input 
+                                    type="text" 
+                                    value={editServiceName} 
+                                    onChange={(e) => setEditServiceName(e.target.value)} 
+                                    style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '4px', width: '100%', fontSize: '0.8rem' }} 
+                                  />
+                                ) : (
+                                  svc.name
+                                )}
+                              </td>
+                              <td style={{ padding: '8px 6px', color: '#4f46e5', fontWeight: '400' }}>
+                                {isEditingThisSvc ? (
+                                  <input 
+                                    type="number" 
+                                    step="0.01" 
+                                    value={editServicePrice} 
+                                    onChange={(e) => setEditServicePrice(e.target.value)} 
+                                    style={{ padding: '4px 8px', border: '1px solid #cbd5e1', borderRadius: '4px', width: '100px', fontSize: '0.8rem' }} 
+                                  />
+                                ) : (
+                                  formatNum(svc.price)
+                                )}
+                              </td>
+                              <td style={{ padding: '8px 6px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                {isEditingThisSvc ? (
+                                  <>
+                                    <button 
+                                      onClick={() => handleSaveEditedService(svc.id)}
+                                      style={{ background: '#10b981', color: 'white', border: 'none', padding: '3px 6px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.65rem' }}
+                                    >
+                                      {isHebrew ? 'שמור' : 'Save'}
+                                    </button>
+                                    <button 
+                                      onClick={() => setEditingServiceId(null)}
+                                      style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '3px 6px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.65rem' }}
+                                    >
+                                      {isHebrew ? 'ביטול' : 'Cancel'}
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button 
+                                      onClick={() => {
+                                        setEditingServiceId(svc.id);
+                                        setEditServiceName(svc.name);
+                                        setEditServicePrice(svc.price);
+                                      }}
+                                      style={{ background: '#e0e7ff', color: '#4f46e5', border: 'none', padding: '3px 6px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.65rem' }}
+                                    >
+                                      {isHebrew ? 'ערוך' : 'Edit'}
+                                    </button>
+                                    <button 
+                                      title={t.delete}
+                                      onClick={() => handleDeleteService(svc.id)}
+                                      style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '3px 6px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.65rem' }}
+                                    >
+                                      {t.delete}
+                                    </button>
+                                  </>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
                       )}
                     </tbody>
                   </table>
