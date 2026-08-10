@@ -61,7 +61,6 @@ export default function AIChatWidget({ isHebrew }) {
     let options = null;
 
     if (isHebrew) {
-      // 1. בדיקה ראשונה ומדויקת למילים בודדות דו-משמעיות להצגת תפריט בחירה
       if (lower === 'מייל' || lower === 'אימייל') {
         reply = 'האם אתה מתכוון ליצירת קשר עם שירות הלקוחות, או לשליחת הצעת מחיר במייל ללקוח?';
         options = [
@@ -90,13 +89,11 @@ export default function AIChatWidget({ isHebrew }) {
           { label: '👥 ניהול וצפייה בספר הלקוחות (CRM)', action: 'manage_clients' },
           { label: '➕ יצירת הצעת מחיר חדשה ללקוח', action: 'new_quote' }
         ];
-      } 
-      // 2. שאר התנאים הספציפיים
-      else if (lower.includes('שולח') && lower.includes('הצעה') && lower.includes('מייל')) {
+      } else if (lower.includes('שולח') && lower.includes('הצעה') && lower.includes('מייל')) {
         reply = 'כדי לשלוח הצעת מחיר במייל ללקוח: פתח את תפריט "פעולות ▼" בשורת ההצעה המבוקשת ובחר באפשרות "שלח במייל". המערכת תשלח את ההצעה אוטומטית לכתובת המייל של הלקוח דרך השרת שלנו (info@quotecodepro.com).';
       } else if (lower.includes('קשר') || lower.includes('פנייה') || lower.includes('לפנות') || lower.includes('אימייל של שירות') || lower.includes('מייל של שירות') || lower.includes('מה האימייל') || lower.includes('כתובת מייל') || lower.includes('שירות לקוחות') || lower.includes('תמיכה') || lower.includes('support')) {
         reply = 'ניתן ליצור איתנו קשר ישירות דרך כתובת האימייל של שירות הלקוחות: info@quotecodepro.com, או להמשיך לקבל מענה מיידי וזמין 24/7 כאן בעוזר ה-AI. לידיעתך, הפעילות שלנו מתנהלת באופן דיגיטלי בענן ללא קבלת קהל פיזית במשרדים.';
-      } else if (lower.includes('קטלוג') || lower.includes('מוצר') || lower.includes('שירות') || lower.includes('פריט') || lower.includes('להוסיף')) {
+      } else if (lower.includes('קטלוג') || lower.includes('מוצר') || lower.includes('שירות בקטלוג') || lower.includes('הוספת מוצר') || lower.includes('הוספת שירות')) {
         reply = 'כדי להוסיף מוצר או שירות לקטלוג: גלול למטה בטאב "הצעות מחיר" הראשי אל טבלת "קטלוג שירותים ומוצרים". הזן בשדה הייעודי את שם השירות/המוצר ואת המחיר הקבוע שלו, ולחץ על כפתור "הוסף לקטלוג". לאחר מכן תוכל לבחור אותו בלחיצה מהירה מתוך רשימת הקטלוג בעת יצירת הצעת מחיר!';
       } else if (lower.includes('פעולות') || lower.includes('תפריט') || lower.includes('כפתור') || lower.includes('צפה')) {
         reply = 'בכל שורה של הצעת מחיר בטבלה ישנו כפתור "פעולות ▼" מצד שמאל. בלחיצה עליו נפתח תפריט המאפשר לך: לצפות במסמך (👁️), לערוך אותו (✏️), לשכפל (📋), לשלוח בוואטסאפ או במייל, או למחוק את ההצעה.';
@@ -120,13 +117,13 @@ export default function AIChatWidget({ isHebrew }) {
         reply = 'מערכת ProFlow מספקת ניהול עסק חכם, הצעות מחיר, קטלוג מוצרים ושירותים, חתימות דיגיטליות, ניהול אזורי פעילות LCL/Intl ודוחות פיננסיים. שאל אותי למשל על: הוספת מוצר לקטלוג, יצירת הצעת מחיר, ניהול לקוחות או יצירת קשר!';
       }
     } else {
-      if (lower === 'email' || lower === 'mail') {
+      if (lower === 'email' || lower === 'mail' || lower === 'e-mail') {
         reply = 'Are you referring to contacting customer support via email, or sending a quote via email to a client?';
         options = [
           { label: '📞 Contact Support', action: 'contact_support' },
           { label: '📄 Send Quote via Email', action: 'send_quote_email' }
         ];
-      } else if (lower === 'edit' || lower === 'change') {
+      } else if (lower === 'edit' || lower === 'change' || lower === 'modify') {
         reply = 'What would you like to edit? Please select an option:';
         options = [
           { label: '✏️ Edit an existing quote', action: 'edit_quote' },
@@ -150,9 +147,9 @@ export default function AIChatWidget({ isHebrew }) {
         ];
       } else if (lower.includes('send') && lower.includes('quote') && lower.includes('email')) {
         reply = 'To send a quote via email to your client, click the "Actions ▼" menu on the quote row and select "Send Email" (sent via info@quotecodepro.com).';
-      } else if (lower.includes('support') || lower.includes('email') || lower.includes('contact') || lower.includes('reach out')) {
+      } else if (lower.includes('support') || lower.includes('email') || lower.includes('contact') || lower.includes('reach out') || lower.includes('customer service')) {
         reply = 'You can contact our support team directly via email at info@quotecodepro.com, or continue getting immediate 24/7 assistance right here through the AI assistant. Please note that ProFlow operates as a fully digital cloud platform without public walk-in offices.';
-      } else if (lower.includes('catalog') || lower.includes('product') || lower.includes('service') || lower.includes('item') || lower.includes('add')) {
+      } else if (lower.includes('catalog') || lower.includes('product') || lower.includes('add catalog') || lower.includes('catalog item')) {
         reply = 'To add a product or service to the catalog: scroll down on the main "Quotes" tab to the "Services & Products Catalog" section. Enter the service name and fixed price, then click "Add to Catalog". You can then quickly select it when building quotes!';
       } else if (lower.includes('action') || lower.includes('menu') || lower.includes('button') || lower.includes('view')) {
         reply = 'In the quotes table, click the "Actions ▼" button on any row to open a menu where you can view, edit, duplicate, WhatsApp/email, or delete the quote.';
