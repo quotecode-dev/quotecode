@@ -116,7 +116,7 @@ export default function LandingGlobal({ onForgotPassword }) {
                 Forgot Password?
               </button>
             )}
-            <button className="nav-btn" onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '8px 18px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)', whiteSpace: 'nowrap', transition: 'background 0.2s' }}>
+            <button className="nav-btn" onClick={() => navigate('/dashboard?lang=en')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '8px 18px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)', whiteSpace: 'nowrap', transition: 'background 0.2s' }}>
               Sign In / Dashboard
             </button>
           </div>
@@ -141,7 +141,7 @@ export default function LandingGlobal({ onForgotPassword }) {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <button onClick={() => navigate('/dashboard?signup=true')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '12px 28px', borderRadius: '8px', fontSize: '1rem', fontWeight: '700', cursor: 'pointer', boxShadow: '0 6px 20px rgba(16, 185, 129, 0.35)', transition: 'transform 0.2s' }}>
+            <button onClick={() => navigate('/dashboard?signup=true&lang=en')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '12px 28px', borderRadius: '8px', fontSize: '1rem', fontWeight: '700', cursor: 'pointer', boxShadow: '0 6px 20px rgba(16, 185, 129, 0.35)', transition: 'transform 0.2s' }}>
               Start 14-Day Free PRO Trial Now 🚀
             </button>
             <span style={{ color: '#34d399', fontSize: '0.9rem', fontWeight: '700' }}>
@@ -274,7 +274,7 @@ export default function LandingGlobal({ onForgotPassword }) {
                   <li>✓ Basic client management</li>
                   <li>✓ Email support</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?signup=true&lang=en')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}>
                   Start for Free
                 </button>
               </div>
@@ -290,7 +290,7 @@ export default function LandingGlobal({ onForgotPassword }) {
                   <li>✓ Up to 20 quotes per month</li>
                   <li>✓ Digital signatures & client management</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?signup=true&lang=en')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}>
                   Select Basic Plan
                 </button>
               </div>
@@ -309,7 +309,7 @@ export default function LandingGlobal({ onForgotPassword }) {
                   <li>✓ Unlimited quotes</li>
                   <li>✓ Full income & expense tracking</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', boxShadow: '0 3px 10px rgba(99,102,241,0.3)' }}>
+                <button onClick={() => navigate('/dashboard?signup=true&lang=en')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer', boxShadow: '0 3px 10px rgba(99,102,241,0.3)' }}>
                   Select PRO Plan
                 </button>
               </div>

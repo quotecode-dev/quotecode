@@ -1480,7 +1480,9 @@ export default function Dashboard() {
   }
 
   if (!session) {
-    const isLoginHebrew = isHebrew;
+    const searchParams = new URLSearchParams(window.location.search);
+    const urlLang = searchParams.get('lang');
+    const isLoginHebrew = urlLang ? urlLang === 'he' : isHebrew;
     const loginDir = isLoginHebrew ? 'rtl' : 'ltr';
 
     return (

@@ -96,7 +96,7 @@ export default function LandingLocal({ onForgotPassword }) {
                 שכחת סיסמה?
               </button>
             )}
-            <button className="nav-btn" onClick={() => navigate('/dashboard')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '9px 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)', whiteSpace: 'nowrap' }}>
+            <button className="nav-btn" onClick={() => navigate('/dashboard?lang=he')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '9px 18px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)', whiteSpace: 'nowrap' }}>
               כניסה למערכת / התחברות
             </button>
           </div>
@@ -121,7 +121,7 @@ export default function LandingLocal({ onForgotPassword }) {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <button onClick={() => navigate('/dashboard?signup=true')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 30px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
+            <button onClick={() => navigate('/dashboard?signup=true&lang=he')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 30px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)' }}>
               התחל 14 יום ניסיון חינם ב-PRO עכשיו 🚀
             </button>
             <span style={{ color: '#34d399', fontSize: '0.95rem', fontWeight: '800' }}>
@@ -254,7 +254,7 @@ export default function LandingLocal({ onForgotPassword }) {
                   <li>✓ ניהול לקוחות בסיסי</li>
                   <li>✓ תמיכה במייל</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?signup=true&lang=he')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   התחל בחינם
                 </button>
               </div>
@@ -274,7 +274,7 @@ export default function LandingLocal({ onForgotPassword }) {
                   <li>✓ חתימה דיגיטלית וניהול לקוחות</li>
                   <li style={{ color: '#ef4444' }}>✗ ללא שליחה ישירה בווצאפ</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/dashboard?signup=true&lang=he')} style={{ marginTop: 'auto', background: '#1f2937', color: '#ffffff', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                   בחר מסלול Basic
                 </button>
               </div>
@@ -297,7 +297,7 @@ export default function LandingLocal({ onForgotPassword }) {
                   <li>✓ שליחה ישירה בווצאפ (WhatsApp)</li>
                   <li>✓ ניהול הכנסות והוצאות מלא</li>
                 </ul>
-                <button onClick={() => navigate('/dashboard?signup=true')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
+                <button onClick={() => navigate('/dashboard?signup=true&lang=he')} style={{ marginTop: 'auto', background: '#6366f1', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.4)' }}>
                   בחר מסלול PRO
                 </button>
               </div>
