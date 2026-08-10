@@ -25,3 +25,15 @@ Please always remember and strictly apply the following ironclad rules in the Pr
    * When updating, upgrading, or replacing any code file, it is MANDATORY to ensure that all existing functions, buttons, logic, and components that currently work in the system remain strictly in place and intact.
    * <span style="color:red;"><b>It is ABSOLUTELY FORBIDDEN to remove, delete, alter, or overwrite any existing feature, button, or code</b></span> without explicit prior request and approval from me.
    * In any addition or fix, the new code must integrate harmoniously alongside the existing code, maintaining 100% functionality of everything already developed and working in the system.
+
+7. **Project File Map & Technical Glossary:**
+   * `src/App.jsx` - Main router, initial language detection, and global modals (recovery/auth state).
+   * `src/pages/Dashboard.jsx` - Central business management dashboard (quotes, CRM, catalog, expenses, reports).
+   * `src/pages/LandingGlobal.jsx` - International landing page (strictly English, foreign currencies).
+   * `src/pages/LandingLocal.jsx` - Local Israeli landing page (strictly Hebrew, ILS currency, 18% VAT).
+   * `src/pages/PublicQuote.jsx` - Public quote view, digital client approval, and signature screen.
+   * `src/components/ProFlowLogo.jsx` - Responsive logo component with directional support (RTL/LTR).
+   * `src/components/PublicQuoteHeader.jsx` - Business header component for public quote views.
+   * `src/components/AccessibilityModal.jsx` - Accessibility controls modal.
+   * `src/AIChatWidget.jsx` - AI assistant widget for user support.
+   * `src/supabase.js` - Supabase client configuration and cloud connection.
