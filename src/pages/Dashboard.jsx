@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import ProFlowLogo from '../components/ProFlowLogo';
 import AccessibilityModal from '../components/AccessibilityModal';
 import AIChatWidget from '../AIChatWidget';
+import { isHebrewEnv, getCurrencySym, getRegionTaxRate } from '../utils/regionConfig';
 
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -636,9 +637,7 @@ export default function Dashboard() {
 
   const isInternationalAccount = bizCountry === 'International';
   
-  const isHebrew = session 
-    ? !isInternationalAccount 
-    : (localStorage.getItem('proflow_lang') === 'he' || (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he')));
+  const isHebrew = isHebrewEnv(bizCountry, session);
 
   let trialDaysLeft = null;
   let isTrialExpired = false;
@@ -1275,7 +1274,7 @@ export default function Dashboard() {
     setStatusMsg({ text: isHebrew ? 'שולח אימייל ללקוח דרך info@quotecodepro.com...' : 'Sending email via cloud...', type: 'success' });
 
     try {
-      const quoteSym = getCurrencySymbol(quote.currency);
+      const quoteSym = getCurrencySym(bizCountry, quote.currency);
       const quoteLink = `${window.location.origin}/public-quote/${quote.id}`;
       
       const clientEmailVal = quote.clients?.email || quote.client_email || '';
@@ -1329,7 +1328,7 @@ export default function Dashboard() {
   const discountAmount = (subtotal * Number(discount || 0)) / 100;
   const baseAmount = subtotal - discountAmount;
   
-  let taxRate = isLocalIsraeliBusiness ? 0.18 : 0.00;
+  let taxRate = getRegionTaxRate(bizCountry);
   
   let taxAmount = 0;
   let totalAmount = 0;
@@ -1452,15 +1451,7 @@ export default function Dashboard() {
     return { name, [isHebrew ? 'הכנסות' : 'Income']: income, [isHebrew ? 'הוצאות' : 'Expenses']: expense };
   });
 
-  const getCurrencySymbol = (curr) => {
-    if (isLocalIsraeliBusiness) return '₪';
-    if (!curr) return '$';
-    if (curr === 'EUR') return '€';
-    if (curr === 'GBP') return '£';
-    if (curr === 'ILS') return '₪';
-    return '$';
-  };
-  const sym = getCurrencySymbol(currency);
+  const sym = getCurrencySym(bizCountry, currency);
 
   const showQuoteForm = isCreatingQuote || editingQuoteId !== null;
 
@@ -1642,7 +1633,7 @@ export default function Dashboard() {
       let quoteId;
 
       if (editingQuoteId) {
-        const { error: updateError } = await supabase.app('quotes').update(quotePayload).eq('id', editingQuoteId);
+        const { error: updateError } = await supabase.from('quotes').update(quotePayload).eq('id', editingQuoteId);
         if (updateError) throw updateError;
         quoteId = editingQuoteId;
         await supabase.from('quote_items').delete().eq('quote_id', quoteId);
