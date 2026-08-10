@@ -3,25 +3,27 @@ import React, { useState, useRef, useEffect } from 'react';
 export default function AIChatWidget({ isHebrew }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState(() => {
+    const defaultWelcome = isHebrew 
+      ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' 
+      : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?';
+
     try {
       const saved = sessionStorage.getItem('proflow_ai_chat');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.length > 0) {
-          // עדכון הודעת הפתיחה הראשונה לפי השפה הנוכחית אם היא הודעת מערכת ראשונית
           if (parsed[0].role === 'assistant') {
-            parsed[0].content = isHebrew 
-              ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' 
-              : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?';
+            parsed[0].content = defaultWelcome;
           }
           return parsed;
         }
       }
     } catch (e) {}
     return [
-      { role: 'assistant', content: isHebrew ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?' }
+      { role: 'assistant', content: defaultWelcome }
     ];
   });
+
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -29,6 +31,23 @@ export default function AIChatWidget({ isHebrew }) {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // עדכון הודעת הפתיחה בזמן אמת אם השפה משתנה
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length > 0 && prev[0].role === 'assistant') {
+        const updated = [...prev];
+        updated[0] = {
+          role: 'assistant',
+          content: isHebrew 
+            ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' 
+            : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?'
+        };
+        return updated;
+      }
+      return prev;
+    });
+  }, [isHebrew]);
 
   useEffect(() => {
     try {
@@ -67,6 +86,8 @@ export default function AIChatWidget({ isHebrew }) {
           reply = 'שליחת הצעת מחיר ישירות בוואטסאפ מתבצעת דרך תפריט "פעולות ▼" בשורת ההצעה (פיצ\'ר בלעדי למנויי PRO) המייצר הודעה מוכנה עם לינק ישיר ללקוח.';
         } else if (lower.includes('מע"מ') || lower.includes('vat') || lower.includes('מס')) {
           reply = 'המערכת מחשבת מע"מ אוטומטית בהתאם להגדרות העסק: 18% ללקוחות בארץ (עם אפשרות לחישוב כולל/לפני מע"מ לפי סוג הלקוח) ו-0% ללקוחות מחו"ל.';
+        } else if (lower.includes('פיזי') || lower.includes('משרד') || lower.includes('להגיע') || lower.includes('כתובת') || lower.includes('פגישה') || lower.includes('פרונטלית') || lower.includes('סניף')) {
+          reply = 'מערכת ProFlow הינה פלטפורמת SaaS עננית ודיגיטלית מלאה הפועלת אונליין, ולכן אינה מקבלת קהל באופן פיזי במשרדים. כל הפעולות, ניהול העסק, הפקת ההצעות והתמיכה מתבצעות באופן דיגיטלי נוח ומהיר ישירות דרך המערכת או באמצעות יצירת קשר עמנו באימייל ובעוזר ה-AI כאן 24/7!';
         } else if (lower.includes('מיון') || lower.includes('סדר') || lower.includes('למיין') || lower.includes('עמודות')) {
           reply = 'ניתן למיין את טבלת ההצעות בקלות בלחיצה על כותרות העמודות בטבלה (מספר הזמנה, שם לקוח, סכום, תאריך, סטטוס או צפיות).';
         } else if (lower.includes('הוצאות') || lower.includes('דוחות') || lower.includes('רווח') || lower.includes('הכנסות'))  {
@@ -74,7 +95,7 @@ export default function AIChatWidget({ isHebrew }) {
         } else if (lower.includes('אזור') || lower.includes('lcl') || lower.includes('intl') || lower.includes('משתמשים') || lower.includes('אדמין')) {
           reply = 'פאנל ה-Super Admin מאפשר לראות את כל משתמשי המערכת, לנהל את החבילות שלהם (Free, Basic, Pro), להעניק מנוי לכל החיים (Lifetime), ולשנות את אזור הפעילות (LCL לישראל בירוק, או Intl לחו"ל באדום עם התראת אישור).';
         } else {
-          reply = 'מערכת ProFlow מספקת ניהול עסק חכם, הצעות מחיר, קטלוג מוצרים ושירותים, חתימות דיגיטליות, ניהול אזורי פעילות LCL/Intl ודוחות פיננסיים. שאל אותי למשל על: הוספת מוצר לקטלוג, יצירת הצעת מחיר, ניהול לקוחות או שליחה בוואטסאפ!';
+          reply = 'מערכת ProFlow מספקת ניהול עסק חכם, הצעות מחיר, קטלוג מוצרים ושירותים, חתימות דיגיטליות, ניהול אזורי פעילות LCL/Intl ודוחות פיננסיים. שאל אותי למשל על: הוספת מוצר לקטלוג, יצירת הצעת מחיר, ניהול לקוחות או יצירת קשר!';
         }
       } else {
         if (lower.includes('catalog') || lower.includes('product') || lower.includes('service') || lower.includes('item') || lower.includes('add')) {
@@ -89,12 +110,14 @@ export default function AIChatWidget({ isHebrew }) {
           reply = 'In the "Clients" tab you can manage your complete client database, tax IDs, contact details, and custom notes.';
         } else if (lower.includes('whatsapp')) {
           reply = 'You can send quotes directly via WhatsApp using the actions menu in your quotes list (PRO feature).';
+        } else if (lower.includes('physical') || lower.includes('office') || lower.includes('address') || lower.includes('visit') || lower.includes('meeting') || lower.includes('location') || lower.includes('in-person')) {
+          reply = 'ProFlow is a fully cloud-based digital SaaS platform operating online, and therefore does not have a physical walk-in office or public reception. All business operations, quote generation, and support are managed seamlessly and securely online via the platform or through our digital support channels 24/7!';
         } else if (lower.includes('sort') || lower.includes('column')) {
           reply = 'You can sort the quotes table by clicking on any column header (Order #, Client Name, Amount, Date, Status, or Views).';
         } else if (lower.includes('lcl') || lower.includes('intl') || lower.includes('region') || lower.includes('admin')) {
           reply = 'In the Super Admin panel, you can manage user subscription plans, grant Lifetime access, and control business regions (LCL in green for Israel or Intl in red for international).';
         } else {
-          reply = 'ProFlow provides smart business management, quotes, product catalog, digital signatures, region management (LCL/Intl), and financial reports. Feel free to ask about adding catalog items, creating quotes, or managing clients!';
+          reply = 'ProFlow provides smart business management, quotes, product catalog, digital signatures, region management (LCL/Intl), and financial reports. Feel free to ask about adding catalog items, creating quotes, managing clients, or contacting support!';
         }
       }
 
