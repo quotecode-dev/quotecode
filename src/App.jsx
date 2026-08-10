@@ -51,7 +51,11 @@ export default function App() {
   const [updateMessage, setUpdateMessage] = useState('');
 
   const queryParams = new URLSearchParams(window.location.search);
-  const isEnglish = queryParams.get('lang') === 'en' || queryParams.get('en') === 'true' || window.location.pathname.startsWith('/en') || localStorage.getItem('proflow_lang') === 'en' || !window.location.pathname.startsWith('/he');
+  const isEnglish = window.location.pathname.startsWith('/en') || 
+                    queryParams.get('lang') === 'en' || 
+                    queryParams.get('en') === 'true' || 
+                    localStorage.getItem('proflow_lang') === 'en' || 
+                    (localStorage.getItem('proflow_lang') !== 'he' && !window.location.pathname.startsWith('/he'));
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
