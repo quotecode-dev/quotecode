@@ -271,6 +271,84 @@ function EditClientModal({ isOpen, onClose, client, onSave, isHebrew }) {
   );
 }
 
+function EditExpenseModal({ isOpen, onClose, expense, onSave, isHebrew }) {
+  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('Hosting / Cloud');
+  const [isRecurring, setIsRecurring] = useState(false);
+
+  useEffect(() => {
+    if (expense) {
+      setDescription(expense.description || '');
+      setAmount(expense.amount || '');
+      setCategory(expense.category || 'Hosting / Cloud');
+      setIsRecurring(expense.is_recurring || false);
+    }
+  }, [expense]);
+
+  if (!isOpen || !expense) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave({
+      ...expense,
+      description,
+      amount: Number(amount),
+      category,
+      is_recurring: isRecurring
+    });
+    onClose();
+  };
+
+  return (
+    <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+      <div style={{ background: 'white', padding: '24px', borderRadius: '14px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)', textAlign: isHebrew ? 'right' : 'left', position: 'relative' }}>
+        
+        <button onClick={onClose} style={{ position: 'absolute', top: '14px', [isHebrew ? 'left' : 'right']: '14px', background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕</button>
+
+        <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.2rem', marginBottom: '16px', fontWeight: '800' }}>
+          {isHebrew ? 'עריכת הוצאה' : 'Edit Expense'}
+        </h3>
+
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>{isHebrew ? 'תיאור ההוצאה' : 'Description'}</label>
+              <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} required style={{ width: '100%', padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>{isHebrew ? 'סכום' : 'Amount'}</label>
+              <input type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} required style={{ width: '100%', padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>{isHebrew ? 'קטגוריה' : 'Category'}</label>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} style={{ width: '100%', padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box' }}>
+                <option value="Hosting / Cloud">{isHebrew ? 'ענן ושרתים' : 'Hosting / Cloud'}</option>
+                <option value="Marketing">{isHebrew ? 'שיווק ופרסום' : 'Marketing'}</option>
+                <option value="Tools / Software">{isHebrew ? 'כלים ותוכנות' : 'Tools / Software'}</option>
+                <option value="Other">{isHebrew ? 'אחר' : 'Other'}</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+              <input type="checkbox" checked={isRecurring} onChange={(e) => setIsRecurring(e.target.checked)} id="edit-recurring-checkbox" />
+              <label htmlFor="edit-recurring-checkbox" style={{ fontWeight: '600', color: '#475569', cursor: 'pointer' }}>{isHebrew ? 'הוצאה חודשית קבועה' : 'Recurring monthly'}</label>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', marginTop: '20px', flexDirection: isHebrew ? 'row-reverse' : 'row' }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.9rem' }}>
+              {isHebrew ? 'ביטול' : 'Cancel'}
+            </button>
+            <button type="submit" style={{ flex: 1, background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.9rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
+              {isHebrew ? 'שמור שינויים' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function LifetimeConfirmModal({ isOpen, onClose, onConfirm, userEmail, isHebrew }) {
   if (!isOpen) return null;
 
@@ -470,6 +548,9 @@ export default function Dashboard() {
 
   // Edit Client Modal State
   const [editingClient, setEditingClient] = useState(null);
+  
+  // Edit Expense Modal State
+  const [editingExpense, setEditingExpense] = useState(null);
   
   // Catalog Item Edit State
   const [editingServiceId, setEditingServiceId] = useState(null);
@@ -998,6 +1079,25 @@ export default function Dashboard() {
     }
   }
 
+  async function handleSaveUpdatedExpense(updatedExpense) {
+    const { error } = await supabase
+      .from('expenses')
+      .update({
+        description: updatedExpense.description,
+        amount: updatedExpense.amount,
+        category: updatedExpense.category,
+        is_recurring: updatedExpense.is_recurring
+      })
+      .eq('id', updatedExpense.id);
+
+    if (error) {
+      setStatusMsg({ text: 'Error updating expense: ' + error.message, type: 'error' });
+    } else {
+      setStatusMsg({ text: isHebrew ? 'ההוצאה עודכנה בהצלחה!' : 'Expense updated successfully!', type: 'success' });
+      if (session?.user?.id) fetchExpenses(session.user.id);
+    }
+  }
+
   async function handleAddExpense(e) {
     e.preventDefault();
     if (!session?.user?.id) return;
@@ -1017,7 +1117,7 @@ export default function Dashboard() {
       setExpenseDesc('');
       setExpenseAmount('');
       setIsRecurring(false);
-      fetchExpenses();
+      fetchExpenses(session.user.id);
       setStatusMsg({ text: isHebrew ? 'ההוצאה נוספה בהצלחה!' : 'Expense added successfully!', type: 'success' });
     }
   }
@@ -1026,7 +1126,7 @@ export default function Dashboard() {
     if (!window.confirm(isHebrew ? 'למחוק הוצאה זו?' : 'Delete this expense?')) return;
     const { error } = await supabase.from('expenses').delete().eq('id', expenseId);
     if (error) setStatusMsg({ text: 'Error deleting expense: ' + error.message, type: 'error' });
-    else fetchExpenses();
+    else fetchExpenses(session.user.id);
   }
 
   const exportToCSV = (dataArray, filename) => {
@@ -1984,6 +2084,14 @@ export default function Dashboard() {
         isHebrew={isHebrew}
       />
 
+      <EditExpenseModal 
+        isOpen={editingExpense !== null}
+        onClose={() => setEditingExpense(null)}
+        expense={editingExpense}
+        onSave={handleSaveUpdatedExpense}
+        isHebrew={isHebrew}
+      />
+
       <LifetimeConfirmModal 
         isOpen={pendingLifetimeUser !== null}
         onClose={() => setPendingLifetimeUser(null)}
@@ -2127,35 +2235,33 @@ export default function Dashboard() {
             >
               {isHebrew ? 'לקוחות' : 'Clients'}
             </button>
+            <button
+              onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
+              style={{
+                flex: '1 1 auto', minWidth: '100px', padding: '7px 10px', borderRadius: '6px', 
+                border: activeTab === 'finances' ? '1px solid #4f46e5' : '1px solid #cbd5e1', 
+                fontWeight: '600', fontSize: '0.8rem', cursor: 'pointer', 
+                background: activeTab === 'finances' ? '#4f46e5' : 'white', 
+                color: activeTab === 'finances' ? 'white' : '#475569', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
+              }}
+            >
+              {isHebrew ? 'הוצאות/הכנסות' : 'Finances'}
+            </button>
             {isSuperAdmin && (
-              <>
-                <button
-                  onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
-                  style={{
-                    flex: '1 1 auto', minWidth: '100px', padding: '7px 10px', borderRadius: '6px', 
-                    border: activeTab === 'finances' ? '1px solid #4f46e5' : '1px solid #cbd5e1', 
-                    fontWeight: '600', fontSize: '0.8rem', cursor: 'pointer', 
-                    background: activeTab === 'finances' ? '#4f46e5' : 'white', 
-                    color: activeTab === 'finances' ? 'white' : '#475569', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
-                  }}
-                >
-                  {isHebrew ? 'הוצאות/הכנסות' : 'Finances'}
-                </button>
-                <button
-                  onClick={() => { setActiveTab('admin_clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
-                  style={{
-                    flex: '1 1 auto', minWidth: '100px', padding: '7px 10px', borderRadius: '6px', 
-                    border: activeTab === 'admin_clients' ? '1px solid #4f46e5' : '1px solid #cbd5e1', 
-                    fontWeight: '600', fontSize: '0.8rem', cursor: 'pointer', 
-                    background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', 
-                    color: activeTab === 'admin_clients' ? 'white' : '#475569', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
-                  }}
-                >
-                  {isHebrew ? 'משתמשים' : 'Users Admin'}
-                </button>
-              </>
+              <button
+                onClick={() => { setActiveTab('admin_clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
+                style={{
+                  flex: '1 1 auto', minWidth: '100px', padding: '7px 10px', borderRadius: '6px', 
+                  border: activeTab === 'admin_clients' ? '1px solid #4f46e5' : '1px solid #cbd5e1', 
+                  fontWeight: '600', fontSize: '0.8rem', cursor: 'pointer', 
+                  background: activeTab === 'admin_clients' ? '#4f46e5' : 'white', 
+                  color: activeTab === 'admin_clients' ? 'white' : '#475569', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
+                }}
+              >
+                {isHebrew ? 'משתמשים' : 'Users Admin'}
+              </button>
             )}
           </div>
 
@@ -3029,7 +3135,7 @@ export default function Dashboard() {
             </div>
           )}
 
-          {isSuperAdmin && activeTab === 'finances' && (
+          {activeTab === 'finances' && (
              <div style={{ background: 'white', padding: '18px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)', border: '1px solid #f1f5f9' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '10px' }}>
                    <h2 style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '800', margin: 0 }}>📊 {isHebrew ? 'הוצאות והכנסות ודוחות עסק' : 'Finances & Reports'}</h2>
@@ -3176,7 +3282,13 @@ export default function Dashboard() {
                                 </td>
                                 <td style={{ padding: '8px 6px', color: '#64748b' }}>{exp.expense_date}</td>
                                 <td style={{ padding: '8px 6px', color: '#ef4444', fontWeight: '400' }}>{sym}{formatNum(exp.amount)}</td>
-                                <td style={{ padding: '8px 6px' }}>
+                                <td style={{ padding: '8px 6px', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                  <button 
+                                    onClick={() => setEditingExpense(exp)}
+                                    style={{ background: '#e0e7ff', color: '#4f46e5', border: 'none', padding: '3px 6px', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '0.65rem' }}
+                                  >
+                                    {isHebrew ? 'ערוך' : 'Edit'}
+                                  </button>
                                   <button 
                                     onClick={() => handleDeleteExpense(exp.id)}
                                     style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '3px 6px', borderRadius: '4px', cursor: 'pointer', fontWeight: '400', fontSize: '0.65rem' }}
@@ -3367,6 +3479,10 @@ export default function Dashboard() {
         <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>⚙️</span>
           {isHebrew ? 'הגדרות' : 'Settings'}
+        </button>
+        <button onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'finances' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
+          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>📊</span>
+          {isHebrew ? 'הוצאות' : 'Finances'}
         </button>
         <button onClick={() => { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>➕</span>
