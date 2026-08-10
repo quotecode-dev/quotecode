@@ -5,7 +5,18 @@ export default function AIChatWidget({ isHebrew }) {
   const [messages, setMessages] = useState(() => {
     try {
       const saved = sessionStorage.getItem('proflow_ai_chat');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.length > 0) {
+          // עדכון הודעת הפתיחה הראשונה לפי השפה הנוכחית אם היא הודעת מערכת ראשונית
+          if (parsed[0].role === 'assistant') {
+            parsed[0].content = isHebrew 
+              ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' 
+              : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?';
+          }
+          return parsed;
+        }
+      }
     } catch (e) {}
     return [
       { role: 'assistant', content: isHebrew ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?' }
@@ -166,9 +177,10 @@ export default function AIChatWidget({ isHebrew }) {
                 fontSize: '0.85rem',
                 boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                 border: msg.role === 'assistant' ? '1px solid #e2e8f0' : 'none',
-                lineHeight: '1.4'
+                lineHeight: '1.4',
+                textAlign: isHebrew ? 'right' : 'left'
               }}>
-                {msg.content}
+                {idx === 0 ? (isHebrew ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?') : msg.content}
               </div>
             ))}
             {loading && (
@@ -185,7 +197,7 @@ export default function AIChatWidget({ isHebrew }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={isHebrew ? 'שאל משהו על ממשק המערכת...' : 'Ask about the interface...'}
-              style={{ flex: 1, padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
+              style={{ flex: 1, padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', outline: 'none', textAlign: isHebrew ? 'right' : 'left' }}
             />
             <button
               type="submit"
