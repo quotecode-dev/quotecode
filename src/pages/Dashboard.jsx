@@ -1117,9 +1117,9 @@ export default function Dashboard() {
     });
     setResetLoading(false);
     if (error) {
-      setResetMsg('שגיאה: ' + error.message);
+      setResetMsg(isHebrew ? 'שגיאה: ' + error.message : 'Error: ' + error.message);
     } else {
-      setResetMsg('קישור לשחזור סיסמה נשלח בהצלחה למייל שלך!');
+      setResetMsg(isHebrew ? 'קישור לשחזור סיסמה נשלח בהצלחה למייל שלך!' : 'Password recovery link sent successfully to your email!');
       setTimeout(() => {
         setForgotOpen(false);
         setResetMsg('');
@@ -1135,9 +1135,9 @@ export default function Dashboard() {
     const { error } = await supabase.auth.updateUser({ password: newPasswordInput });
     setRecoveryUpdateLoading(false);
     if (error) {
-      setRecoveryUpdateMsg('שגיאה בעדכון הסיסמה: ' + error.message);
+      setRecoveryUpdateMsg(isHebrew ? 'שגיאה בעדכון הסיסמה: ' + error.message : 'Error updating password: ' + error.message);
     } else {
-      setRecoveryUpdateMsg('הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...');
+      setRecoveryUpdateMsg(isHebrew ? 'הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...' : 'Password updated successfully! Redirecting...');
       setTimeout(() => {
         setIsPasswordRecoveryMode(false);
         window.location.href = window.location.origin;
@@ -1642,7 +1642,7 @@ export default function Dashboard() {
       let quoteId;
 
       if (editingQuoteId) {
-        const { error: updateError } = await supabase.from('quotes').update(quotePayload).eq('id', editingQuoteId);
+        const { error: updateError } = await supabase.app('quotes').update(quotePayload).eq('id', editingQuoteId);
         if (updateError) throw updateError;
         quoteId = editingQuoteId;
         await supabase.from('quote_items').delete().eq('quote_id', quoteId);
@@ -1801,13 +1801,13 @@ export default function Dashboard() {
 
   if (isPasswordRecoveryMode) {
     return (
-      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir="rtl">
+      <div style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
         <div style={{ background: 'white', padding: '30px', borderRadius: '14px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', width: '100%', maxWidth: '380px', textAlign: 'center' }}>
-          <h2 style={{ color: '#0f172a', marginBottom: '12px', fontWeight: '800' }}>איפוס סיסמה חדשה</h2>
-          <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '18px' }}>הזן את הסיסמה החדשה שלך לחשבון</p>
+          <h2 style={{ color: '#0f172a', marginBottom: '12px', fontWeight: '800' }}>{isHebrew ? 'איפוס סיסמה חדשה' : 'Set New Password'}</h2>
+          <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '18px' }}>{isHebrew ? 'הזן את הסיסמה החדשה שלך לחשבון' : 'Enter your new account password'}</p>
           
           {recoveryUpdateMsg && (
-            <div style={{ padding: '8px', borderRadius: '6px', marginBottom: '12px', fontSize: '0.8rem', background: recoveryUpdateMsg.includes('שגיאה') ? '#fee2e2' : '#dcfce7', color: recoveryUpdateMsg.includes('שגיאה') ? '#991b1b' : '#166534', fontWeight: 'bold' }}>
+            <div style={{ padding: '8px', borderRadius: '6px', marginBottom: '12px', fontSize: '0.8rem', background: recoveryUpdateMsg.includes('שגיאה') || recoveryUpdateMsg.includes('Error') ? '#fee2e2' : '#dcfce7', color: recoveryUpdateMsg.includes('שגיאה') || recoveryUpdateMsg.includes('Error') ? '#991b1b' : '#166534', fontWeight: 'bold' }}>
               {recoveryUpdateMsg}
             </div>
           )}
@@ -1817,12 +1817,12 @@ export default function Dashboard() {
               type="password" 
               value={newPasswordInput} 
               onChange={(e) => setNewPasswordInput(e.target.value)} 
-              placeholder="סיסמה חדשה" 
+              placeholder={isHebrew ? 'סיסמה חדשה' : 'New password'} 
               required 
-              style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', marginBottom: '12px', fontSize: '0.95rem', direction: 'rtl', textAlign: 'right' }} 
+              style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', marginBottom: '12px', fontSize: '0.95rem', direction: isHebrew ? 'rtl' : 'ltr', textAlign: isHebrew ? 'right' : 'left' }} 
             />
             <button type="submit" disabled={recoveryUpdateLoading} style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer' }}>
-              {recoveryUpdateLoading ? 'מעדכן...' : 'עדכן סיסמה ושמור'}
+              {recoveryUpdateLoading ? (isHebrew ? 'מעדכן...' : 'Updating...') : (isHebrew ? 'עדכן סיסמה ושמור' : 'Update Password & Save')}
             </button>
           </form>
         </div>
@@ -1921,11 +1921,11 @@ export default function Dashboard() {
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isLoginHebrew ? 'rtl' : 'ltr'}>
             <div style={{ background: 'white', padding: '24px', borderRadius: '14px', width: '100%', maxWidth: '380px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)', textAlign: 'center', position: 'relative' }}>
               <button onClick={() => setForgotOpen(false)} style={{ position: 'absolute', top: '14px', [isLoginHebrew ? 'left' : 'right']: '14px', background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕</button>
-              <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.2rem', marginBottom: '8px', fontWeight: '800' }}>איפוס סיסמה חדשה</h3>
-              <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '16px' }}>הזן את כתובת האימייל שלך לחשבון</p>
+              <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.2rem', marginBottom: '8px', fontWeight: '800' }}>{isLoginHebrew ? 'איפוס סיסמה חדשה' : 'Password Recovery'}</h3>
+              <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '16px' }}>{isLoginHebrew ? 'הזן את כתובת האימייל שלך לחשבון' : 'Enter your email address to recover your password'}</p>
               
               {resetMsg && (
-                <div style={{ padding: '8px', borderRadius: '6px', marginBottom: '12px', fontSize: '0.8rem', background: resetMsg.includes('שגיאה') ? '#fee2e2' : '#dcfce7', color: resetMsg.includes('שגיאה') ? '#991b1b' : '#166534', fontWeight: 'bold' }}>
+                <div style={{ padding: '8px', borderRadius: '6px', marginBottom: '12px', fontSize: '0.8rem', background: resetMsg.includes('שגיאה') || resetMsg.includes('Error') ? '#fee2e2' : '#dcfce7', color: resetMsg.includes('שגיאה') || resetMsg.includes('Error') ? '#991b1b' : '#166534', fontWeight: 'bold' }}>
                   {resetMsg}
                 </div>
               )}
@@ -1940,7 +1940,7 @@ export default function Dashboard() {
                   style={{ width: '100%', padding: '9px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', marginBottom: '12px', direction: 'ltr', textAlign: 'left', fontSize: '0.9rem' }} 
                 />
                 <button type="submit" disabled={resetLoading} style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer' }}>
-                  {resetLoading ? 'שולח...' : 'עדכן סיסמה ושמור'}
+                  {resetLoading ? (isLoginHebrew ? 'שולח...' : 'Sending...') : (isLoginHebrew ? 'עדכן סיסמה ושמור' : 'Send Recovery Link')}
                 </button>
               </form>
             </div>
@@ -2546,7 +2546,7 @@ export default function Dashboard() {
                     required 
                     style={{ flex: '1 1 80px', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', fontSize: '0.8rem', background: '#f8fafc' }} 
                   />
-                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '7px 14px', borderRadius: '6px', fontWeight: '600', cursor: 'pointer', fontSize: '0.8rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
+                  <button type="submit" style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '7px 14px', borderRadius: '6px', fontWeight: '600', fontSize: '0.8rem', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
                     {t.addService}
                   </button>
                 </form>
