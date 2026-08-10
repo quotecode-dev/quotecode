@@ -28,25 +28,45 @@ function PublicTools() {
     setToCurrency(temp);
   };
 
-  // Units state
+  // Units state with Swap support and full unit list
   const [unitValue, setUnitValue] = useState('1');
-  const [unitType, setUnitType] = useState('m_to_ft');
+  const [fromUnit, setFromUnit] = useState('m');
+  const [toUnit, setToUnit] = useState('ft');
+
+  const unitFactors = {
+    m: 1,
+    ft: 0.3048,
+    km: 1000,
+    mi: 1609.344,
+    cm: 0.01,
+    in: 0.0254
+  };
+
+  const unitLabels = {
+    m: 'מטר',
+    ft: 'פיט (רגל)',
+    km: 'קילומטר',
+    mi: 'מייל',
+    cm: 'סנטימטר',
+    in: 'אינץ\''
+  };
 
   const convertUnits = () => {
     const val = parseFloat(unitValue) || 0;
-    switch (unitType) {
-      case 'm_to_ft': return (val * 3.28084).toFixed(2) + ' פיט (רגליים)';
-      case 'ft_to_m': return (val / 3.28084).toFixed(2) + ' מטר';
-      case 'km_to_mi': return (val * 0.621371).toFixed(2) + ' מייל';
-      case 'mi_to_km': return (val / 0.621371).toFixed(2) + ' קילומטר';
-      case 'cm_to_in': return (val * 0.393701).toFixed(2) + ' אינץ\'';
-      default: return val;
-    }
+    const inMeters = val * unitFactors[fromUnit];
+    const result = inMeters / unitFactors[toUnit];
+    return result.toFixed(2);
+  };
+
+  const handleSwapUnits = () => {
+    const temp = fromUnit;
+    setFromUnit(toUnit);
+    setToUnit(temp);
   };
 
   // Metals state (Gold & Silver purity tiers)
   const [metalType, setMetalType] = useState('gold'); // 'gold' or 'silver'
-  const [purity, setPurity] = useState('24k'); // gold: 24k, 22k, 21k, 18k, 14k | silver: 999, 925, 800
+  const [purity, setPurity] = useState('24k'); 
   const [metalGrams, setMetalGrams] = useState('10');
 
   const baseGoldPricePerGramILS = 276; 
@@ -198,36 +218,61 @@ function PublicTools() {
             {activeTab === 'units' && (
               <div>
                 <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#1e293b' }}>המרת יחידות מידה ומרחקים</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '15px', alignItems: 'flex-end', marginBottom: '20px' }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>ערך להמרה:</label>
-                    <input
-                      type="number"
-                      value={unitValue}
-                      onChange={(e) => setUnitValue(e.target.value)}
-                      style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none' }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>סוג המרה:</label>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>מידת מקור:</label>
                     <select
-                      value={unitType}
-                      onChange={(e) => setUnitType(e.target.value)}
+                      value={fromUnit}
+                      onChange={(e) => setFromUnit(e.target.value)}
                       style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
                     >
-                      <option value="m_to_ft">מטר ➔ פיט (רגל)</option>
-                      <option value="ft_to_m">פיט (רגל) ➔ מטר</option>
-                      <option value="km_to_mi">קילומטר ➔ מייל</option>
-                      <option value="mi_to_km">מייל ➔ קילומטר</option>
-                      <option value="cm_to_in">סנטימטר ➔ אינץ'</option>
+                      {Object.entries(unitLabels).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
                     </select>
                   </div>
+
+                  {/* Swap Button for Units */}
+                  <button
+                    onClick={handleSwapUnits}
+                    title="החלף יחידות (SWAP)"
+                    style={{
+                      background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', width: '46px', height: '46px',
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', transition: 'all 0.2s'
+                    }}
+                  >
+                    ⇄
+                  </button>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>מידת יעד:</label>
+                    <select
+                      value={toUnit}
+                      onChange={(e) => setToUnit(e.target.value)}
+                      style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', background: 'white' }}
+                    >
+                      {Object.entries(unitLabels).map(([key, label]) => (
+                        <option key={key} value={key}>{label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: '25px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>ערך להמרה ({unitLabels[fromUnit]}):</label>
+                  <input
+                    type="number"
+                    value={unitValue}
+                    onChange={(e) => setUnitValue(e.target.value)}
+                    style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '1rem', outline: 'none', boxSizing: 'border-box' }}
+                  />
                 </div>
 
                 <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
                   <div style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '5px' }}>תוצאה:</div>
                   <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#4f46e5' }}>
-                    {convertUnits()}
+                    {convertUnits()} {unitLabels[toUnit]}
                   </div>
                 </div>
               </div>
