@@ -1716,7 +1716,7 @@ export default function Dashboard() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              {isSuperAdmin && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.65rem', fontWeight: 'bold', padding: '3px 6px', borderRadius: '4px' }}>SUPER ADMIN</span>}
+              {isSuperAdmin && <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.65rem', fontWeight: 'bold', padding: '3px 6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>👑 SUPER ADMIN</span>}
               <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{session.user.email}</span>
               <button onClick={handleSignOut} style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '5px 8px', borderRadius: '5px', cursor: 'pointer', fontWeight: '600', fontSize: '0.75rem' }}>Sign Out</button>
             </div>
@@ -1737,7 +1737,7 @@ export default function Dashboard() {
 
           {trialEndsAt && !isTrialExpired && !isSuperAdmin && !isExpiringSoon && (
             <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '8px 12px', borderRadius: '6px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '8px', fontSize: '0.8rem' }}>
-              <span>{isHebrew ? '🚀 תקופת ניסיון פעילה (כולל כל פיצ\'רי ה-PRO)' : '🚀 Active Trial Period (Full PRO Access)'}</span>
+              <span>🚀 {isHebrew ? 'תקופת ניסיון פעילה (כולל כל פיצ\'רי ה-PRO)' : 'Active Trial Period (Full PRO Access)'}</span>
               <span>{isHebrew ? `תקופת הניסיון שלך עומדת לפוג בעוד ${trialDaysLeft} ימים` : `Your trial period expires in ${trialDaysLeft} days`}</span>
             </div>
           )}
@@ -2289,7 +2289,7 @@ export default function Dashboard() {
                                 style={{ background: '#e0e7ff', color: '#4f46e5', border: 'none', padding: '5px 8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
                                 title={isHebrew ? 'הצג פרטי משתמש מלאים' : 'View User Details'}
                               >
-                                ℹ️ {isHebrew ? 'פרטים' : 'Details'}
+                                📋 {isHebrew ? 'פרטים' : 'Details'}
                               </button>
                             </td>
                           </tr>

@@ -36,6 +36,19 @@ export default function QuoteForm({
   handleItemChange,
   handleAddFromCatalog
 }) {
+  const handleClientSelect = (e) => {
+    const val = e.target.value;
+    setClientName(val);
+    const found = clients.find(c => c.company_name?.toLowerCase() === val.toLowerCase());
+    if (found) {
+      setClientEmail(found.email || '');
+      setClientPhone(found.phone || '');
+      setClientType(found.client_type || '');
+      setClientTaxId(found.tax_id || '');
+      setClientAddress(found.address || '');
+    }
+  };
+
   return (
     <div style={{ background: 'white', padding: '16px', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)', marginBottom: '20px', border: editingQuoteId ? '2px solid #4f46e5' : '1px solid #f1f5f9' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '8px' }}>
@@ -63,7 +76,7 @@ export default function QuoteForm({
             <input 
               type="text" 
               value={clientName} 
-              onChange={(e) => setClientName(e.target.value)} 
+              onChange={handleClientSelect} 
               list="existing-clients-list"
               placeholder="e.g. Acme Corp" 
               required 
