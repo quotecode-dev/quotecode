@@ -89,7 +89,7 @@ export default function AIChatWidget({ isHebrew }) {
           { label: '👥 ניהול וצפייה בספר הלקוחות (CRM)', action: 'manage_clients' },
           { label: '➕ יצירת הצעת מחיר חדשה ללקוח', action: 'new_quote' }
         ];
-      } else if (lower.includes('שולח') && lower.includes('הצעה') && lower.includes('מייל')) {
+      } else if (lower.includes('שליחת הצעת מחיר במייל') || lower.includes('שולח') && lower.includes('הצעה') && lower.includes('מייל')) {
         reply = 'כדי לשלוח הצעת מחיר במייל ללקוח: פתח את תפריט "פעולות ▼" בשורת ההצעה המבוקשת ובחר באפשרות "שלח במייל". המערכת תשלח את ההצעה אוטומטית לכתובת המייל של הלקוח דרך השרת שלנו (info@quotecodepro.com).';
       } else if (lower.includes('קשר') || lower.includes('פנייה') || lower.includes('לפנות') || lower.includes('אימייל של שירות') || lower.includes('מייל של שירות') || lower.includes('מה האימייל') || lower.includes('כתובת מייל') || lower.includes('שירות לקוחות') || lower.includes('תמיכה') || lower.includes('support')) {
         reply = 'ניתן ליצור איתנו קשר ישירות דרך כתובת האימייל של שירות הלקוחות: info@quotecodepro.com, או להמשיך לקבל מענה מיידי וזמין 24/7 כאן בעוזר ה-AI. לידיעתך, הפעילות שלנו מתנהלת באופן דיגיטלי בענן ללא קבלת קהל פיזית במשרדים.';
