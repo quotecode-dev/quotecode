@@ -69,16 +69,15 @@ export default function AIChatWidget({ isHebrew }) {
       const lower = userMsg.toLowerCase();
 
       if (isHebrew) {
-        if (lower.includes('קטלוג') || lower.includes('מוצר') || lower.includes('שירות') || lower.includes('פריט') || lower.includes('להוסיף')) {
+        // בדיקת יצירת קשר ושירות לקוחות בראש הרשימה כדי שלא יתפספס
+        if (lower.includes('קשר') || lower.includes('לפנות') || lower.includes('פנייה') || lower.includes('אימייל') || lower.includes('מייל') || lower.includes('שירות לקוחות') || lower.includes('תמיכה') || lower.includes('support')) {
+          reply = 'ניתן ליצור איתנו קשר ישירות דרך כתובת האימייל של שירות הלקוחות, או להמשיך לקבל מענה מיידי וזמין 24/7 כאן בעוזר ה-AI. לידיעתך, הפעילות שלנו מתנהלת באופן דיגיטלי בענן ללא קבלת קהל פיזית במשרדים.';
+        } else if (lower.includes('קטלוג') || lower.includes('מוצר') || lower.includes('שירות') || lower.includes('פריט') || lower.includes('להוסיף')) {
           reply = 'כדי להוסיף מוצר או שירות לקטלוג: גלול למטה בטאב "הצעות מחיר" הראשי אל טבלת "קטלוג שירותים ומוצרים". הזן בשדה הייעודי את שם השירות/המוצר ואת המחיר הקבוע שלו, ולחץ על כפתור "הוסף לקטלוג". לאחר מכן תוכל לבחור אותו בלחיצה מהירה מתוך רשימת הקטלוג בעת יצירת הצעת מחיר!';
         } else if (lower.includes('פעולות') || lower.includes('תפריט') || lower.includes('כפתור') || lower.includes('צפה') || lower.includes('עריכה')) {
           reply = 'בכל שורה של הצעת מחיר בטבלה ישנו כפתור "פעולות ▼" מצד שמאל. בלחיצה עליו נפתח תפריט המאפשר לך: לצפות במסמך (👁️), לערוך אותו (✏️), לשכפל (📋), לשלוח בוואטסאפ או במייל, או למחוק את ההצעה.';
         } else if (lower.includes('סיכום') || lower.includes('הזמנות') || lower.includes('רשימה') || lower.includes('היסטוריה') || lower.includes('טבלה')) {
           reply = 'את סיכום כל ההצעות וההזמנות ניתן לראות בטאב "הצעות מחיר" הראשי. הטבלה מציגה את מספר ההזמנה, שם הלקוח, תיאור הפריט הראשון, הסכום הכולל, תאריך היצירה, סטטוס העסק (טיוטה, נשלח, אושר, שולם) ומספר צפיות אמיתיות של לקוחות (👁️).';
-        } else if (lower.includes('יצירת קשר') || lower.includes('לפנות') || lower.includes('דבר איתנו') || lower.includes('support') || (lower.includes('מייל') && (lower.includes('אליכם') || lower.includes('חברה') || lower.includes('תמיכה') || lower.includes('יכול')))) {
-          reply = 'ניתן ליצור איתנו קשר ישירות דרך כתובת האימייל הרשמית של שירות הלקוחות שלנו, או להמשיך לקבל מענה מיידי וזמין 24/7 כאן בעוזר ה-AI. לידיעתך, הפעילות שלנו מתנהלת באופן דיגיטלי בענן ללא קבלת קהל פיזית במשרדים.';
-        } else if (lower.includes('שליחת הצעת מחיר במייל') || (lower.includes('מייל') && lower.includes('הצעה'))) {
-          reply = 'כדי לשלוח הצעת מחיר במייל ללקוח: פתח את תפריט "פעולות ▼" בשורת ההצעה המבוקשת ובחר באפשרות "שלח במייל". המערכת תשלח את ההצעה אוטומטית לכתובת המייל של הלקוח דרך השרת.';
         } else if (lower.includes('הצעה') || lower.includes('חדשה') || lower.includes('ליצור') || lower.includes('הפקת')) {
           reply = 'כדי ליצור הצעת מחיר חדשה לחץ על כפתור "➕ צור הצעת מחיר חדשה" בראש הדשבורד. מלא את פרטי הלקוח, בחר את סוג הלקוח (עסקי או פרטי), הוסף פריטים (ידנית או מהקטלוג) ולחיצה על "הפק ושמור בענן" תשמור את ההצעה.';
         } else if (lower.includes('לקוח') || lower.includes('crm') || lower.includes('ח.פ')) {
@@ -99,16 +98,14 @@ export default function AIChatWidget({ isHebrew }) {
           reply = 'מערכת ProFlow מספקת ניהול עסק חכם, הצעות מחיר, קטלוג מוצרים ושירותים, חתימות דיגיטליות, ניהול אזורי פעילות LCL/Intl ודוחות פיננסיים. שאל אותי למשל על: הוספת מוצר לקטלוג, יצירת הצעת מחיר, ניהול לקוחות או יצירת קשר!';
         }
       } else {
-        if (lower.includes('catalog') || lower.includes('product') || lower.includes('service') || lower.includes('item') || lower.includes('add')) {
+        if (lower.includes('contact') || lower.includes('reach out') || lower.includes('support') || lower.includes('email') || lower.includes('mail')) {
+          reply = 'You can contact our support team directly via email, or continue getting immediate 24/7 assistance right here through the AI assistant. Please note that ProFlow operates as a fully digital cloud platform without public walk-in offices.';
+        } else if (lower.includes('catalog') || lower.includes('product') || lower.includes('service') || lower.includes('item') || lower.includes('add')) {
           reply = 'To add a product or service to the catalog: scroll down on the main "Quotes" tab to the "Services & Products Catalog" section. Enter the service name and fixed price, then click "Add to Catalog". You can then quickly select it when building quotes!';
         } else if (lower.includes('action') || lower.includes('menu') || lower.includes('button') || lower.includes('view')) {
           reply = 'In the quotes table, click the "Actions ▼" button on any row to open a menu where you can view, edit, duplicate, WhatsApp/email, or delete the quote.';
         } else if (lower.includes('quote') || lower.includes('create')) {
           reply = 'To create a new quote, click "Create New Quote" at the top of your dashboard, fill in client details, add items, and click generate.';
-        } else if (lower.includes('contact') || lower.includes('reach out') || lower.includes('support') || (lower.includes('email') && (lower.includes('you') || lower.includes('company') || lower.includes('can')))) {
-          reply = 'You can contact our support team directly via email, or continue getting immediate 24/7 assistance right here through the AI assistant. Please note that ProFlow operates as a fully digital cloud platform without public walk-in offices.';
-        } else if (lower.includes('send') && lower.includes('email')) {
-          reply = 'To send a quote via email to your client, click the "Actions ▼" menu on the quote row and select "Send Email".';
         } else if (lower.includes('client') || lower.includes('crm')) {
           reply = 'In the "Clients" tab you can manage your complete client database, tax IDs, contact details, and custom notes.';
         } else if (lower.includes('whatsapp')) {
