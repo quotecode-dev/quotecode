@@ -61,12 +61,34 @@ export default function AIChatWidget({ isHebrew }) {
     let options = null;
 
     if (isHebrew) {
-      // זיהוי שאלה אמביוולנטית שדורשת הבהרה (כמו סתם "מייל" או "אימייל")
+      // זיהוי שאלות דו-משמעיות או כלליות הדורשות הבהרה עם תפריט בחירה
       if (lower === 'מייל' || lower === 'אימייל' || lower === 'email' || lower === 'e-mail') {
         reply = 'האם אתה מתכוון ליצירת קשר עם שירות הלקוחות, או לשליחת הצעת מחיר במייל ללקוח?';
         options = [
           { label: '📞 יצירת קשר עם שירות הלקוחות', action: 'contact_support' },
           { label: '📄 שליחת הצעת מחיר במייל', action: 'send_quote_email' }
+        ];
+      } else if (lower === 'עריכה' || lower === 'לערוך' || lower === 'שינוי' || lower === 'edit') {
+        reply = 'למה אתה מתכוון כשאתה אומר עריכה? בחר את האפשרות המתאימה:';
+        options = [
+          { label: '✏️ עריכת הצעת מחיר קיימת', action: 'edit_quote' },
+          { label: '👥 עריכת פרטי לקוח (CRM)', action: 'edit_client' },
+          { label: '📦 עריכת שירות/מוצר בקטלוג', action: 'edit_catalog' },
+          { label: '⚙️ עריכת הגדרות עסק', action: 'edit_settings' }
+        ];
+      } else if (lower === 'מחיקה' || lower === 'למחוק' || lower === 'delete' || lower === 'remove') {
+        reply = 'מה ברצונך למחוק? בחר את האפשרות הרצויה:';
+        options = [
+          { label: '🗑️ מחיקת הצעת מחיר', action: 'delete_quote' },
+          { label: '👥 מחיקת לקוח מספר הלקוחות', action: 'delete_client' },
+          { label: '📦 מחיקת שירות מהקטלוג', action: 'delete_catalog' },
+          { label: '📊 מחיקת הוצאה מהדוחות', action: 'delete_expense' }
+        ];
+      } else if (lower === 'לקוח' || lower === 'לקוחות' || lower === 'client') {
+        reply = 'האם אתה מתכוון לניהול ספר הלקוחות או ליצירת הצעה ללקוח חדש?';
+        options = [
+          { label: '👥 ניהול וצפייה בספר הלקוחות (CRM)', action: 'manage_clients' },
+          { label: '➕ יצירת הצעת מחיר חדשה ללקוח', action: 'new_quote' }
         ];
       } else if (lower.includes('שולח') && lower.includes('הצעה') && lower.includes('מייל')) {
         reply = 'כדי לשלוח הצעת מחיר במייל ללקוח: פתח את תפריט "פעולות ▼" בשורת ההצעה המבוקשת ובחר באפשרות "שלח במייל". המערכת תשלח את ההצעה אוטומטית לכתובת המייל של הלקוח דרך השרת שלנו (info@quotecodepro.com).';
@@ -74,14 +96,12 @@ export default function AIChatWidget({ isHebrew }) {
         reply = 'ניתן ליצור איתנו קשר ישירות דרך כתובת האימייל של שירות הלקוחות: info@quotecodepro.com, או להמשיך לקבל מענה מיידי וזמין 24/7 כאן בעוזר ה-AI. לידיעתך, הפעילות שלנו מתנהלת באופן דיגיטלי בענן ללא קבלת קהל פיזית במשרדים.';
       } else if (lower.includes('קטלוג') || lower.includes('מוצר') || lower.includes('שירות') || lower.includes('פריט') || lower.includes('להוסיף')) {
         reply = 'כדי להוסיף מוצר או שירות לקטלוג: גלול למטה בטאב "הצעות מחיר" הראשי אל טבלת "קטלוג שירותים ומוצרים". הזן בשדה הייעודי את שם השירות/המוצר ואת המחיר הקבוע שלו, ולחץ על כפתור "הוסף לקטלוג". לאחר מכן תוכל לבחור אותו בלחיצה מהירה מתוך רשימת הקטלוג בעת יצירת הצעת מחיר!';
-      } else if (lower.includes('פעולות') || lower.includes('תפריט') || lower.includes('כפתור') || lower.includes('צפה') || lower.includes('עריכה')) {
+      } else if (lower.includes('פעולות') || lower.includes('תפריט') || lower.includes('כפתור') || lower.includes('צפה')) {
         reply = 'בכל שורה של הצעת מחיר בטבלה ישנו כפתור "פעולות ▼" מצד שמאל. בלחיצה עליו נפתח תפריט המאפשר לך: לצפות במסמך (👁️), לערוך אותו (✏️), לשכפל (📋), לשלוח בוואטסאפ או במייל, או למחוק את ההצעה.';
       } else if (lower.includes('סיכום') || lower.includes('הזמנות') || lower.includes('רשימה') || lower.includes('היסטוריה') || lower.includes('טבלה')) {
         reply = 'את סיכום כל ההצעות וההזמנות ניתן לראות בטאב "הצעות מחיר" הראשי. הטבלה מציגה את מספר ההזמנה, שם הלקוח, תיאור הפריט הראשון, הסכום הכולל, תאריך היצירה, סטטוס העסק (טיוטה, נשלח, אושר, שולם) ומספר צפיות אמיתיות של לקוחות (👁️).';
       } else if (lower.includes('הצעה') || lower.includes('חדשה') || lower.includes('ליצור') || lower.includes('הפקת')) {
         reply = 'כדי ליצור הצעת מחיר חדשה לחץ על כפתור "➕ צור הצעת מחיר חדשה" בראש הדשבורד. מלא את פרטי הלקוח, בחר את סוג הלקוח (עסקי או פרטי), הוסף פריטים (ידנית או מהקטלוג) ולחיצה על "הפק ושמור בענן" תשמור את ההצעה.';
-      } else if (lower.includes('לקוח') || lower.includes('crm') || lower.includes('ח.פ')) {
-        reply = 'בטאב "לקוחות" תוכל לנהל את ספר הלקוחות המלא שלך. שם מופיעים שם החברה, ח.פ / ת.ז, אימייל, טלפון, כתובת, והערות או הנחיות מיוחדות לכל לקוח.';
       } else if (lower.includes('וואטסאפ') || lower.includes('whatsapp') || lower.includes('וואט סאפ'))  {
         reply = 'שליחת הצעת מחיר ישירות בוואטסאפ מתבצעת דרך תפריט "פעולות ▼" בשורת ההצעה (פיצ\'ר בלעדי למנויי PRO) המייצר הודעה מוכנה עם לינק ישיר ללקוח.';
       } else if (lower.includes('מע"מ') || lower.includes('vat') || lower.includes('מס')) {
@@ -104,6 +124,28 @@ export default function AIChatWidget({ isHebrew }) {
           { label: '📞 Contact Support', action: 'contact_support' },
           { label: '📄 Send Quote via Email', action: 'send_quote_email' }
         ];
+      } else if (lower === 'edit' || lower === 'change' || lower === 'modify') {
+        reply = 'What would you like to edit? Please select an option:';
+        options = [
+          { label: '✏️ Edit an existing quote', action: 'edit_quote' },
+          { label: '👥 Edit client details (CRM)', action: 'edit_client' },
+          { label: '📦 Edit catalog service/product', action: 'edit_catalog' },
+          { label: '⚙️ Edit business settings', action: 'edit_settings' }
+        ];
+      } else if (lower === 'delete' || lower === 'remove') {
+        reply = 'What would you like to delete? Please select an option:';
+        options = [
+          { label: '🗑️ Delete a quote', action: 'delete_quote' },
+          { label: '👥 Delete a client', action: 'delete_client' },
+          { label: '📦 Delete a catalog item', action: 'delete_catalog' },
+          { label: '📊 Delete an expense', action: 'delete_expense' }
+        ];
+      } else if (lower === 'client' || lower === 'clients') {
+        reply = 'Are you referring to managing your client database or creating a new quote for a client?';
+        options = [
+          { label: '👥 Manage Clients Database (CRM)', action: 'manage_clients' },
+          { label: '➕ Create New Quote for Client', action: 'new_quote' }
+        ];
       } else if (lower.includes('send') && lower.includes('quote') && lower.includes('email')) {
         reply = 'To send a quote via email to your client, click the "Actions ▼" menu on the quote row and select "Send Email" (sent via info@quotecodepro.com).';
       } else if (lower.includes('support') || lower.includes('email') || lower.includes('contact') || lower.includes('reach out')) {
@@ -114,8 +156,6 @@ export default function AIChatWidget({ isHebrew }) {
         reply = 'In the quotes table, click the "Actions ▼" button on any row to open a menu where you can view, edit, duplicate, WhatsApp/email, or delete the quote.';
       } else if (lower.includes('quote') || lower.includes('create')) {
         reply = 'To create a new quote, click "Create New Quote" at the top of your dashboard, fill in client details, add items, and click generate.';
-      } else if (lower.includes('client') || lower.includes('crm')) {
-        reply = 'In the "Clients" tab you can manage your complete client database, tax IDs, contact details, and custom notes.';
       } else if (lower.includes('whatsapp')) {
         reply = 'You can send quotes directly via WhatsApp using the actions menu in your quotes list (PRO feature).';
       } else if (lower.includes('physical') || lower.includes('office') || lower.includes('address') || lower.includes('visit') || lower.includes('meeting') || lower.includes('location') || lower.includes('in-person')) {
@@ -154,6 +194,26 @@ export default function AIChatWidget({ isHebrew }) {
       simulatedQuery = isHebrew ? 'יצירת קשר עם שירות הלקוחות' : 'Contact Support';
     } else if (action === 'send_quote_email') {
       simulatedQuery = isHebrew ? 'שליחת הצעת מחיר במייל' : 'Send Quote via Email';
+    } else if (action === 'edit_quote') {
+      simulatedQuery = isHebrew ? 'עריכת הצעת מחיר' : 'Edit an existing quote';
+    } else if (action === 'edit_client') {
+      simulatedQuery = isHebrew ? 'עריכת פרטי לקוח' : 'Edit client details';
+    } else if (action === 'edit_catalog') {
+      simulatedQuery = isHebrew ? 'עריכת שירות בקטלוג' : 'Edit catalog service';
+    } else if (action === 'edit_settings') {
+      simulatedQuery = isHebrew ? 'עריכת הגדרות עסק' : 'Edit business settings';
+    } else if (action === 'delete_quote') {
+      simulatedQuery = isHebrew ? 'מחיקת הצעת מחיר' : 'Delete a quote';
+    } else if (action === 'delete_client') {
+      simulatedQuery = isHebrew ? 'מחיקת לקוח' : 'Delete a client';
+    } else if (action === 'delete_catalog') {
+      simulatedQuery = isHebrew ? 'מחיקת שירות מהקטלוג' : 'Delete a catalog item';
+    } else if (action === 'delete_expense') {
+      simulatedQuery = isHebrew ? 'מחיקת הוצאה' : 'Delete an expense';
+    } else if (action === 'manage_clients') {
+      simulatedQuery = isHebrew ? 'ניהול ספר לקוחות' : 'Manage Clients Database';
+    } else if (action === 'new_quote') {
+      simulatedQuery = isHebrew ? 'יצירת הצעת מחיר חדשה' : 'Create New Quote';
     }
 
     setMessages(prev => [...prev, { role: 'user', content: simulatedQuery }]);
@@ -245,7 +305,6 @@ export default function AIChatWidget({ isHebrew }) {
               }}>
                 {idx === 0 ? (isHebrew ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' : 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?') : msg.content}
                 
-                {/* הצגת כפתורי בחירה אם יש אופציות להבהרה */}
                 {msg.options && msg.options.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
                     {msg.options.map((opt, oIdx) => (
