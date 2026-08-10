@@ -49,7 +49,6 @@ function PublicTools() {
   const [purity, setPurity] = useState('24k'); // gold: 24k, 22k, 21k, 18k, 14k | silver: 999, 925, 800
   const [metalGrams, setMetalGrams] = useState('10');
 
-  // Base base price per gram for pure 24K gold and pure 999 silver in ILS
   const baseGoldPricePerGramILS = 276; 
   const baseSilverPricePerGramILS = 3.2; 
   const usdRate = rates['USD'];
@@ -158,8 +157,6 @@ function PublicTools() {
                       background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '8px', width: '46px', height: '46px',
                       cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', transition: 'all 0.2s'
                     }}
-                    onMouseEnter={(e) => e.target.style.background = '#e2e8f0'}
-                    onMouseLeave={(e) => e.target.style.background = '#f1f5f9'}
                   >
                     ⇄
                   </button>
@@ -240,7 +237,6 @@ function PublicTools() {
               <div>
                 <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', color: '#1e293b' }}>מחשבון שווי זהב וכסף לפי משקל ודרגת טוהר</h2>
                 
-                {/* Metal Type Selector */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
                   <div>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '600' }}>סוג מתכת:</label>
@@ -317,9 +313,6 @@ function PublicTools() {
           <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', color: '#1e293b' }}>כלים מתקדמים לניהול עסק וקשרי מסחר בינלאומיים</h3>
           <p style={{ fontSize: '0.9rem', lineHeight: '1.6', color: '#475569', marginBottom: '15px' }}>
             עסקים, עצמאיים ויבואנים נדרשים יום-יום לבצע חישובים מהירים של שערי מטבע, המרות מידות בעבודה מול ספקים בחו"ל ומעקב אחרי מדדים פיננסיים. מרכז הכלים של ProFlow נועד לרכז עבורכם את כל הפעולות הללו במקום אחד, בצורה מדויקת ומהירה.
-          </p>
-          <p style={{ fontSize: '0.9rem', lineHeight: '1.6', color: '#475569' }}>
-            מתכננים להפיק הצעות מחיר מקצועיות ללקוחות בארץ ובחו"ל במטבעות שונים? גלו את מערכת ניהול העסק המתקדמת של ProFlow.
           </p>
         </section>
 
