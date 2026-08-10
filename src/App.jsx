@@ -4,7 +4,8 @@ import LandingGlobal from './pages/LandingGlobal';
 import LandingLocal from './pages/LandingLocal';
 import Dashboard from './pages/Dashboard';
 import PublicQuote from './pages/PublicQuote';
-import PublicTools from './components/PublicTools'; // <-- הוספנו את הייבוא כאן
+import PublicTools from './components/PublicTools';
+import PublicToolsEn from './components/PublicToolsEn';
 import { supabase } from './supabase';
 import { isHebrewEnv } from './utils/regionConfig';
 
@@ -234,7 +235,8 @@ export default function App() {
         <Route path="/he" element={<LandingLocal />} />
         <Route path="/en" element={<LandingGlobal />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/tools" element={<PublicTools />} /> {/* <-- הוספנו את הניתוב לכלי הציבורי כאן */}
+        <Route path="/tools" element={<PublicTools />} />
+        <Route path="/en/tools" element={<PublicToolsEn />} />
         <Route path="/public-quote/:id" element={<PublicQuote />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
         <Route path="*" element={<LandingGlobal />} />
