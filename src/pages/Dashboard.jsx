@@ -81,18 +81,14 @@ export default function Dashboard() {
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
   
-  // פתרון ברזל למניעת ריצוד ברישום חדש / אינקוגניטו: בדיקה סינכרונית מיידית של שפה ואזור זמן
   const [bizCountry, setBizCountry] = useState(() => {
-    if (typeof window === 'undefined') return 'Local';
+    if (typeof window === 'undefined') return 'International';
     const cached = localStorage.getItem('proflow_cached_country');
     if (cached) return cached;
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const browserLang = navigator.language || navigator.userLanguage || '';
-    const isHebNav = timeZone === 'Asia/Jerusalem' || browserLang.toLowerCase().startsWith('he');
-    return isHebNav ? 'Local' : 'International';
+    return 'International';
   });
 
-  const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_HEB);
+  const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_ENG);
   const [trialEndsAt, setTrialEndsAt] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
@@ -111,7 +107,7 @@ export default function Dashboard() {
   const [editServiceName, setEditServiceName] = useState('');
   const [editServicePrice, setEditServicePrice] = useState('');
 
-  const [currency, setCurrency] = useState('ILS');
+  const [currency, setCurrency] = useState('USD');
 
   function getCurrencySymbol(curr) {
     if (bizCountry === 'International') {
@@ -166,7 +162,7 @@ export default function Dashboard() {
         setServices([]);
         setExpenses([]);
         setSettingId(null);
-        setBizCountry('Local');
+        setBizCountry('International');
         localStorage.removeItem('proflow_cached_country');
         setIsInitializing(false);
       } else if (event === 'PASSWORD_RECOVERY') {
@@ -269,7 +265,7 @@ export default function Dashboard() {
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState('');
-  const [terms, setTerms] = useState(DEFAULT_TERMS_HEB); 
+  const [terms, setTerms] = useState(DEFAULT_TERMS_ENG); 
   const [notes, setNotes] = useState('');
   
   const [items, setItems] = useState([{ description: '', quantity: '', unit_price: '' }]);
@@ -450,7 +446,7 @@ export default function Dashboard() {
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'pro');
       setBizRole(data.role || 'user');
-      const countryVal = data.country || 'Local';
+      const countryVal = data.country || 'International';
       setBizCountry(countryVal);
       localStorage.setItem('proflow_cached_country', countryVal);
       
@@ -475,10 +471,9 @@ export default function Dashboard() {
       const trialEndDate = new Date();
       trialEndDate.setDate(trialEndDate.getDate() + 14);
 
-      const isHebNav = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
-      const detectedCountry = isHebNav ? 'Local' : 'International';
-      const detectedTerms = detectedCountry === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB;
-      const detectedCurr = detectedCountry === 'International' ? 'USD' : 'ILS';
+      const detectedCountry = 'International';
+      const detectedTerms = DEFAULT_TERMS_ENG;
+      const detectedCurr = 'USD';
 
       const defaultPayload = {
         user_id: userId,
@@ -1448,8 +1443,8 @@ export default function Dashboard() {
     }
 
     if (sortField === 'country') {
-      const aValStr = a.country || 'Local';
-      const bValStr = b.country || 'Local';
+      const aValStr = a.country || 'International';
+      const bValStr = b.country || 'International';
       return sortDirection === 'asc' ? aValStr.localeCompare(bValStr) : bValStr.localeCompare(aValStr);
     }
 
@@ -1506,14 +1501,12 @@ export default function Dashboard() {
   }
 
   if (!session) {
-    const searchParams = new URLSearchParams(window.location.search);
-    const urlLang = searchParams.get('lang');
-    const isLoginHebrew = urlLang ? urlLang === 'he' : isHebrew;
-    const loginDir = isLoginHebrew ? 'rtl' : 'ltr';
+    const isLoginHebrew = false;
+    const loginDir = 'ltr';
 
     return (
       <div dir={loginDir} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative' }}>
-        <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '380px', textAlign: isLoginHebrew ? 'right' : 'left' }}>
+        <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', width: '100%', maxWidth: '380px', textAlign: 'left' }}>
           
           <div style={{ textAlign: 'center', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1540,14 +1533,12 @@ export default function Dashboard() {
             </div>
             
             {isSignUp ? (
-              <div dir={isLoginHebrew ? 'rtl' : 'ltr'} style={{ background: 'linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%)', border: '1px solid #c7d2fe', padding: '10px 14px', borderRadius: '8px', marginTop: '14px', marginBottom: '4px', color: '#4f46e5', fontSize: '0.82rem', fontWeight: '700', textAlign: isLoginHebrew ? 'right' : 'left', width: '100%', boxSizing: 'border-box', boxShadow: '0 2px 4px -1px rgba(79, 70, 229, 0.1)', lineHeight: '1.4' }}>
-                {isLoginHebrew 
-                  ? 'לרישום לאתר ולקבלת 14 יום ניסיון ב-PRO מתנה, נא הקלד אימייל וסיסמה.' 
-                  : 'To register and claim your 14-day free PRO trial, please enter your email and password.'}
+              <div dir="ltr" style={{ background: 'linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%)', border: '1px solid #c7d2fe', padding: '10px 14px', borderRadius: '8px', marginTop: '14px', marginBottom: '4px', color: '#4f46e5', fontSize: '0.82rem', fontWeight: '700', textAlign: 'left', width: '100%', boxSizing: 'border-box', boxShadow: '0 2px 4px -1px rgba(79, 70, 229, 0.1)', lineHeight: '1.4' }}>
+                To register and claim your 14-day free PRO trial, please enter your email and password.
               </div>
             ) : (
               <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '10px' }}>
-                {isLoginHebrew ? 'התחברות למערכת הניהול' : 'Sign in to your dashboard'}
+                Sign in to your dashboard
               </p>
             )}
           </div>
@@ -1560,15 +1551,15 @@ export default function Dashboard() {
             <input type="password" name="fake_pass_login" tabIndex="-1" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
 
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isLoginHebrew ? 'אימייל' : 'Email'}</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Email</label>
               <input type="email" name="user_email_field" autoComplete="off" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" data-form-type="other" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} required placeholder="user@example.com" style={{ width: '100%', padding: '9px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#eff6ff', fontSize: '0.9rem' }} />
             </div>
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>{isLoginHebrew ? 'סיסמה' : 'Password'}</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>Password</label>
               <input type="password" name="user_password_field" autoComplete="off" data-lpignore="true" data-bwignore="true" data-1p-ignore data-dashlane-ignore="true" data-form-type="other" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} required placeholder="••••••••" style={{ width: '100%', padding: '9px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#eff6ff', fontSize: '0.9rem' }} />
             </div>
             <button type="submit" style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.95rem', cursor: 'pointer', boxShadow: '0 2px 6px rgba(79, 70, 229, 0.2)' }}>
-              {isLoginHebrew ? (isSignUp ? 'הירשם' : 'התחבר') : (isSignUp ? 'Sign Up' : 'Sign In')}
+              {isSignUp ? 'Sign Up' : 'Sign In'}
             </button>
           </form>
 
@@ -1578,9 +1569,7 @@ export default function Dashboard() {
               onClick={() => setIsSignUp(!isSignUp)}
               style={{ background: 'none', border: 'none', color: '#4f46e5', cursor: 'pointer', fontWeight: '600', padding: 0 }}
             >
-              {isLoginHebrew 
-                ? (isSignUp ? 'יש לך כבר חשבון? התחבר' : 'אין חשבון? הירשם וקבל 14 יום PRO מתנה!') 
-                : (isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up!")}
+              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up!"}
             </button>
             {!isSignUp && (
               <button
@@ -1588,18 +1577,18 @@ export default function Dashboard() {
                 onClick={() => setForgotOpen(true)}
                 style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
               >
-                {isLoginHebrew ? 'שכחת סיסמה?' : 'Forgot password?'}
+                Forgot password?
               </button>
             )}
           </div>
         </div>
 
         {forgotOpen && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isLoginHebrew ? 'rtl' : 'ltr'}>
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir="ltr">
             <div style={{ background: 'white', padding: '24px', borderRadius: '14px', width: '100%', maxWidth: '380px', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.2)', textAlign: 'center', position: 'relative' }}>
-              <button onClick={() => setForgotOpen(false)} style={{ position: 'absolute', top: '14px', [isLoginHebrew ? 'left' : 'right']: '14px', background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕</button>
-              <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.2rem', marginBottom: '8px', fontWeight: '800' }}>{isLoginHebrew ? 'איפוס סיסמה חדשה' : 'Password Recovery'}</h3>
-              <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '16px' }}>{isLoginHebrew ? 'הזן את כתובת האימייל שלך לחשבון' : 'Enter your email address to recover your password'}</p>
+              <button onClick={() => setForgotOpen(false)} style={{ position: 'absolute', top: '14px', right: '14px', background: 'none', border: 'none', fontSize: '1.1rem', cursor: 'pointer', color: '#64748b', fontWeight: 'bold' }}>✕</button>
+              <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.2rem', marginBottom: '8px', fontWeight: '800' }}>Password Recovery</h3>
+              <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '16px' }}>Enter your email address to recover your password</p>
               
               {resetMsg && (
                 <div style={{ padding: '8px', borderRadius: '6px', marginBottom: '12px', fontSize: '0.8rem', background: resetMsg.includes('שגיאה') || resetMsg.includes('Error') ? '#fee2e2' : '#dcfce7', color: resetMsg.includes('שגיאה') || resetMsg.includes('Error') ? '#991b1b' : '#166534', fontWeight: 'bold' }}>
@@ -1617,7 +1606,7 @@ export default function Dashboard() {
                   style={{ width: '100%', padding: '9px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', marginBottom: '12px', direction: 'ltr', textAlign: 'left', fontSize: '0.9rem' }} 
                 />
                 <button type="submit" disabled={resetLoading} style={{ width: '100%', background: '#4f46e5', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: '600', fontSize: '0.9rem', cursor: 'pointer' }}>
-                  {resetLoading ? (isLoginHebrew ? 'שולח...' : 'Sending...') : (isLoginHebrew ? 'עדכן סיסמה ושמור' : 'Send Recovery Link')}
+                  {resetLoading ? 'Sending...' : 'Send Recovery Link'}
                 </button>
               </form>
             </div>
@@ -1730,7 +1719,6 @@ export default function Dashboard() {
             </div>
 
             <div style={{ flex: '0 1 auto', textAlign: 'center', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {/* תיקון קריטי: הפרדה מלאה ע"י ציון isDashboard={true} */}
               <AIChatWidget isHebrew={isHebrew} isDashboard={true} />
               {!isPro && !isSuperAdmin && (
                 <button
@@ -1895,7 +1883,6 @@ export default function Dashboard() {
                 </div>
               )}
 
-              {/* טבלת ההצעות המודולרית החדשה */}
               <QuotesTab
                 quotes={filteredQuotes}
                 searchTerm={searchTerm}
@@ -2126,7 +2113,6 @@ export default function Dashboard() {
                     <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="050-0000000" style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#f8fafc', fontSize: '0.85rem' }} />
                   </div>
 
-                  {/* הוספת בחירת מטבע למשתמשים בינלאומיים בלבד */}
                   {isInternationalAccount && (
                     <div>
                       <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>
@@ -2271,7 +2257,7 @@ export default function Dashboard() {
                     ) : (
                       filteredAdminAccounts.map(acc => {
                         const isLifetime = acc.trial_ends_at === null || acc.trial_ends_at === undefined;
-                        const currentCountry = acc.country || 'Local';
+                        const currentCountry = acc.country || 'International';
                         return (
                           <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.8rem' }}>
                             <td style={{ padding: '10px 6px', fontWeight: '500', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
@@ -2342,7 +2328,7 @@ export default function Dashboard() {
                                   <span>{isLifetime ? (isHebrew ? 'יש מנוי לכל החיים' : 'Lifetime Active') : (isHebrew ? 'אין מנוי לכל החיים' : 'Trial Active')}</span>
                                 </button>
                                 <span style={{ fontSize: '0.75rem', color: '#64748b', whiteSpace: 'nowrap' }}>
-                                  {isLifetime ? (isHebrew ? '(ללא הגבלת זמן)' : '(No expiry)') : (isHebrew ? `עד: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}` : `Ends: ${newDate(acc.trial_ends_at).toLocaleDateString('en-GB')}`)}
+                                  {isLifetime ? (isHebrew ? '(ללא הגבלת זמן)' : '(No expiry)') : (isHebrew ? `עד: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}` : `Ends: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}`)}
                                 </span>
                               </div>
                             </td>
@@ -2377,41 +2363,41 @@ export default function Dashboard() {
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           </span>
-          {isHebrew ? 'הצעות' : 'Quotes'}
+          Quotes
         </button>
         <button onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'clients' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </span>
-          {isHebrew ? 'לקוחות' : 'Clients'}
+          Clients
         </button>
         <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2`2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </span>
-          {isHebrew ? 'הגדרות' : 'Settings'}
+          Settings
         </button>
         <button onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'finances' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           </span>
-          {isHebrew ? 'הוצאות' : 'Finances'}
+          Finances
         </button>
         <button onClick={() => { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </span>
-          {isHebrew ? 'חדש' : 'New'}
+          New
         </button>
       </div>
 
       <footer className="no-print" style={{ textAlign: 'center', padding: '16px', marginTop: '30px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.8rem' }}>
         <div style={{ marginBottom: '6px' }}>
-          Powered by <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business Management & Quoting System'}
+          Powered by <strong>ProFlow</strong> - Business Management & Quoting System
         </div>
         <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: isHebrew?0:'4px', marginLeft: isHebrew?'4px':0, verticalAlign: 'middle'}}><circle cx="12" cy="5" r="2"/><path d="m5 10 7-1 7 1"/><path d="m12 10v7"/><path d="m12 17-4 5"/><path d="m12 17 4 5"/></svg>
-          {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '4px', verticalAlign: 'middle'}}><circle cx="12" cy="5" r="2"/><path d="m5 10 7-1 7 1"/><path d="m12 10v7"/><path d="m12 17-4 5"/><path d="m12 17 4 5"/></svg>
+          Accessibility Statement
         </button>
       </footer>
     </div>
