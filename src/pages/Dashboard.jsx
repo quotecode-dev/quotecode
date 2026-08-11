@@ -81,9 +81,15 @@ export default function Dashboard() {
   const [bizPlan, setBizPlan] = useState('free');
   const [bizRole, setBizRole] = useState('user');
   
-  // טעינה מיידית מ-LocalStorage למניעת הבזק שפה בריפרש
+  // פתרון ברזל למניעת ריצוד ברישום חדש / אינקוגניטו: בדיקה סינכרונית מיידית של שפה ואזור זמן
   const [bizCountry, setBizCountry] = useState(() => {
-    return typeof window !== 'undefined' ? (localStorage.getItem('proflow_cached_country') || 'Local') : 'Local';
+    if (typeof window === 'undefined') return 'Local';
+    const cached = localStorage.getItem('proflow_cached_country');
+    if (cached) return cached;
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const browserLang = navigator.language || navigator.userLanguage || '';
+    const isHebNav = timeZone === 'Asia/Jerusalem' || browserLang.toLowerCase().startsWith('he');
+    return isHebNav ? 'Local' : 'International';
   });
 
   const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_HEB);
@@ -144,7 +150,6 @@ export default function Dashboard() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        // חוק הברזל: מעדכן סשן רק אם ה-ID אכן השתנה בפועל כדי למנוע איפוס טפסים בחזרה לטאב
         setSession((prevSession) => {
           if (prevSession?.user?.id !== newSession?.user?.id) {
             if (newSession?.user?.id) {
@@ -2337,7 +2342,7 @@ export default function Dashboard() {
                                   <span>{isLifetime ? (isHebrew ? 'יש מנוי לכל החיים' : 'Lifetime Active') : (isHebrew ? 'אין מנוי לכל החיים' : 'Trial Active')}</span>
                                 </button>
                                 <span style={{ fontSize: '0.75rem', color: '#64748b', whiteSpace: 'nowrap' }}>
-                                  {isLifetime ? (isHebrew ? '(ללא הגבלת זמן)' : '(No expiry)') : (isHebrew ? `עד: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}` : `Ends: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}`)}
+                                  {isLifetime ? (isHebrew ? '(ללא הגבלת זמן)' : '(No expiry)') : (isHebrew ? `עד: ${new Date(acc.trial_ends_at).toLocaleDateString('en-GB')}` : `Ends: ${newDate(acc.trial_ends_at).toLocaleDateString('en-GB')}`)}
                                 </span>
                               </div>
                             </td>
@@ -2382,7 +2387,7 @@ export default function Dashboard() {
         </button>
         <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2`2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
