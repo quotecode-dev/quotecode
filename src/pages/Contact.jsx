@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import AIChatWidget from '../components/AIChatWidget';
+import AIChatWidget from '../AIChatWidget';
 
 export default function Contact({ isHebrew }) {
   const navigate = useNavigate();
@@ -36,7 +36,6 @@ export default function Contact({ isHebrew }) {
   };
 
   const handleAiClick = () => {
-    // הפעלת אירוע גלובלי לפתיחת ווידג'ט ה-AI
     window.dispatchEvent(new CustomEvent('open-proflow-ai-chat'));
   };
 
