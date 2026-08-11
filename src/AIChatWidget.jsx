@@ -85,12 +85,22 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           reply = 'תקופת הניסיון מעניקה לך 14 יום חינם לגמרי עם גישה מלאה לכל פיצ\'רי ה-PRO של המערכת (הצעות מחיר ללא הגבלה, שליחת וואטסאפ ועוד) ללא שום התחייבות!';
         } else if (lower.includes('מע"מ') || lower.includes('מס') || lower.includes('vat')) {
           reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט סכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
+        } else if (lower.includes('עובדים') || lower.includes('צוות') || lower.includes('הרשאות')) {
+          reply = 'במסלול PRO ניתן לנהל גישות מתקדמות ולצרף משתמשים נוספים לעסק בהתאם לצורך ניהול המכירות והמשרד.';
+        } else if (lower.includes('לוגו') || lower.includes('מיתוג') || lower.includes('צבעים') || lower.includes('עיצוב')) {
+          reply = 'בהחלט! תוכל להעלות את לוגו העסק שלך בהגדרות המערכת, והוא יופיע באופן אוטומטי בראש כל הצעת מחיר שתפיק ללקוחותיך.';
+        } else if (lower.includes('חשבונית') || lower.includes('קבלה') || lower.includes('תשלום') || lower.includes('אשראי') || lower.includes('פייפאל')) {
+          reply = 'המנוי נרכש בצורה מאובטחת באשראי או באמצעים דיגיטליים, והמערכת מספקת אסמכתאות וחשבונות מסודרים. ProFlow מתמקדת בהפקת הצעות מחיר חכמות, גבייה וחתימות דיגיטליות.';
+        } else if (lower.includes('ייבוא') || lower.includes('ייבא') || lower.includes('אקסל') || lower.includes('מיגרציה')) {
+          reply = 'כן, ניתן לייבא נתונים ולקוחות בקלות אל תוך ספר הלקוחות (CRM) של ProFlow, וכן לייצא את כל הנתונים החוצה בפורמט CSV בכל עת.';
+        } else if (lower.includes('אינטגרציה') || lower.includes('api') || lower.includes('סליקה') || lower.includes('חיבור')) {
+          reply = 'ProFlow תומכת בחיבורים מתקדמים, שליחת הודעות וואטסאפ ישירות, וייצוא נתונים נוח למערכות חיצוניות ולאקסל.';
         } else if (lower.includes('קשר') || lower.includes('תמיכה') || lower.includes('אימייל') || lower.includes('support')) {
           reply = 'ניתן לפנות אלינו בכל שאלה ישירות לכתובת האימייל של שירות הלקוחות: support@quotecodepro.com. אנו משתדלים להשיב בתוך 24 שעות בימי עסקים.';
         } else if (lower.includes('ענן') || lower.includes('אבטחה') || lower.includes('בטוח')) {
           reply = 'בהחלט! ProFlow מבוססת על שרתי ענן מתקדמים ברמת אבטחה גבוהה ביותר, כולל הצפנת נתונים וגיבויים אוטומטיים שמבטיחים שהמידע שלך תמיד שמור.';
         } else {
-          reply = 'ProFlow היא פלטפורמת SaaS עננית לניהול עסק, הפקת הצעות מחיר חכמות, חתימות דיגיטליות וניהול לקוחות. האם תרצה להתחיל 14 יום ניסיון חינם או לשאול על המסלולים שלנו?';
+          reply = 'ProFlow היא פלטפורמת SaaS עננית לניהול עסק, הפקת הצעות מחיר חכמות, חתימות דיגיטליות וניהול לקוחות. האם תרצה להתחיל 14 יום ניסיון חינם או לשאול על המסלולים והפיצ\'רים שלנו?';
         }
       } else {
         if (lower === 'מייל' || lower === 'אימייל') {
@@ -157,6 +167,16 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           reply = 'The 14-day free trial gives you full access to all PRO features with zero obligations!';
         } else if (lower.includes('tax') || lower.includes('vat')) {
           reply = 'Prices for Israeli clients include 18% VAT as required by law, while international clients are billed at 0% VAT automatically.';
+        } else if (lower.includes('team') || lower.includes('employees') || lower.includes('staff') || lower.includes('users')) {
+          reply = 'With the PRO plan, you can manage user access and add team members to handle sales and business operations efficiently.';
+        } else if (lower.includes('logo') || lower.includes('brand') || lower.includes('colors') || lower.includes('design')) {
+          reply = 'Yes! You can upload your business logo in your settings, and it will automatically appear at the top of every price quote you send to clients.';
+        } else if (lower.includes('invoice') || lower.includes('payment') || lower.includes('credit card') || lower.includes('paypal')) {
+          reply = 'Subscriptions are securely paid via credit card or digital methods with proper receipts provided. ProFlow focuses on smart price quoting, digital signatures, and client billing.';
+        } else if (lower.includes('import') || lower.includes('excel') || lower.includes('migrate')) {
+          reply = 'Yes, you can easily import your client database into ProFlow CRM, and export all data to CSV format at any time.';
+        } else if (lower.includes('integration') || lower.includes('api') || lower.includes('connect')) {
+          reply = 'ProFlow supports seamless integrations, direct WhatsApp messaging, and easy data exporting to external tools and Excel.';
         } else {
           reply = 'ProFlow is a cloud-based SaaS platform for smart business management and price quoting. Feel free to ask about our pricing, free trial, or features!';
         }
@@ -281,16 +301,13 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
       justifyContent: 'center',
       zIndex: 999999
     }}>
-      {/* מעטפת פנימית שמדמה את רוחב האתר המדויק */}
       <div style={{
         width: '100%',
         maxWidth: '1050px',
         padding: '0 20px',
         display: 'flex',
-        // הפתרון הכירורגי: מתיישר תמיד לתחילת הכיוון. בעברית (RTL) זה ימין. באנגלית (LTR) זה שמאל.
         justifyContent: 'flex-start',
       }}>
-        {/* אזור הצ'אט והכפתור עצמם */}
         <div style={{
           position: 'relative',
           pointerEvents: 'auto', 
@@ -320,7 +337,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             }
           `}</style>
 
-          {/* כפתור צף - מוסתר כשהצ'אט פתוח */}
           {!isOpen && (
             <button
               onClick={() => setIsOpen(true)}
@@ -348,7 +364,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             </button>
           )}
 
-          {/* פופאפ הצ'אט */}
           {isOpen && (
             <div className="ai-chat-popup" style={{
               position: 'absolute',
