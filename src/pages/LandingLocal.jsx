@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProFlowLogo from '../components/ProFlowLogo';
+import AIChatWidget from '../AIChatWidget';
 
 export default function LandingLocal({ onForgotPassword }) {
   const navigate = useNavigate();
@@ -102,6 +103,7 @@ export default function LandingLocal({ onForgotPassword }) {
             <ProFlowLogo size={32} rtl={true} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <AIChatWidget isHebrew={true} isDashboard={false} />
             {onForgotPassword && (
               <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
                 שכחת סיסמה?
