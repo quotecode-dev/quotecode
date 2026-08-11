@@ -80,7 +80,7 @@ export default function LandingLocal({ onForgotPassword }) {
           color: #ffffff;
         }
         
-        /* Flexbox Header - Centered and clustered on Desktop */
+        /* Desktop Header Layout */
         .header-container {
           display: flex;
           justify-content: center;
@@ -97,14 +97,22 @@ export default function LandingLocal({ onForgotPassword }) {
           display: none;
         }
 
+        .desktop-btn-text {
+          display: inline;
+        }
+        .mobile-btn-text {
+          display: none;
+        }
+
+        /* Mobile Header Layout Adjustments */
         @media (max-width: 768px) {
           .header-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
+            gap: 8px;
+            padding: 10px 12px;
           }
           .header-logo {
             order: 1;
@@ -118,8 +126,10 @@ export default function LandingLocal({ onForgotPassword }) {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 15px;
+            margin-bottom: 10px;
             position: relative;
+            z-index: 9999;
           }
           .chat-label {
             display: block !important;
@@ -128,8 +138,14 @@ export default function LandingLocal({ onForgotPassword }) {
             font-weight: bold;
             margin-bottom: 6px;
           }
+          .desktop-btn-text {
+            display: none;
+          }
+          .mobile-btn-text {
+            display: inline;
+          }
           .nav-btn {
-            padding: 8px 10px !important;
+            padding: 7px 12px !important;
             font-size: 0.75rem !important;
             white-space: nowrap !important;
           }
@@ -146,7 +162,7 @@ export default function LandingLocal({ onForgotPassword }) {
       </div>
 
       {/* Header */}
-      <header style={{ background: 'rgba(9, 13, 22, 0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
+      <header style={{ background: 'rgba(9, 13, 22, 0.98)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div className="header-container">
           
           <div className="header-logo" style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '4px 8px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
@@ -158,14 +174,15 @@ export default function LandingLocal({ onForgotPassword }) {
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
-          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             {onForgotPassword && (
-              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                 שכחת סיסמה?
               </button>
             )}
-            <button className="nav-btn" onClick={() => navigate('/dashboard?lang=he')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '9px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)', whiteSpace: 'nowrap' }}>
-              כניסה למערכת / התחברות
+            <button className="nav-btn" onClick={() => navigate('/dashboard?lang=he')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '9px 14px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem', boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)', whiteSpace: 'nowrap' }}>
+              <span className="desktop-btn-text">כניסה למערכת / התחברות</span>
+              <span className="mobile-btn-text">כניסה / התחברות</span>
             </button>
           </div>
 
@@ -193,7 +210,7 @@ export default function LandingLocal({ onForgotPassword }) {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
             <button onClick={() => navigate('/dashboard?signup=true&lang=he')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '14px 30px', borderRadius: '12px', fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.5)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               התחל 14 יום ניסיון חינם ב-PRO עכשיו
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 3 0 3 0z"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-3 0-3 z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 3 0 3 0z"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-3 0-3z"/></svg>
             </button>
             <span style={{ color: '#34d399', fontSize: '0.95rem', fontWeight: '800' }}>
               14 יום חינם לגמרי לכל פיצ'רי ה-PRO!
@@ -420,7 +437,7 @@ export default function LandingLocal({ onForgotPassword }) {
             <a href="/he/terms" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>תנאי שימוש</a>
             <span style={{ color: '#334155' }}>|</span>
             <a href="/he/privacy" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>מדיניות פרטיות</a>
-            <span style={{ color: '#334155' }}>|</span>
+            <span style={{ color: '_blank' }}>|</span>
             <a href="/he/contact" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>צור קשר</a>
             <span style={{ color: '#334155' }}>|</span>
             <a href="https://www.quotecodepro.com/tools" className="footer-link" style={{ textDecoration: 'none', padding: 0, color: '#818cf8', fontWeight: 'bold' }}>כלים לעסקים</a>
