@@ -438,16 +438,17 @@ export default function Dashboard() {
       setBizCountry(countryVal);
       localStorage.setItem('proflow_cached_country', countryVal);
       
-      const defTerms = data.default_terms || (countryVal === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
+      const defaultFallbackTerms = countryVal === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB;
+      const defTerms = data.default_terms && data.default_terms.trim() !== '' ? data.default_terms : defaultFallbackTerms;
       setDefaultTerms(defTerms);
       setTrialEndsAt(data.trial_ends_at !== undefined ? data.trial_ends_at : null);
       
       if (countryVal === 'International') {
         setCurrency('USD');
-        setTerms(defTerms.includes('General Terms') ? defTerms : DEFAULT_TERMS_ENG);
+        setTerms(defTerms);
       } else {
         setCurrency('ILS');
-        setTerms(defTerms.includes('תנאים כלליים') ? defTerms : DEFAULT_TERMS_HEB);
+        setTerms(defTerms);
       }
 
       await supabase
@@ -499,7 +500,7 @@ export default function Dashboard() {
         setDefaultTerms(newData.default_terms || detectedTerms);
         setTrialEndsAt(newData.trial_ends_at);
         setCurrency(newData.country === 'International' ? 'USD' : 'ILS');
-        setTerms(newData.country === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
+        setTerms(newData.default_terms || detectedTerms);
       } else {
         setSettingId(null);
         setBizPlan('pro');
@@ -551,9 +552,18 @@ export default function Dashboard() {
 
   async function handleAdminCountryChange(accountId, newCountry) {
     if (!newCountry) return;
+    
+    // אכיפת כלל הברזל: אם מעבירים לבינלאומי (International), נעדכן אוטומטית גם את תנאי ברירת המחדל באנגלית כדי למנוע הופעת עברית
+    const updatePayload = { country: newCountry };
+    if (newCountry === 'International') {
+      updatePayload.default_terms = DEFAULT_TERMS_ENG;
+    } else {
+      updatePayload.default_terms = DEFAULT_TERMS_HEB;
+    }
+
     const { data, error } = await supabase
       .from('business_settings')
-      .update({ country: newCountry })
+      .update(updatePayload)
       .eq('id', accountId)
       .select();
     
@@ -1343,7 +1353,7 @@ export default function Dashboard() {
 
   const filteredQuotes = quotes.filter(quote => {
     const matchesSearch = (quote.clients?.company_name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-                        quote.id.toLowerCase().includes(searchTerm.toLowerCase());
+                          quote.id.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'All' || (quote.status || 'draft').toLowerCase() === statusFilter.toLowerCase();
     return matchesSearch && matchesStatus;
   }).sort((a, b) => {
