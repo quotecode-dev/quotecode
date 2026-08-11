@@ -7,6 +7,7 @@ import PublicQuote from './pages/PublicQuote';
 import PublicTools from './components/PublicTools';
 import PublicToolsEn from './components/PublicToolsEn';
 import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import { supabase } from './supabase';
 import { isHebrewEnv } from './utils/regionConfig';
 
@@ -267,12 +268,12 @@ export default function App() {
         
         {/* --- דפים משפטיים וצור קשר (עברית) --- */}
         <Route path="/he/terms" element={<Terms isHebrew={true} />} />
-        <Route path="/he/privacy" element={<LegalPagePlaceholder isHebrew={true} title="מדיניות פרטיות" />} />
+        <Route path="/he/privacy" element={<Privacy isHebrew={true} />} />
         <Route path="/he/contact" element={<LegalPagePlaceholder isHebrew={true} title="צור קשר" />} />
         
         {/* --- דפים משפטיים וצור קשר (אנגלית) --- */}
         <Route path="/en/terms" element={<Terms isHebrew={false} />} />
-        <Route path="/en/privacy" element={<LegalPagePlaceholder isHebrew={false} title="Privacy Policy" />} />
+        <Route path="/en/privacy" element={<Privacy isHebrew={false} />} />
         <Route path="/en/contact" element={<LegalPagePlaceholder isHebrew={false} title="Contact Us" />} />
 
         <Route path="*" element={<LandingGlobal />} />
