@@ -132,7 +132,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
         } else if (lower.includes('מע"מ') || lower.includes('vat') || lower.includes('מס')) {
           reply = 'המערכת מחשבת מע"מ אוטומטית בהתאם להגדרות העסק: 18% ללקוחות בארץ (עם אפשרות לחישוב כולל/לפני מע"מ לפי סוג הלקוח) ו-0% ללקוחות מחו"ל.';
         } else if (lower.includes('פיזי') || lower.includes('משרד') || lower.includes('להגיע') || lower.includes('כתובת') || lower.includes('פגישה') || lower.includes('פרונטלית') || lower.includes('סניף')) {
-          reply = 'מערכת ProFlow הינה פלטפורמת SaaS עננית ודיגיטלית מלאה הפועלת אונליין, ולכן אינה מקבלת קהל באופן פיזי במשרדים. כל הפעולות, ניהול העסק, הפקת ההצעות והתמיכה מתבצעות באופן דיגיטלי נוח ומהיר ישירות דרך המערכת או באמצעות יצירת קשר עמנו באימייל (support@quotecodepro.com) ובעוזר ה-AI כאן 24/7!';
+          reply = 'מערכת ProFlow הינה פלטפורמת SaaS עננית ודיגיטלית מלאה הפועלת אונליין, ולכן אינה מקבלת קהל באופן פיזי במשרדים. כל הפעולות, ניהול העסק, הפקת הצעות והתמיכה מתבצעות באופן דיגיטלי נוח ומהיר ישירות דרך המערכת או באמצעות יצירת קשר עמנו באימייל (support@quotecodepro.com) ובעוזר ה-AI כאן 24/7!';
         } else if (lower.includes('מיון') || lower.includes('סדר') || lower.includes('למיין') || lower.includes('עמודות')) {
           reply = 'ניתן למיין את טבלת ההצעות בקלות בלחיצה על כותרות העמודות בטבלה (מספר הזמנה, שם לקוח, סכום, תאריך, סטטוס או צפיות).';
         } else if (lower.includes('הוצאות') || lower.includes('דוחות') || lower.includes('רווח') || lower.includes('הכנסות'))  {
@@ -268,8 +268,20 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
 
   return (
     <div className="no-print" style={{ position: 'relative', display: 'inline-block' }}>
+      <style>{`
+        @media (max-width: 640px) {
+          .ai-btn-text {
+            display: none !important;
+          }
+          .ai-support-btn {
+            padding: 8px 10px !important;
+            border-radius: 50% !important;
+          }
+        }
+      `}</style>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        className="ai-support-btn"
         style={{
           background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
           color: 'white',
@@ -286,7 +298,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
         }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-        {isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}
+        <span className="ai-btn-text">{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}</span>
       </button>
 
       {isOpen && (
@@ -344,8 +356,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
                 lineHeight: '1.4',
                 textAlign: isHebrew ? 'right' : 'left'
               }}>
-                {idx === 0 ? (isHebrew ? (isDashboard ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך בממשק המערכת היום?' : 'שלום! אני עוזר ה-AI של ProFlow. יש לך שאלות על המחירים, המסלולים או הפיצ\'רים שלנו?') : (isDashboard ? 'Hello! I am ProFlow AI assistant. How can I help you with the interface today?' : 'Hello! I am ProFlow AI assistant. Have questions about our pricing, plans, or features?')) : msg.content}
-                
+                {msg.content}
                 {msg.options && msg.options.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
                     {msg.options.map((opt, oIdx) => (
@@ -364,8 +375,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
                           textAlign: isHebrew ? 'right' : 'left',
                           transition: 'all 0.2s'
                         }}
-                        onMouseEnter={(e) => { e.target.style.background = '#e0e7ff'; }}
-                        onMouseLeave={(e) => { e.target.style.background = '#f1f5f9'; }}
                       >
                         {opt.label}
                       </button>
