@@ -8,6 +8,7 @@ import PublicTools from './components/PublicTools';
 import PublicToolsEn from './components/PublicToolsEn';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import Contact from './pages/Contact';
 import { supabase } from './supabase';
 import { isHebrewEnv } from './utils/regionConfig';
 
@@ -41,30 +42,6 @@ function RootHandler() {
   }, [navigate]);
 
   return <LandingGlobal />;
-}
-
-// רכיב זמני (Placeholder) לעמודים שנמצאים בבנייה
-function LegalPagePlaceholder({ isHebrew, title }) {
-  const navigate = useNavigate();
-  return (
-    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ background: '#090d16', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#f8fafc', fontFamily: 'Inter, Segoe UI, sans-serif', padding: '20px' }}>
-      <div style={{ background: '#111827', padding: '40px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)', textAlign: 'center', maxWidth: '500px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🚧</div>
-        <h1 style={{ fontSize: '1.8rem', color: '#ffffff', marginBottom: '16px', fontWeight: '800' }}>{title}</h1>
-        <p style={{ color: '#94a3b8', lineHeight: '1.6', marginBottom: '24px', fontSize: '1rem' }}>
-          {isHebrew 
-            ? 'העמוד הזה נמצא כרגע בבנייה (אנו מכינים את התוכן המשפטי). הוא יעלה לאוויר בקרוב!' 
-            : 'This page is currently under construction (we are preparing the legal content). It will be live soon!'}
-        </p>
-        <button 
-          onClick={() => navigate(isHebrew ? '/he' : '/en')}
-          style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.95rem', boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)' }}
-        >
-          {isHebrew ? 'חזור לדף הבית' : 'Go Back Home'}
-        </button>
-      </div>
-    </div>
-  );
 }
 
 export default function App() {
@@ -266,15 +243,14 @@ export default function App() {
         <Route path="/public-quote/:id" element={<PublicQuote />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
         
-        {/* --- דפים משפטיים וצור קשר (עברית) --- */}
+        {/* --- דפים משפטיים וצור קשר --- */}
         <Route path="/he/terms" element={<Terms isHebrew={true} />} />
         <Route path="/he/privacy" element={<Privacy isHebrew={true} />} />
-        <Route path="/he/contact" element={<LegalPagePlaceholder isHebrew={true} title="צור קשר" />} />
+        <Route path="/he/contact" element={<Contact isHebrew={true} />} />
         
-        {/* --- דפים משפטיים וצור קשר (אנגלית) --- */}
         <Route path="/en/terms" element={<Terms isHebrew={false} />} />
         <Route path="/en/privacy" element={<Privacy isHebrew={false} />} />
-        <Route path="/en/contact" element={<LegalPagePlaceholder isHebrew={false} title="Contact Us" />} />
+        <Route path="/en/contact" element={<Contact isHebrew={false} />} />
 
         <Route path="*" element={<LandingGlobal />} />
       </Routes>
