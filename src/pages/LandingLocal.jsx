@@ -83,18 +83,13 @@ export default function LandingLocal({ onForgotPassword }) {
         /* Desktop Header Layout */
         .header-container {
           display: flex;
-          justify-content: center;
+          justify-content: space-between;
           align-items: center;
-          gap: 150px;
           max-width: 1050px;
           margin: 0 auto;
           padding: 12px 20px;
           width: 100%;
           box-sizing: border-box;
-        }
-
-        .chat-label {
-          display: none;
         }
 
         .desktop-btn-text {
@@ -108,41 +103,21 @@ export default function LandingLocal({ onForgotPassword }) {
         @media (max-width: 768px) {
           .header-container {
             display: flex;
-            flex-wrap: nowrap !important; /* התיקון: מכריח שורה אחת תמיד */
+            flex-wrap: nowrap !important;
             justify-content: space-between;
             align-items: center;
-            gap: 4px;
-            padding: 8px 5px;
+            padding: 12px 16px;
           }
           .header-logo {
             order: 1;
             flex-shrink: 0 !important;
           }
-          .header-chat-wrapper {
-            order: 2;
-            width: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 0;
-            margin-bottom: 0;
-            position: relative;
-            z-index: 999;
-          }
           .header-actions {
-            order: 3;
+            order: 2;
             flex-shrink: 0 !important;
             display: flex;
             align-items: center;
-            gap: 4px;
-          }
-          .chat-label {
-            display: block !important;
-            font-size: 0.75rem;
-            color: #818cf8;
-            font-weight: bold;
-            margin-bottom: 2px;
-            white-space: nowrap !important;
+            gap: 10px;
           }
           .desktop-btn-text {
             display: none;
@@ -151,10 +126,10 @@ export default function LandingLocal({ onForgotPassword }) {
             display: inline;
           }
           .nav-btn {
-            padding: 6px 8px !important;
-            font-size: 0.72rem !important;
+            padding: 8px 14px !important;
+            font-size: 0.8rem !important;
             white-space: nowrap !important;
-            flex-shrink: 0 !important; /* התיקון: מונע את השבירה לשתי שורות */
+            flex-shrink: 0 !important;
           }
           .hero-title {
             font-size: 2.2rem !important;
@@ -176,14 +151,9 @@ export default function LandingLocal({ onForgotPassword }) {
             <ProFlowLogo size={32} rtl={true} />
           </div>
           
-          <div className="header-chat-wrapper">
-            <span className="chat-label" style={{ whiteSpace: 'nowrap' }}>צאט AI</span>
-            <AIChatWidget isHebrew={true} isDashboard={false} />
-          </div>
-          
           <div className="header-actions">
             {onForgotPassword && (
-              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold', whiteSpace: 'nowrap', marginLeft: '10px' }}>
                 שכחת סיסמה?
               </button>
             )}
@@ -452,6 +422,9 @@ export default function LandingLocal({ onForgotPassword }) {
           <p style={{ margin: 0, fontSize: '0.85rem' }}>&copy; {new Date().getFullYear()} ProFlow Israel. כל הזכויות שמורות.</p>
         </div>
       </footer>
+
+      {/* Global AI Chat Widget - Fixed to bottom corner */}
+      <AIChatWidget isHebrew={true} isDashboard={false} />
 
     </div>
   );

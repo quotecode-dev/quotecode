@@ -28,10 +28,10 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   
-  // התיקון לקפיצת הדסקטופ: רפרנס למיכל ההודעות הפנימי בלבד
+  // רפרנס למיכל ההודעות הפנימי בלבד כדי למנוע קפיצת מסך
   const scrollContainerRef = useRef(null);
 
-  // האזנה לאירוע גלובלי לפתיחת הצ'אט מבחוץ (כמו מעמוד צור קשר)
+  // האזנה לאירוע גלובלי לפתיחת הצ'אט מבחוץ
   useEffect(() => {
     const handleOpenExternalChat = () => setIsOpen(true);
     window.addEventListener('open-proflow-ai-chat', handleOpenExternalChat);
@@ -79,7 +79,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
 
     if (isHebrew) {
       if (!isDashboard) {
-        // --- מצב ציבורי / שיווקי (דף הבית / צור קשר) ---
         if (lower.includes('מחיר') || lower.includes('עולה') || lower.includes('מסלול') || lower.includes('כמה')) {
           reply = 'אנחנו מציעים 3 מסלולים עיקריים: מסלול חינמי (Free) ב-0 ₪, מסלול בסיסי (Basic) החל מ-39 ₪ לחודש, ומסלול עסקי (Pro) הפופולרי ב-79 ₪ לחודש (בחיוב שנתי). ניתן לעבור בין המסלולים בכל עת!';
         } else if (lower.includes('ניסיון') || lower.includes('חינם') || lower.includes('14')) {
@@ -94,7 +93,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           reply = 'ProFlow היא פלטפורמת SaaS עננית לניהול עסק, הפקת הצעות מחיר חכמות, חתימות דיגיטליות וניהול לקוחות. האם תרצה להתחיל 14 יום ניסיון חינם או לשאול על המסלולים שלנו?';
         }
       } else {
-        // --- מצב פנימי / דשבורד (הלוגיקה המקורית המלאה שלך) ---
         if (lower === 'מייל' || lower === 'אימייל') {
           reply = 'האם אתה מתכוון ליצירת קשר עם שירות הלקוחות, או לשליחת הצעת מחיר במייל ללקוח?';
           options = [
@@ -153,7 +151,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
       }
     } else {
       if (!isDashboard) {
-        // --- Public Mode EN ---
         if (lower.includes('price') || lower.includes('cost') || lower.includes('plan')) {
           reply = 'We offer 3 main plans: Free ($0), Basic (starting at $12/mo billed annually), and our most popular Pro Business plan ($23/mo billed annually).';
         } else if (lower.includes('trial') || lower.includes('free') || lower.includes('14')) {
@@ -164,7 +161,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           reply = 'ProFlow is a cloud-based SaaS platform for smart business management and price quoting. Feel free to ask about our pricing, free trial, or features!';
         }
       } else {
-        // --- App Mode EN (הלוגיקה המקורית המלאה שלך) ---
         if (lower === 'email' || lower === 'mail' || lower === 'e-mail') {
           reply = 'Are you referring to contacting customer support via email, or sending a quote via email to a client?';
           options = [
@@ -275,27 +271,27 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
   };
 
   return (
-    <div className="no-print" style={{ position: 'relative', display: 'inline-block' }}>
+    <div className="no-print" style={{ 
+      position: 'fixed', 
+      bottom: '24px', 
+      [isHebrew ? 'right' : 'left']: '24px', 
+      zIndex: 999999,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: isHebrew ? 'flex-end' : 'flex-start'
+    }}>
       <style>{`
         @media (max-width: 768px) {
-          .ai-btn-text {
-            display: none !important;
-          }
-          .ai-support-btn {
-            padding: 8px 10px !important;
-            border-radius: 50% !important;
-          }
           .ai-chat-popup {
             position: fixed !important;
             top: 0 !important;
+            bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
-            bottom: 0 !important;
             width: 100% !important;
             height: 100% !important;
-            height: 100dvh !important;
             max-width: 100% !important;
-            max-height: none !important;
+            max-height: 100% !important;
             margin: 0 !important;
             border-radius: 0 !important;
             box-sizing: border-box !important;
@@ -304,43 +300,48 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           }
         }
       `}</style>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="ai-support-btn"
-        style={{
-          background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-          color: 'white',
-          border: 'none',
-          padding: '8px 16px',
-          borderRadius: '20px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          fontSize: '0.85rem',
-          boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          whiteSpace: 'nowrap'
-        }}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-        <span className="ai-btn-text" style={{ whiteSpace: 'nowrap' }}>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}</span>
-      </button>
 
+      {/* כפתור צף - מוסתר כשהצ'אט פתוח */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="ai-support-btn"
+          style={{
+            background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+            color: 'white',
+            border: 'none',
+            padding: '12px 20px',
+            borderRadius: '30px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '0.95rem',
+            boxShadow: '0 10px 25px rgba(79, 70, 229, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'transform 0.2s ease',
+          }}
+          onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+          <span className="ai-btn-text" style={{ whiteSpace: 'nowrap' }}>{isHebrew ? 'צאט AI' : 'AI Chat'}</span>
+        </button>
+      )}
+
+      {/* פופאפ הצ'אט */}
       {isOpen && (
         <div className="ai-chat-popup" style={{
           position: 'absolute',
-          top: '100%',
-          marginTop: '15px',
+          bottom: 'calc(100% + 15px)', // נפתח כלפי מעלה ביחס לכפתור ה-Fixed
           [isHebrew ? 'right' : 'left']: '0',
           width: '360px',
-          height: '480px',
+          height: '520px',
           background: 'white',
           borderRadius: '16px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           display: 'flex',
           flexDirection: 'column',
-          zIndex: 99999,
           border: '1px solid #e2e8f0',
           overflow: 'hidden',
           textAlign: isHebrew ? 'right' : 'left'
@@ -369,7 +370,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             </button>
           </div>
 
-          {/* כאן הוספנו את ה-ref כדי שנוכל לגלול רק את המיכל הזה */}
           <div 
             ref={scrollContainerRef} 
             style={{ flex: 1, padding: '15px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', background: '#f8fafc' }}
