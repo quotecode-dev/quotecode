@@ -68,6 +68,16 @@ export default function LandingLocal({ onForgotPassword }) {
         .faq-item:hover {
           border-color: rgba(99, 102, 241, 0.4);
         }
+        .footer-link {
+          color: #94a3b8;
+          text-decoration: none;
+          transition: color 0.2s;
+          font-size: 0.9rem;
+          margin: 0 10px;
+        }
+        .footer-link:hover {
+          color: #ffffff;
+        }
         @media (max-width: 480px) {
           .nav-btn {
             padding: 8px 12px !important;
@@ -321,7 +331,7 @@ export default function LandingLocal({ onForgotPassword }) {
           </div>
 
           {/* FAQ Section */}
-          <div style={{ marginBottom: '60px', textAlign: 'right', maxWidth: '800px', margin: '0 auto 60px auto' }}>
+          <div style={{ marginBottom: '40px', textAlign: 'right', maxWidth: '800px', margin: '0 auto 40px auto' }}>
             <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#ffffff', marginBottom: '8px', textAlign: 'center' }}>שאלות נפוצות</h2>
             <p style={{ color: '#94a3b8', marginBottom: '24px', fontSize: '1rem', textAlign: 'center' }}>כל מה ששאלת על המערכת, במקום אחד.</p>
             
@@ -344,8 +354,19 @@ export default function LandingLocal({ onForgotPassword }) {
       </main>
 
       {/* Footer */}
-      <footer style={{ background: '#05070a', color: '#64748b', padding: '30px 16px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.9rem' }}>
-        <p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} ProFlow Israel. כל הזכויות שמורות.</p>
+      <footer style={{ background: '#05070a', color: '#64748b', padding: '40px 16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '15px' }}>
+            <button onClick={() => navigate('/he/terms')} className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>תנאי שימוש</button>
+            <span style={{ color: '#334155' }}>|</span>
+            <button onClick={() => navigate('/he/privacy')} className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>מדיניות פרטיות</button>
+            <span style={{ color: '#334155' }}>|</span>
+            <button onClick={() => navigate('/he/contact')} className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>צור קשר</button>
+            <span style={{ color: '#334155' }}>|</span>
+            <button onClick={() => navigate('/he/tools')} className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#818cf8', fontWeight: 'bold' }}>כלים לעסקים</button>
+          </div>
+          <p style={{ margin: 0, fontSize: '0.85rem' }}>&copy; {new Date().getFullYear()} ProFlow Israel. כל הזכויות שמורות.</p>
+        </div>
       </footer>
 
     </div>
