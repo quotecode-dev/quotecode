@@ -96,12 +96,11 @@ export default function LandingLocal({ onForgotPassword }) {
         מבצע! 14 יום חינם לגמרי - עם גישה מלאה לכל הפיצ'רים של מסלול ה-PRO!
       </div>
 
-      {/* Header - Aligned precisely with 1050px container */}
+      {/* Header - Added 50px horizontal padding to pull items towards center */}
       <header style={{ background: 'rgba(9, 13, 22, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', maxWidth: '1050px', margin: '0 auto', padding: '12px 16px', width: '100%', boxSizing: 'border-box' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', maxWidth: '1150px', margin: '0 auto', padding: '12px 50px', width: '100%', boxSizing: 'border-box' }}>
           
-          {/* Logo with marginLeft: 40px to pull towards center */}
-          <div style={{ justifySelf: 'start', marginLeft: '40px', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '4px 8px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
+          <div style={{ justifySelf: 'start', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '4px 8px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
             <ProFlowLogo size={32} rtl={true} />
           </div>
           
@@ -109,8 +108,7 @@ export default function LandingLocal({ onForgotPassword }) {
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
-          {/* Actions with marginRight: 40px to pull towards center */}
-          <div style={{ justifySelf: 'end', marginRight: '40px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ justifySelf: 'end', display: 'flex', alignItems: 'center', gap: '12px' }}>
             {onForgotPassword && (
               <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
                 שכחת סיסמה?
