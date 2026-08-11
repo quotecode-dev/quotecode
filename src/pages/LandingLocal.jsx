@@ -357,13 +357,13 @@ export default function LandingLocal({ onForgotPassword }) {
       <footer style={{ background: '#05070a', color: '#64748b', padding: '40px 16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '15px' }}>
-            <button onClick={() => navigate('/he/terms')} className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>תנאי שימוש</button>
+            <a href="/he/terms" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>תנאי שימוש</a>
             <span style={{ color: '#334155' }}>|</span>
-            <button onClick={() => navigate('/he/privacy')} className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>מדיניות פרטיות</button>
+            <a href="/he/privacy" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>מדיניות פרטיות</a>
             <span style={{ color: '#334155' }}>|</span>
-            <button onClick={() => navigate('/he/contact')} className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>צור קשר</button>
+            <a href="/he/contact" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>צור קשר</a>
             <span style={{ color: '#334155' }}>|</span>
-            <button onClick={() => navigate('/he/tools')} className="footer-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#818cf8', fontWeight: 'bold' }}>כלים לעסקים</button>
+            <a href="https://www.quotecodepro.com/he/tools" className="footer-link" style={{ textDecoration: 'none', padding: 0, color: '#818cf8', fontWeight: 'bold' }}>כלים לעסקים</a>
           </div>
           <p style={{ margin: 0, fontSize: '0.85rem' }}>&copy; {new Date().getFullYear()} ProFlow Israel. כל הזכויות שמורות.</p>
         </div>
