@@ -117,13 +117,15 @@ export default function LandingGlobal({ onForgotPassword }) {
       </div>
 
       {/* Header */}
-      <header style={{ background: 'rgba(9, 13, 22, 0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', padding: '12px 20px', position: 'sticky', top: 0, zIndex: 1000 }}>
-        <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: '10px' }}>
-          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '5px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', flexShrink: 0 }} onClick={() => navigate('/global')}>
+      <header style={{ background: 'rgba(9, 13, 22, 0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', maxWidth: '1050px', margin: '0 auto', padding: '12px 20px', width: '100%', boxSizing: 'border-box' }}>
+          <div style={{ justifySelf: 'start', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '5px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/global')}>
             <ProFlowLogo size={32} rtl={false} />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ justifySelf: 'center' }}>
             <AIChatWidget isHebrew={false} isDashboard={false} />
+          </div>
+          <div style={{ justifySelf: 'end', display: 'flex', alignItems: 'center', gap: '12px' }}>
             {onForgotPassword && (
               <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
                 Forgot Password?
