@@ -100,8 +100,9 @@ export default function LandingGlobal({ onForgotPassword }) {
       `}</style>
 
       {/* Top Banner Launch Promotion */}
-      <div style={{ background: 'linear-gradient(90deg, #4f46e5, #10b981)', color: 'white', padding: '8px 16px', textAlign: 'center', fontSize: '0.85rem', fontWeight: '600' }}>
-        🎉 Launch Promotion! 14-day free trial - with full access to all PRO features!
+      <div style={{ background: 'linear-gradient(90deg, #4f46e5, #10b981)', color: 'white', padding: '8px 16px', textAlign: 'center', fontSize: '0.85rem', fontWeight: '600', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: '6px'}}><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        Launch Promotion! 14-day free trial - with full access to all PRO features!
       </div>
 
       {/* Header */}
@@ -128,7 +129,8 @@ export default function LandingGlobal({ onForgotPassword }) {
         <div style={{ maxWidth: '1050px', margin: '0 auto', textAlign: 'center' }}>
           
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(99, 102, 241, 0.12))', color: '#34d399', padding: '8px 20px', borderRadius: '20px', fontSize: '0.9rem', fontWeight: '700', marginBottom: '20px', border: '1px solid rgba(16, 185, 129, 0.3)', boxShadow: '0 0 20px rgba(16, 185, 129, 0.15)' }}>
-            🔥 Launch Promotion: 14-day free trial for all PRO features!
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f97316" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            Launch Promotion: 14-day free trial for all PRO features!
           </div>
           
           <h1 className="hero-title" style={{ fontSize: '3.2rem', fontWeight: '800', color: '#ffffff', lineHeight: '1.15', marginBottom: '20px', letterSpacing: '-0.5px' }}>
@@ -141,8 +143,9 @@ export default function LandingGlobal({ onForgotPassword }) {
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-            <button onClick={() => navigate('/dashboard?signup=true&lang=en')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '12px 28px', borderRadius: '8px', fontSize: '1rem', fontWeight: '700', cursor: 'pointer', boxShadow: '0 6px 20px rgba(16, 185, 129, 0.35)', transition: 'transform 0.2s' }}>
-              Start 14-Day Free PRO Trial Now 🚀
+            <button onClick={() => navigate('/dashboard?signup=true&lang=en')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '12px 28px', borderRadius: '8px', fontSize: '1rem', fontWeight: '700', cursor: 'pointer', boxShadow: '0 6px 20px rgba(16, 185, 129, 0.35)', transition: 'transform 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              Start 14-Day Free PRO Trial Now
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 3 0 3 0z"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-3 0-3z"/></svg>
             </button>
             <span style={{ color: '#34d399', fontSize: '0.9rem', fontWeight: '700' }}>
               14 days completely free for all PRO features!
@@ -150,7 +153,10 @@ export default function LandingGlobal({ onForgotPassword }) {
           </div>
 
           <div style={{ marginBottom: '50px', color: '#94a3b8', fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-            <span style={{ color: '#fbbf24' }}>⭐⭐⭐⭐⭐</span> Over 500 businesses already generate quotes with ease
+            <span style={{ display: 'flex', gap: '2px' }}>
+              {[1, 2, 3, 4, 5].map(i => <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>)}
+            </span>
+            Over 500 businesses already generate quotes with ease
           </div>
 
           {/* AI Video Demo Showcase (English) */}
@@ -170,8 +176,9 @@ export default function LandingGlobal({ onForgotPassword }) {
           {/* Pain-Point Section with AI Image */}
           <div className="pain-box" style={{ background: '#111827', borderRadius: '14px', overflow: 'hidden', maxWidth: '800px', margin: '0 auto 40px auto', padding: '24px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '5px 14px', borderRadius: '16px', fontSize: '0.8rem', fontWeight: '700' }}>
-                🛑 Sound Familiar?
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', padding: '5px 14px', borderRadius: '16px', fontSize: '0.8rem', fontWeight: '700' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#ef4444" stroke="#b91c1c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Sound Familiar?
               </span>
               <h2 style={{ fontSize: '1.9rem', fontWeight: '800', color: '#ffffff', marginTop: '12px', marginBottom: '8px' }}>
                 Tired of struggling with price quotes and endless paperwork?
@@ -189,8 +196,9 @@ export default function LandingGlobal({ onForgotPassword }) {
                 onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80'; }} 
               />
             </div>
-            <div style={{ color: '#34d399', fontWeight: '700', fontSize: '1rem' }}>
-              ✨ There is a much easier, smarter, and professional way to run your business with ProFlow!
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', textAlign: 'center', color: '#34d399', fontWeight: '700', fontSize: '1rem' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              There is a much easier, smarter, and professional way to run your business with ProFlow!
             </div>
           </div>
 
@@ -225,19 +233,25 @@ export default function LandingGlobal({ onForgotPassword }) {
           {/* Features Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', textAlign: 'left', marginBottom: '60px' }}>
             <div className="hover-card" style={{ background: '#111827', padding: '28px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '12px', background: 'rgba(251, 191, 36, 0.1)', display: 'inline-block', padding: '8px', borderRadius: '10px' }}>⚡</div>
+              <div style={{ marginBottom: '16px', background: 'rgba(251, 191, 36, 0.1)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '56px', height: '56px', borderRadius: '14px' }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
               <h3 style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '8px', fontWeight: '700' }}>Quotes in Minutes</h3>
               <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.5' }}>Create professional, beautiful price quotes including automated tax calculations, discounts, and items from your catalog.</p>
             </div>
             
             <div className="hover-card" style={{ background: '#111827', padding: '28px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '12px', background: 'rgba(99, 102, 241, 0.1)', display: 'inline-block', padding: '8px', borderRadius: '10px' }}>✍️</div>
+              <div style={{ marginBottom: '16px', background: 'rgba(99, 102, 241, 0.1)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '56px', height: '56px', borderRadius: '14px' }}>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </div>
               <h3 style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '8px', fontWeight: '700' }}>Digital Signatures & Approvals</h3>
               <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.5' }}>Send a direct link to your client to review, digitally sign, and approve orders from any smartphone or computer.</p>
             </div>
 
             <div className="hover-card" style={{ background: '#111827', padding: '28px', borderRadius: '14px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '12px', background: 'rgba(16, 185, 129, 0.1)', display: 'inline-block', padding: '8px', borderRadius: '10px' }}>📊</div>
+              <div style={{ marginBottom: '16px', background: 'rgba(16, 185, 129, 0.1)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '56px', height: '56px', borderRadius: '14px' }}>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
               <h3 style={{ fontSize: '1.15rem', color: '#ffffff', marginBottom: '8px', fontWeight: '700' }}>Income & Expense Tracking</h3>
               <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.5' }}>Track business profits, manage operating expenses, and view accurate financial reports in real time.</p>
             </div>
@@ -297,8 +311,9 @@ export default function LandingGlobal({ onForgotPassword }) {
 
               {/* Pro / Business Plan (Highlighted) */}
               <div className="hover-card" style={{ background: '#111827', padding: '28px', borderRadius: '14px', border: '2px solid #6366f1', boxShadow: '0 12px 25px rgba(99, 102, 241, 0.15)', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '-12px', right: '16px', background: '#6366f1', color: 'white', padding: '3px 10px', borderRadius: '16px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                  Most Popular ⭐
+                <div style={{ position: 'absolute', top: '-12px', right: '16px', background: '#6366f1', color: 'white', padding: '3px 10px', borderRadius: '16px', fontSize: '0.7rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  Most Popular
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 </div>
                 <h3 style={{ fontSize: '1.2rem', color: '#ffffff', marginBottom: '8px', fontWeight: '700' }}>Pro Business Plan</h3>
                 <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '16px' }}>For growing agencies and businesses with no limits.</p>
