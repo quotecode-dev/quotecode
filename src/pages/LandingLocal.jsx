@@ -79,6 +79,27 @@ export default function LandingLocal({ onForgotPassword }) {
         .footer-link:hover {
           color: #ffffff;
         }
+        
+        /* Flexbox Header Layout - Centered with gap to keep items close to chat */
+        .header-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 50px;
+          max-width: 1050px;
+          margin: 0 auto;
+          padding: 12px 20px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+          .header-container {
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+          }
+        }
         @media (max-width: 480px) {
           .nav-btn {
             padding: 8px 12px !important;
@@ -96,19 +117,22 @@ export default function LandingLocal({ onForgotPassword }) {
         מבצע! 14 יום חינם לגמרי - עם גישה מלאה לכל הפיצ'רים של מסלול ה-PRO!
       </div>
 
-      {/* Header - Added 50px horizontal padding to pull items towards center */}
+      {/* Header */}
       <header style={{ background: 'rgba(9, 13, 22, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', maxWidth: '1150px', margin: '0 auto', padding: '12px 50px', width: '100%', boxSizing: 'border-box' }}>
+        <div className="header-container">
           
-          <div style={{ justifySelf: 'start', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '4px 8px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
+          {/* Logo (Right in RTL) */}
+          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '4px 8px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
             <ProFlowLogo size={32} rtl={true} />
           </div>
           
-          <div style={{ justifySelf: 'center' }}>
+          {/* AI Chat Widget (Center) */}
+          <div>
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
-          <div style={{ justifySelf: 'end', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Actions / Login Button (Left in RTL) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {onForgotPassword && (
               <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
                 שכחת סיסמה?
@@ -118,6 +142,7 @@ export default function LandingLocal({ onForgotPassword }) {
               כניסה למערכת / התחברות
             </button>
           </div>
+
         </div>
       </header>
 
