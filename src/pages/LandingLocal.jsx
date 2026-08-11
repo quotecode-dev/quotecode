@@ -80,12 +80,12 @@ export default function LandingLocal({ onForgotPassword }) {
           color: #ffffff;
         }
         
-        /* Flexbox Header - Centered and clustered */
+        /* Flexbox Header - Clustered around the chat center */
         .header-container {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 60px;
+          gap: 150px;
           max-width: 1050px;
           margin: 0 auto;
           padding: 12px 20px;
