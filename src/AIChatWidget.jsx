@@ -77,7 +77,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
         } else if (lower.includes('ניסיון') || lower.includes('חינם') || lower.includes('14')) {
           reply = 'תקופת הניסיון מעניקה לך 14 יום חינם לגמרי עם גישה מלאה לכל פיצ\'רי ה-PRO של המערכת (הצעות מחיר ללא הגבלה, שליחת וואטסאפ ועוד) ללא שום התחייבות!';
         } else if (lower.includes('מע"מ') || lower.includes('מס') || lower.includes('vat')) {
-          reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט הסכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
+          reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט סכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
         } else if (lower.includes('קשר') || lower.includes('תמיכה') || lower.includes('אימייל') || lower.includes('support')) {
           reply = 'ניתן לפנות אלינו בכל שאלה ישירות לכתובת האימייל של שירות הלקוחות: support@quotecodepro.com. אנו משתדלים להשיב בתוך 24 שעות בימי עסקים.';
         } else if (lower.includes('ענן') || lower.includes('אבטחה') || lower.includes('בטוח')) {
@@ -269,22 +269,23 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
   return (
     <div className="no-print" style={{ position: 'relative', display: 'inline-block' }}>
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
+          .ai-btn-text {
+            display: none !important;
+          }
+          .ai-support-btn {
+            padding: 8px 10px !important;
+            border-radius: 50% !important;
+          }
           .ai-chat-popup {
             position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            height: 100dvh !important;
+            bottom: 10px !important;
+            left: 10px !important;
+            right: 10px !important;
+            width: auto !important;
             max-width: 100% !important;
-            max-height: none !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
-            box-sizing: border-box !important;
-            z-index: 999999 !important;
+            height: 75vh !important;
+            max-height: 480px !important;
           }
         }
       `}</style>
@@ -303,12 +304,11 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          whiteSpace: 'nowrap'
+          gap: '6px'
         }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-        <span className="ai-btn-text" style={{ whiteSpace: 'nowrap' }}>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}</span>
+        <span className="ai-btn-text">{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}</span>
       </button>
 
       {isOpen && (
