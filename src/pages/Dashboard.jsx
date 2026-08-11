@@ -1710,14 +1710,15 @@ export default function Dashboard() {
                   onClick={() => setShowPricingModal(true)}
                   style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: '16px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem', boxShadow: '0 2px 8px rgba(245, 158, 11, 0.25)', display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
-                  ⭐ {isHebrew ? 'שדרג חבילה' : 'Upgrade Plan'}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: isHebrew?0:'4px', marginLeft: isHebrew?'4px':0}}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span>{isHebrew ? 'שדרג חבילה' : 'Upgrade Plan'}</span>
                 </button>
               )}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               {isSuperAdmin && (
-                <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.65rem', fontWeight: 'bold', padding: '3px 6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ background: '#fef08a', color: '#854d0e', fontSize: '0.65rem', fontWeight: 'bold', padding: '3px 6px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z"/></svg>
                   SUPER ADMIN
                 </span>
@@ -1728,14 +1729,17 @@ export default function Dashboard() {
           </div>
 
           {statusMsg.text && statusMsg.text !== 'System connected to Supabase.' && (
-            <div style={{ padding: '8px 12px', borderRadius: '6px', marginBottom: '12px', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b', fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem' }}>
-              {statusMsg.text}
+            <div style={{ padding: '8px 12px', borderRadius: '6px', marginBottom: '12px', background: statusMsg.type === 'success' ? '#dcfce7' : '#fee2e2', color: statusMsg.type === 'success' ? '#166534' : '#991b1b', fontWeight: 'bold', textAlign: 'center', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+              {statusMsg.type !== 'success' && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
+              <span>{statusMsg.text}</span>
             </div>
           )}
 
           {isExpiringSoon && (
             <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#991b1b', padding: '10px 16px', borderRadius: '8px', marginBottom: '12px', fontWeight: 'bold', textAlign: 'center', fontSize: '0.85rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-              <span>⚠️</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </span>
               <span>{isHebrew ? `תקופת הניסיון שלך עומדת לפוג בעוד ${trialDaysLeft} ימים!` : `Your trial period expires in ${trialDaysLeft} days!`}</span>
             </div>
           )}
@@ -1751,8 +1755,9 @@ export default function Dashboard() {
           )}
 
           {isTrialExpired && !isSuperAdmin && (
-            <div style={{ background: '#fee2e2', border: '1px solid #ef4444', color: '#b91c1c', padding: '8px 12px', borderRadius: '6px', marginBottom: '12px', fontWeight: '500', fontSize: '0.8rem' }}>
-              {isHebrew ? '⚠️ תקופת הניסיון שלך הסתיימה ועברת למסלול FREE. כדי לחזור ליהנות מכל פיצ\'רי ה-PRO, אנא שדרג את החבילה.' : '⚠️ Your trial has expired and you have been moved to the FREE tier. Please upgrade.'}
+            <div style={{ background: '#fee2e2', border: '1px solid #ef4444', color: '#b91c1c', padding: '8px 12px', borderRadius: '6px', marginBottom: '12px', fontWeight: '500', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span>{isHebrew ? 'תקופת הניסיון שלך הסתיימה ועברת למסלול FREE. כדי לחזור ליהנות מכל פיצ\'רי ה-PRO, אנא שדרג את החבילה.' : 'Your trial has expired and you have been moved to the FREE tier. Please upgrade.'}</span>
             </div>
           )}
 
@@ -1853,9 +1858,11 @@ export default function Dashboard() {
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
                     </span>
                     <span>
-                      {isHebrew 
-                        ? `הצעה חמה! הלקוח "${currentHotClientName}" צפה בהצעה מספר פעמים ועדיין לא חתם. כדאי ליצור קשר!` 
-                        : `Hot Quote! Client "${currentHotClientName}" viewed the quote multiple times without signing.`}
+                      {isHebrew ? (
+                        <>הצעה חמה! הלקוח <span style={{ color: '#4f46e5', fontWeight: '900' }}>"{currentHotClientName}"</span> צפה בהצעה מספר פעמים ועדיין לא חתם. כדאי ליצור קשר!</>
+                      ) : (
+                        <>Hot Quote! Client <span style={{ color: '#4f46e5', fontWeight: '900' }}>"{currentHotClientName}"</span> viewed the quote multiple times without signing.</>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -2283,7 +2290,7 @@ export default function Dashboard() {
                                   }}
                                   title={isLifetime ? 'לחץ לביטול מנוי לכל החיים' : 'לחץ להענקת מנוי לכל החיים'}
                                 >
-                                  <span>♾️</span>
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/></svg>
                                   <span>{isLifetime ? (isHebrew ? 'יש מנוי לכל החיים' : 'Lifetime Active') : (isHebrew ? 'אין מנוי לכל החיים' : 'Trial Active')}</span>
                                 </button>
                                 <span style={{ fontSize: '0.75rem', color: '#64748b', whiteSpace: 'nowrap' }}>
@@ -2300,7 +2307,7 @@ export default function Dashboard() {
                                 style={{ background: '#e0e7ff', color: '#4f46e5', border: 'none', padding: '5px 8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                                 title={isHebrew ? 'הצג פרטי משתמש מלאים' : 'View User Details'}
                               >
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                                 <span>{isHebrew ? 'פרטים' : 'Details'}</span>
                               </button>
                             </td>
@@ -2319,23 +2326,33 @@ export default function Dashboard() {
 
       <div className="no-print mobile-bottom-nav" style={{ display: 'flex', position: 'fixed', bottom: 0, left: 0, width: '100%', background: '#1e293b', color: 'white', justifyContent: 'space-around', padding: '10px 0', zIndex: 9998, boxShadow: '0 -4px 15px rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <button onClick={() => { setActiveTab('main'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'main' && !showQuoteForm ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>📄</span>
+          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </span>
           {isHebrew ? 'הצעות' : 'Quotes'}
         </button>
         <button onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'clients' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>👥</span>
+          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
           {isHebrew ? 'לקוחות' : 'Clients'}
         </button>
         <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>⚙️</span>
+          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </span>
           {isHebrew ? 'הגדרות' : 'Settings'}
         </button>
         <button onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'finances' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>📊</span>
+          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </span>
           {isHebrew ? 'הוצאות' : 'Finances'}
         </button>
         <button onClick={() => { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>➕</span>
+          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
           {isHebrew ? 'חדש' : 'New'}
         </button>
       </div>
@@ -2344,8 +2361,9 @@ export default function Dashboard() {
         <div style={{ marginBottom: '6px' }}>
           Powered by <strong>ProFlow</strong> - {isHebrew ? 'מערכת ניהול עסק והצעות מחיר' : 'Business Management & Quoting System'}
         </div>
-        <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.8rem' }}>
-          ♿ {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
+        <button onClick={() => setShowAccessibility(true)} style={{ background: 'none', border: 'none', color: '#4f46e5', textDecoration: 'underline', cursor: 'pointer', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: isHebrew?0:'4px', marginLeft: isHebrew?'4px':0, verticalAlign: 'middle'}}><circle cx="12" cy="5" r="2"/><path d="m5 10 7-1 7 1"/><path d="m12 10v7"/><path d="m12 17-4 5"/><path d="m12 17 4 5"/></svg>
+          {isHebrew ? 'הצהרת נגישות' : 'Accessibility Statement'}
         </button>
       </footer>
     </div>
