@@ -83,8 +83,9 @@ export default function LandingLocal({ onForgotPassword }) {
         /* Desktop Header Layout */
         .header-container {
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
+          gap: 150px;
           max-width: 1050px;
           margin: 0 auto;
           padding: 12px 20px;
@@ -107,6 +108,7 @@ export default function LandingLocal({ onForgotPassword }) {
             justify-content: space-between;
             align-items: center;
             padding: 12px 16px;
+            gap: 0;
           }
           .header-logo {
             order: 1;
