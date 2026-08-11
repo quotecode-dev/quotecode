@@ -277,6 +277,16 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             padding: 8px 10px !important;
             border-radius: 50% !important;
           }
+          .ai-chat-popup {
+            position: fixed !important;
+            bottom: 10px !important;
+            left: 10px !important;
+            right: 10px !important;
+            width: auto !important;
+            max-width: 100% !important;
+            height: 75vh !important;
+            max-height: 480px !important;
+          }
         }
       `}</style>
       <button
@@ -302,10 +312,10 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
       </button>
 
       {isOpen && (
-        <div style={{
-          position: 'fixed',
-          bottom: '20px',
-          [isHebrew ? 'right' : 'left']: '20px',
+        <div className="ai-chat-popup" style={{
+          position: 'absolute',
+          bottom: '45px',
+          [isHebrew ? 'right' : 'left']: '0',
           width: '360px',
           height: '480px',
           background: 'white',
