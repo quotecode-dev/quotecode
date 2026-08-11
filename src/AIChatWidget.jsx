@@ -81,7 +81,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
         } else if (lower.includes('קשר') || lower.includes('תמיכה') || lower.includes('אימייל') || lower.includes('support')) {
           reply = 'ניתן לפנות אלינו בכל שאלה ישירות לכתובת האימייל של שירות הלקוחות: support@quotecodepro.com. אנו משתדלים להשיב בתוך 24 שעות בימי עסקים.';
         } else if (lower.includes('ענן') || lower.includes('אבטחה') || lower.includes('בטוח')) {
-          reply = 'בהחלט! ProFlow מבוססת על שרתי ענן מתקדמים ברמת אבטחה גבוהה ביותר, כולל הצפנת נתונים וגיבויים אוטומטיים ששומרים על המידע העסקי שלך בבטחה מלאה.';
+          reply = 'בהחלט! ProFlow מבוססת על שרתי ענן מתקדמים ברמת אבטחה גבוהה ביותר, כולל הצפנת נתונים וגיבויים אוטומטיים שמבטיחים שהמידע שלך תמיד שמור.';
         } else {
           reply = 'ProFlow היא פלטפורמת SaaS עננית לניהול עסק, הפקת הצעות מחיר חכמות, חתימות דיגיטליות וניהול לקוחות. האם תרצה להתחיל 14 יום ניסיון חינם או לשאול על המסלולים שלנו?';
         }
@@ -283,9 +283,10 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
             bottom: auto !important;
-            width: 92vw !important;
+            right: auto !important;
+            width: 90vw !important;
             max-width: 340px !important;
-            height: 70vh !important;
+            height: 65vh !important;
             max-height: 420px !important;
             margin: 0 !important;
             box-sizing: border-box !important;

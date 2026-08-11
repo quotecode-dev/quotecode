@@ -171,7 +171,7 @@ export default function LandingLocal({ onForgotPassword }) {
           </div>
           
           <div className="header-chat-wrapper">
-            <span className="chat-label">צאט AI</span>
+            <span className="chat-label" style={{ whiteSpace: 'nowrap' }}>צאט AI</span>
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
