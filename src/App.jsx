@@ -265,14 +265,14 @@ export default function App() {
         <Route path="/public-quote/:id" element={<PublicQuote />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
         
-        {/* --- דפים משפטיים וצור קשר --- */}
+        {/* --- דפים משפטיים וצור קשר (עברית) --- */}
         <Route path="/he/terms" element={<Terms isHebrew={true} />} />
-        <Route path="/en/terms" element={<Terms isHebrew={false} />} />
-        
         <Route path="/he/privacy" element={<LegalPagePlaceholder isHebrew={true} title="מדיניות פרטיות" />} />
-        <Route path="/en/privacy" element={<LegalPagePlaceholder isHebrew={false} title="Privacy Policy" />} />
-        
         <Route path="/he/contact" element={<LegalPagePlaceholder isHebrew={true} title="צור קשר" />} />
+        
+        {/* --- דפים משפטיים וצור קשר (אנגלית) --- */}
+        <Route path="/en/terms" element={<Terms isHebrew={false} />} />
+        <Route path="/en/privacy" element={<LegalPagePlaceholder isHebrew={false} title="Privacy Policy" />} />
         <Route path="/en/contact" element={<LegalPagePlaceholder isHebrew={false} title="Contact Us" />} />
 
         <Route path="*" element={<LandingGlobal />} />
