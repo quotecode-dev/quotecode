@@ -79,6 +79,16 @@ export default function LandingGlobal({ onForgotPassword }) {
           margin-bottom: 30px;
           border: 1px solid rgba(255, 255, 255, 0.08);
         }
+        .footer-link {
+          color: #94a3b8;
+          text-decoration: none;
+          transition: color 0.2s;
+          font-size: 0.9rem;
+          margin: 0 10px;
+        }
+        .footer-link:hover {
+          color: #ffffff;
+        }
         @media (max-width: 480px) {
           .nav-btn {
             padding: 7px 14px !important;
@@ -197,7 +207,7 @@ export default function LandingGlobal({ onForgotPassword }) {
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', textAlign: 'center', color: '#34d399', fontWeight: '700', fontSize: '1rem' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
               There is a much easier, smarter, and professional way to run your business with ProFlow!
             </div>
           </div>
@@ -356,8 +366,19 @@ export default function LandingGlobal({ onForgotPassword }) {
       </main>
 
       {/* Footer */}
-      <footer style={{ background: '#05070a', color: '#64748b', padding: '30px 20px', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.85rem' }}>
-        <p style={{ margin: 0 }}>&copy; {new Date().getFullYear()} ProFlow Global. All rights reserved.</p>
+      <footer style={{ background: '#05070a', color: '#64748b', padding: '40px 20px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '15px' }}>
+            <a href="/en/terms" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>Terms of Service</a>
+            <span style={{ color: '#334155' }}>|</span>
+            <a href="/en/privacy" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>Privacy Policy</a>
+            <span style={{ color: '#334155' }}>|</span>
+            <a href="/en/contact" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>Contact Us</a>
+            <span style={{ color: '#334155' }}>|</span>
+            <a href="https://www.quotecodepro.com/en/tools" className="footer-link" style={{ textDecoration: 'none', padding: 0, color: '#818cf8', fontWeight: 'bold' }}>Business Tools</a>
+          </div>
+          <p style={{ margin: 0, fontSize: '0.85rem' }}>&copy; {new Date().getFullYear()} ProFlow Global. All rights reserved.</p>
+        </div>
       </footer>
 
     </div>

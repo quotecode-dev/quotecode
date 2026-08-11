@@ -363,7 +363,7 @@ export default function LandingLocal({ onForgotPassword }) {
             <span style={{ color: '#334155' }}>|</span>
             <a href="/he/contact" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>צור קשר</a>
             <span style={{ color: '#334155' }}>|</span>
-            <a href="https://www.quotecodepro.com/he/tools" className="footer-link" style={{ textDecoration: 'none', padding: 0, color: '#818cf8', fontWeight: 'bold' }}>כלים לעסקים</a>
+            <a href="https://www.quotecodepro.com/tools" className="footer-link" style={{ textDecoration: 'none', padding: 0, color: '#818cf8', fontWeight: 'bold' }}>כלים לעסקים</a>
           </div>
           <p style={{ margin: 0, fontSize: '0.85rem' }}>&copy; {new Date().getFullYear()} ProFlow Israel. כל הזכויות שמורות.</p>
         </div>
