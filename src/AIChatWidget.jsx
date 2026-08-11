@@ -77,7 +77,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
         } else if (lower.includes('ניסיון') || lower.includes('חינם') || lower.includes('14')) {
           reply = 'תקופת הניסיון מעניקה לך 14 יום חינם לגמרי עם גישה מלאה לכל פיצ\'רי ה-PRO של המערכת (הצעות מחיר ללא הגבלה, שליחת וואטסאפ ועוד) ללא שום התחייבות!';
         } else if (lower.includes('מע"מ') || lower.includes('מס') || lower.includes('vat')) {
-          reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט סכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
+          reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט הסכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
         } else if (lower.includes('קשר') || lower.includes('תמיכה') || lower.includes('אימייל') || lower.includes('support')) {
           reply = 'ניתן לפנות אלינו בכל שאלה ישירות לכתובת האימייל של שירות הלקוחות: support@quotecodepro.com. אנו משתדלים להשיב בתוך 24 שעות בימי עסקים.';
         } else if (lower.includes('ענן') || lower.includes('אבטחה') || lower.includes('בטוח')) {
@@ -269,29 +269,21 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
   return (
     <div className="no-print" style={{ position: 'relative', display: 'inline-block' }}>
       <style>{`
-        @media (max-width: 640px) {
-          .ai-btn-text {
-            display: none !important;
-          }
-          .ai-support-btn {
-            padding: 8px 10px !important;
-            border-radius: 50% !important;
-          }
+        @media (max-width: 768px) {
           .ai-chat-popup {
             position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            bottom: auto !important;
-            right: auto !important;
-            width: 90vw !important;
-            max-width: 360px !important;
-            height: 60dvh !important;
-            max-height: 450px !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            height: 100dvh !important;
+            max-width: 100% !important;
+            max-height: none !important;
             margin: 0 !important;
+            border-radius: 0 !important;
             box-sizing: border-box !important;
-            display: flex !important;
-            flex-direction: column !important;
             z-index: 999999 !important;
           }
         }
@@ -334,8 +326,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           zIndex: 99999,
           border: '1px solid #e2e8f0',
           overflow: 'hidden',
-          textAlign: isHebrew ? 'right' : 'left',
-          boxSizing: 'border-box'
+          textAlign: isHebrew ? 'right' : 'left'
         }} dir={isHebrew ? 'rtl' : 'ltr'}>
           <div style={{
             background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
@@ -343,8 +334,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             padding: '12px 16px',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
-            flexShrink: 0
+            alignItems: 'center'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '1.1rem' }}>✨</span>
@@ -411,7 +401,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={handleSend} style={{ padding: '10px', background: 'white', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '8px', flexShrink: 0 }}>
+          <form onSubmit={handleSend} style={{ padding: '10px', background: 'white', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '8px' }}>
             <input
               type="text"
               value={input}
