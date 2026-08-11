@@ -142,14 +142,18 @@ export default function Dashboard() {
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN') {
-        setSession(session);
-        if (session?.user?.id) {
-          await loadData(session.user.id, session.user.email);
-        }
-      } else if (event === 'TOKEN_REFRESHED') {
-        setSession(session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // חוק הברזל: מעדכן סשן רק אם ה-ID אכן השתנה בפועל כדי למנוע איפוס טפסים בחזרה לטאב
+        setSession((prevSession) => {
+          if (prevSession?.user?.id !== newSession?.user?.id) {
+            if (newSession?.user?.id) {
+              loadData(newSession.user.id, newSession.user.email);
+            }
+            return newSession;
+          }
+          return prevSession;
+        });
       } else if (event === 'SIGNED_OUT') {
         setSession(null);
         setQuotes([]);
