@@ -80,7 +80,7 @@ export default function LandingLocal({ onForgotPassword }) {
           color: #ffffff;
         }
         
-        /* Flexbox Header - Clustered around the chat center */
+        /* Flexbox Header - Centered and clustered on Desktop */
         .header-container {
           display: flex;
           justify-content: center;
@@ -93,14 +93,40 @@ export default function LandingLocal({ onForgotPassword }) {
           box-sizing: border-box;
         }
 
+        .chat-label {
+          display: none;
+        }
+
         @media (max-width: 768px) {
           .header-container {
-            flex-direction: column;
-            gap: 15px;
-            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
           }
-        }
-        @media (max-width: 480px) {
+          .header-logo {
+            order: 1;
+          }
+          .header-actions {
+            order: 2;
+          }
+          .header-chat-wrapper {
+            order: 3;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 8px;
+          }
+          .chat-label {
+            display: block !important;
+            font-size: 0.8rem;
+            color: #818cf8;
+            font-weight: bold;
+            margin-bottom: 4px;
+          }
           .nav-btn {
             padding: 8px 12px !important;
             font-size: 0.8rem !important;
@@ -121,15 +147,16 @@ export default function LandingLocal({ onForgotPassword }) {
       <header style={{ background: 'rgba(9, 13, 22, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div className="header-container">
           
-          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '4px 8px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
+          <div className="header-logo" style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '4px 8px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
             <ProFlowLogo size={32} rtl={true} />
           </div>
           
-          <div>
+          <div className="header-chat-wrapper">
+            <span className="chat-label">צאט AI</span>
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {onForgotPassword && (
               <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
                 שכחת סיסמה?
