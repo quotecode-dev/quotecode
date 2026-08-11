@@ -283,7 +283,6 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             bottom: 0 !important;
             left: 0 !important;
             right: 0 !important;
-            transform: none !important;
             width: 100% !important;
             max-width: 100% !important;
             height: 75dvh !important;
@@ -292,6 +291,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             border-radius: 16px 16px 0 0 !important;
             box-sizing: border-box !important;
             z-index: 999999 !important;
+            transform: none !important;
           }
         }
       `}</style>
@@ -310,18 +310,18 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          whiteSpace: 'nowrap'
+          gap: '6px'
         }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-        <span className="ai-btn-text" style={{ whiteSpace: 'nowrap' }}>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}</span>
+        <span className="ai-btn-text">{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}</span>
       </button>
 
       {isOpen && (
         <div className="ai-chat-popup" style={{
           position: 'absolute',
-          bottom: '45px',
+          top: '100%',
+          marginTop: '15px',
           [isHebrew ? 'right' : 'left']: '0',
           width: '360px',
           height: '480px',
@@ -333,8 +333,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           zIndex: 99999,
           border: '1px solid #e2e8f0',
           overflow: 'hidden',
-          textAlign: isHebrew ? 'right' : 'left',
-          boxSizing: 'border-box'
+          textAlign: isHebrew ? 'right' : 'left'
         }} dir={isHebrew ? 'rtl' : 'ltr'}>
           <div style={{
             background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
