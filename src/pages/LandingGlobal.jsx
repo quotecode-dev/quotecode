@@ -225,8 +225,8 @@ export default function LandingGlobal({ onForgotPassword }) {
                 <div style={{ color: '#818cf8', fontSize: '1.5rem', fontWeight: 'bold', marginTop: '4px' }}>142</div>
               </div>
             </div>
-            <div style={{ background: '#1f2937', padding: '20px', borderRadius: '8px', textAlign: 'center', color: '#94a3b8', border: '1px dashed rgba(255,255,255,0.1)', fontSize: '0.9rem' }}>
-              Live Preview of ProFlow Quotation & Billing System
+            <div style={{ background: '#1f2937', padding: '20px', borderRadius: '8px', textAlign: 'center', color: '#94a3b8', border: '1px dashed rgba(255,255,255,0.1)', fontSize: '0.9rem', fontWeight: 'bold' }}>
+              This is how your business dashboard will look in ProFlow
             </div>
           </div>
 

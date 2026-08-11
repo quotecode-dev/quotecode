@@ -205,8 +205,8 @@ export default function LandingLocal({ onForgotPassword }) {
                 <div style={{ color: '#818cf8', fontSize: '1.5rem', fontWeight: 'bold', marginTop: '4px' }}>142</div>
               </div>
             </div>
-            <div style={{ background: '#1f2937', padding: '20px', borderRadius: '10px', textAlign: 'center', color: '#94a3b8', border: '1px dashed rgba(255,255,255,0.1)', fontSize: '0.9rem' }}>
-              תצוגה מקדימה חיה של מערכת ניהול הצעות המחיר והגבייה
+            <div style={{ background: '#1f2937', padding: '20px', borderRadius: '10px', textAlign: 'center', color: '#94a3b8', border: '1px dashed rgba(255,255,255,0.1)', fontSize: '0.9rem', fontWeight: 'bold' }}>
+              כך ייראה דשבורד הניהול של העסק שלך ב-ProFlow
             </div>
           </div>
 
