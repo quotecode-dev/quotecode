@@ -1,283 +1,259 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Sparkles, CheckCircle, ArrowRight, ShieldCheck, Zap, BarChart3, 
-  FileText, Users, Clock, Globe, Lock, ChevronDown, Star, Menu, X, 
-  HelpCircle, MessageSquare, LogIn, Database, RefreshCw, Send, Check
-} from 'lucide-react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import LandingGlobal from './pages/LandingGlobal';
+import LandingLocal from './pages/LandingLocal';
+import Dashboard from './pages/Dashboard';
+import PublicQuote from './pages/PublicQuote';
+import PublicTools from './components/PublicTools';
+import PublicToolsEn from './components/PublicToolsEn';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Contact from './pages/Contact';
+import { supabase } from './supabase';
+import { isHebrewEnv } from './utils/regionConfig';
 
-export default function App() {
-  const [lang, setLang] = useState('he'); // 'he' | 'en'
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessage, setChatMessage] = useState('');
-  const [chatMessages, setChatMessages] = useState([
-    { sender: 'ai', text: lang === 'he' ? 'שלום! אני עוזר ה-AI של ProFlow. איך אעזור לך היום בניהול העסק?' : 'Hello! I am ProFlow AI assistant. How can I help you manage your business today?' }
-  ]);
+function RootHandler() {
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    const search = window.location.search;
+    const hash = window.location.hash;
+    const isEnglishQuery = search.includes('lang=en') || search.includes('en=true');
+
+    if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+      navigate('/dashboard' + hash + search, { replace: true });
+      return;
+    }
+
+    if (isEnglishQuery) {
+      localStorage.setItem('proflow_lang', 'en');
+      return;
+    }
+
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const browserLang = navigator.language || navigator.userLanguage || '';
+    
+    if (timeZone === 'Asia/Jerusalem' || browserLang.toLowerCase().startsWith('he')) {
+      localStorage.setItem('proflow_lang', 'he');
+      navigate('/he', { replace: true });
+    } else {
+      localStorage.setItem('proflow_lang', 'en');
+    }
+  }, [navigate]);
+
+  return <LandingGlobal />;
+}
+
+export default function App() {
+  const [session, setSession] = useState(null);
+  const [recoveryMode, setRecoveryMode] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotMessage, setForgotMessage] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState('');
+
+  const queryParams = new URLSearchParams(window.location.search);
+  
+  const currentCountry = session?.user?.user_metadata?.country || (window.location.pathname.startsWith('/he') ? 'Local' : 'International');
+  const isHebrew = isHebrewEnv(currentCountry, session) || 
+                   window.location.pathname.startsWith('/he') || 
+                   queryParams.get('lang') === 'he';
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user?.email) {
+        setRecoveryEmail(session.user.email);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      if (session?.user?.email) {
+        setRecoveryEmail(session.user.email);
+      }
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryMode(true);
+      }
+    });
+
+    if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
+      setRecoveryMode(true);
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (user?.email) setRecoveryEmail(user.email);
+      });
+    }
+
+    return () => {
+      subscription.unsubscribe();
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSendChat = (e) => {
+  const handleSendRecovery = async (e) => {
     e.preventDefault();
-    if (!chatMessage.trim()) return;
-    const newMsgs = [...chatMessages, { sender: 'user', text: chatMessage }];
-    setChatMessages(newMsgs);
-    setChatMessage('');
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { 
-        sender: 'ai', 
-        text: lang === 'he' ? 'קיבלתי את פנייתך. מערכת ProFlow מותאמת במיוחד לשוק הישראלי (כולל ניהול מע"מ 18%, מטבע שקלי, חתימות דיגיטליות וניהול לקוחות). האם תרצה עזרה בהפקת הצעת מחיר?' : 'Received! ProFlow is specifically tailored for business management with full digital workflow.'
-      }]);
-    }, 1000);
-  };
+    setForgotLoading(true);
+    setForgotMessage('');
 
-  const t = {
-    he: {
-      badge: "מבצע! 14 יום חינם לגמרי - עם גישה מלאה לכל הפיצ'רים של ה-PRO!",
-      navLogin: "כניסה למערכת / התחברות",
-      navAi: "שירות לקוחות ותמיכה AI",
-      heroTopBadge: "מבצע השקה: 14 יום ניסיון חינם לכל פיצ'רי ה-PRO!",
-      heroTitle1: "ניהול עסק, הפקת הצעות מחיר וגבייה",
-      heroTitle2: "בקלות, במהירות ובחכמה",
-      heroSubtitle: "פלטפורמת SaaS מתקדמת המותאמת במיוחד לשוק הישראלי (כולל ניהול מע\"מ 18% כחוק, מטבע שקלי, חתימות דיגיטליות וניהול לקוחות).",
-      ctaMain: "התחל 14 יום ניסיון חינם ב-PRO עכשיו",
-      ctaSub: "14 יום חינם לגמרי לכל פיצ'רי ה-PRO!",
-      socialProof: "מעל 500 עסקים כבר מפיקים הצעות מחיר בקלות",
-      featuresTitle: "הכלים המתקדמים ביותר לצמיחה עסקית",
-      featuresSubtitle: "הטכנולוגיה המובילה בישראל לניהול הצעות מחיר, מעקב לקוחות וגבייה חכמה.",
-      feat1Title: "הפקת הצעות מחיר חכמות",
-      feat1Desc: "יצירת הצעות מחיר מעוצבות ומקצועיות בתוך שניות, כולל חישוב אוטומטי של מע\"מ 18% ושקלים.",
-      feat2Title: "ניהול לקוחות CRM מתקדם",
-      feat2Desc: "מעקב מלא אחר סטטוס הלקוח, היסטוריית תשלומים, מסמכים והתראות חכמות במקום אחד.",
-      feat3Title: "אבטחת מידע וענן מתקדם",
-      feat3Desc: "גיבוי מלא לענן, אבטחת מידע ברמה הגבוהה ביותר וגישה מכל מקום ובכל זמן.",
-      footerText: "ProFlow - מערכת SaaS מתקדמת לניהול עסק והפקת הצעות מחיר חכמות.",
-      rights: "כל הזכויות שמורות © 2026 ProFlow"
-    },
-    en: {
-      badge: "Promo! 14 days completely free - full access to all PRO features!",
-      navLogin: "System Login / Sign In",
-      navAi: "AI Customer Service & Support",
-      heroTopBadge: "Launch Promo: 14-day free trial for all PRO features!",
-      heroTitle1: "Business Management, Quotes & Invoicing",
-      heroTitle2: "Easily, Quickly & Smartly",
-      heroSubtitle: "Advanced SaaS platform tailored for modern businesses (including 18% VAT handling, multi-currency, digital signatures & client CRM).",
-      ctaMain: "Start 14-Day Free PRO Trial Now",
-      ctaSub: "14 days completely free for all PRO features!",
-      socialProof: "Over 500 businesses create quotes with ease",
-      featuresTitle: "Advanced Tools for Business Growth",
-      featuresSubtitle: "Leading technology for quotes, client tracking, and smart billing.",
-      feat1Title: "Smart Quote Generation",
-      feat1Desc: "Create stunning, professional quotes in seconds with automated 18% VAT calculations.",
-      feat2Title: "Advanced CRM Management",
-      feat2Desc: "Full tracking of client status, payment history, documents, and smart alerts.",
-      feat3Title: "Cloud Security & Infrastructure",
-      feat3Desc: "Full cloud backup, top-tier data security, and access from anywhere at any time.",
-      footerText: "ProFlow - Advanced SaaS platform for business management and smart quotes.",
-      rights: "All rights reserved © 2026 ProFlow"
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: window.location.origin + (!isHebrew ? '/dashboard?lang=en' : '/dashboard'),
+    });
+
+    setForgotLoading(false);
+
+    if (error) {
+      setForgotMessage(!isHebrew ? 'Error: ' + error.message : 'שגיאה בשליחה: ' + error.message);
+    } else {
+      setForgotMessage(!isHebrew ? 'Recovery link sent successfully to your email.' : 'קישור לשחזור סיסמה נשלח בהצלחה לכתובת המייל שלך.');
+      setTimeout(() => {
+        setForgotPasswordOpen(false);
+        setForgotMessage('');
+        setForgotEmail('');
+      }, 3000);
     }
   };
 
-  const currentT = t[lang];
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setUpdateLoading(true);
+    setUpdateMessage('');
+
+    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+    setUpdateLoading(false);
+
+    if (error) {
+      setUpdateMessage(!isHebrew ? 'Error updating password: ' + error.message : 'שגיאה בעדכון הסיסמה: ' + error.message);
+    } else {
+      if (window.PasswordCredential) {
+        try {
+          const userEmail = recoveryEmail || data?.user?.email;
+          if (userEmail) {
+            navigator.credentials.store(new PasswordCredential({
+              id: userEmail,
+              password: newPassword
+            }));
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      setUpdateMessage(!isHebrew ? 'Password updated successfully! Redirecting...' : 'הסיסמה עודכנה בהצלחה! מעביר אותך למערכת...');
+      setTimeout(() => {
+        setRecoveryMode(false);
+        window.location.href = !isHebrew ? '/dashboard?lang=en' : '/dashboard';
+      }, 2000);
+    }
+  };
 
   return (
-    <div className={`min-h-screen bg-[#0A0F1D] text-white selection:bg-blue-600 selection:text-white font-sans ${lang === 'he' ? 'rtl' : 'ltr'}`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
-      
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-xs sm:text-sm font-medium py-2 px-4 text-center shadow-md relative z-50 flex items-center justify-center gap-4">
-        <span>{currentT.badge}</span>
-        <button 
-          onClick={() => setLang(lang === 'he' ? 'en' : 'he')}
-          className="bg-white/20 hover:bg-white/35 transition px-2 py-0.5 rounded text-xs font-bold uppercase"
-        >
-          {lang === 'he' ? 'English' : 'עברית'}
-        </button>
-      </div>
-
-      {/* Header - Fixed Container Alignment */}
-      <header className="w-full bg-[#0A0F1D]/90 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          
-          {/* Logo (Right side in Hebrew) */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/60 px-4 py-2 rounded-xl shadow-inner">
-              <span className="text-xl font-black tracking-wider text-white">Pro<span className="text-indigo-400">Flow</span></span>
-              <div className="bg-indigo-600 text-white p-1 rounded-lg flex items-center justify-center">
-                <Check className="w-4 h-4" />
-              </div>
-            </div>
-          </div>
-
-          {/* Center AI Chat Button */}
-          <div className="hidden md:flex items-center">
+    <BrowserRouter>
+      {/* חלון שחזור סיסמה */}
+      {forgotPasswordOpen && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center',
+          alignItems: 'center', zIndex: 9999, direction: !isHebrew ? 'ltr' : 'rtl', fontFamily: 'Arial, sans-serif'
+        }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', textAlign: 'center', position: 'relative' }}>
             <button 
-              onClick={() => setChatOpen(!chatOpen)}
-              className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white px-5 py-2.5 rounded-full font-medium shadow-lg shadow-indigo-600/20 transition-all transform hover:scale-105"
+              onClick={() => setForgotPasswordOpen(false)}
+              style={{ position: 'absolute', top: '15px', [!isHebrew ? 'right' : 'left']: '15px', background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer', color: '#64748b' }}
             >
-              <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-              <span>{currentT.navAi}</span>
+              ✕
             </button>
-          </div>
-
-          {/* Login Button (Left side in Hebrew) */}
-          <div className="flex items-center gap-3">
-            <a 
-              href="#login" 
-              className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2 text-sm sm:text-base"
-            >
-              <LogIn className="w-4 h-4" />
-              <span>{currentT.navLogin}</span>
-            </a>
-          </div>
-
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="relative pt-16 pb-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0A0F1D] to-[#0A0F1D] -z-10" />
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-          
-          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-400 text-sm font-semibold mb-8 animate-bounce">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>{currentT.heroTopBadge}</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white tracking-tight max-w-4xl leading-tight mb-6">
-            {currentT.heroTitle1} <br />
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              {currentT.heroTitle2}
-            </span>
-          </h1>
-
-          <p className="text-slate-400 text-lg sm:text-xl max-w-2xl mb-10 leading-relaxed">
-            {currentT.heroSubtitle}
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-8">
-            <a 
-              href="#register" 
-              className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-8 py-4 rounded-2xl shadow-xl shadow-emerald-500/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 text-lg"
-            >
-              <Zap className="w-5 h-5 fill-slate-950" />
-              <span>{currentT.ctaMain}</span>
-            </a>
-          </div>
-
-          <p className="text-emerald-400 font-semibold text-sm mb-6 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4" />
-            <span>{currentT.ctaSub}</span>
-          </p>
-
-          <div className="flex items-center gap-2 text-amber-400 font-medium text-sm mb-12">
-            <div className="flex gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400" />
-              ))}
-            </div>
-            <span className="text-slate-300 ms-1">{currentT.socialProof}</span>
-          </div>
-
-          {/* Hero Image / Mockup */}
-          <div className="relative w-full max-w-4xl rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-900/50 p-2">
-            <div className="rounded-xl overflow-hidden aspect-video bg-slate-950 flex items-center justify-center relative">
-              <img 
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80" 
-                alt="Business Management" 
-                className="w-full h-full object-cover opacity-80"
+            <h2 style={{ color: '#0f172a', marginBottom: '15px' }}>{!isHebrew ? 'Password Recovery' : 'שחזור סיסמה'}</h2>
+            <p style={{ color: '#334155', fontSize: '15px', marginBottom: '20px', fontWeight: '500' }}>
+              {!isHebrew ? 'Enter your email address to recover your password' : 'לשחזור סיסמה הקלד את כתובת המייל שלך'}
+            </p>
+            <form onSubmit={handleSendRecovery}>
+              <input
+                type="email"
+                placeholder={!isHebrew ? 'Email address' : 'כתובת אימייל'}
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                required
+                autoComplete="email"
+                style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '16px', boxSizing: 'border-box', textAlign: !isHebrew ? 'left' : 'right' }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0F1D] via-transparent to-transparent opacity-60" />
-            </div>
+              <button
+                type="submit"
+                disabled={forgotLoading}
+                style={{ width: '100%', padding: '12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                {forgotLoading ? (!isHebrew ? 'Sending...' : 'שולח...') : (!isHebrew ? 'Send Recovery Link' : 'שלח לשחזור סיסמה')}
+              </button>
+            </form>
+            {forgotMessage && <p style={{ marginTop: '15px', color: forgotMessage.includes('שגיאה') || forgotMessage.includes('Error') ? '#dc2626' : '#16a34a', fontWeight: 'bold', fontSize: '14px' }}>{forgotMessage}</p>}
           </div>
-
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-slate-900/30 border-t border-slate-800/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">{currentT.featuresTitle}</h2>
-            <p className="text-slate-400 text-lg">{currentT.featuresSubtitle}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl hover:border-indigo-500/50 transition">
-              <div className="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-xl flex items-center justify-center mb-6">
-                <FileText className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">{currentT.feat1Title}</h3>
-              <p className="text-slate-400 leading-relaxed">{currentT.feat1Desc}</p>
-            </div>
-
-            <div className="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl hover:border-indigo-500/50 transition">
-              <div className="w-12 h-12 bg-purple-600/20 text-purple-400 rounded-xl flex items-center justify-center mb-6">
-                <Users className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">{currentT.feat2Title}</h3>
-              <p className="text-slate-400 leading-relaxed">{currentT.feat2Desc}</p>
-            </div>
-
-            <div className="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl hover:border-indigo-500/50 transition">
-              <div className="w-12 h-12 bg-emerald-600/20 text-emerald-400 rounded-xl flex items-center justify-center mb-6">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">{currentT.feat3Title}</h3>
-              <p className="text-slate-400 leading-relaxed">{currentT.feat3Desc}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-950 border-t border-slate-900 py-12 text-center text-slate-500 text-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="mb-2 text-slate-400">{currentT.footerText}</p>
-          <p>{currentT.rights}</p>
-        </div>
-      </footer>
-
-      {/* Floating AI Chat Widget */}
-      {chatOpen && (
-        <div className="fixed bottom-6 end-6 w-80 sm:w-96 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden">
-          <div className="bg-indigo-600 text-white p-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold">
-              <Sparkles className="w-5 h-5 text-amber-300" />
-              <span>ProFlow AI Assistant</span>
-            </div>
-            <button onClick={() => setChatOpen(false)} className="text-white hover:text-slate-200">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="p-4 h-72 overflow-y-auto flex flex-col gap-3 bg-slate-950/50">
-            {chatMessages.map((msg, idx) => (
-              <div key={idx} className={`p-3 rounded-xl max-w-[85%] text-sm ${msg.sender === 'user' ? 'bg-indigo-600 text-white ms-auto' : 'bg-slate-800 text-slate-200 me-auto'}`}>
-                {msg.text}
-              </div>
-            ))}
-          </div>
-          <form onSubmit={handleSendChat} className="p-3 bg-slate-900 border-t border-slate-800 flex gap-2">
-            <input 
-              type="text" 
-              value={chatMessage} 
-              onChange={(e) => setChatMessage(e.target.value)}
-              placeholder={lang === 'he' ? 'שאל משהו את ה-AI...' : 'Ask AI anything...'}
-              className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
-            />
-            <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-xl">
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
         </div>
       )}
 
-    </div>
+      {/* חלון עדכון סיסמה חדשה */}
+      {recoveryMode && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center',
+          alignItems: 'center', zIndex: 9999, direction: !isHebrew ? 'ltr' : 'rtl', fontFamily: 'Arial, sans-serif'
+        }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', textAlign: 'center' }}>
+            <h2 style={{ color: '#0f172a', marginBottom: '15px' }}>{!isHebrew ? 'Set New Password' : 'איפוס סיסמה חדשה'}</h2>
+            <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '20px' }}>{!isHebrew ? 'Enter your new account password' : 'הזן את הסיסמה החדשה שלך לחשבון'}</p>
+            <form onSubmit={handleUpdatePassword}>
+              <input
+                type="text"
+                name="username"
+                value={recoveryEmail}
+                readOnly
+                autoComplete="username"
+                style={{ display: 'none' }}
+              />
+              <input
+                type="password"
+                placeholder={!isHebrew ? 'New password' : 'סיסמה חדשה'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                autoComplete="new-password"
+                style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '16px', boxSizing: 'border-box', textAlign: !isHebrew ? 'left' : 'right' }}
+              />
+              <button
+                type="submit"
+                disabled={updateLoading}
+                style={{ width: '100%', padding: '12px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                {updateLoading ? (!isHebrew ? 'Updating...' : 'מעדכן...') : (!isHebrew ? 'Update Password & Save' : 'עדכן סיסמה ושמור')}
+              </button>
+            </form>
+            {updateMessage && <p style={{ marginTop: '15px', color: updateMessage.includes('שגיאה') || updateMessage.includes('Error') ? '#dc2626' : '#16a34a', fontWeight: 'bold', fontSize: '14px' }}>{updateMessage}</p>}
+          </div>
+        </div>
+      )}
+
+      <Routes>
+        <Route path="/" element={<RootHandler />} />
+        <Route path="/he" element={<LandingLocal />} />
+        <Route path="/en" element={<LandingGlobal />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/tools" element={<PublicTools />} />
+        <Route path="/en/tools" element={<PublicToolsEn />} />
+        <Route path="/public-quote/:id" element={<PublicQuote />} />
+        <Route path="/quote/:id" element={<PublicQuote />} />
+        
+        {/* --- דפים משפטיים וצור קשר --- */}
+        <Route path="/he/terms" element={<Terms isHebrew={true} />} />
+        <Route path="/he/privacy" element={<Privacy isHebrew={true} />} />
+        <Route path="/he/contact" element={<Contact isHebrew={true} />} />
+        
+        <Route path="/en/terms" element={<Terms isHebrew={false} />} />
+        <Route path="/en/privacy" element={<Privacy isHebrew={false} />} />
+        <Route path="/en/contact" element={<Contact isHebrew={false} />} />
+
+        <Route path="*" element={<LandingGlobal />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
