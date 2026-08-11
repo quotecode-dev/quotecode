@@ -77,7 +77,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
         } else if (lower.includes('ניסיון') || lower.includes('חינם') || lower.includes('14')) {
           reply = 'תקופת הניסיון מעניקה לך 14 יום חינם לגמרי עם גישה מלאה לכל פיצ\'רי ה-PRO של המערכת (הצעות מחיר ללא הגבלה, שליחת וואטסאפ ועוד) ללא שום התחייבות!';
         } else if (lower.includes('מע"מ') || lower.includes('מס') || lower.includes('vat')) {
-          reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט סכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
+          reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט הסכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
         } else if (lower.includes('קשר') || lower.includes('תמיכה') || lower.includes('אימייל') || lower.includes('support')) {
           reply = 'ניתן לפנות אלינו בכל שאלה ישירות לכתובת האימייל של שירות הלקוחות: support@quotecodepro.com. אנו משתדלים להשיב בתוך 24 שעות בימי עסקים.';
         } else if (lower.includes('ענן') || lower.includes('אבטחה') || lower.includes('בטוח')) {
@@ -279,13 +279,19 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           }
           .ai-chat-popup {
             position: fixed !important;
-            bottom: 10px !important;
-            left: 10px !important;
-            right: 10px !important;
-            width: auto !important;
+            top: auto !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            transform: none !important;
+            width: 100% !important;
             max-width: 100% !important;
-            height: 75vh !important;
-            max-height: 480px !important;
+            height: 75dvh !important;
+            max-height: 85vh !important;
+            margin: 0 !important;
+            border-radius: 16px 16px 0 0 !important;
+            box-sizing: border-box !important;
+            z-index: 999999 !important;
           }
         }
       `}</style>
@@ -304,11 +310,12 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
           display: 'flex',
           alignItems: 'center',
-          gap: '6px'
+          gap: '6px',
+          whiteSpace: 'nowrap'
         }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-        <span className="ai-btn-text">{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}</span>
+        <span className="ai-btn-text" style={{ whiteSpace: 'nowrap' }}>{isHebrew ? 'שירות לקוחות ותמיכה AI' : 'AI Support & Chat'}</span>
       </button>
 
       {isOpen && (
@@ -326,7 +333,8 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           zIndex: 99999,
           border: '1px solid #e2e8f0',
           overflow: 'hidden',
-          textAlign: isHebrew ? 'right' : 'left'
+          textAlign: isHebrew ? 'right' : 'left',
+          boxSizing: 'border-box'
         }} dir={isHebrew ? 'rtl' : 'ltr'}>
           <div style={{
             background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
@@ -407,7 +415,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={isHebrew ? 'שאל משהו...' : 'Ask something...'}
-              style={{ flex: 1, padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', outline: 'none', textAlign: isHebrew ? 'right' : 'left' }}
+              style={{ flex: 1, padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.85rem', outline: 'none', textAlign: isHebrew ? 'right' : 'left', color: '#000000' }}
             />
             <button
               type="submit"

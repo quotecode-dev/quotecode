@@ -108,36 +108,40 @@ export default function LandingLocal({ onForgotPassword }) {
         @media (max-width: 768px) {
           .header-container {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap !important; /* התיקון: מכריח שורה אחת תמיד */
             justify-content: space-between;
             align-items: center;
-            gap: 6px;
-            padding: 8px 10px;
+            gap: 4px;
+            padding: 8px 5px;
           }
           .header-logo {
             order: 1;
-          }
-          .header-actions {
-            order: 2;
             flex-shrink: 0 !important;
           }
           .header-chat-wrapper {
-            order: 3;
-            width: 100%;
+            order: 2;
+            width: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 12px;
-            margin-bottom: 6px;
+            margin-top: 0;
+            margin-bottom: 0;
             position: relative;
             z-index: 999;
           }
+          .header-actions {
+            order: 3;
+            flex-shrink: 0 !important;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+          }
           .chat-label {
             display: block !important;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #818cf8;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             white-space: nowrap !important;
           }
           .desktop-btn-text {
@@ -147,10 +151,10 @@ export default function LandingLocal({ onForgotPassword }) {
             display: inline;
           }
           .nav-btn {
-            padding: 6px 10px !important;
+            padding: 6px 8px !important;
             font-size: 0.72rem !important;
             white-space: nowrap !important;
-            flex-shrink: 0 !important;
+            flex-shrink: 0 !important; /* התיקון: מונע את השבירה לשתי שורות */
           }
           .hero-title {
             font-size: 2.2rem !important;
@@ -173,11 +177,11 @@ export default function LandingLocal({ onForgotPassword }) {
           </div>
           
           <div className="header-chat-wrapper">
-            <span className="chat-label">צאט AI</span>
+            <span className="chat-label" style={{ whiteSpace: 'nowrap' }}>צאט AI</span>
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
-          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div className="header-actions">
             {onForgotPassword && (
               <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                 שכחת סיסמה?
