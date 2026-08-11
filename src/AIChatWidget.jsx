@@ -276,26 +276,27 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
       bottom: '24px', 
       left: 0, 
       right: 0, 
-      pointerEvents: 'none', // מבטיח שאפשר יהיה ללחוץ על אלמנטים מאחורי הקונטיינר
+      pointerEvents: 'none',
       display: 'flex', 
-      justifyContent: 'center', // ממקם את התוכן במרכז (מעל 1050 פיקסלים)
+      justifyContent: 'center',
       zIndex: 999999
     }}>
       {/* מעטפת פנימית שמדמה את רוחב האתר המדויק */}
       <div style={{
         width: '100%',
         maxWidth: '1050px',
-        padding: '0 20px', // משווה את הריפוד של ה-Header המקורי
+        padding: '0 20px',
         display: 'flex',
-        justifyContent: isHebrew ? 'flex-end' : 'flex-start',
+        // הפתרון הכירורגי: מתיישר תמיד לתחילת הכיוון. בעברית (RTL) זה ימין. באנגלית (LTR) זה שמאל.
+        justifyContent: 'flex-start',
       }}>
         {/* אזור הצ'אט והכפתור עצמם */}
         <div style={{
           position: 'relative',
-          pointerEvents: 'auto', // מחזיר את היכולת ללחוץ על הצ'אט 
+          pointerEvents: 'auto', 
           display: 'flex',
           flexDirection: 'column',
-          alignItems: isHebrew ? 'flex-end' : 'flex-start'
+          alignItems: 'flex-start'
         }}>
           
           <style>{`
@@ -351,7 +352,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           {isOpen && (
             <div className="ai-chat-popup" style={{
               position: 'absolute',
-              bottom: 'calc(100% + 15px)', // נפתח כלפי מעלה ביחס לכפתור ה-Fixed
+              bottom: 'calc(100% + 15px)',
               [isHebrew ? 'right' : 'left']: '0',
               width: '360px',
               height: '520px',
