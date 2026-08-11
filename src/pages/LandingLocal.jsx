@@ -85,7 +85,7 @@ export default function LandingLocal({ onForgotPassword }) {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 600px;
+          gap: 500px;
           max-width: 1050px;
           margin: 0 auto;
           padding: 12px 20px;
