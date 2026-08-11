@@ -137,6 +137,7 @@ export default function LandingLocal({ onForgotPassword }) {
             color: #818cf8;
             font-weight: bold;
             margin-bottom: 4px;
+            white-space: nowrap !important;
           }
           .desktop-btn-text {
             display: none;
