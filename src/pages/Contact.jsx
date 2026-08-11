@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import AIChatWidget from '../components/AIChatWidget';
 
 export default function Contact({ isHebrew }) {
   const navigate = useNavigate();
 
-  // מילון תרגומים מלא לעמוד צור קשר
   const t = isHebrew ? {
     title: 'צור קשר',
     subtitle: 'נשמח לעזור! אנחנו זמינים עבורך לכל שאלה, בקשה או תקלה טכנית.',
@@ -16,9 +16,8 @@ export default function Contact({ isHebrew }) {
     responseTimeValue: 'אנו משתדלים להשיב לכל פנייה בתוך 24 שעות.',
     responseTimeDesc: 'בימי חול (א\'-ה\'). פניות שיישלחו בסוף השבוע ייענו ביום העסקים הבא.',
     aiTitle: 'צ\'אט תמיכה חכם (AI)',
-    aiDesc: 'קבל מענה מיידי 24/7 לשאלות נפוצות, תפעול המערכת והדרכות בעזרת נציג ה-AI שלנו.',
+    aiDesc: 'קבל מענה מיידי 24/7 לשאלות נפוצות, תפעול המערכת והדרכות בעזרת עוזר ה-AI שלנו.',
     aiButton: 'התחל צ\'אט ✦',
-    aiAlert: 'ה-AI שלנו עובר אימונים אחרונים על נתוני המערכת ויהיה זמין בקרוב! 🤖',
     footerText: 'ProFlow Israel - פלטפורמת ה-SaaS המתקדמת לניהול עסק.'
   } : {
     title: 'Contact Us',
@@ -31,14 +30,14 @@ export default function Contact({ isHebrew }) {
     responseTimeValue: 'We aim to respond to all inquiries within 24 hours.',
     responseTimeDesc: 'On business days. Inquiries sent over the weekend will be addressed on the next business day.',
     aiTitle: 'AI Support Chat',
-    aiDesc: 'Get instant 24/7 answers to common questions, system operations, and guides using our AI agent.',
+    aiDesc: 'Get instant 24/7 answers to common questions, system operations, and guides using our AI assistant.',
     aiButton: 'Start Chat ✦',
-    aiAlert: 'Our AI is undergoing final training on system data and will be available soon! 🤖',
     footerText: 'ProFlow Global - The advanced SaaS platform for business management.'
   };
 
   const handleAiClick = () => {
-    alert(t.aiAlert);
+    // הפעלת אירוע גלובלי לפתיחת ווידג'ט ה-AI
+    window.dispatchEvent(new CustomEvent('open-proflow-ai-chat'));
   };
 
   return (
@@ -92,21 +91,24 @@ export default function Contact({ isHebrew }) {
 
       {/* Header */}
       <header style={{ background: 'rgba(9, 13, 22, 0.9)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '16px 20px', position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
              <div style={{ width: '28px', height: '28px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
              </div>
              ProFlow
           </div>
-          <button 
-            onClick={() => navigate(-1)} 
-            style={{ background: 'transparent', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.2)', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s' }}
-            onMouseEnter={(e) => { e.target.style.color = '#ffffff'; e.target.style.borderColor = '#ffffff'; }}
-            onMouseLeave={(e) => { e.target.style.color = '#94a3b8'; e.target.style.borderColor = 'rgba(255,255,255,0.2)'; }}
-          >
-            {t.back}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <AIChatWidget isHebrew={isHebrew} isDashboard={false} />
+            <button 
+              onClick={() => navigate(-1)} 
+              style={{ background: 'transparent', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.2)', padding: '6px 16px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s' }}
+              onMouseEnter={(e) => { e.target.style.color = '#ffffff'; e.target.style.borderColor = '#ffffff'; }}
+              onMouseLeave={(e) => { e.target.style.color = '#94a3b8'; e.target.style.borderColor = 'rgba(255,255,255,0.2)'; }}
+            >
+              {t.back}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -142,8 +144,8 @@ export default function Contact({ isHebrew }) {
 
             {/* AI Chat Card */}
             <div className="contact-card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, right: 0, background: '#8b5cf6', color: 'white', padding: '4px 12px', borderBottomLeftRadius: isHebrew ? '0' : '16px', borderBottomRightRadius: isHebrew ? '16px' : '0', fontSize: '0.75rem', fontWeight: 'bold' }}>
-                Coming Soon
+              <div style={{ position: 'absolute', top: 0, right: 0, background: '#10b981', color: 'white', padding: '4px 12px', borderBottomLeftRadius: isHebrew ? '0' : '16px', borderBottomRightRadius: isHebrew ? '16px' : '0', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                Active 24/7
               </div>
               <div className="contact-icon" style={{ background: 'rgba(139, 92, 246, 0.15)' }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
