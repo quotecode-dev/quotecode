@@ -15,11 +15,17 @@ import { isHebrewEnv } from './utils/regionConfig';
 function RootHandler() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const search = window.location.search;
-    const hash = window.location.hash;
-    const isEnglishQuery = search.includes('lang=en') || search.includes('en=true');
+  const search = window.location.search;
+  const hash = window.location.hash;
+  const isEnglishQuery = search.includes('lang=en') || search.includes('en=true');
 
+  const storedLang = localStorage.getItem('proflow_lang');
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const browserLang = navigator.language || navigator.userLanguage || '';
+  
+  const isHebrewUser = storedLang === 'he' || (!storedLang && (timeZone === 'Asia/Jerusalem' || browserLang.toLowerCase().startsWith('he')));
+
+  useEffect(() => {
     if (hash.includes('type=recovery') || search.includes('type=recovery')) {
       navigate('/dashboard' + hash + search, { replace: true });
       return;
@@ -30,16 +36,20 @@ function RootHandler() {
       return;
     }
 
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const browserLang = navigator.language || navigator.userLanguage || '';
-    
-    if (timeZone === 'Asia/Jerusalem' || browserLang.toLowerCase().startsWith('he')) {
+    if (isHebrewUser) {
       localStorage.setItem('proflow_lang', 'he');
-      navigate('/he', { replace: true });
+      if (window.location.pathname === '/') {
+        navigate('/he', { replace: true });
+      }
     } else {
       localStorage.setItem('proflow_lang', 'en');
     }
-  }, [navigate]);
+  }, [navigate, hash, search, isEnglishQuery, isHebrewUser]);
+
+  // פתרון הברזל לריצוד: החלטה סינכרונית מיידית ברינדור הראשון
+  if (isHebrewUser && !isEnglishQuery) {
+    return <LandingLocal />;
+  }
 
   return <LandingGlobal />;
 }
