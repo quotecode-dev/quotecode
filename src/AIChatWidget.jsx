@@ -77,7 +77,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
         } else if (lower.includes('ניסיון') || lower.includes('חינם') || lower.includes('14')) {
           reply = 'תקופת הניסיון מעניקה לך 14 יום חינם לגמרי עם גישה מלאה לכל פיצ\'רי ה-PRO של המערכת (הצעות מחיר ללא הגבלה, שליחת וואטסאפ ועוד) ללא שום התחייבות!';
         } else if (lower.includes('מע"מ') || lower.includes('מס') || lower.includes('vat')) {
-          reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט הסכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
+          reply = 'ללקוחות בארץ המחירים כוללים מע"מ 18% כחוק (עם פירוט סכום לפני מע"מ). ללקוחות מחו"ל (International) המע"מ מוגדר אוטומטית כ-0%.';
         } else if (lower.includes('קשר') || lower.includes('תמיכה') || lower.includes('אימייל') || lower.includes('support')) {
           reply = 'ניתן לפנות אלינו בכל שאלה ישירות לכתובת האימייל של שירות הלקוחות: support@quotecodepro.com. אנו משתדלים להשיב בתוך 24 שעות בימי עסקים.';
         } else if (lower.includes('ענן') || lower.includes('אבטחה') || lower.includes('בטוח')) {
@@ -285,13 +285,14 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             bottom: auto !important;
             right: auto !important;
             width: 90vw !important;
-            max-width: 340px !important;
-            height: 60vh !important;
-            max-height: 420px !important;
+            max-width: 360px !important;
+            height: 60dvh !important;
+            max-height: 450px !important;
             margin: 0 !important;
             box-sizing: border-box !important;
             display: flex !important;
             flex-direction: column !important;
+            z-index: 999999 !important;
           }
         }
       `}</style>
@@ -342,7 +343,8 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             padding: '12px 16px',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            flexShrink: 0
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '1.1rem' }}>✨</span>
@@ -409,7 +411,7 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={handleSend} style={{ padding: '10px', background: 'white', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '8px' }}>
+          <form onSubmit={handleSend} style={{ padding: '10px', background: 'white', borderTop: '1px solid #e2e8f0', display: 'flex', gap: '8px', flexShrink: 0 }}>
             <input
               type="text"
               value={input}

@@ -108,7 +108,7 @@ export default function LandingLocal({ onForgotPassword }) {
         @media (max-width: 768px) {
           .header-container {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap !important; /* מונע שבירת שורות */
             justify-content: space-between;
             align-items: center;
             gap: 6px;
@@ -116,24 +116,27 @@ export default function LandingLocal({ onForgotPassword }) {
           }
           .header-logo {
             order: 1;
+            flex-shrink: 0;
           }
           .header-actions {
-            order: 2;
+            order: 3;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
           }
           .header-chat-wrapper {
-            order: 3;
-            width: 100%;
+            order: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 12px;
-            margin-bottom: 6px;
             position: relative;
             z-index: 999;
+            flex-shrink: 0;
           }
           .chat-label {
             display: block !important;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: #818cf8;
             font-weight: bold;
             margin-bottom: 4px;
@@ -175,9 +178,9 @@ export default function LandingLocal({ onForgotPassword }) {
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
-          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="header-actions">
             {onForgotPassword && (
-              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                 שכחת סיסמה?
               </button>
             )}
