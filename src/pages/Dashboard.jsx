@@ -105,7 +105,15 @@ export default function Dashboard() {
   const [editServiceName, setEditServiceName] = useState('');
   const [editServicePrice, setEditServicePrice] = useState('');
 
+  const [currency, setCurrency] = useState('ILS');
+
   function getCurrencySymbol(curr) {
+    if (bizCountry === 'International') {
+      if (curr === 'EUR') return '€';
+      if (curr === 'GBP') return '£';
+      if (curr === 'CAD' || curr === 'AUD') return '$';
+      return '$';
+    }
     return getCurrencySym(bizCountry, curr);
   }
 
@@ -249,7 +257,6 @@ export default function Dashboard() {
   const [clientTaxId, setClientTaxId] = useState('');
   const [clientAddress, setClientAddress] = useState('');
   
-  const [currency, setCurrency] = useState('ILS');
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState('');
@@ -443,13 +450,9 @@ export default function Dashboard() {
       setDefaultTerms(defTerms);
       setTrialEndsAt(data.trial_ends_at !== undefined ? data.trial_ends_at : null);
       
-      if (countryVal === 'International') {
-        setCurrency('USD');
-        setTerms(defTerms);
-      } else {
-        setCurrency('ILS');
-        setTerms(defTerms);
-      }
+      const userCurr = data.currency || (countryVal === 'International' ? 'USD' : 'ILS');
+      setCurrency(userCurr);
+      setTerms(defTerms);
 
       await supabase
         .from('business_settings')
@@ -466,12 +469,14 @@ export default function Dashboard() {
       const isHebNav = typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('he');
       const detectedCountry = isHebNav ? 'Local' : 'International';
       const detectedTerms = detectedCountry === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB;
+      const detectedCurr = detectedCountry === 'International' ? 'USD' : 'ILS';
 
       const defaultPayload = {
         user_id: userId,
         email: userEmail,
         business_name: 'New Business',
         country: detectedCountry,
+        currency: detectedCurr,
         plan: 'pro',
         role: 'user',
         default_terms: detectedTerms,
@@ -499,7 +504,7 @@ export default function Dashboard() {
         localStorage.setItem('proflow_cached_country', newData.country || detectedCountry);
         setDefaultTerms(newData.default_terms || detectedTerms);
         setTrialEndsAt(newData.trial_ends_at);
-        setCurrency(newData.country === 'International' ? 'USD' : 'ILS');
+        setCurrency(newData.currency || detectedCurr);
         setTerms(newData.default_terms || detectedTerms);
       } else {
         setSettingId(null);
@@ -509,7 +514,7 @@ export default function Dashboard() {
         localStorage.setItem('proflow_cached_country', detectedCountry);
         setDefaultTerms(detectedTerms);
         setTrialEndsAt(trialEndDate.toISOString());
-        setCurrency(detectedCountry === 'International' ? 'USD' : 'ILS');
+        setCurrency(detectedCurr);
         setTerms(detectedTerms);
       }
     }
@@ -553,12 +558,13 @@ export default function Dashboard() {
   async function handleAdminCountryChange(accountId, newCountry) {
     if (!newCountry) return;
     
-    // אכיפת כלל הברזל: אם מעבירים לבינלאומי (International), נעדכן אוטומטית גם את תנאי ברירת המחדל באנגלית כדי למנוע הופעת עברית
     const updatePayload = { country: newCountry };
     if (newCountry === 'International') {
       updatePayload.default_terms = DEFAULT_TERMS_ENG;
+      updatePayload.currency = 'USD';
     } else {
       updatePayload.default_terms = DEFAULT_TERMS_HEB;
+      updatePayload.currency = 'ILS';
     }
 
     const { data, error } = await supabase
@@ -599,6 +605,7 @@ export default function Dashboard() {
       logo_url: bizLogoUrl,
       default_terms: defaultTerms,
       country: bizCountry,
+      currency: currency,
       user_id: session.user.id
     };
 
@@ -1141,7 +1148,7 @@ export default function Dashboard() {
     setClientTaxId(quote.clients?.tax_id || '');
     setClientAddress(quote.clients?.address || '');
     
-    const quoteCurr = isLocalIsraeliBusiness ? 'ILS' : (quote.currency || 'USD');
+    const quoteCurr = isLocalIsraeliBusiness ? 'ILS' : (quote.currency || currency || 'USD');
     setCurrency(quoteCurr);
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
@@ -1175,7 +1182,7 @@ export default function Dashboard() {
     setValidUntil('');
     setDiscount('');
     const isIntl = !isLocalIsraeliBusiness;
-    const initialCurr = isIntl ? 'USD' : 'ILS';
+    const initialCurr = isIntl ? (currency || 'USD') : 'ILS';
     setCurrency(initialCurr);
     setTerms(isIntl ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB);
     setNotes('');
@@ -1192,7 +1199,7 @@ export default function Dashboard() {
     setClientTaxId(quote.clients?.tax_id || '');
     setClientAddress(quote.clients?.address || '');
     
-    const quoteCurr = isLocalIsraeliBusiness ? 'ILS' : (quote.currency || 'USD');
+    const quoteCurr = isLocalIsraeliBusiness ? 'ILS' : (quote.currency || currency || 'USD');
     setCurrency(quoteCurr);
 
     setQuoteStatus('Draft');
@@ -1227,7 +1234,7 @@ export default function Dashboard() {
     setDiscount('');
     setTerms(isLocalIsraeliBusiness ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     setNotes('');
-    setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
+    setCurrency(isLocalIsraeliBusiness ? 'ILS' : (currency || 'USD'));
     setItems([{ description: '', quantity: '', unit_price: '' }]);
     setStatusMsg({ text: isHebrew ? 'הפעולה בוטלה. הנה רשימת ההצעות.' : 'Action cancelled. Here are your quotes.', type: 'success' });
   };
@@ -1341,7 +1348,7 @@ export default function Dashboard() {
       setDiscount('');
       setTerms(isLocalIsraeliBusiness ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
       setNotes('');
-      setCurrency(isLocalIsraeliBusiness ? 'ILS' : 'USD');
+      setCurrency(isLocalIsraeliBusiness ? 'ILS' : (currency || 'USD'));
       setItems([{ description: '', quantity: '', unit_price: '' }]);
       loadData(session.user.id, session.user.email);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1714,7 +1721,8 @@ export default function Dashboard() {
             </div>
 
             <div style={{ flex: '0 1 auto', textAlign: 'center', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AIChatWidget isHebrew={isHebrew} />
+              {/* תיקון קריטי: הפרדה מלאה ע"י ציון isDashboard={true} */}
+              <AIChatWidget isHebrew={isHebrew} isDashboard={true} />
               {!isPro && !isSuperAdmin && (
                 <button
                   onClick={() => setShowPricingModal(true)}
@@ -1757,7 +1765,7 @@ export default function Dashboard() {
           {trialEndsAt && !isTrialExpired && !isSuperAdmin && !isExpiringSoon && (
             <div style={{ background: '#eff6ff', border: '1px solid #3b82f6', color: '#1d4ed8', padding: '8px 12px', borderRadius: '6px', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '500', flexDirection: isHebrew ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '8px', fontSize: '0.8rem' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 3 0 3 0z"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-3 0-3z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 3 0 3 0z"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-3 0-3 z"/></svg>
                 {isHebrew ? 'תקופת ניסיון פעילה (כולל כל פיצ\'רי ה-PRO)' : 'Active Trial Period (Full PRO Access)'}
               </span>
               <span>{isHebrew ? `תקופת הניסיון שלך עומדת לפוג בעוד ${trialDaysLeft} ימים` : `Your trial period expires in ${trialDaysLeft} days`}</span>
@@ -2108,6 +2116,27 @@ export default function Dashboard() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>{isHebrew ? 'טלפון עסק' : 'Business Phone'}</label>
                     <input type="text" value={bizPhone} onChange={(e) => setBizPhone(e.target.value)} placeholder="050-0000000" style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', direction: 'ltr', textAlign: 'left', background: '#f8fafc', fontSize: '0.85rem' }} />
                   </div>
+
+                  {/* הוספת בחירת מטבע למשתמשים בינלאומיים בלבד */}
+                  {isInternationalAccount && (
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>
+                        {isHebrew ? 'מטבע עבודה (בינלאומי)' : 'Business Currency'}
+                      </label>
+                      <select 
+                        value={currency} 
+                        onChange={(e) => setCurrency(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.85rem', fontWeight: 'bold', color: '#4f46e5' }}
+                      >
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="CAD">CAD ($)</option>
+                        <option value="AUD">AUD ($)</option>
+                      </select>
+                    </div>
+                  )}
+
                   <div style={{ gridColumn: 'span 2' }}>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>{isHebrew ? 'כתובת העסק' : 'Business Address'}</label>
                     <input type="text" value={bizAddress} onChange={(e) => setBizAddress(e.target.value)} placeholder={isHebrew ? 'לדוגמה: הסתת 4, רמת גן' : 'e.g. Main St 10, City'} style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.85rem' }} />
