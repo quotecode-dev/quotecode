@@ -286,10 +286,12 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             right: auto !important;
             width: 90vw !important;
             max-width: 340px !important;
-            height: 65vh !important;
+            height: 60vh !important;
             max-height: 420px !important;
             margin: 0 !important;
             box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
           }
         }
       `}</style>

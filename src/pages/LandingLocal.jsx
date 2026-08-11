@@ -171,13 +171,13 @@ export default function LandingLocal({ onForgotPassword }) {
           </div>
           
           <div className="header-chat-wrapper">
-            <span className="chat-label" style={{ whiteSpace: 'nowrap' }}>צאט AI</span>
+            <span className="chat-label">צאט AI</span>
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
-          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             {onForgotPassword && (
-              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                 שכחת סיסמה?
               </button>
             )}
