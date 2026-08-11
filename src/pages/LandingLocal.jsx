@@ -111,8 +111,8 @@ export default function LandingLocal({ onForgotPassword }) {
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
-            padding: 10px 12px;
+            gap: 6px;
+            padding: 8px 10px;
           }
           .header-logo {
             order: 1;
@@ -126,17 +126,17 @@ export default function LandingLocal({ onForgotPassword }) {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 15px;
-            margin-bottom: 10px;
+            margin-top: 12px;
+            margin-bottom: 6px;
             position: relative;
-            z-index: 9999;
+            z-index: 999;
           }
           .chat-label {
             display: block !important;
             font-size: 0.85rem;
             color: #818cf8;
             font-weight: bold;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
           }
           .desktop-btn-text {
             display: none;
@@ -145,8 +145,8 @@ export default function LandingLocal({ onForgotPassword }) {
             display: inline;
           }
           .nav-btn {
-            padding: 7px 12px !important;
-            font-size: 0.75rem !important;
+            padding: 6px 10px !important;
+            font-size: 0.72rem !important;
             white-space: nowrap !important;
           }
           .hero-title {
@@ -174,9 +174,9 @@ export default function LandingLocal({ onForgotPassword }) {
             <AIChatWidget isHebrew={true} isDashboard={false} />
           </div>
           
-          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             {onForgotPassword && (
-              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                 שכחת סיסמה?
               </button>
             )}
@@ -437,7 +437,7 @@ export default function LandingLocal({ onForgotPassword }) {
             <a href="/he/terms" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>תנאי שימוש</a>
             <span style={{ color: '#334155' }}>|</span>
             <a href="/he/privacy" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>מדיניות פרטיות</a>
-            <span style={{ color: '_blank' }}>|</span>
+            <span style={{ color: '#334155' }}>|</span>
             <a href="/he/contact" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>צור קשר</a>
             <span style={{ color: '#334155' }}>|</span>
             <a href="https://www.quotecodepro.com/tools" className="footer-link" style={{ textDecoration: 'none', padding: 0, color: '#818cf8', fontWeight: 'bold' }}>כלים לעסקים</a>

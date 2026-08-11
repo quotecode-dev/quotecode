@@ -279,13 +279,14 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           }
           .ai-chat-popup {
             position: fixed !important;
-            bottom: 10px !important;
-            left: 10px !important;
-            right: 10px !important;
-            width: auto !important;
-            max-width: 100% !important;
-            height: 75vh !important;
-            max-height: 480px !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            bottom: auto !important;
+            width: 92% !important;
+            max-width: 380px !important;
+            height: 70vh !important;
+            max-height: 450px !important;
           }
         }
       `}</style>
