@@ -283,11 +283,12 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             left: 50% !important;
             transform: translate(-50%, -50%) !important;
             bottom: auto !important;
-            width: 90% !important;
-            max-width: 360px !important;
+            width: 92vw !important;
+            max-width: 340px !important;
             height: 70vh !important;
-            max-height: 450px !important;
+            max-height: 420px !important;
             margin: 0 !important;
+            box-sizing: border-box !important;
           }
         }
       `}</style>
@@ -329,7 +330,8 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           zIndex: 99999,
           border: '1px solid #e2e8f0',
           overflow: 'hidden',
-          textAlign: isHebrew ? 'right' : 'left'
+          textAlign: isHebrew ? 'right' : 'left',
+          boxSizing: 'border-box'
         }} dir={isHebrew ? 'rtl' : 'ltr'}>
           <div style={{
             background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
