@@ -91,12 +91,12 @@ export default function LandingGlobal({ onForgotPassword }) {
           color: #ffffff;
         }
         
-        /* Flexbox Header - Centered and clustered around chat */
+        /* Desktop Header Layout */
         .header-container {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 150px;
+          gap: 500px;
           max-width: 1050px;
           margin: 0 auto;
           padding: 12px 20px;
@@ -104,20 +104,60 @@ export default function LandingGlobal({ onForgotPassword }) {
           box-sizing: border-box;
         }
 
+        .desktop-btn-text {
+          display: inline;
+        }
+        .mobile-btn-text {
+          display: none;
+        }
+
+        /* Mobile Header Layout Adjustments */
         @media (max-width: 768px) {
           .header-container {
-            flex-direction: column;
-            gap: 15px;
-            padding: 15px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap !important;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 0;
+          }
+          .header-logo {
+            order: 1;
+            flex-shrink: 0 !important;
+          }
+          .header-actions {
+            order: 2;
+            flex-shrink: 0 !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          .desktop-btn-text {
+            display: none;
+          }
+          .mobile-btn-text {
+            display: inline;
+          }
+          .nav-btn {
+            padding: 8px 14px !important;
+            font-size: 0.8rem !important;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+          }
+          .hero-title {
+            font-size: 2.2rem !important;
           }
         }
+        
+        /* Small Mobile Adjustments */
         @media (max-width: 480px) {
           .nav-btn {
             padding: 7px 12px !important;
             font-size: 0.8rem !important;
           }
           .hero-title {
-            font-size: 2.2rem !important;
+            font-size: 2rem !important;
           }
           .pricing-toggle-container {
             display: flex;
@@ -140,22 +180,23 @@ export default function LandingGlobal({ onForgotPassword }) {
       {/* Header */}
       <header style={{ background: 'rgba(9, 13, 22, 0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div className="header-container">
-          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '5px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/global')}>
+          
+          <div className="header-logo" style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '5px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/global')}>
             <ProFlowLogo size={32} rtl={false} />
           </div>
-          <div>
-            <AIChatWidget isHebrew={false} isDashboard={false} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          
+          <div className="header-actions">
             {onForgotPassword && (
-              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
+              <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600', whiteSpace: 'nowrap' }}>
                 Forgot Password?
               </button>
             )}
             <button className="nav-btn" onClick={() => navigate('/dashboard?lang=en')} style={{ background: '#6366f1', color: 'white', border: 'none', padding: '8px 18px', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)', whiteSpace: 'nowrap', transition: 'background 0.2s' }}>
-              Sign In / Dashboard
+              <span className="desktop-btn-text">Sign In / Dashboard</span>
+              <span className="mobile-btn-text">Sign In</span>
             </button>
           </div>
+
         </div>
       </header>
 
@@ -232,7 +273,7 @@ export default function LandingGlobal({ onForgotPassword }) {
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', textAlign: 'center', color: '#34d399', fontWeight: '700', fontSize: '1rem' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1-1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
               There is a much easier, smarter, and professional way to run your business with ProFlow!
             </div>
           </div>
@@ -405,6 +446,9 @@ export default function LandingGlobal({ onForgotPassword }) {
           <p style={{ margin: 0, fontSize: '0.85rem' }}>&copy; {new Date().getFullYear()} ProFlow Global. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Global AI Chat Widget - Fixed to bottom corner */}
+      <AIChatWidget isHebrew={false} isDashboard={false} />
 
     </div>
   );
