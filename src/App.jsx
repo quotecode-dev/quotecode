@@ -71,10 +71,18 @@ export default function App() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-      if (session?.user?.email) {
-        setRecoveryEmail(session.user.email);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
+      // חוק הברזל: מעדכן את הסשן רק אם המשתמש התחבר/התנתק בפועל או ה-ID השתנה,
+      // כדי למנוע איפוס טפסים וריענוני סרק מיותרים כשחוזרים לטאב מהדפדפן.
+      setSession((prevSession) => {
+        if (prevSession?.user?.id !== newSession?.user?.id) {
+          return newSession;
+        }
+        return prevSession;
+      });
+
+      if (newSession?.user?.email) {
+        setRecoveryEmail(newSession.user.email);
       }
       if (event === 'PASSWORD_RECOVERY') {
         setRecoveryMode(true);
