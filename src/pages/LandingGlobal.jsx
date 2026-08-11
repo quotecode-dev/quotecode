@@ -90,6 +90,27 @@ export default function LandingGlobal({ onForgotPassword }) {
         .footer-link:hover {
           color: #ffffff;
         }
+        
+        /* Flexbox Header - Centered and clustered around chat */
+        .header-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 150px;
+          max-width: 1050px;
+          margin: 0 auto;
+          padding: 12px 20px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        @media (max-width: 768px) {
+          .header-container {
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+          }
+        }
         @media (max-width: 480px) {
           .nav-btn {
             padding: 7px 12px !important;
@@ -116,16 +137,16 @@ export default function LandingGlobal({ onForgotPassword }) {
         Launch Promotion! 14-day free trial - with full access to all PRO features!
       </div>
 
-      {/* Header - Aligned precisely with 1050px container and internal padding */}
+      {/* Header */}
       <header style={{ background: 'rgba(9, 13, 22, 0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', maxWidth: '1050px', margin: '0 auto', padding: '12px 24px', width: '100%', boxSizing: 'border-box' }}>
-          <div style={{ justifySelf: 'start', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '5px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/global')}>
+        <div className="header-container">
+          <div style={{ cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '5px 10px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/global')}>
             <ProFlowLogo size={32} rtl={false} />
           </div>
-          <div style={{ justifySelf: 'center' }}>
+          <div>
             <AIChatWidget isHebrew={false} isDashboard={false} />
           </div>
-          <div style={{ justifySelf: 'end', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {onForgotPassword && (
               <button onClick={onForgotPassword} style={{ background: 'transparent', color: '#818cf8', border: 'none', cursor: 'pointer', fontSize: '0.85rem', fontWeight: '600' }}>
                 Forgot Password?
