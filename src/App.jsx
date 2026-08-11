@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import PublicQuote from './pages/PublicQuote';
 import PublicTools from './components/PublicTools';
 import PublicToolsEn from './components/PublicToolsEn';
+import Terms from './pages/Terms';
 import { supabase } from './supabase';
 import { isHebrewEnv } from './utils/regionConfig';
 
@@ -264,14 +265,14 @@ export default function App() {
         <Route path="/public-quote/:id" element={<PublicQuote />} />
         <Route path="/quote/:id" element={<PublicQuote />} />
         
-        {/* --- דפים משפטיים וצור קשר (עברית) --- */}
-        <Route path="/he/terms" element={<LegalPagePlaceholder isHebrew={true} title="תנאי שימוש" />} />
-        <Route path="/he/privacy" element={<LegalPagePlaceholder isHebrew={true} title="מדיניות פרטיות" />} />
-        <Route path="/he/contact" element={<LegalPagePlaceholder isHebrew={true} title="צור קשר" />} />
+        {/* --- דפים משפטיים וצור קשר --- */}
+        <Route path="/he/terms" element={<Terms isHebrew={true} />} />
+        <Route path="/en/terms" element={<Terms isHebrew={false} />} />
         
-        {/* --- דפים משפטיים וצור קשר (אנגלית) --- */}
-        <Route path="/en/terms" element={<LegalPagePlaceholder isHebrew={false} title="Terms of Service" />} />
+        <Route path="/he/privacy" element={<LegalPagePlaceholder isHebrew={true} title="מדיניות פרטיות" />} />
         <Route path="/en/privacy" element={<LegalPagePlaceholder isHebrew={false} title="Privacy Policy" />} />
+        
+        <Route path="/he/contact" element={<LegalPagePlaceholder isHebrew={true} title="צור קשר" />} />
         <Route path="/en/contact" element={<LegalPagePlaceholder isHebrew={false} title="Contact Us" />} />
 
         <Route path="*" element={<LandingGlobal />} />
