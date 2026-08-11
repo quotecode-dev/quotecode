@@ -96,7 +96,7 @@ export default function LandingLocal({ onForgotPassword }) {
         מבצע! 14 יום חינם לגמרי - עם גישה מלאה לכל הפיצ'רים של מסלול ה-PRO!
       </div>
 
-      {/* Header - Aligned precisely with 1050px container */}
+      {/* Header - Aligned precisely with 1050px container (Logo right, AI center, Actions left) */}
       <header style={{ background: 'rgba(9, 13, 22, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', maxWidth: '1050px', margin: '0 auto', padding: '12px 16px', width: '100%', boxSizing: 'border-box' }}>
           <div style={{ justifySelf: 'start', cursor: 'pointer', background: 'rgba(255, 255, 255, 0.04)', padding: '4px 8px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center' }} onClick={() => navigate('/he')}>
@@ -339,26 +339,28 @@ export default function LandingLocal({ onForgotPassword }) {
             <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#ffffff', marginBottom: '8px', textAlign: 'center' }}>שאלות נפוצות</h2>
             <p style={{ color: '#94a3b8', marginBottom: '24px', fontSize: '1rem', textAlign: 'center' }}>כל מה ששאלת על המערכת, במקום אחד.</p>
             
-            {faqs.map((faq, idx) => (
-              <div key={idx} className="faq-item" style={{ padding: '16px', cursor: 'pointer' }} onClick={() => setOpenFaq(openFaq === idx ? null : idx)}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', fontSize: '1rem', color: '#ffffff', gap: '10px' }}>
-                  <span>{faq.q}</span>
-                  <span style={{ color: '#818cf8', fontSize: '1.2rem', flexShrink: 0 }}>{openFaq === idx ? '−' : '+'}</span>
-                </div>
-                {openFaq === idx && (
-                  <div style={{ marginTop: '10px', color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.6', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px' }}>
-                    {faq.a}
+            <div className="faq-container">
+              {faqs.map((faq, idx) => (
+                <div key={idx} className="faq-item" style={{ padding: '16px', cursor: 'pointer' }} onClick={() => setOpenFaq(openFaq === idx ? null : idx)}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', fontSize: '1rem', color: '#ffffff', gap: '10px' }}>
+                    <span>{faq.q}</span>
+                    <span style={{ color: '#818cf8', fontSize: '1.2rem', flexShrink: 0 }}>{openFaq === idx ? '−' : '+'}</span>
                   </div>
-                )}
-              </div>
-            ))}
+                  {openFaq === idx && (
+                    <div style={{ marginTop: '10px', color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.6', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '10px' }}>
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
         </div>
       </main>
 
       {/* Footer */}
-      <footer style={{ background: '#05070a', color: '#64748b', padding: '40px 16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      <footer style={{ background: '#05070a', color: '#64748b', padding: '40px 16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
         <div style={{ maxWidth: '1050px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '15px' }}>
             <a href="/he/terms" className="footer-link" style={{ textDecoration: 'none', padding: 0 }}>תנאי שימוש</a>
