@@ -183,6 +183,8 @@ export default function Dashboard() {
     }
   }, [quotes]);
 
+  const isHebrew = isHebrewEnv(bizCountry, session);
+
   const handleToggleDropdown = (e, quoteId) => {
     e.stopPropagation();
     if (openDropdownId === quoteId) {
@@ -280,8 +282,6 @@ export default function Dashboard() {
   const [pendingEmailQuote, setPendingEmailQuote] = useState(null);
 
   const isInternationalAccount = bizCountry === 'International';
-  
-  const isHebrew = isHebrewEnv(bizCountry, session);
 
   let trialDaysLeft = null;
   let isTrialExpired = false;
@@ -949,7 +949,7 @@ export default function Dashboard() {
         logoUrl: bizLogoUrl,
         businessLogo: bizLogoUrl,
         logo: bizLogoUrl,
-        isHebrew: false
+        isHebrew: isHebrew
       };
 
       const { data, error } = await supabase.functions.invoke('send-quote-email', {
@@ -1581,7 +1581,7 @@ export default function Dashboard() {
   const currentHotClientName = hotQuotesList.length > 0 ? (hotQuotesList[hotQuoteIndex % hotQuotesList.length]?.clients?.company_name || 'Client') : '';
 
   return (
-  <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div dir={isHebrew ? 'rtl' : 'ltr'} style={{ fontFamily: 'Segoe UI, Tahoma, sans-serif', background: '#f8fafc', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
       <style>{`
         @keyframes popupBounce {
@@ -1863,8 +1863,8 @@ export default function Dashboard() {
                 dropdownPos={dropdownPos}
                 dropdownRef={dropdownRef}
                 handleToggleDropdown={handleToggleDropdown}
-                isHebrew={false}
-                isLocalIsraeliBusiness={false}
+                isHebrew={isHebrew}
+                isLocalIsraeliBusiness={isLocalIsraeliBusiness}
                 sym={sym}
                 formatNum={formatNum}
                 t={t}
@@ -1881,7 +1881,7 @@ export default function Dashboard() {
                     value={newServiceName} 
                     onChange={(e) => setNewServiceName(e.target.value)} 
                     required 
-                    style={{ flex: '2 1 140px', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: 'left', fontSize: '0.8rem', background: '#f8fafc' }} 
+                    style={{ flex: '2 1 140px', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.8rem', background: '#f8fafc' }} 
                   />
                   <input 
                     type="number" 
@@ -1898,7 +1898,7 @@ export default function Dashboard() {
                 </form>
 
                 <div style={{ overflowX: 'auto' }}>
-                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '320px' }}>
+                   <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '320px' }}>
                     <thead>
                       <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         <th style={{ padding: '6px' }}>{t.description}</th>
@@ -2012,8 +2012,8 @@ export default function Dashboard() {
               items={items} setItems={setItems}
               services={services}
               clients={clients}
-              isHebrew={false}
-              isLocalIsraeliBusiness={false}
+              isHebrew={isHebrew}
+              isLocalIsraeliBusiness={isLocalIsraeliBusiness}
               t={t}
               sym={sym}
               formatNum={formatNum}
@@ -2041,7 +2041,7 @@ export default function Dashboard() {
               handleClientSort={handleClientSort}
               setEditingClient={setEditingClient}
               handleDeleteClient={handleDeleteClient}
-              isHebrew={false}
+              isHebrew={isHebrew}
               t={t}
             />
           )}
@@ -2055,7 +2055,7 @@ export default function Dashboard() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '16px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>Business Name</label>
-                    <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: 'left', background: '#f8fafc', fontSize: '0.85rem' }} />
+                    <input type="text" value={bizName} onChange={(e) => setBizName(e.target.value)} required style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.85rem' }} />
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>Tax ID / Lic No</label>
@@ -2089,7 +2089,7 @@ export default function Dashboard() {
 
                   <div style={{ gridColumn: 'span 2' }}>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>Business Address</label>
-                    <input type="text" value={bizAddress} onChange={(e) => setBizAddress(e.target.value)} placeholder="e.g. Main St 10, City" style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: 'left', background: '#f8fafc', fontSize: '0.85rem' }} />
+                    <input type="text" value={bizAddress} onChange={(e) => setBizAddress(e.target.value)} placeholder="e.g. Main St 10, City" style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', background: '#f8fafc', fontSize: '0.85rem' }} />
                   </div>
                 </div>
 
@@ -2104,7 +2104,7 @@ export default function Dashboard() {
                     value={defaultTerms} 
                     onChange={(e) => setDefaultTerms(e.target.value)} 
                     rows="4"
-                    style={{ width: '100%', padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#f8fafc', boxSizing: 'border-box', textAlign: 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
+                    style={{ width: '100%', padding: '8px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#f8fafc', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.85rem', fontFamily: 'inherit', lineHeight: '1.4' }} 
                   />
                 </div>
 
@@ -2143,7 +2143,7 @@ export default function Dashboard() {
               handleExportExpenses={handleExportExpenses}
               setEditingExpense={setEditingExpense}
               handleDeleteExpense={handleDeleteExpense}
-              isHebrew={false}
+              isHebrew={isHebrew}
               sym={sym}
               formatNum={formatNum}
               t={t}
@@ -2168,12 +2168,12 @@ export default function Dashboard() {
                   placeholder="Search user (email or business)..." 
                   value={adminSearchTerm}
                   onChange={(e) => setAdminSearchTerm(e.target.value)}
-                  style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '220px', boxSizing: 'border-box', textAlign: 'left', fontSize: '0.8rem', background: '#f8fafc' }}
+                  style={{ padding: '6px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', width: '220px', boxSizing: 'border-box', textAlign: isHebrew ? 'right' : 'left', fontSize: '0.8rem', background: '#f8fafc' }}
                 />
               </div>
               
               <div style={{ overflowX: 'auto', background: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '800px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('email')}>
