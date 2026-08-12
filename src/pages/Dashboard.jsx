@@ -213,8 +213,8 @@ export default function Dashboard() {
     }
   };
   
-  const [sortField, setSortField] = useState('email');
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortField, setSortField] = useState('default_online');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   const [clientSortField, setClientSortField] = useState('company_name');
   const [clientSortDirection, setClientSortDirection] = useState('asc');
@@ -236,7 +236,7 @@ export default function Dashboard() {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection(field === 'last_sign_in' ? 'desc' : 'asc');
     }
   };
 
@@ -1385,7 +1385,7 @@ export default function Dashboard() {
       bVal = Number(b.total || 0);
     } else if (quoteSortField === 'status') {
       aVal = a.status || '';
-      bVal = b.status || '';
+      bVal = a.status || '';
     } else if (quoteSortField === 'views') {
       aVal = Number(a.view_count || 0);
       bVal = Number(b.view_count || 0);
@@ -1429,6 +1429,20 @@ export default function Dashboard() {
     return (acc.email && acc.email.toLowerCase().includes(term)) || 
            (acc.business_name && acc.business_name.toLowerCase().includes(term));
   }).sort((a, b) => {
+    const nowMs = Date.now();
+    const isOnlineA = a.last_sign_in ? (nowMs - new Date(a.last_sign_in).getTime() < 10 * 60 * 1000) : false;
+    const isOnlineB = b.last_sign_in ? (nowMs - new Date(b.last_sign_in).getTime() < 10 * 60 * 1000) : false;
+
+    if (sortField === 'default_online') {
+      // ברירת מחדל: אונליין קודם, ואז לפי זמן כניסה אחרון (מהחדש לישן)
+      if (isOnlineA && !isOnlineB) return -1;
+      if (!isOnlineA && isOnlineB) return 1;
+
+      const timeA = a.last_sign_in ? new Date(a.last_sign_in).getTime() : 0;
+      const timeB = b.last_sign_in ? new Date(b.last_sign_in).getTime() : 0;
+      return timeB - timeA;
+    }
+
     let aVal = a[sortField];
     let bVal = b[sortField];
 
@@ -2295,7 +2309,7 @@ export default function Dashboard() {
                       title="Click to view new users list"
                     >
                       <div style={{ fontSize: '0.65rem', color: '#4f46e5', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
                         NEW USERS (24H)
                       </div>
                       <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#4f46e5' }}>{newUsersList.length} ✨</div>
