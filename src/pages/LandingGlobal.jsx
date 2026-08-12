@@ -448,7 +448,7 @@ export default function LandingGlobal({ onForgotPassword }) {
       </footer>
 
       {/* Global AI Chat Widget - Fixed to bottom corner */}
-      <AIChatWidget isHebrew={false} isDashboard={false} />
+      <AIChatWidget isHebrew={isHebrew} isDashboard={false} />
 
     </div>
   );

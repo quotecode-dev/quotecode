@@ -266,9 +266,9 @@ export default function App() {
         <Route path="/he/privacy" element={<Privacy isHebrew={true} />} />
         <Route path="/he/contact" element={<Contact isHebrew={true} />} />
         
-        <Route path="/en/terms" element={<Terms isHebrew={false} />} />
-        <Route path="/en/privacy" element={<Privacy isHebrew={false} />} />
-        <Route path="/en/contact" element={<Contact isHebrew={false} />} />
+        <Route path="/en/terms" element={<Terms isHebrew={isHebrew} />} />
+        <Route path="/en/privacy" element={<Privacy isHebrew={isHebrew} />} />
+        <Route path="/en/contact" element={<Contact isHebrew={isHebrew} />} />
 
         <Route path="*" element={<LandingGlobal />} />
       </Routes>

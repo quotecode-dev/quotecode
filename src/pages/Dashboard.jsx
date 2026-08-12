@@ -1863,7 +1863,7 @@ export default function Dashboard() {
                 dropdownPos={dropdownPos}
                 dropdownRef={dropdownRef}
                 handleToggleDropdown={handleToggleDropdown}
-                isHebrew={false}
+                isHebrew={isHebrew}
                 isLocalIsraeliBusiness={false}
                 sym={sym}
                 formatNum={formatNum}
@@ -2012,7 +2012,7 @@ export default function Dashboard() {
               items={items} setItems={setItems}
               services={services}
               clients={clients}
-              isHebrew={false}
+              isHebrew={isHebrew}
               isLocalIsraeliBusiness={false}
               t={t}
               sym={sym}
@@ -2041,7 +2041,7 @@ export default function Dashboard() {
               handleClientSort={handleClientSort}
               setEditingClient={setEditingClient}
               handleDeleteClient={handleDeleteClient}
-              isHebrew={false}
+              isHebrew={isHebrew}
               t={t}
             />
           )}
@@ -2143,7 +2143,7 @@ export default function Dashboard() {
               handleExportExpenses={handleExportExpenses}
               setEditingExpense={setEditingExpense}
               handleDeleteExpense={handleDeleteExpense}
-              isHebrew={false}
+              isHebrew={isHebrew}
               sym={sym}
               formatNum={formatNum}
               t={t}
