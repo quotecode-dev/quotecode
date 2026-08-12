@@ -120,8 +120,12 @@ export default function QuoteForm({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px', marginBottom: '12px' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: '600', color: '#475569', marginBottom: '3px' }}>{t.currency}</label>
-            <select value={currency} onChange={(e) => setCurrency(e.target.value)} style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#f8fafc', boxSizing: 'border-box', fontSize: '0.85rem' }}>
-              {isLocalIsraeliBusiness ? <option value="ILS">ILS (₪)</option> : <><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option></>}
+            <select 
+              value={currency} 
+              disabled={true} 
+              style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', background: '#f1f5f9', boxSizing: 'border-box', fontSize: '0.85rem', fontWeight: 'bold', color: '#4f46e5', cursor: 'not-allowed' }}
+            >
+              <option value={currency}>{currency} ({sym})</option>
             </select>
           </div>
           <div>
@@ -164,13 +168,22 @@ export default function QuoteForm({
             </div>
         </div>
 
+        {/* כותרות עמודות פריטי ההצעה */}
+        <div style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 36px' : '2fr 1fr 1fr 1fr', gap: '6px', marginBottom: '4px', padding: '0 6px', fontSize: '0.7rem', fontWeight: 'bold', color: '#64748b' }}>
+          <span>{t.description}</span>
+          <span>{t.quantity}</span>
+          <span>{t.unitPrice}</span>
+          <span>{t.totalPrice}</span>
+          {items.length > 1 && <span></span>}
+        </div>
+
         {items.map((item, index) => (
           <div key={index} style={{ display: 'grid', gridTemplateColumns: items.length > 1 ? '2fr 1fr 1fr 1fr 36px' : '2fr 1fr 1fr 1fr', gap: '6px', marginBottom: '6px', background: '#f8fafc', padding: '6px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-            <input type="text" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '0.8rem' }} />
-            <input type="text" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '0.8rem' }} />
-            <input type="text" value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '0.8rem' }} />
-            <div style={{ padding: '7px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '5px', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.8rem' }}>{sym}{formatNum(Number(item.quantity || 0) * Number(item.unit_price || 0))}</div>
-            {items.length > 1 && <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', border: 'none', borderRadius: '5px' }}>✕</button>}
+            <input type="text" placeholder={t.description} value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} required style={{ padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '0.8rem' }} />
+            <input type="number" step="any" placeholder={t.quantity} value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} required style={{ padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '0.8rem' }} />
+            <input type="number" step="any" placeholder={t.unitPrice} value={item.unit_price} onChange={(e) => handleItemChange(index, 'unit_price', e.target.value)} required style={{ padding: '7px', border: '1px solid #cbd5e1', borderRadius: '5px', fontSize: '0.8rem' }} />
+            <div style={{ padding: '7px', background: 'white', border: '1px solid #cbd5e1', borderRadius: '5px', textAlign: isHebrew ? 'left' : 'right', fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: isHebrew ? 'flex-start' : 'flex-end' }}>{sym}{formatNum(Number(item.quantity || 0) * Number(item.unit_price || 0))}</div>
+            {items.length > 1 && <button type="button" onClick={() => removeItem(index)} style={{ background: '#fee2e2', border: 'none', borderRadius: '5px', cursor: 'pointer', color: '#991b1b', fontWeight: 'bold' }}>✕</button>}
           </div>
         ))}
 
