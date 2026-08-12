@@ -1370,7 +1370,7 @@ export default function Dashboard() {
       bVal = b.id;
     } else if (quoteSortField === 'client') {
       aVal = a.clients?.company_name || '';
-      bVal = b.clients?.company_name || '';
+      bVal = a.clients?.company_name || '';
     } else if (quoteSortField === 'total') {
       aVal = Number(a.total || 0);
       bVal = Number(b.total || 0);
@@ -2260,34 +2260,45 @@ export default function Dashboard() {
           {isSuperAdmin && activeTab === 'admin_clients' && (
             <div style={{ background: 'white', padding: '18px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)', border: '1px solid #e2e8f0' }}>
               
-              {/* סטטיסטיקת משתמשים בזמן אמת */}
+              {/* סטטיסטיקת משתמשים בזמן אמת - ממורכזת */}
               {(() => {
                 const totalU = allAccounts.length;
                 const localU = allAccounts.filter(a => (a.country || 'Local') === 'Local').length;
                 const intlU = allAccounts.filter(a => a.country === 'International').length;
+                
                 const activeRecent = allAccounts.filter(a => {
                   if (!a.last_sign_in) return false;
                   const diff = Date.now() - new Date(a.last_sign_in).getTime();
-                  return diff < 48 * 60 * 60 * 1000;
+                  return diff < 10 * 60 * 1000; // 10 דקות אחרונות
                 }).length;
+
+                const newUsersList = allAccounts.filter(a => {
+                  if (!a.created_at) return false;
+                  const diff = Date.now() - new Date(a.created_at).getTime();
+                  return diff < 7 * 24 * 60 * 60 * 1000;
+                });
 
                 return (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', marginBottom: '16px' }}>
-                    <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>Total Users</div>
-                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{totalU}</div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#4f46e5', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>NEW USERS (7D)</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#4f46e5' }}>{newUsersList.length} ✨</div>
                     </div>
-                    <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '0.65rem', color: '#166534', fontWeight: 'bold', textTransform: 'uppercase' }}>Local (LCL)</div>
-                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#166534' }}>{localU}</div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#166534', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>ACTIVE (10M)</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#166534' }}>{activeRecent} <span style={{display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#166534'}}/></div>
                     </div>
-                    <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '0.65rem', color: '#991b1b', fontWeight: 'bold', textTransform: 'uppercase' }}>International (Intl)</div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>LOCAL (LCL)</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{localU}</div>
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#991b1b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>INTERNATIONAL</div>
                       <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#991b1b' }}>{intlU}</div>
                     </div>
-                    <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ fontSize: '0.65rem', color: '#4f46e5', fontWeight: 'bold', textTransform: 'uppercase' }}>Active (Last 48h)</div>
-                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#4f46e5' }}>{activeRecent} 🟢</div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>TOTAL USERS</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{totalU}</div>
                     </div>
                   </div>
                 );
@@ -2364,11 +2375,11 @@ export default function Dashboard() {
                         const rColor = currentCountry === 'Local' ? '#166534' : '#991b1b';
                         const rBorder = currentCountry === 'Local' ? '#bbf7d0' : '#fecaca';
 
-                        // חישוב נורית חיווי לפי Last Sign In (ירוק אם התחבר ב-48 שעות האחרונות, אדום אחרת)
+                        // 10 דקות אחרונות
                         let isRecentActive = false;
                         if (acc.last_sign_in) {
                           const diffMs = Date.now() - new Date(acc.last_sign_in).getTime();
-                          isRecentActive = diffMs < 48 * 60 * 60 * 1000;
+                          isRecentActive = diffMs < 10 * 60 * 1000;
                         }
 
                         return (
@@ -2473,8 +2484,8 @@ export default function Dashboard() {
                               </div>
                             </td>
                             <td style={{ padding: '10px 6px', fontSize: '0.75rem', color: '#475569', direction: 'ltr', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span title={isRecentActive ? 'Active recently' : 'Inactive'} style={{ fontSize: '0.85rem' }}>
-                                {isRecentActive ? '🟢' : '🔴'}
+                              <span title={isRecentActive ? 'Active recently' : 'Inactive'} style={{ fontSize: '0.6rem' }}>
+                                <span style={{display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: isRecentActive ? '#22c55e' : '#ef4444'}}></span>
                               </span>
                               <span>{acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}</span>
                             </td>
