@@ -2312,7 +2312,7 @@ export default function Dashboard() {
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{verticalAlign: 'middle', marginRight: '6px'}}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                         NEW USERS (24H)
                       </div>
-                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#4f46e5' }}>{newUsersList.length} ✨</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#4f46e5' }}>{newUsersList.length}</div>
                     </div>
                     <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
                       <div style={{ fontSize: '0.65rem', color: '#166534', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>ACTIVE (10M)</div>
