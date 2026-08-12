@@ -99,6 +99,8 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           reply = 'ניתן לפנות אלינו בכל שאלה ישירות לכתובת האימייל של שירות הלקוחות: support@quotecodepro.com. אנו משתדלים להשיב בתוך 24 שעות בימי עסקים.';
         } else if (lower.includes('ענן') || lower.includes('אבטחה') || lower.includes('בטוח')) {
           reply = 'בהחלט! ProFlow מבוססת על שרתי ענן מתקדמים ברמת אבטחה גבוהה ביותר, כולל הצפנת נתונים וגיבויים אוטומטיים שמבטיחים שהמידע שלך תמיד שמור.';
+        } else if (lower.includes('ביטול') || lower.includes('להקפיא') || lower.includes('לבטל')) {
+          reply = 'ניתן לבטל או להקפיא את המנוי בכל עת ללא התחייבות. בעת הביטול מתוך "הגדרות עסק" במערכת, תוכל לבחור אם למחוק את כל הנתונים שלך לצמיתות, או לשמור אותם בארכיון לצפייה עתידית.';
         } else {
           reply = 'ProFlow היא פלטפורמת SaaS עננית לניהול עסק, הפקת הצעות מחיר חכמות, חתימות דיגיטליות וניהול לקוחות. האם תרצה להתחיל 14 יום ניסיון חינם או לשאול על המסלולים והפיצ\'רים שלנו?';
         }
@@ -123,7 +125,8 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             { label: '🗑️ מחיקת הצעת מחיר', action: 'delete_quote' },
             { label: '👥 מחיקת לקוח מספר הלקוחות', action: 'delete_client' },
             { label: '📦 מחיקת שירות מהקטלוג', action: 'delete_catalog' },
-            { label: '📊 מחיקת הוצאה מהדוחות', action: 'delete_expense' }
+            { label: '📊 מחיקת הוצאה מהדוחות', action: 'delete_expense' },
+            { label: '🛑 ביטול / מחיקת מנוי', action: 'cancel_subscription' }
           ];
         } else if (lower === 'לקוח' || lower === 'לקוחות') {
           reply = 'האם אתה מתכוון לניהול ספר הלקוחות או ליצירת הצעה ללקוח חדש?';
@@ -155,8 +158,10 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           reply = 'בטאב "הוצאות/הכנסות" (למנהלי מערכת) תוכל לנהל את הוצאות העסק השוטפות, לצפות בגרפים שנתיים של הכנסות מול הוצאות, ולייצא דוחות מרוכזים לאקסל (CSV).';
         } else if (lower.includes('אזור') || lower.includes('lcl') || lower.includes('intl') || lower.includes('משתמשים') || lower.includes('אדמין')) {
           reply = 'פאנל ה-Super Admin מאפשר לראות את כל משתמשי המערכת, לנהל את החבילות שלהם (Free, Basic, Pro), להעניק מנוי לכל החיים (Lifetime), ולשנות את אזור הפעילות (LCL לישראל בירוק, או Intl לחו"ל באדום עם התראת אישור).';
+        } else if (lower.includes('ביטול מנוי') || lower.includes('לבטל מנוי') || lower.includes('להקפיא') || lower.includes('הקפאה') || lower.includes('למחוק מנוי') || lower.includes('איך מבטלים')) {
+          reply = 'כדי לבטל או להקפיא את המנוי שלך: עבור לטאב "הגדרות עסק", גלול למטה לאזור "ניהול מנוי וחבילת שירות". לחץ על "ביטול מנוי" – במהלך תהליך העזיבה תוכל לבחור האם לשמור את כל הנתונים שלך בארכיון לצפייה עתידית (Read-only), או למחוק את כל הנתונים מהשרתים לצמיתות באופן מיידי.';
         } else {
-          reply = 'מערכת ProFlow מספקת ניהול עסק חכם, הצעות מחיר, קטלוג מוצרים ושירותים, חתימות דיגיטליות, ניהול אזורי פעילות LCL/Intl ודוחות פיננסיים. שאל אותי למשל על: הוספת מוצר לקטלוג, יצירת הצעת מחיר, ניהול לקוחות או יצירת קשר!';
+          reply = 'מערכת ProFlow מספקת ניהול עסק חכם, הצעות מחיר, קטלוג מוצרים ושירותים, חתימות דיגיטליות, ניהול אזורי פעילות LCL/Intl ודוחות פיננסיים. שאל אותי למשל על: הוספת מוצר לקטלוג, יצירת הצעת מחיר, ניהול לקוחות, ביטול מנוי, או יצירת קשר!';
         }
       }
     } else {
@@ -177,6 +182,8 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           reply = 'Yes, you can easily import your client database into ProFlow CRM, and export all data to CSV format at any time.';
         } else if (lower.includes('integration') || lower.includes('api') || lower.includes('connect')) {
           reply = 'ProFlow supports seamless integrations, direct WhatsApp messaging, and easy data exporting to external tools and Excel.';
+        } else if (lower.includes('cancel') || lower.includes('freeze') || lower.includes('pause') || lower.includes('unsubscribe')) {
+          reply = 'You can cancel or freeze your subscription at any time with no commitments. During cancellation from the "Business Settings" screen, you can choose to permanently delete all your data or archive it for future read-only access.';
         } else {
           reply = 'ProFlow is a cloud-based SaaS platform for smart business management and price quoting. Feel free to ask about our pricing, free trial, or features!';
         }
@@ -201,7 +208,8 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
             { label: '🗑️ Delete a quote', action: 'delete_quote' },
             { label: '👥 Delete a client', action: 'delete_client' },
             { label: '📦 Delete a catalog item', action: 'delete_catalog' },
-            { label: '📊 Delete an expense', action: 'delete_expense' }
+            { label: '📊 Delete an expense', action: 'delete_expense' },
+            { label: '🛑 Cancel Subscription', action: 'cancel_subscription' }
           ];
         } else if (lower === 'client' || lower === 'clients') {
           reply = 'Are you referring to managing your client database or creating a new quote for a client?';
@@ -227,8 +235,10 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
           reply = 'You can sort the quotes table by clicking on any column header (Order #, Client Name, Amount, Date, Status, or Views).';
         } else if (lower.includes('lcl') || lower.includes('intl') || lower.includes('region') || lower.includes('admin')) {
           reply = 'In the Super Admin panel, you can manage user subscription plans, grant Lifetime access, and control business regions (LCL in green for Israel or Intl in red for international).';
+        } else if (lower.includes('cancel subscription') || lower.includes('unsubscribe') || lower.includes('freeze') || lower.includes('pause') || lower.includes('delete account')) {
+          reply = 'To cancel or freeze your subscription: go to the "Business Settings" tab and scroll down to "Subscription Management". Click "Cancel Subscription" – during the cancellation process, you can complete a quick exit survey and choose whether to archive your data for future read-only access or delete it permanently.';
         } else {
-          reply = 'ProFlow provides smart business management, quotes, product catalog, digital signatures, region management (LCL/Intl), and financial reports. Feel free to ask about adding catalog items, creating quotes, managing clients, or contacting support!';
+          reply = 'ProFlow provides smart business management, quotes, product catalog, digital signatures, region management (LCL/Intl), and financial reports. Feel free to ask about adding catalog items, creating quotes, managing clients, canceling subscriptions, or contacting support!';
         }
       }
     }
@@ -278,6 +288,8 @@ export default function AIChatWidget({ isHebrew, isDashboard = false }) {
       simulatedQuery = isHebrew ? 'ניהול ספר לקוחות' : 'Manage Clients Database';
     } else if (action === 'new_quote') {
       simulatedQuery = isHebrew ? 'יצירת הצעת מחיר חדשה' : 'Create New Quote';
+    } else if (action === 'cancel_subscription') {
+      simulatedQuery = isHebrew ? 'ביטול מנוי' : 'Cancel subscription';
     }
 
     setMessages(prev => [...prev, { role: 'user', content: simulatedQuery }]);
