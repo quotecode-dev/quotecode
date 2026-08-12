@@ -648,7 +648,7 @@ export default function Dashboard() {
     if (error) {
       setStatusMsg({ text: 'Error updating client: ' + error.message, type: 'error' });
     } else {
-      setStatusMsg({ text: isHebrew ? 'פרטי הלקוח עודכנו בהצלחה!' : 'Client updated successfully!', type: 'success' });
+      setStatusMsg({ text: 'Client updated successfully!', type: 'success' });
       if (session?.user?.id) fetchClients(session.user.id);
     }
   }
@@ -667,7 +667,7 @@ export default function Dashboard() {
     if (error) {
       setStatusMsg({ text: 'Error updating expense: ' + error.message, type: 'error' });
     } else {
-      setStatusMsg({ text: isHebrew ? 'ההוצאה עודכנה בהצלחה!' : 'Expense updated successfully!', type: 'success' });
+      setStatusMsg({ text: 'Expense updated successfully!', type: 'success' });
       if (session?.user?.id) fetchExpenses(session.user.id);
     }
   }
@@ -692,12 +692,12 @@ export default function Dashboard() {
       setExpenseAmount('');
       setIsRecurring(false);
       fetchExpenses(session.user.id);
-      setStatusMsg({ text: isHebrew ? 'ההוצאה נוספה בהצלחה!' : 'Expense added successfully!', type: 'success' });
+      setStatusMsg({ text: 'Expense added successfully!', type: 'success' });
     }
   }
 
   async function handleDeleteExpense(expenseId) {
-    if (!window.confirm(isHebrew ? 'למחוק הוצאה זו?' : 'Delete this expense?')) return;
+    if (!window.confirm('Delete this expense?')) return;
     const { error } = await supabase.from('expenses').delete().eq('id', expenseId);
     if (error) setStatusMsg({ text: 'Error deleting expense: ' + error.message, type: 'error' });
     else fetchExpenses(session.user.id);
@@ -705,7 +705,7 @@ export default function Dashboard() {
 
   const exportToCSV = (dataArray, filename) => {
     if (!dataArray || dataArray.length === 0) {
-      alert(isHebrew ? 'אין נתונים לייצוא.' : 'No data to export.');
+      alert('No data to export.');
       return;
     }
     const keys = Object.keys(dataArray[0]);
@@ -1863,8 +1863,8 @@ export default function Dashboard() {
                 dropdownPos={dropdownPos}
                 dropdownRef={dropdownRef}
                 handleToggleDropdown={handleToggleDropdown}
-                isHebrew={isHebrew}
-                isLocalIsraeliBusiness={isLocalIsraeliBusiness}
+                isHebrew={false}
+                isLocalIsraeliBusiness={false}
                 sym={sym}
                 formatNum={formatNum}
                 t={t}
