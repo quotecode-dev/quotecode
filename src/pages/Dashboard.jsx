@@ -100,7 +100,6 @@ export default function Dashboard() {
 
   const [currency, setCurrency] = useState('ILS');
 
-  // Admin confirmation popup state for lock/delete subscription actions
   const [adminActionModal, setAdminActionModal] = useState({ isOpen: false, type: null, account: null });
 
   function getCurrencySymbol(curr) {
@@ -454,11 +453,19 @@ export default function Dashboard() {
       localStorage.setItem('proflow_cached_country', countryVal);
       
       const defaultFallbackTerms = countryVal === 'International' ? DEFAULT_TERMS_ENG : DEFAULT_TERMS_HEB;
-      const defTerms = data.default_terms && data.default_terms.trim() !== '' ? data.default_terms : defaultFallbackTerms;
+      let defTerms = data.default_terms && data.default_terms.trim() !== '' ? data.default_terms : defaultFallbackTerms;
+      
+      if (countryVal === 'International' && defTerms.trim() === DEFAULT_TERMS_HEB.trim()) {
+        defTerms = DEFAULT_TERMS_ENG;
+        supabase.from('business_settings').update({ default_terms: DEFAULT_TERMS_ENG }).eq('id', data.id).then();
+      } else if (countryVal === 'Local' && defTerms.trim() === DEFAULT_TERMS_ENG.trim()) {
+        defTerms = DEFAULT_TERMS_HEB;
+        supabase.from('business_settings').update({ default_terms: DEFAULT_TERMS_HEB }).eq('id', data.id).then();
+      }
+
       setDefaultTerms(defTerms);
       setTrialEndsAt(data.trial_ends_at !== undefined ? data.trial_ends_at : null);
       
-      // Ironclad Rule Enforcement
       const userCurr = countryVal === 'Local' ? 'ILS' : (data.currency || 'USD');
       setCurrency(userCurr);
       setTerms(defTerms);
@@ -475,9 +482,10 @@ export default function Dashboard() {
       const trialEndDate = new Date();
       trialEndDate.setDate(trialEndDate.getDate() + 14);
 
-      const detectedCountry = 'Local';
-      const detectedTerms = DEFAULT_TERMS_HEB;
-      const detectedCurr = 'ILS';
+      const isHebURL = window.location.pathname.startsWith('/he') || window.location.search.includes('lang=he') || localStorage.getItem('proflow_lang') === 'he';
+      const detectedCountry = isHebURL ? 'Local' : 'International';
+      const detectedTerms = isHebURL ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG;
+      const detectedCurr = isHebURL ? 'ILS' : 'USD';
 
       const defaultPayload = {
         user_id: userId,
@@ -600,7 +608,6 @@ export default function Dashboard() {
     }
   }
 
-  // Admin action handlers with modern confirmation popups
   async function executeAdminAction() {
     if (!adminActionModal.account) return;
     const acc = adminActionModal.account;
@@ -1647,7 +1654,6 @@ export default function Dashboard() {
         onPlanUpdated={() => loadData(session?.user?.id, session?.user?.email)}
       />
       
-      {/* Admin Action Confirmation Popup Modal */}
       {adminActionModal.isOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 11000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
           <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '100%', maxWidth: '380px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)', textAlign: isHebrew ? 'right' : 'left' }}>
@@ -2192,7 +2198,6 @@ export default function Dashboard() {
                 </button>
               </form>
 
-              {/* --- אזור ניהול מנוי שנוסף --- */}
               <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
                 <h3 style={{ fontSize: '0.95rem', color: '#1e293b', fontWeight: '800', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
