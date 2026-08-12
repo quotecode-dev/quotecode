@@ -261,7 +261,7 @@ export default function Dashboard() {
   const [terms, setTerms] = useState(DEFAULT_TERMS_HEB); 
   const [notes, setNotes] = useState('');
   
-  const [items, setItems] = useState([{ description: '', quantity: '', unit_price: '' }]);
+  const [items, setItems] = useState([{ description: '', quantity: '1', unit_price: '' }]);
   const [newServiceName, setNewServiceName] = useState('');
   const [newServicePrice, setNewServicePrice] = useState('');
 
@@ -310,6 +310,9 @@ export default function Dashboard() {
     addItem: isHebrew ? '+ הוסף פריט ידנית' : '+ Add Custom Item',
     quickAdd: isHebrew ? 'בחר שירות מהקטלוג...' : 'Choose from catalog...',
     description: isHebrew ? 'תיאור' : 'Description',
+    quantity: isHebrew ? 'כמות' : 'Qty',
+    unitPrice: isHebrew ? 'מחיר יחידה' : 'Unit Price',
+    totalPrice: isHebrew ? 'סכום' : 'Amount',
     total: isHebrew ? 'סה"כ' : 'Total',
     subtotal: isHebrew ? 'סכום ביניים:' : 'Subtotal:',
     vat: isHebrew ? 'מע"מ (18%):' : 'VAT (18%):',
@@ -829,7 +832,7 @@ export default function Dashboard() {
     setItems(newItems);
   };
 
-  const addItem = () => setItems([...items, { description: '', quantity: '', unit_price: '' }]);
+  const addItem = () => setItems([...items, { description: '', quantity: '1', unit_price: '' }]);
 
   const handleAddFromCatalog = (e) => {
     const sId = e.target.value;
@@ -837,9 +840,9 @@ export default function Dashboard() {
     const svc = services.find(s => s.id.toString() === sId);
     if (svc) {
       if (items.length === 1 && items[0].description === '' && items[0].unit_price === '') {
-        setItems([{ description: svc.name, quantity: 1, unit_price: svc.price }]);
+        setItems([{ description: svc.name, quantity: '1', unit_price: svc.price }]);
       } else {
-        setItems([...items, { description: svc.name, quantity: 1, unit_price: svc.price }]);
+        setItems([...items, { description: svc.name, quantity: '1', unit_price: svc.price }]);
       }
     }
     e.target.value = ''; 
@@ -1135,9 +1138,9 @@ export default function Dashboard() {
     setNotes(editNotes);
     
     if (quote.quote_items && quote.quote_items.length > 0) {
-      setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
+      setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity || '1', unit_price: item.unit_price })));
     } else {
-      setItems([{ description: '', quantity: '', unit_price: '' }]);
+      setItems([{ description: '', quantity: '1', unit_price: '' }]);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStatusMsg({ text: `Editing Quote #${quote.id.slice(0, 6)}...`, type: 'success' });
@@ -1157,7 +1160,7 @@ export default function Dashboard() {
     setCurrency(currency || (isHebrew ? 'ILS' : 'USD'));
     setTerms(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     setNotes('');
-    setItems([{ description: '', quantity: '', unit_price: '' }]);
+    setItems([{ description: '', quantity: '1', unit_price: '' }]);
   };
 
   const handleDuplicateQuote = (quote) => {
@@ -1184,9 +1187,9 @@ export default function Dashboard() {
     setNotes(dupNotes);
     
     if (quote.quote_items && quote.quote_items.length > 0) {
-      setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity, unit_price: item.unit_price })));
+      setItems(quote.quote_items.map(item => ({ description: item.description, quantity: item.quantity || '1', unit_price: item.unit_price })));
     } else {
-      setItems([{ description: '', quantity: '', unit_price: '' }]);
+      setItems([{ description: '', quantity: '1', unit_price: '' }]);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setStatusMsg({ text: 'Quote loaded for duplication.', type: 'success' });
@@ -1206,7 +1209,7 @@ export default function Dashboard() {
     setTerms(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     setNotes('');
     setCurrency(currency || (isHebrew ? 'ILS' : 'USD'));
-    setItems([{ description: '', quantity: '', unit_price: '' }]);
+    setItems([{ description: '', quantity: '1', unit_price: '' }]);
     setStatusMsg({ text: 'Action cancelled. Here are your quotes.', type: 'success' });
   };
 
@@ -1316,7 +1319,7 @@ export default function Dashboard() {
       setTerms(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
       setNotes('');
       setCurrency(currency || (isHebrew ? 'ILS' : 'USD'));
-      setItems([{ description: '', quantity: '', unit_price: '' }]);
+      setItems([{ description: '', quantity: '1', unit_price: '' }]);
       loadData(session.user.id, session.user.email);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
