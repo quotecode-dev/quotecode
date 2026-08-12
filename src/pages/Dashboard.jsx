@@ -100,6 +100,9 @@ export default function Dashboard() {
 
   const [currency, setCurrency] = useState('ILS');
 
+  // Admin confirmation popup state for lock/delete subscription actions
+  const [adminActionModal, setAdminActionModal] = useState({ isOpen: false, type: null, account: null });
+
   function getCurrencySymbol(curr) {
     if (bizCountry === 'International') {
       if (curr === 'EUR') return '€';
@@ -595,6 +598,36 @@ export default function Dashboard() {
       setStatusMsg({ text: isHebrew ? 'סטטוס הגישה עודכן בהצלחה!' : 'Access status updated successfully!', type: 'success' });
       fetchAllAccounts();
     }
+  }
+
+  // Admin action handlers with modern confirmation popups
+  async function executeAdminAction() {
+    if (!adminActionModal.account) return;
+    const acc = adminActionModal.account;
+
+    if (adminActionModal.type === 'freeze') {
+      const { error } = await supabase.from('business_settings').update({ plan: 'free', trial_ends_at: null }).eq('id', acc.id);
+      if (error) setStatusMsg({ text: 'Error freezing user account: ' + error.message, type: 'error' });
+      else {
+        setStatusMsg({ text: isHebrew ? 'המנוי הוקפא בהצלחה!' : 'Account frozen successfully!', type: 'success' });
+        fetchAllAccounts();
+      }
+    } else if (adminActionModal.type === 'delete_data') {
+      const targetUserId = acc.user_id;
+      if (targetUserId) {
+        await supabase.from('quotes').delete().eq('user_id', targetUserId);
+        await supabase.from('clients').delete().eq('user_id', targetUserId);
+        await supabase.from('services').delete().eq('user_id', targetUserId);
+        await supabase.from('expenses').delete().eq('user_id', targetUserId);
+      }
+      const { error } = await supabase.from('business_settings').delete().eq('id', acc.id);
+      if (error) setStatusMsg({ text: 'Error deleting account data: ' + error.message, type: 'error' });
+      else {
+        setStatusMsg({ text: isHebrew ? 'החשבון והנתונים נמחקו לצמיתות!' : 'Account and data deleted successfully!', type: 'success' });
+        fetchAllAccounts();
+      }
+    }
+    setAdminActionModal({ isOpen: false, type: null, account: null });
   }
 
   async function handleSaveSettings(e) {
@@ -1604,8 +1637,46 @@ export default function Dashboard() {
       `}</style>
 
       <AccessibilityModal isOpen={showAccessibility} onClose={() => setShowAccessibility(false)} isHebrew={isHebrew} />
-      <PricingModal isOpen={showPricingModal} onClose={() => setShowPricingModal(false)} isHebrew={isHebrew} isLocalIsraeliBusiness={isLocalIsraeliBusiness} />
+      <PricingModal 
+        isOpen={showPricingModal} 
+        onClose={() => setShowPricingModal(false)} 
+        isHebrew={isHebrew} 
+        isLocalIsraeliBusiness={isLocalIsraeliBusiness} 
+        currentPlan={bizPlan}
+        userId={session?.user?.id}
+        onPlanUpdated={() => loadData(session?.user?.id, session?.user?.email)}
+      />
       
+      {/* Admin Action Confirmation Popup Modal */}
+      {adminActionModal.isOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 11000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
+          <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '100%', maxWidth: '380px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.2)', textAlign: isHebrew ? 'right' : 'left' }}>
+            <h3 style={{ marginTop: 0, color: '#1e293b', fontSize: '1.1rem', marginBottom: '8px' }}>
+              {adminActionModal.type === 'freeze' 
+                ? (isHebrew ? 'האם אתה בטוח שברצונך להקפיא/לנעול את המנוי?' : 'Are you sure you want to freeze/lock this subscription?') 
+                : (isHebrew ? 'האם אתה בטוח שברצונך למחוק את החשבון והנתונים?' : 'Are you sure you want to delete this account and all data?')}
+            </h3>
+            <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '16px' }}>
+              {adminActionModal.account?.email}
+            </p>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                onClick={() => setAdminActionModal({ isOpen: false, type: null, account: null })}
+                style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '8px', borderRadius: '6px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}
+              >
+                {isHebrew ? 'ביטול' : 'Cancel'}
+              </button>
+              <button 
+                onClick={executeAdminAction}
+                style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none', padding: '8px', borderRadius: '6px', fontWeight: '600', fontSize: '0.85rem', cursor: 'pointer' }}
+              >
+                {isHebrew ? 'אישור פעולה' : 'Confirm Action'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <EditClientModal 
         isOpen={editingClient !== null}
         onClose={() => setEditingClient(null)}
@@ -2206,6 +2277,9 @@ export default function Dashboard() {
                         Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th style={{ padding: '8px 6px', textAlign: 'center' }}>
+                        Subscription Controls
+                      </th>
+                      <th style={{ padding: '8px 6px', textAlign: 'center' }}>
                         Details
                       </th>
                     </tr>
@@ -2213,7 +2287,7 @@ export default function Dashboard() {
                   <tbody>
                     {filteredAdminAccounts.length === 0 ? (
                       <tr>
-                        <td colSpan="8" style={{ textAlign: 'center', padding: '25px', color: '#94a3b8', fontSize: '0.8rem' }}>
+                        <td colSpan="9" style={{ textAlign: 'center', padding: '25px', color: '#94a3b8', fontSize: '0.8rem' }}>
                           No users found matching your search.
                         </td>
                       </tr>
@@ -2297,6 +2371,24 @@ export default function Dashboard() {
                             </td>
                             <td style={{ padding: '10px 6px', fontSize: '0.75rem', color: '#475569', direction: 'ltr', textAlign: 'left' }}>
                               {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
+                            </td>
+                            <td style={{ padding: '10px 6px', textAlign: 'center' }}>
+                              <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                                <button
+                                  onClick={() => setAdminActionModal({ isOpen: true, type: 'freeze', account: acc })}
+                                  style={{ background: '#fef3c7', color: '#b45309', border: 'none', padding: '5px 8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.7rem' }}
+                                  title="Freeze / Lock Subscription"
+                                >
+                                  {isHebrew ? 'הקפאה' : 'Freeze'}
+                                </button>
+                                <button
+                                  onClick={() => setAdminActionModal({ isOpen: true, type: 'delete_data', account: acc })}
+                                  style={{ background: '#fee2e2', color: '#991b1b', border: 'none', padding: '5px 8px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.7rem' }}
+                                  title="Delete Account & Data"
+                                >
+                                  {isHebrew ? 'מחיקה' : 'Delete'}
+                                </button>
+                              </div>
                             </td>
                             <td style={{ padding: '10px 6px', textAlign: 'center' }}>
                               <button
