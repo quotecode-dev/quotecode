@@ -451,13 +451,14 @@ export default function Dashboard() {
       setDefaultTerms(defTerms);
       setTrialEndsAt(data.trial_ends_at !== undefined ? data.trial_ends_at : null);
       
-      const userCurr = data.currency || (countryVal === 'International' ? 'USD' : 'ILS');
+      // Ironclad Rule Enforcement
+      const userCurr = countryVal === 'Local' ? 'ILS' : (data.currency || 'USD');
       setCurrency(userCurr);
       setTerms(defTerms);
 
       await supabase
         .from('business_settings')
-        .update({ last_sign_in: nowIso })
+        .update({ last_sign_in: nowIso, currency: userCurr })
         .eq('user_id', userId);
 
       if (data.role === 'super_admin') {
@@ -605,7 +606,7 @@ export default function Dashboard() {
       logo_url: bizLogoUrl,
       default_terms: defaultTerms,
       country: bizCountry,
-      currency: currency,
+      currency: isLocalIsraeliBusiness ? 'ILS' : currency,
       user_id: session.user.id
     };
 
@@ -2073,12 +2074,18 @@ export default function Dashboard() {
                     <select 
                       value={currency} 
                       onChange={(e) => setCurrency(e.target.value)}
-                      style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.85rem', fontWeight: 'bold', color: '#4f46e5' }}
+                      disabled={isLocalIsraeliBusiness}
+                      style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: isLocalIsraeliBusiness ? '#f1f5f9' : '#f8fafc', fontSize: '0.85rem', fontWeight: 'bold', color: '#4f46e5' }}
                     >
-                      <option value="ILS">ILS (₪)</option>
-                      <option value="USD">USD ($)</option>
-                      <option value="EUR">EUR (€)</option>
-                      <option value="GBP">GBP (£)</option>
+                      {isLocalIsraeliBusiness ? (
+                        <option value="ILS">ILS (₪)</option>
+                      ) : (
+                        <>
+                          <option value="USD">USD ($)</option>
+                          <option value="EUR">EUR (€)</option>
+                          <option value="GBP">GBP (£)</option>
+                        </>
+                      )}
                     </select>
                   </div>
 
