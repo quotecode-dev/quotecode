@@ -20,15 +20,6 @@ import QuotesTab from '../components/QuotesTab';
 
 const formatNum = (val) => Math.round(Number(val || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-';
-  const parts = dateStr.split('T')[0].split('-');
-  if (parts.length === 3) {
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
-  }
-  return dateStr;
-};
-
 const DEFAULT_TERMS_HEB = `תנאים כלליים:
 1. תוקף ההצעה: ההצעה בתוקף ל-30 ימים מיום הצעת המחיר.
 2. מחירים: המחירים כוללים מע"מ, אלא אם צוין אחרת.
@@ -82,13 +73,13 @@ export default function Dashboard() {
   const [bizRole, setBizRole] = useState('user');
   
   const [bizCountry, setBizCountry] = useState(() => {
-    if (typeof window === 'undefined') return 'International';
+    if (typeof window === 'undefined') return 'Local';
     const cached = localStorage.getItem('proflow_cached_country');
     if (cached) return cached;
-    return 'International';
+    return 'Local';
   });
 
-  const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_ENG);
+  const [defaultTerms, setDefaultTerms] = useState(DEFAULT_TERMS_HEB);
   const [trialEndsAt, setTrialEndsAt] = useState(null);
   const [allAccounts, setAllAccounts] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
@@ -107,7 +98,7 @@ export default function Dashboard() {
   const [editServiceName, setEditServiceName] = useState('');
   const [editServicePrice, setEditServicePrice] = useState('');
 
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('ILS');
 
   function getCurrencySymbol(curr) {
     if (bizCountry === 'International') {
@@ -162,7 +153,7 @@ export default function Dashboard() {
         setServices([]);
         setExpenses([]);
         setSettingId(null);
-        setBizCountry('International');
+        setBizCountry('Local');
         localStorage.removeItem('proflow_cached_country');
         setIsInitializing(false);
       } else if (event === 'PASSWORD_RECOVERY') {
@@ -267,7 +258,7 @@ export default function Dashboard() {
   const [quoteStatus, setQuoteStatus] = useState('Draft');
   const [validUntil, setValidUntil] = useState('');
   const [discount, setDiscount] = useState('');
-  const [terms, setTerms] = useState(DEFAULT_TERMS_ENG); 
+  const [terms, setTerms] = useState(DEFAULT_TERMS_HEB); 
   const [notes, setNotes] = useState('');
   
   const [items, setItems] = useState([{ description: '', quantity: '', unit_price: '' }]);
@@ -344,7 +335,12 @@ export default function Dashboard() {
     edit: isHebrew ? 'ערוך מסמך' : 'Edit Document',
     duplicate: isHebrew ? 'שכפל מסמך' : 'Duplicate Document',
     delete: isHebrew ? 'מחק' : 'Delete',
-    clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management'
+    clientsManagement: isHebrew ? 'ניהול לקוחות' : 'Clients Management',
+    quotesNav: isHebrew ? 'הצעות מחיר' : 'Quotes',
+    settingsNav: isHebrew ? 'הגדרות עסק' : 'Business Settings',
+    clientsNav: isHebrew ? 'לקוחות' : 'Clients',
+    financesNav: isHebrew ? 'פיננסים' : 'Finances',
+    usersAdminNav: isHebrew ? 'ניהול משתמשים' : 'Users Admin'
   };
 
   async function loadData(userId, userEmail) {
@@ -446,7 +442,7 @@ export default function Dashboard() {
       setBizLogoUrl(data.logo_url || '');
       setBizPlan(data.plan || 'pro');
       setBizRole(data.role || 'user');
-      const countryVal = data.country || 'International';
+      const countryVal = data.country || 'Local';
       setBizCountry(countryVal);
       localStorage.setItem('proflow_cached_country', countryVal);
       
@@ -471,14 +467,14 @@ export default function Dashboard() {
       const trialEndDate = new Date();
       trialEndDate.setDate(trialEndDate.getDate() + 14);
 
-      const detectedCountry = 'International';
-      const detectedTerms = DEFAULT_TERMS_ENG;
-      const detectedCurr = 'USD';
+      const detectedCountry = 'Local';
+      const detectedTerms = DEFAULT_TERMS_HEB;
+      const detectedCurr = 'ILS';
 
       const defaultPayload = {
         user_id: userId,
         email: userEmail,
-        business_name: 'New Business',
+        business_name: 'עסק חדש',
         country: detectedCountry,
         currency: detectedCurr,
         plan: 'pro',
@@ -1123,14 +1119,14 @@ export default function Dashboard() {
     setClientTaxId(quote.clients?.tax_id || '');
     setClientAddress(quote.clients?.address || '');
     
-    const quoteCurr = currency || 'USD';
+    const quoteCurr = currency || (isHebrew ? 'ILS' : 'USD');
     setCurrency(quoteCurr);
 
     setQuoteStatus(quote.status ? quote.status.charAt(0).toUpperCase() + quote.status.slice(1) : 'Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || ''); 
 
-    let editTerms = quote.terms || DEFAULT_TERMS_ENG;
+    let editTerms = quote.terms || (isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     let editNotes = quote.notes || '';
 
     setTerms(editTerms);
@@ -1156,8 +1152,8 @@ export default function Dashboard() {
     setClientAddress('');
     setValidUntil('');
     setDiscount('');
-    setCurrency(currency || 'USD');
-    setTerms(DEFAULT_TERMS_ENG);
+    setCurrency(currency || (isHebrew ? 'ILS' : 'USD'));
+    setTerms(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     setNotes('');
     setItems([{ description: '', quantity: '', unit_price: '' }]);
   };
@@ -1172,14 +1168,14 @@ export default function Dashboard() {
     setClientTaxId(quote.clients?.tax_id || '');
     setClientAddress(quote.clients?.address || '');
     
-    const quoteCurr = currency || 'USD';
+    const quoteCurr = currency || (isHebrew ? 'ILS' : 'USD');
     setCurrency(quoteCurr);
 
     setQuoteStatus('Draft');
     setValidUntil(quote.valid_until || '');
     setDiscount(quote.discount || '');
 
-    let dupTerms = quote.terms || DEFAULT_TERMS_ENG;
+    let dupTerms = quote.terms || (isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     let dupNotes = quote.notes || '';
 
     setTerms(dupTerms);
@@ -1205,9 +1201,9 @@ export default function Dashboard() {
     setClientAddress('');
     setValidUntil('');
     setDiscount('');
-    setTerms(DEFAULT_TERMS_ENG);
+    setTerms(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
     setNotes('');
-    setCurrency(currency || 'USD');
+    setCurrency(currency || (isHebrew ? 'ILS' : 'USD'));
     setItems([{ description: '', quantity: '', unit_price: '' }]);
     setStatusMsg({ text: 'Action cancelled. Here are your quotes.', type: 'success' });
   };
@@ -1315,9 +1311,9 @@ export default function Dashboard() {
       setClientAddress('');
       setValidUntil('');
       setDiscount('');
-      setTerms(DEFAULT_TERMS_ENG);
+      setTerms(isHebrew ? DEFAULT_TERMS_HEB : DEFAULT_TERMS_ENG);
       setNotes('');
-      setCurrency(currency || 'USD');
+      setCurrency(currency || (isHebrew ? 'ILS' : 'USD'));
       setItems([{ description: '', quantity: '', unit_price: '' }]);
       loadData(session.user.id, session.user.email);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1408,8 +1404,8 @@ export default function Dashboard() {
     }
 
     if (sortField === 'country') {
-      const aValStr = a.country || 'International';
-      const bValStr = b.country || 'International';
+      const aValStr = a.country || 'Local';
+      const bValStr = b.country || 'Local';
       return sortDirection === 'asc' ? aValStr.localeCompare(bValStr) : bValStr.localeCompare(aValStr);
     }
 
@@ -1749,7 +1745,7 @@ export default function Dashboard() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
               }}
             >
-              Quotes
+              {t.quotesNav}
             </button>
             <button
               onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
@@ -1762,7 +1758,7 @@ export default function Dashboard() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
               }}
             >
-              Business Settings
+              {t.settingsNav}
             </button>
             <button
               onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
@@ -1775,7 +1771,7 @@ export default function Dashboard() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
               }}
             >
-              Clients
+              {t.clientsNav}
             </button>
             <button
               onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }}
@@ -1788,7 +1784,7 @@ export default function Dashboard() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
               }}
             >
-              Finances
+              {t.financesNav}
             </button>
             {isSuperAdmin && (
               <button
@@ -1802,7 +1798,7 @@ export default function Dashboard() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px'
                 }}
               >
-                Users Admin
+                {t.usersAdminNav}
               </button>
             )}
           </div>
@@ -2079,11 +2075,10 @@ export default function Dashboard() {
                       onChange={(e) => setCurrency(e.target.value)}
                       style={{ width: '100%', padding: '7px 10px', border: '1px solid #cbd5e1', borderRadius: '6px', boxSizing: 'border-box', background: '#f8fafc', fontSize: '0.85rem', fontWeight: 'bold', color: '#4f46e5' }}
                     >
+                      <option value="ILS">ILS (₪)</option>
                       <option value="USD">USD ($)</option>
                       <option value="EUR">EUR (€)</option>
                       <option value="GBP">GBP (£)</option>
-                      <option value="CAD">CAD ($)</option>
-                      <option value="AUD">AUD ($)</option>
                     </select>
                   </div>
 
@@ -2212,11 +2207,11 @@ export default function Dashboard() {
                     ) : (
                       filteredAdminAccounts.map(acc => {
                         const isLifetime = acc.trial_ends_at === null || acc.trial_ends_at === undefined;
-                        const currentCountry = acc.country || 'International';
+                        const currentCountry = acc.country || 'Local';
                         return (
                           <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.8rem' }}>
                             <td style={{ padding: '10px 6px', fontWeight: '500', color: '#1e293b' }}>{acc.email || 'N/A'}</td>
-                            <td style={{ padding: '10px 6px', color: '#334155' }}>{acc.business_name || 'New Business'}</td>
+                            <td style={{ padding: '10px 6px', color: '#334155' }}>{acc.business_name || 'עסק חדש'}</td>
                             <td style={{ padding: '10px 6px' }}>
                               <select 
                                 value={acc.plan ? acc.plan.toLowerCase() : 'free'} 
@@ -2318,31 +2313,31 @@ export default function Dashboard() {
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           </span>
-          Quotes
+          {t.quotesNav}
         </button>
         <button onClick={() => { setActiveTab('clients'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'clients' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           </span>
-          Clients
+          {t.clientsNav}
         </button>
         <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </span>
-          Settings
+          {t.settingsNav}
         </button>
         <button onClick={() => { setActiveTab('finances'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'finances' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
-          <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
+          <span style={{ isHebrew: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           </span>
-          Finances
+          {t.financesNav}
         </button>
         <button onClick={() => { handleCreateNewQuoteClick(); }} style={{ background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </span>
-          New
+          {isHebrew ? 'חדש' : 'New'}
         </button>
       </div>
 
