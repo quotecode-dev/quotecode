@@ -340,7 +340,8 @@ export default function Dashboard() {
     settingsNav: isHebrew ? 'הגדרות עסק' : 'Business Settings',
     clientsNav: isHebrew ? 'לקוחות' : 'Clients',
     financesNav: isHebrew ? 'פיננסים' : 'Finances',
-    usersAdminNav: isHebrew ? 'ניהול משתמשים' : 'Users Admin'
+    usersAdminNav: isHebrew ? 'ניהול משתמשים' : 'Users Admin',
+    hotQuoteAlert: (name) => isHebrew ? `הצעה חמה! הלקוח "${name}" צפה בהצעה מספר פעמים ללא חתימה.` : `Hot Quote! Client "${name}" viewed the quote multiple times without signing.`
   };
 
   async function loadData(userId, userEmail) {
@@ -1831,7 +1832,7 @@ export default function Dashboard() {
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
                     </span>
                     <span>
-                      Hot Quote! Client <span style={{ color: '#4f46e5', fontWeight: '900' }}>"{currentHotClientName}"</span> viewed the quote multiple times without signing.
+                      {t.hotQuoteAlert(currentHotClientName)}
                     </span>
                   </div>
                 </div>
