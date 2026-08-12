@@ -744,6 +744,18 @@ export default function Dashboard() {
     else fetchExpenses(session.user.id);
   }
 
+  async function handleDeleteQuote(quoteId) {
+    if (!window.confirm('Delete this quote permanently?')) return;
+    await supabase.from('quote_items').delete().eq('quote_id', quoteId);
+    const { error } = await supabase.from('quotes').delete().eq('id', quoteId);
+    if (error) {
+      setStatusMsg({ text: 'Error deleting quote: ' + error.message, type: 'error' });
+    } else {
+      setStatusMsg({ text: 'Quote deleted successfully!', type: 'success' });
+      if (session?.user?.id) fetchQuotes(session.user.id);
+    }
+  }
+
   const exportToCSV = (dataArray, filename) => {
     if (!dataArray || dataArray.length === 0) {
       alert('No data to export.');
@@ -928,28 +940,6 @@ export default function Dashboard() {
     const { error } = await supabase.from('services').delete().eq('id', id);
     if (error) setStatusMsg({ text: 'Error deleting service: ' + error.message, type: 'error' });
     else fetchServices(session.user.id);
-  }
-
-  async function handleDeleteClient(clientId) {
-    if (!window.confirm('Delete this client?')) return;
-    const { error } = await supabase.from('clients').delete().eq('id', clientId);
-    if (error) setStatusMsg({ text: 'Error deleting client: ' + error.message, type: 'error' });
-    else {
-      setStatusMsg({ text: 'Client deleted successfully.', type: 'success' });
-      fetchClients(session.user.id);
-    }
-  }
-
-  async function handleDeleteQuote(quoteId) {
-    if (!window.confirm('Delete this quote permanently?')) return;
-    await supabase.from('quote_items').delete().eq('quote_id', quoteId);
-    const { error } = await supabase.from('quotes').delete().eq('id', quoteId);
-    if (error) {
-      setStatusMsg({ text: 'Error deleting quote: ' + error.message, type: 'error' });
-    } else {
-      setStatusMsg({ text: 'Quote deleted successfully!', type: 'success' });
-      fetchQuotes(session.user.id);
-    }
   }
 
   const sendWhatsApp = (proposal) => {
@@ -1380,7 +1370,7 @@ export default function Dashboard() {
       bVal = b.id;
     } else if (quoteSortField === 'client') {
       aVal = a.clients?.company_name || '';
-      bVal = b.clients?.company_name || '';
+      bVal = a.clients?.company_name || '';
     } else if (quoteSortField === 'total') {
       aVal = Number(a.total || 0);
       bVal = Number(b.total || 0);
@@ -2269,6 +2259,51 @@ export default function Dashboard() {
 
           {isSuperAdmin && activeTab === 'admin_clients' && (
             <div style={{ background: 'white', padding: '18px', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)', border: '1px solid #e2e8f0' }}>
+              
+              {/* סטטיסטיקת משתמשים בזמן אמת - ממורכזת */}
+              {(() => {
+                const totalU = allAccounts.length;
+                const localU = allAccounts.filter(a => (a.country || 'Local') === 'Local').length;
+                const intlU = allAccounts.filter(a => a.country === 'International').length;
+                
+                const activeRecent = allAccounts.filter(a => {
+                  if (!a.last_sign_in) return false;
+                  const diff = Date.now() - new Date(a.last_sign_in).getTime();
+                  return diff < 10 * 60 * 1000; // 10 דקות אחרונות
+                }).length;
+
+                const newUsersList = allAccounts.filter(a => {
+                  if (!a.created_at) return false;
+                  const diff = Date.now() - new Date(a.created_at).getTime();
+                  return diff < 7 * 24 * 60 * 60 * 1000;
+                });
+
+                return (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', marginBottom: '16px' }}>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#4f46e5', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>NEW USERS (7D)</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#4f46e5' }}>{newUsersList.length} ✨</div>
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#166534', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>ACTIVE (10M)</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#166534' }}>{activeRecent} <span style={{display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#166534'}}/></div>
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>LOCAL (LCL)</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{localU}</div>
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#991b1b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>INTERNATIONAL</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#991b1b' }}>{intlU}</div>
+                    </div>
+                    <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '4px' }}>TOTAL USERS</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>{totalU}</div>
+                    </div>
+                  </div>
+                );
+              })()}
+
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
                 <h2 style={{ fontSize: '1rem', color: '#1e293b', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eab308" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z"/></svg>
@@ -2290,7 +2325,7 @@ export default function Dashboard() {
               </div>
               
               <div style={{ overflowX: 'auto', background: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '800px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: isHebrew ? 'right' : 'left', minWidth: '700px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                       <th style={{ padding: '8px 6px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('email')}>
@@ -2315,9 +2350,6 @@ export default function Dashboard() {
                         Last Sign In {sortField === 'last_sign_in' ? (sortDirection === 'asc' ? '▲' : '▼') : ''}
                       </th>
                       <th style={{ padding: '8px 6px', textAlign: 'center' }}>
-                        Subscription Controls
-                      </th>
-                      <th style={{ padding: '8px 6px', textAlign: 'center' }}>
                         Details
                       </th>
                     </tr>
@@ -2325,7 +2357,7 @@ export default function Dashboard() {
                   <tbody>
                     {filteredAdminAccounts.length === 0 ? (
                       <tr>
-                        <td colSpan="9" style={{ textAlign: 'center', padding: '25px', color: '#94a3b8', fontSize: '0.8rem' }}>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '25px', color: '#94a3b8', fontSize: '0.8rem' }}>
                           No users found matching your search.
                         </td>
                       </tr>
@@ -2342,6 +2374,13 @@ export default function Dashboard() {
                         const rBg = currentCountry === 'Local' ? '#dcfce7' : '#fee2e2';
                         const rColor = currentCountry === 'Local' ? '#166534' : '#991b1b';
                         const rBorder = currentCountry === 'Local' ? '#bbf7d0' : '#fecaca';
+
+                        // 10 דקות אחרונות
+                        let isRecentActive = false;
+                        if (acc.last_sign_in) {
+                          const diffMs = Date.now() - new Date(acc.last_sign_in).getTime();
+                          isRecentActive = diffMs < 10 * 60 * 1000;
+                        }
 
                         return (
                           <tr key={acc.id} style={{ borderBottom: '1px solid #f1f5f9', fontSize: '0.8rem' }}>
@@ -2444,26 +2483,11 @@ export default function Dashboard() {
                                 </span>
                               </div>
                             </td>
-                            <td style={{ padding: '10px 6px', fontSize: '0.75rem', color: '#475569', direction: 'ltr', textAlign: 'left' }}>
-                              {acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}
-                            </td>
-                            <td style={{ padding: '10px 6px', textAlign: 'center' }}>
-                              <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
-                                <button
-                                  onClick={() => setAdminActionModal({ isOpen: true, type: 'freeze', account: acc })}
-                                  style={{ background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a', padding: '6px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
-                                  title="Freeze / Lock Subscription"
-                                >
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                                </button>
-                                <button
-                                  onClick={() => setAdminActionModal({ isOpen: true, type: 'delete_data', account: acc })}
-                                  style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', padding: '6px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
-                                  title="Delete Account & Data"
-                                >
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                                </button>
-                              </div>
+                            <td style={{ padding: '10px 6px', fontSize: '0.75rem', color: '#475569', direction: 'ltr', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span title={isRecentActive ? 'Active recently' : 'Inactive'} style={{ fontSize: '0.6rem' }}>
+                                <span style={{display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: isRecentActive ? '#22c55e' : '#ef4444'}}></span>
+                              </span>
+                              <span>{acc.last_sign_in ? new Date(acc.last_sign_in).toLocaleString('en-GB') : 'N/A'}</span>
                             </td>
                             <td style={{ padding: '10px 6px', textAlign: 'center' }}>
                               <button
@@ -2503,7 +2527,7 @@ export default function Dashboard() {
         </button>
         <button onClick={() => { setActiveTab('settings'); setIsCreatingQuote(false); setEditingQuoteId(null); }} style={{ background: 'none', border: 'none', color: activeTab === 'settings' ? '#38bdf8' : '#94a3b8', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
           <span style={{ fontSize: '1.2rem', marginBottom: '1px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '2px' }}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2_2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0-1.51 1z"/></svg>
           </span>
           {t.settingsNav}
         </button>
