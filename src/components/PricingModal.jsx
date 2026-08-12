@@ -5,10 +5,10 @@ export default function PricingModal({ isOpen, onClose, isHebrew, isLocalIsraeli
 
   if (!isOpen) return null;
 
-  const basicMonthly = isLocalIsraeliBusiness ? '₪49' : '$39';
-  const basicYearly = isLocalIsraeliBusiness ? '₪39' : '$29';
-  const proMonthly = isLocalIsraeliBusiness ? '₪99' : '$89';
-  const proYearly = isLocalIsraeliBusiness ? '₪79' : '$69';
+  const basicMonthly = isLocalIsraeliBusiness ? '₪119' : '$29';
+  const basicYearly = isLocalIsraeliBusiness ? '₪99' : '$23';
+  const proMonthly = isLocalIsraeliBusiness ? '₪199' : '$49';
+  const proYearly = isLocalIsraeliBusiness ? '₪159' : '$39';
 
   return (
     <div className="no-print" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '20px' }} dir={isHebrew ? 'rtl' : 'ltr'}>
